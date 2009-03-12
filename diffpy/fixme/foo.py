@@ -1,4 +1,4 @@
-########################################################################
+##############################################################################
 #
 # diffpy.fixme      by DANSE Diffraction group
 #                   Simon J. L. Billinge
@@ -10,7 +10,7 @@
 # See AUTHORS.txt for a list of people who contributed.
 # See LICENSE.txt for license information.
 #
-########################################################################
+##############################################################################
 
 
 """Template module file.  Defines example class Foo and routine func.
