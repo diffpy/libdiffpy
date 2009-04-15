@@ -25,7 +25,7 @@ dist = setup(
             # insert list of DiffPy and DANSE dependencies here
         ],
         dependency_links = [
-            # For public release, remove dev.danse.us.
+            # REMOVE dev.danse.us for a public release.
             'http://dev.danse.us/packages/',
             'http://www.diffpy.org/packages/',
         ],
