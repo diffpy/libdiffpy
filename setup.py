@@ -32,10 +32,20 @@ dist = setup(
 
         author = 'Simon J.L. Billinge',
         author_email = 'sb2896@columbia.edu',
-        description = 'FIXME - what this package does.',
-        license = 'BSD',
+        maintainer = 'FIXME'
+        maintainer_email = 'FIXME@columbia.edu',
         url = 'http://www.diffpy.org/',
+        download_url = 'http://www.diffpy.org/packages/',
+        description = 'FIXME - what this package does.',
+        license = open('LICENSE.txt').read(),
         keywords = 'FIXME',
+        classifiers = [
+            # List of possible values at
+            # http://pypi.python.org/pypi?:action=list_classifiers
+            'Intended Audience :: Science/Research',
+            'Programming Language :: Python :: 2.5',
+            'Topic :: Scientific/Engineering :: Physics',
+        ],
 )
 
 # End of file
