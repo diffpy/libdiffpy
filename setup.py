@@ -37,7 +37,7 @@ dist = setup(
         url = 'http://www.diffpy.org/',
         download_url = 'http://www.diffpy.org/packages/',
         description = 'FIXME - what this package does.',
-        license = open('LICENSE.txt').read(),
+        license = 'BSD',
         keywords = 'FIXME',
         classifiers = [
             # List of possible values at
