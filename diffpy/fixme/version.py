@@ -13,7 +13,7 @@
 ##############################################################################
 
 
-"""Definition of __version__ and __date__ for diffpy.srreal.
+"""Definition of __version__ and __date__ for diffpy.fixme.
 """
 
 # module version
@@ -21,7 +21,7 @@ __id__ = "$Id$"
 
 # obtain version information
 from pkg_resources import get_distribution
-__version__ = get_distribution('diffpy.srreal').version
+__version__ = get_distribution('diffpy.fixme').version
 
 # we assume that tag_date was used and __version__ ends in YYYYMMDD
 __date__ = __version__[-8:-4] + '-' + \
