@@ -1,11 +1,11 @@
 ##############################################################################
 #
-# diffpy.FIXME      by DANSE Diffraction group
+# diffpy.lib        by DANSE Diffraction group
 #                   Simon J. L. Billinge
 #                   (c) 2008 Trustees of the Columbia University
 #                   in the City of New York.  All rights reserved.
 #
-# File coded by:    FIXME
+# File coded by:    Pavol Juhas
 #
 # See AUTHORS.txt for a list of people who contributed.
 # See LICENSE.txt for license information.
@@ -13,13 +13,19 @@
 ##############################################################################
 
 
-"""FIXME - description of the package here.
-You should also list classes and functions that get imported
-here to the top package namespace.
+"""Definition of __version__ and __date__ for diffpy.lib.
 """
 
-# package version
-from diffpy.fixme.version import __version__
+# module version
+__id__ = "$Id$"
+
+# obtain version information
+from pkg_resources import get_distribution
+__version__ = get_distribution('diffpy.lib').version
+
+# we assume that tag_date was used and __version__ ends in YYYYMMDD
+__date__ = __version__[-8:-4] + '-' + \
+           __version__[-4:-2] + '-' + __version__[-2:]
 
 
 # End of file

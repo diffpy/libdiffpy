@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-# Installation script for diffpy.fixme
+# Installation script for diffpy.lib
 
-"""diffpy.fixme - template for DiffPy library package
+"""diffpy.lib - template for DiffPy library package
 put description of the package here.
 
-Packages:   diffpy.fixme
-Scripts:    (none yet)
+Packages:   diffpy.lib
+Scripts:    diffpy-config
 """
 
 from setuptools import setup, find_packages
@@ -14,7 +14,7 @@ import fix_setuptools_chmod
 
 # define distribution
 dist = setup(
-        name = 'diffpy.fixme',
+        name = 'diffpy.lib',
         version = '0.1a1',
         namespace_packages = ['diffpy'],
         packages = find_packages(),
@@ -32,18 +32,18 @@ dist = setup(
 
         author = 'Simon J.L. Billinge',
         author_email = 'sb2896@columbia.edu',
-        maintainer = 'FIXME'
-        maintainer_email = 'FIXME@columbia.edu',
+        maintainer = 'Pavol Juhas',
+        maintainer_email = 'pj2192@columbia.edu',
         url = 'http://www.diffpy.org/',
         download_url = 'http://www.diffpy.org/packages/',
-        description = 'FIXME - what this package does.',
+        description = 'DiffPy C++ monolithic library.',
         license = 'BSD',
-        keywords = 'FIXME',
+        keywords = 'diffpy C++ library headers',
         classifiers = [
             # List of possible values at
             # http://pypi.python.org/pypi?:action=list_classifiers
             'Intended Audience :: Science/Research',
-            'Programming Language :: Python :: 2.5',
+            'Programming Language :: C++',
             'Topic :: Scientific/Engineering :: Physics',
         ],
 )

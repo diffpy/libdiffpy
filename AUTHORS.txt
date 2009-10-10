@@ -1,8 +1,2 @@
-FIXME - include authors sorted by contributions.
-
-Chris Farrow
 Pavol Juhas
-Peng Tian
-Simon J.L. Billinge
-Timur Dykhne
-Wenduo Zhou
+Chris Farrow
