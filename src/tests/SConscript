@@ -2,10 +2,9 @@ Import('env')
 
 # Environment for building unit test driver
 env_test = env.Clone(tools=['default', 'cxxtest'], CXXTEST_SUFFIX='.hpp')
-lib_dir = Dir('#/').abspath
-env_test.PrependUnique(LIBS='libsrreal', LIBPATH=lib_dir)
+lib_dir = Dir('../').abspath
+env_test.PrependUnique(LIBS='libdiffpy', LIBPATH=lib_dir)
 env_test.PrependENVPath('LD_LIBRARY_PATH', lib_dir)
-env_test.AppendUnique(LIBS='libboost_python')
 
 # Targets --------------------------------------------------------------------
 

@@ -1,0 +1,26 @@
+# TODO: create version.tpl and run this file from SConscript
+
+import os
+
+Import('env')
+
+from diffpy.lib import __version__ as diffpylib_version
+
+def build_VersionCode(target, source, env):
+    flds = {'version' : diffpylib_version}
+    versiontemplate = open(str(source[0])).read()
+    versioncode = versiontemplate % flds
+    open(str(target[0]), 'w').write(versioncode)
+    return None
+
+env.Append(BUILDERS={'BuildVersionCode' :
+        Builder(action=build_VersionCode, suffix='.hpp', src_suffix='.tpl')})
+
+# Targets --------------------------------------------------------------------
+
+ver = env.BuildVersionCode(['version.hpp'], ['version.tpl'])
+env.Depends(ver, env.Value(diffpylib_version))
+
+env['lib_includes'] += [ver]
+
+# vim: ft=python
