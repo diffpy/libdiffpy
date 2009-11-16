@@ -73,7 +73,12 @@ Alias('install-lib', Install(libdir, libdiffpy))
 
 # install-includes
 includedir = env.get('includedir', os.path.join(env['prefix'], 'include'))
-get_target_path = lambda f : os.path.join(includedir, f.path)
+srcdir = Dir('.').path
+def get_target_path(f):
+    cutleft = len(srcdir) + 1
+    frelsrc = f.path[cutleft:]
+    rv = os.path.join(includedir, frelsrc)
+    return rv
 include_targets = map(get_target_path, env['lib_includes'])
 
 Alias('install-include', InstallAs(include_targets, env['lib_includes']))
