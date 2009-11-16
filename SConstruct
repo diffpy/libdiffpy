@@ -36,10 +36,12 @@ vars.Add(PathVariable('prefix',
 vars.Update(env)
 vars.Add(PathVariable('libdir',
     'object code library directory [prefix/lib]',
-    env['prefix'] + '/lib'))
+    env['prefix'] + '/lib',
+    PathVariable.PathIsDirCreate))
 vars.Add(PathVariable('includedir',
     'installation directory for C++ header files [prefix/include]',
-    env['prefix'] + '/include'))
+    env['prefix'] + '/include',
+    PathVariable.PathIsDirCreate))
 vars.Update(env)
 env.Help(vars.GenerateHelpText(env))
 
