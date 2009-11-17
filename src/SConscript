@@ -19,7 +19,8 @@ env.ParseConfig("pyobjcryst-config --cflags --ldflags")
 env.ParseConfig("gsl-config --cflags --libs")
 env.AppendUnique(LIBS='boost_python')
 # configure version specific options.
-SConscript('SConscript.configure')
+if not (GetOption('clean') or env.GetOption('help')):
+    SConscript('SConscript.configure')
 
 # Compiler specific options
 if icpc:
