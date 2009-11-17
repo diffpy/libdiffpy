@@ -25,7 +25,7 @@
 
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
 #include <diffpy/PythonInterface.hpp>
-#include "globals.hpp"
+#include "tests_dir.hpp"
 
 using namespace std;
 using namespace boost;
@@ -45,10 +45,9 @@ python::object newDiffPyStructure()
 
 python::object loadTestStructure(const string& tailname)
 {
-    using boost::filesystem::path;
-    path fp = path(testdata_dir()) /= tailname;
     python::object stru = newDiffPyStructure();
-    stru.attr("read")(fp.string());
+    string fp = prepend_testdata_dir(tailname);
+    stru.attr("read")(fp);
     return stru;
 }
 
