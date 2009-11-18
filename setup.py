@@ -11,6 +11,7 @@ Scripts:    diffpy-config
 
 from setuptools import setup, find_packages
 import fix_setuptools_chmod
+from setup_scons import scons_bdist_egg
 
 # define distribution
 dist = setup(
@@ -18,6 +19,12 @@ dist = setup(
         version = '0.1a1',
         namespace_packages = ['diffpy'],
         packages = find_packages(),
+        data_files = [
+            #('', ['build/fast/diffpy.pc']),
+        ],
+        cmdclass = {
+            'bdist_egg' : scons_bdist_egg,
+        },
         entry_points = {
             # define console_scripts here, see setuptools docs for details.
         },
