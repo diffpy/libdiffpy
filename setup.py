@@ -11,7 +11,7 @@ Scripts:    diffpy-config
 
 from setuptools import setup, find_packages
 import fix_setuptools_chmod
-from setup_scons import scons_bdist_egg
+from setup_scons import scons_easy_install, scons_bdist_egg
 
 # define distribution
 dist = setup(
@@ -24,6 +24,7 @@ dist = setup(
         ],
         cmdclass = {
             'bdist_egg' : scons_bdist_egg,
+            'easy_install' : scons_easy_install,
         },
         entry_points = {
             # define console_scripts here, see setuptools docs for details.
