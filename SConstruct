@@ -7,6 +7,10 @@
 
 import os
 
+# Version string must be in the form "MAJOR.MINOR",
+# src/diffpy/SConscript.version adds "-rSVNREV".
+DIFFPY_VERSION_STR = "1.0"
+
 # copy system environment variables related to compilation
 DefaultEnvironment(ENV={
         'PATH' : os.environ['PATH'],
@@ -48,7 +52,8 @@ env.Help(vars.GenerateHelpText(env))
 builddir = env.Dir('build/' + env['build'])
 
 Export('env')
+Export('DIFFPY_VERSION_STR')
 
-env.SConscript('src/SConscript', variant_dir=builddir, duplicate=0)
+env.SConscript('src/SConscript', variant_dir=builddir)
 
 # vim: ft=python

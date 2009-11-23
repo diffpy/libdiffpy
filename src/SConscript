@@ -5,7 +5,7 @@ Import('env')
 # Build environment configuration --------------------------------------------
 
 # The directory of this SConscript should be searched first for any headers.
-env.PrependUnique(CPPPATH='#/src')
+env.PrependUnique(CPPPATH=Dir('.'))
 
 # Use Intel C++ compiler when it is available
 icpc = env.WhereIs('icpc')
