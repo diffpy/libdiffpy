@@ -18,7 +18,9 @@
 *
 *****************************************************************************/
 
-#include <signal.h>
+#include <Python.h>
+#include <csignal>
+
 #include <diffpy/PythonInterface.hpp>
 
 using std::string;

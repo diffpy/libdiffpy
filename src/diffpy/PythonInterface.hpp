@@ -21,7 +21,6 @@
 #ifndef PYTHONINTERFACE_HPP_INCLUDED
 #define PYTHONINTERFACE_HPP_INCLUDED
 
-#include <Python.h>
 #include <string>
 
 namespace diffpy {
