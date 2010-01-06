@@ -20,9 +20,23 @@ def CheckBoostVersion(context, version):
 # Start configuration
 conf = Configure(env, custom_tests={'CheckBoostVersion' : CheckBoostVersion})
 
+boostlibtags = ['-mt', '']
+def configure_boost_library(libname):
+    for t in boostlibtags:
+        libnamefull = libname + t
+        if conf.CheckLib(libnamefull, language='C++'):
+            boostlibtags[:] = [t]
+            return
+    # library not found here
+    print('This program requires %r library' % libname)
+    env.Exit(1)
+
+# boost_python
+configure_boost_library('boost_python')
+
 # Boost 1.35 needs linking with boost_system
 if conf.CheckBoostVersion('1.35'):
-    env.AppendUnique(LIBS='boost_system')
+    configure_boost_library('boost_system')
 
 env = conf.Finish()
 
