@@ -1,5 +1,13 @@
 import os
 
+# Do nothing if version.hpp already exists in the source tree.
+
+version_hpp = str(File('version.hpp').srcnode())
+if os.path.isfile(version_hpp):
+    Return()
+
+# Otherwise build version.hpp from the svn data.
+
 Import('env')
 Import('DIFFPY_VERSION_STR')
 
