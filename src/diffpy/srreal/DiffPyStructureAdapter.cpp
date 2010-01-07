@@ -25,7 +25,9 @@
 #include <boost/python.hpp>
 #include <boost/python/stl_iterator.hpp>
 
+#include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
+#include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
@@ -323,5 +325,23 @@ double DiffPyStructureBondGenerator::msdSiteDir(
     return rv;
 }
 
+// Factory Function and its Registration -------------------------------------
+
+StructureAdapter* createDiffPyStructureAdapter(const python::object& stru)
+{
+    using diffpy::importFromPyModule;
+    python::object cls_Structure;
+    cls_Structure = importFromPyModule("diffpy.Structure", "Structure");
+    StructureAdapter* rv = NULL;
+    if (cls_Structure.ptr() &&
+        PyObject_IsInstance(stru.ptr(), cls_Structure.ptr()))
+    {
+        rv = new DiffPyStructureAdapter(stru);
+    }
+    return rv;
+}
+
+bool reg_DiffPyStructureAdapterFactory =
+registerPythonStructureAdapterFactory(createDiffPyStructureAdapter);
 
 // End of file

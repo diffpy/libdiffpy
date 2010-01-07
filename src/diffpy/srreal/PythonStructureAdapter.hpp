@@ -24,9 +24,6 @@
 
 #include <boost/python.hpp>
 
-#include <diffpy/srreal/DiffPyStructureAdapter.hpp>
-#include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
-
 namespace diffpy {
 namespace srreal {
 
@@ -34,6 +31,14 @@ class StructureAdapter;
 
 /// Factory for constructing appropriate StructureAdapter for a Python object.
 StructureAdapter* createPQAdapter(const boost::python::object& stru);
+
+/// PythonStructureAdapterFactory type is a function that can
+/// create StructureAdapter from boost::python object
+typedef StructureAdapter*
+    (*PythonStructureAdapterFactory)(const boost::python::object&);
+
+/// This function registers a concrete structure adapter factory
+bool registerPythonStructureAdapterFactory(PythonStructureAdapterFactory);
 
 }   // namespace srreal
 }   // namespace diffpy

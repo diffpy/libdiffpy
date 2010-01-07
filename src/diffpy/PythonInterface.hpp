@@ -23,12 +23,18 @@
 
 #include <string>
 
+#include <boost/python.hpp>
+
 namespace diffpy {
 
 // routines
 
 void initializePython(int py_argc=0, char* py_argv[]=NULL);
 std::string getPythonErrorString();
+
+/// Obtain object from specified Python module or None when not available
+boost::python::object
+    importFromPyModule(const std::string& modname, const std::string& item);
 
 }   // namespace diffpy
 

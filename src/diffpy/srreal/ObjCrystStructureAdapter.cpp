@@ -33,6 +33,8 @@
 #include <ObjCryst/Crystal.h>
 #include <ObjCryst/ScatteringPower.h>
 
+#include <diffpy/PythonInterface.hpp>
+#include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/Lattice.hpp>
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
@@ -379,6 +381,26 @@ msdSiteDir(int siteidx, const R3::Vector& s) const
     return rv;
 }
 
+// Factory Function and its Registration -------------------------------------
 
+StructureAdapter*
+createPyObjCrystStructureAdapter(const boost::python::object& stru)
+{
+    using diffpy::importFromPyModule;
+    boost::python::object cls_Crystal;
+    cls_Crystal = importFromPyModule("pyobjcryst.crystal", "Crystal");
+    StructureAdapter* rv = NULL;
+    if (cls_Crystal.ptr() &&
+        PyObject_IsInstance(stru.ptr(), cls_Crystal.ptr()));
+    {
+        const ObjCryst::Crystal* pcryst =
+            boost::python::extract<ObjCryst::Crystal*>(stru);
+        rv = createPQAdapter(*pcryst);
+    }
+    return rv;
+}
+
+bool reg_PyObjCrystStructureAdapter =
+registerPythonStructureAdapterFactory(createPyObjCrystStructureAdapter);
 
 // End of file

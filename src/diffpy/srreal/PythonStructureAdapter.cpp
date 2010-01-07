@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <string>
-#include <map>
+#include <set>
 
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 
@@ -36,59 +36,12 @@ namespace srreal {
 
 namespace {
 
-/// Obtain object from specified Python module or None when not available
+typedef set<PythonStructureAdapterFactory> PSAFactorySet;
 
-python::object importFromPyModule(const string& modname, const string& item)
+PSAFactorySet& getPSAFactorySet()
 {
-    static map<string, python::object> cacheditems;
-    string fullname = modname + "." + item;
-    // perform import when not in the cache
-    if (!cacheditems.count(fullname))
-    {
-        try {
-            cacheditems[fullname] =
-                python::import(modname.c_str()).attr(item.c_str());
-        }
-        // Ignore import errors when item could not be recovered.
-        catch (python::error_already_set e) {
-            PyErr_Clear();
-            cacheditems[fullname] = python::object();
-        }
-    }
-    return cacheditems[fullname];
-}
-
-
-// diffpy.Structure.Structure and derived classes
-
-StructureAdapter* createDiffPyStructureAdapter(const python::object& stru)
-{
-    python::object cls_Structure;
-    cls_Structure = importFromPyModule("diffpy.Structure", "Structure");
-    StructureAdapter* rv = NULL;
-    if (cls_Structure.ptr() &&
-        PyObject_IsInstance(stru.ptr(), cls_Structure.ptr()))
-    {
-        rv = new DiffPyStructureAdapter(stru);
-    }
-    return rv;
-}
-
-// pyobjcryst.crystal.Crystal and derived classes
-
-StructureAdapter* createPyObjCrystStructureAdapter(const python::object& stru)
-{
-    python::object cls_Crystal;
-    cls_Crystal = importFromPyModule("pyobjcryst.crystal", "Crystal");
-    StructureAdapter* rv = NULL;
-    if (cls_Crystal.ptr() &&
-        PyObject_IsInstance(stru.ptr(), cls_Crystal.ptr()));
-    {
-        const ObjCryst::Crystal* pcryst =
-            python::extract<ObjCryst::Crystal*>(stru);
-        rv = createPQAdapter(*pcryst);
-    }
-    return rv;
+    static PSAFactorySet factories;
+    return factories;
 }
 
 }   // namespace
@@ -97,16 +50,16 @@ StructureAdapter* createPyObjCrystStructureAdapter(const python::object& stru)
 
 StructureAdapter* createPQAdapter(const boost::python::object& stru)
 {
-    // NOTE: This may be later replaced with a Boost Python converter.
     StructureAdapter* rv = NULL;
-    // Check if stru is a diffpy.Structure or derived object
-    rv = createDiffPyStructureAdapter(stru);
-    if (rv)  return rv;
-    // Check if stru is a pyobjcryst.Crystal or derived object
-    rv = createPyObjCrystStructureAdapter(stru);
-    if (rv)  return rv;
-    // add other python adapters here ...
-    //
+    // Loop over all registered factories.  They should return
+    // a new StructureAdapter instance or NULL on failure.
+    PSAFactorySet::iterator factory = getPSAFactorySet().begin();
+    PSAFactorySet::iterator last = getPSAFactorySet().end();
+    for (; factory != last; ++factory)
+    {
+        rv = (*factory)(stru);
+        if (rv)  return rv;
+    }
     // We get here only if nothing worked.
     python::object pytype = python::import("__builtin__").attr("type");
     python::object tp = python::str(pytype(stru));
@@ -116,6 +69,13 @@ StructureAdapter* createPQAdapter(const boost::python::object& stru)
     throw invalid_argument(emsg.str());
 }
 
+// Factory functions registration --------------------------------------------
+
+bool registerPythonStructureAdapterFactory(PythonStructureAdapterFactory fctr)
+{
+    getPSAFactorySet().insert(fctr);
+    return true;
+}
 
 }   // namespace srreal
 }   // namespace diffpy

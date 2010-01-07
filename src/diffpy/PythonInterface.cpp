@@ -18,12 +18,13 @@
 *
 *****************************************************************************/
 
-#include <Python.h>
-#include <csignal>
-
 #include <diffpy/PythonInterface.hpp>
 
+#include <csignal>
+#include <map>
+
 using std::string;
+using namespace boost;
 
 namespace diffpy {
 
@@ -58,6 +59,27 @@ string getPythonErrorString()
     Py_XDECREF(pemsg);
     PyErr_Restore(ptype, pvalue, ptraceback);
     return rv;
+}
+
+
+python::object importFromPyModule(const string& modname, const string& item)
+{
+    static std::map<string, python::object> cacheditems;
+    string fullname = modname + "." + item;
+    // perform import when not in the cache
+    if (!cacheditems.count(fullname))
+    {
+        try {
+            cacheditems[fullname] =
+                python::import(modname.c_str()).attr(item.c_str());
+        }
+        // Ignore import errors when item could not be recovered.
+        catch (python::error_already_set e) {
+            PyErr_Clear();
+            cacheditems[fullname] = python::object();
+        }
+    }
+    return cacheditems[fullname];
 }
 
 
