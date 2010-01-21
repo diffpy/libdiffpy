@@ -27,13 +27,13 @@
 #include <boost/shared_ptr.hpp>
 
 #include <diffpy/srreal/PQEvaluator.hpp>
+#include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/Attributes.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 class BaseBondGenerator;
-class StructureAdapter;
 
 typedef std::vector<double> QuantityType;
 
