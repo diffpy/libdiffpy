@@ -22,8 +22,6 @@
 #define BVPARAM_HPP_INCLUDED
 
 #include <string>
-#include <map>
-#include <set>
 
 namespace diffpy {
 namespace srreal {
