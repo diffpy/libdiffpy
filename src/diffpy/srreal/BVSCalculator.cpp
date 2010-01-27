@@ -71,10 +71,10 @@ const BVParametersTable& BVSCalculator::getBVParamTable() const
 }
 
 
-const BVPar& BVSCalculator::bvpar(int idx0, int idx1) const
+const BVParam& BVSCalculator::bvpar(int idx0, int idx1) const
 {
     // FIXME
-    static BVPar rv;
+    static BVParam rv;
     return rv;
 }
 

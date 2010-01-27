@@ -24,6 +24,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <diffpy/srreal/PairQuantity.hpp>
+#include <diffpy/srreal/BVParam.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -33,7 +34,6 @@ class BVParametersTable {
         BVParametersTable* copy() const { return new BVParametersTable; }
 };
 
-class BVPar { };
 
 class BVSCalculator : public PairQuantity
 {
@@ -52,7 +52,7 @@ class BVSCalculator : public PairQuantity
         void setBVParamTable(const BVParametersTable&);
         const BVParametersTable& getBVParamTable() const;
         // scattering factors lookup
-        const BVPar& bvpar(int idx0, int idx1) const;
+        const BVParam& bvpar(int idx0, int idx1) const;
 
     protected:
 
