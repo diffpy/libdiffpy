@@ -1,7 +1,7 @@
 Import('env')
 
 def srcsupported(f):
-    rv = env['has_objcryst'] or 'objcryst' not in str(f).lower()
+    rv = env.get('has_objcryst') or 'objcryst' not in str(f).lower()
     return rv
 
 env['lib_includes'] += filter(srcsupported, Glob('*.[hi]pp'))
