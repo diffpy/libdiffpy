@@ -24,16 +24,10 @@
 #include <boost/shared_ptr.hpp>
 
 #include <diffpy/srreal/PairQuantity.hpp>
-#include <diffpy/srreal/BVParam.hpp>
+#include <diffpy/srreal/BVParametersTable.hpp>
 
 namespace diffpy {
 namespace srreal {
-
-class BVParametersTable { 
-    public:
-        BVParametersTable* copy() const { return new BVParametersTable; }
-};
-
 
 class BVSCalculator : public PairQuantity
 {

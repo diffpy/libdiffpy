@@ -39,27 +39,61 @@ BVParam::BVParam()
     mB = 0.37;
 }
 
+BVParam::BVParam(const string& atom0, int valence0,
+                const string& atom1, int valence1,
+                double Ro, double B, string ref_id)
+{
+    matom0 = atom0;
+    mvalence0 = valence0;
+    matom1 = atom1;
+    mvalence1 = valence1;
+    if (mvalence0 < mvalence1)
+    {
+        swap(matom0, matom1);
+        swap(mvalence0, mvalence1);
+    }
+    mRo = Ro;
+    mB = mB;
+    mref_id = ref_id;
+}
+
 // Public Methods ------------------------------------------------------------
 
 void BVParam::setFromCifLine(const std::string& cifline)
 {
-    BVParam bv1;
+    BVParam bp1;
     istringstream linefp(cifline);
-    linefp >> bv1.matom0 >> bv1.mvalence0 >>
-        bv1.matom1 >> bv1.mvalence1 >> bv1.mRo >> bv1.mB >> bv1.mref_id;
+    linefp >> bp1.matom0 >> bp1.mvalence0 >>
+        bp1.matom1 >> bp1.mvalence1 >> bp1.mRo >> bp1.mB >> bp1.mref_id;
     if (!linefp)
     {
         const char* emsg = "Cannot parse cif line.";
         throw invalid_argument(emsg);
     }
-    *this = bv1;
+    *this = bp1;
 }
 
 
 double BVParam::atd(double distance)
 {
-    double rv = exp((mRo - distance) / mB);
+    double rv = (mRo > 0.0) ? exp((mRo - distance) / mB) : 0.0;
     return rv;
+}
+
+
+// class BVParam::CompareIons
+bool BVParam::CompareIons::operator()(
+        const BVParam& bp0, const BVParam& bp1) const
+{
+    if (bp0.matom0 < bp1.matom0)  return true;
+    if (bp0.matom0 > bp1.matom0)  return false;
+    if (bp0.mvalence0 < bp1.mvalence0)  return true;
+    if (bp0.mvalence0 > bp1.mvalence0)  return false;
+    if (bp0.matom1 < bp1.matom1)  return true;
+    if (bp0.matom1 > bp1.matom1)  return false;
+    if (bp0.mvalence1 < bp1.mvalence1)  return true;
+    if (bp0.mvalence1 > bp1.mvalence1)  return false;
+    return false;
 }
 
 }   // namespace srreal
