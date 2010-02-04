@@ -114,6 +114,24 @@ public:
         TS_ASSERT_DIFFERS(string("pj2"), bvtb->lookup(mymgo).mref_id);
     }
 
+
+    void test_getAll()
+    {
+        BVParametersTable::SetOfBVParam allpars0, allpars1;
+        allpars0 = bvtb->getAll();
+        TS_ASSERT(!allpars0.empty());
+        size_t cnt0 = allpars0.size();
+        BVParam mymgo("Mg", 2, "O", -2);
+        bvtb->setCustom(mymgo);
+        TS_ASSERT_EQUALS(cnt0, bvtb->getAll().size());
+        bvtb->setCustom(BVParam("Mg", 7, "O", -3));
+        allpars1 = bvtb->getAll();
+        size_t cnt1 = allpars1.size();
+        TS_ASSERT_EQUALS(cnt0 + 1, cnt1);
+        bvtb->resetAll();
+        TS_ASSERT_EQUALS(cnt0, bvtb->getAll().size());
+    }
+
 };  // class TestBVParametersTable
 
 // End of file

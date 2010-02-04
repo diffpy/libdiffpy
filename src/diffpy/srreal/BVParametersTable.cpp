@@ -106,6 +106,15 @@ void BVParametersTable::resetAll()
     mcustomtable.clear();
 }
 
+
+BVParametersTable::SetOfBVParam
+BVParametersTable::getAll() const
+{
+    SetOfBVParam rv = *mstandardtable;
+    rv.insert(mcustomtable.begin(), mcustomtable.end());
+    return rv;
+}
+
 // Private Methods -----------------------------------------------------------
 
 BVParametersTable::SetOfBVParam*

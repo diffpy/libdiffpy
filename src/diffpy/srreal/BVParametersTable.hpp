@@ -34,6 +34,9 @@ class BVParametersTable
 
     public:
 
+        // types
+        typedef std::set<BVParam,BVParam::CompareIons> SetOfBVParam;
+
         // constructors
         BVParametersTable();
         BVParametersTable* copy() const;
@@ -47,12 +50,12 @@ class BVParametersTable
         void resetCustom(const std::string& atom0, int valence0,
                 const std::string& atom1, int valence1);
         void resetAll();
+        SetOfBVParam getAll() const;
 
     private:
 
         // data
-        typedef std::set<BVParam,BVParam::CompareIons> SetOfBVParam;
-        SetOfBVParam* mstandardtable;
+        const SetOfBVParam* mstandardtable;
         SetOfBVParam mcustomtable;
 
         // methods
