@@ -37,10 +37,12 @@ class BVParam
                 double Ro=0.0, double B=0.37, std::string ref_id="");
 
         // methods
+        /// Return bond valence at a specified distance
+        double bondvalence(double distance) const;
+        /// Return distance corresponding  to a specified bond valence
+        double bonddistance(double bvalence) const;
         /// obtain data from a cif record in bvparm.cif
         void setFromCifLine(const std::string&);
-        /// Return bond valence at a specified distance
-        double atd(double distance);
 
         // data
         std::string matom0;

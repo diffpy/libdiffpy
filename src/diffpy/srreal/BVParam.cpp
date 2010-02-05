@@ -59,6 +59,20 @@ BVParam::BVParam(const string& atom0, int valence0,
 
 // Public Methods ------------------------------------------------------------
 
+double BVParam::bondvalence(double distance) const
+{
+    double rv = (mRo > 0.0) ? exp((mRo - distance) / mB) : 0.0;
+    return rv;
+}
+
+
+double BVParam::bonddistance(double bvalence) const
+{
+    double rv = mRo - mB * log(bvalence);
+    return rv;
+}
+
+
 void BVParam::setFromCifLine(const std::string& cifline)
 {
     BVParam bp1;
@@ -71,13 +85,6 @@ void BVParam::setFromCifLine(const std::string& cifline)
         throw invalid_argument(emsg);
     }
     *this = bp1;
-}
-
-
-double BVParam::atd(double distance)
-{
-    double rv = (mRo > 0.0) ? exp((mRo - distance) / mB) : 0.0;
-    return rv;
 }
 
 
