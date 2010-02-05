@@ -37,16 +37,22 @@ class BVSCalculator : public PairQuantity
         BVSCalculator();
 
         // results
+        /// difference between expected and calculated valence per each site
+        QuantityType bvdiff() const;
         /// mean square difference of BVS from the expected values
-        double bvmsd() const;
+        double bvmsdiff() const;
         /// root mean square difference of BVS from the expected values
-        double bvrmsd() const;
+        double bvrmsdiff() const;
 
         // access and configuration of BVS parameters
         void setBVParamTable(const BVParametersTable&);
         const BVParametersTable& getBVParamTable() const;
         // scattering factors lookup
         const BVParam& bvpar(int idx0, int idx1) const;
+
+        // R-range configuration using the valence precision
+        void setValencePrecision(double);
+        double getValencePrecision() const;
 
     protected:
 
