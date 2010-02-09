@@ -824,7 +824,7 @@ loop_
     "Ho 9   P  -3    2.56     0.37     b   ?",
     "Ho 9   As -3    2.64     0.37     b   ?",
     "Ho 9   H  -1    1.88     0.37     b   ?",
-    "I  0   I   0    2.195    0.35     e   unchecked",
+    // I  0   I   0    2.195    0.35     e   unchecked,
     "I  1   F  -1    2.32     0.37     e   unchecked",
     "I  1   Cl -1    2.47     0.37     e   unchecked",
     "I  3   O  -2    2.02     0.37     e   unchecked",
