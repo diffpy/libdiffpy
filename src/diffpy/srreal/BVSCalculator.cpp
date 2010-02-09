@@ -46,10 +46,32 @@ BVSCalculator::BVSCalculator()
 
 // results
 
+QuantityType BVSCalculator::bvdiff() const
+{
+    assert(mstructure_cache.valences.size() == this->value().size());
+    int cntsites = this->value().size();
+    QuantityType rv(cntsites);
+    for (int i = 0; i < cntsites; ++i)
+    {
+        rv[i] = mstructure_cache.valences[i] - this->value()[i];
+    }
+    return rv;
+}
+
+
 double BVSCalculator::bvmsdiff() const
 {
-    // FIXME
-    return 0.0;
+    QuantityType bd = this->bvdiff();
+    assert(bd.size() == mstructure_cache.multiplicities.size());
+    int cntsites = bd.size();
+    double sumofsquares = 0.0;
+    for (int i = 0; i < cntsites; ++i)
+    {
+        sumofsquares += mstructure_cache.multiplicities[i] * pow(bd[i], 2);
+    }
+    double rv = (mstructure_cache.total_occupancy > 0.0) ?
+        (sumofsquares / mstructure_cache.total_occupancy) : 0.0;
+    return rv;
 }
 
 
@@ -71,14 +93,6 @@ const BVParametersTable& BVSCalculator::getBVParamTable() const
 {
     assert(mbvptable.get());
     return *mbvptable;
-}
-
-
-const BVParam& BVSCalculator::bvpar(int idx0, int idx1) const
-{
-    // FIXME
-    static BVParam rv;
-    return rv;
 }
 
 
@@ -109,8 +123,15 @@ double BVSCalculator::getValencePrecision() const
 
 // Protected Methods ---------------------------------------------------------
 
+// PairQuantity overloads
+
 void BVSCalculator::resetValue()
-{ }
+{
+    // calcPoints requires that structure and rlimits data are cached.
+    this->cacheStructureData();
+    this->resizeValue(this->mstructure->countSites());
+    this->PairQuantity::resetValue();
+}
 
 
 void BVSCalculator::configureBondGenerator(BaseBondGenerator& bnds)
@@ -118,8 +139,42 @@ void BVSCalculator::configureBondGenerator(BaseBondGenerator& bnds)
 
 
 void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds)
-{ }
+{
+    int summationscale = (bnds.site0() == bnds.site1()) ? 1 : 2;
+    const string& a0 = mstructure_cache.baresymbols[bnds.site0()];
+    const string& a1 = mstructure_cache.baresymbols[bnds.site1()];
+    int v0 = mstructure_cache.valences[bnds.site0()];
+    int v1 = mstructure_cache.valences[bnds.site1()];
+    const BVParam& bp = mbvptable->lookup(a0, v0, a1, v1);
+    double valence = bp.bondvalence(bnds.distance());
+    int plusminus0 = (v0 >= 0) ? 1 : -1;
+    int plusminus1 = (v1 >= 0) ? 1 : -1;
+    mvalue[bnds.site0()] += summationscale * plusminus0 * valence;
+    mvalue[bnds.site1()] += summationscale * plusminus1 * valence;
+}
 
+// Private Methods -----------------------------------------------------------
+
+void BVSCalculator::cacheStructureData()
+{
+    int cntsites = mstructure->countSites();
+    mstructure_cache.baresymbols.resize(cntsites);
+    mstructure_cache.valences.resize(cntsites);
+    mstructure_cache.multiplicities.resize(cntsites);
+    for (int i = 0; i < cntsites; ++i)
+    {
+        const string& smbl = mstructure->siteAtomType(i);
+        mstructure_cache.baresymbols[i] = atomBareSymbol(smbl);
+        mstructure_cache.valences[i] = atomValence(smbl);
+        mstructure_cache.multiplicities[i] = mstructure->siteMultiplicity(i);
+        if (mstructure->siteOccupancy(i) != 1.0)
+        {
+            const char* emsg = "Non unit occupancy is not supported.";
+            throw invalid_argument(emsg);
+        }
+    }
+    mstructure_cache.total_occupancy = mstructure->totalOccupancy();
+}
 
 }   // namespace srreal
 }   // namespace diffpy

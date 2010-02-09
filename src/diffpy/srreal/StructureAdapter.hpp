@@ -81,6 +81,14 @@ class StructureAdapter
         virtual void customPQConfig(PairQuantity& pq) const  { }
 };
 
+// Routines ------------------------------------------------------------------
+
+/// Return bare element symbol from atom symbol that may be isotope or ion,
+/// for example "Ca2+" or "12-C".
+std::string atomBareSymbol(const std::string& atomtype);
+
+/// Return valence of possibly ionic symbol such as "S2-" or "Cl-".
+int atomValence(const std::string& atomtype);
 
 }   // namespace srreal
 }   // namespace diffpy

@@ -47,8 +47,6 @@ class BVSCalculator : public PairQuantity
         // access and configuration of BVS parameters
         void setBVParamTable(const BVParametersTable&);
         const BVParametersTable& getBVParamTable() const;
-        // scattering factors lookup
-        const BVParam& bvpar(int idx0, int idx1) const;
 
         // R-range configuration using the valence precision
         void setValencePrecision(double);
@@ -63,9 +61,19 @@ class BVSCalculator : public PairQuantity
 
     private:
 
+        // methods
+        void cacheStructureData();
+
         // data
         // configuration
         boost::shared_ptr<BVParametersTable> mbvptable;
+        // cache
+        struct {
+            std::vector<std::string> baresymbols;
+            std::vector<int> valences;
+            QuantityType multiplicities;
+            double total_occupancy;
+        } mstructure_cache;
 
 };  // class BVSCalculator
 
