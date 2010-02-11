@@ -20,7 +20,6 @@
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>
-#include <boost/filesystem/path.hpp>
 #include <boost/python.hpp>
 
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
