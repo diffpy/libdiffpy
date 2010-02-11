@@ -65,7 +65,7 @@ string getPythonErrorString()
 python::object importFromPyModule(const string& modname, const string& item)
 {
     static std::map<string, python::object> cacheditems;
-    string fullname = modname + "." + item;
+    string fullname = modname + ":" + item;
     // perform import when not in the cache
     if (!cacheditems.count(fullname))
     {
