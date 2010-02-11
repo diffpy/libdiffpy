@@ -66,7 +66,7 @@ double BVParam::bondvalence(double distance) const
 }
 
 
-double BVParam::bonddistance(double bvalence) const
+double BVParam::bondvalenceToDistance(double bvalence) const
 {
     double rv = mRo - mB * log(bvalence);
     return rv;

@@ -40,7 +40,7 @@ class BVParam
         /// Return bond valence at a specified distance
         double bondvalence(double distance) const;
         /// Return distance corresponding  to a specified bond valence
-        double bonddistance(double bvalence) const;
+        double bondvalenceToDistance(double bvalence) const;
         /// obtain data from a cif record in bvparm.cif
         void setFromCifLine(const std::string&);
 

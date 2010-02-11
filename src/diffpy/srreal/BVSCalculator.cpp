@@ -103,7 +103,7 @@ void BVSCalculator::setValencePrecision(double eps)
     BVParametersTable::SetOfBVParam::const_iterator bpit;
     for (bpit = allbp.begin(); bpit != allbp.end(); ++bpit)
     {
-        dmx = max(dmx, bpit->bonddistance(eps));
+        dmx = max(dmx, bpit->bondvalenceToDistance(eps));
     }
     this->setRmax(dmx);
 }
