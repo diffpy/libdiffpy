@@ -536,7 +536,7 @@ void PDFCalculator::configureBondGenerator(BaseBondGenerator& bnds)
 }
 
 
-void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds)
+void PDFCalculator::addPairContribution(BaseBondGenerator& bnds)
 {
     int summationscale = (bnds.site0() == bnds.site1()) ? 1 : 2;
     double sfprod = this->sfSite(bnds.site0()) * this->sfSite(bnds.site1());

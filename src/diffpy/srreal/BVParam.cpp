@@ -61,7 +61,7 @@ BVParam::BVParam(const string& atom0, int valence0,
 
 double BVParam::bondvalence(double distance) const
 {
-    double rv = (mRo > 0.0) ? exp((mRo - distance) / mB) : 0.0;
+    double rv = (mB > 0.0) ? exp((mRo - distance) / mB) : 0.0;
     return rv;
 }
 

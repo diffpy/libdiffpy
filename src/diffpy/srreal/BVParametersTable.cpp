@@ -48,6 +48,13 @@ BVParametersTable* BVParametersTable::copy() const
 
 // Public Methods ------------------------------------------------------------
 
+const BVParam& BVParametersTable::none() const
+{
+    static const BVParam bpnone;
+    return bpnone;
+}
+
+
 const BVParam& BVParametersTable::lookup(const BVParam& bpk) const
 {
     assert(mstandardtable);
@@ -65,8 +72,7 @@ const BVParam& BVParametersTable::lookup(const BVParam& bpk) const
     }
     if (!rv)
     {
-        static BVParam bpnone;
-        rv = &bpnone;
+        rv = &(this->none());
     }
     return *rv;
 }

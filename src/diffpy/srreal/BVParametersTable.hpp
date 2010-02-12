@@ -42,6 +42,7 @@ class BVParametersTable
         BVParametersTable* copy() const;
 
         // methods
+        const BVParam& none() const;
         const BVParam& lookup(const BVParam&) const;
         const BVParam& lookup(const std::string& atom0, int valence0,
                 const std::string& atom1, int valence1) const;

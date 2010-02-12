@@ -136,7 +136,7 @@ void BVSCalculator::configureBondGenerator(BaseBondGenerator& bnds)
 }
 
 
-void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds)
+void BVSCalculator::addPairContribution(BaseBondGenerator& bnds)
 {
     int summationscale = (bnds.site0() == bnds.site1()) ? 1 : 2;
     const string& a0 = mstructure_cache.baresymbols[bnds.site0()];
@@ -145,9 +145,13 @@ void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds)
     int v1 = mstructure_cache.valences[bnds.site1()];
     const BVParametersTable& bvtb = this->getBVParamTable();
     const BVParam& bp = bvtb.lookup(a0, v0, a1, v1);
-    double valencehalf = bp.bondvalence(bnds.distance()) / 2.0;
-    if (valencehalf > 0) {
+    // skip to the next site when there are no bond parameters for this pair
+    if (&bp == &bvtb.none())
+    {
+        bnds.nextsite();
+        return;
     }
+    double valencehalf = bp.bondvalence(bnds.distance()) / 2.0;
     int plusminus0 = (v0 >= 0) ? 1 : -1;
     int plusminus1 = (v1 >= 0) ? 1 : -1;
     mvalue[bnds.site0()] += summationscale * plusminus0 * valencehalf;
