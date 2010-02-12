@@ -12,8 +12,7 @@
 *
 ******************************************************************************
 *
-* class TestBVSCalculator -- unit tests for an adapter
-*     to Structure class from diffpy.Structure
+* class TestBVSCalculator -- unit tests suite
 *
 * $Id$
 *
