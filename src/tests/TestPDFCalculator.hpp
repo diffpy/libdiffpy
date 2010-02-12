@@ -107,6 +107,6 @@ public:
         TS_ASSERT_THROWS(mpdfc->addEnvelope("invalid"), logic_error);
     }
 
-};
+};  // class TestPDFCalculator
 
 // End of file

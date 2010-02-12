@@ -37,6 +37,8 @@ class BVSCalculator : public PairQuantity
         BVSCalculator();
 
         // results
+        /// expected valence per each site
+        QuantityType valences() const;
         /// difference between expected and calculated valence per each site
         QuantityType bvdiff() const;
         /// mean square difference of BVS from the expected values
@@ -49,7 +51,9 @@ class BVSCalculator : public PairQuantity
         const BVParametersTable& getBVParamTable() const;
 
         // R-range configuration using the valence precision
+        /// set cutoff value for bond valence contributions
         void setValencePrecision(double);
+        /// return cutoff value for bond valence contributions
         double getValencePrecision() const;
 
     protected:
@@ -63,10 +67,13 @@ class BVSCalculator : public PairQuantity
 
         // methods
         void cacheStructureData();
+        /// rmax necessary for achieving the specified valence precision
+        double rmaxFromPrecision(double) const;
 
         // data
         // configuration
         boost::shared_ptr<BVParametersTable> mbvptable;
+        double mvalenceprecision;
         // cache
         struct {
             std::vector<std::string> baresymbols;

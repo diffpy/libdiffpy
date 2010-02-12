@@ -46,15 +46,23 @@ BVSCalculator::BVSCalculator()
 
 // results
 
+QuantityType BVSCalculator::valences() const
+{
+    QuantityType rv(mstructure_cache.valences.size());
+    copy(mstructure_cache.valences.begin(), mstructure_cache.valences.end(),
+            rv.begin());
+    return rv;
+}
+
+
 QuantityType BVSCalculator::bvdiff() const
 {
-    assert(mstructure_cache.valences.size() == this->value().size());
-    int cntsites = this->value().size();
+    QuantityType vobs = this->valences();
+    assert(vobs.size() == this->value().size());
+    int cntsites = this->countSites();
     QuantityType rv(cntsites);
-    for (int i = 0; i < cntsites; ++i)
-    {
-        rv[i] = mstructure_cache.valences[i] - this->value()[i];
-    }
+    transform(vobs.begin(), vobs.end(), this->value().begin(),
+            rv.begin(), minus<double>());
     return rv;
 }
 
@@ -63,11 +71,11 @@ double BVSCalculator::bvmsdiff() const
 {
     QuantityType bd = this->bvdiff();
     assert(bd.size() == mstructure_cache.multiplicities.size());
-    int cntsites = bd.size();
+    int cntsites = this->countSites();
     double sumofsquares = 0.0;
     for (int i = 0; i < cntsites; ++i)
     {
-        sumofsquares += mstructure_cache.multiplicities[i] * pow(bd[i], 2);
+        sumofsquares += mstructure_cache.multiplicities[i] * bd[i] * bd[i];
     }
     double rv = (mstructure_cache.total_occupancy > 0.0) ?
         (sumofsquares / mstructure_cache.total_occupancy) : 0.0;
@@ -98,27 +106,13 @@ const BVParametersTable& BVSCalculator::getBVParamTable() const
 
 void BVSCalculator::setValencePrecision(double eps)
 {
-    BVParametersTable::SetOfBVParam allbp = this->getBVParamTable().getAll();
-    double dmx = 0.0;
-    BVParametersTable::SetOfBVParam::const_iterator bpit;
-    for (bpit = allbp.begin(); bpit != allbp.end(); ++bpit)
-    {
-        dmx = max(dmx, bpit->bondvalenceToDistance(eps));
-    }
-    this->setRmax(dmx);
+    mvalenceprecision = eps;
 }
 
 
 double BVSCalculator::getValencePrecision() const
 {
-    BVParametersTable::SetOfBVParam allbp = this->getBVParamTable().getAll();
-    double veps = 0.0;
-    BVParametersTable::SetOfBVParam::const_iterator bpit;
-    for (bpit = allbp.begin(); bpit != allbp.end(); ++bpit)
-    {
-        veps = max(veps, bpit->bondvalence(this->getRmax()));
-    }
-    return veps;
+    return mvalenceprecision;
 }
 
 // Protected Methods ---------------------------------------------------------
@@ -135,7 +129,11 @@ void BVSCalculator::resetValue()
 
 
 void BVSCalculator::configureBondGenerator(BaseBondGenerator& bnds)
-{ }
+{
+    double rmaxused = min(this->getRmax(),
+            this->rmaxFromPrecision(this->getValencePrecision()));
+    bnds.setRmax(rmaxused);
+}
 
 
 void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds)
@@ -145,19 +143,22 @@ void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds)
     const string& a1 = mstructure_cache.baresymbols[bnds.site1()];
     int v0 = mstructure_cache.valences[bnds.site0()];
     int v1 = mstructure_cache.valences[bnds.site1()];
-    const BVParam& bp = mbvptable->lookup(a0, v0, a1, v1);
-    double valence = bp.bondvalence(bnds.distance());
+    const BVParametersTable& bvtb = this->getBVParamTable();
+    const BVParam& bp = bvtb.lookup(a0, v0, a1, v1);
+    double valencehalf = bp.bondvalence(bnds.distance()) / 2.0;
+    if (valencehalf > 0) {
+    }
     int plusminus0 = (v0 >= 0) ? 1 : -1;
     int plusminus1 = (v1 >= 0) ? 1 : -1;
-    mvalue[bnds.site0()] += summationscale * plusminus0 * valence;
-    mvalue[bnds.site1()] += summationscale * plusminus1 * valence;
+    mvalue[bnds.site0()] += summationscale * plusminus0 * valencehalf;
+    mvalue[bnds.site1()] += summationscale * plusminus1 * valencehalf;
 }
 
 // Private Methods -----------------------------------------------------------
 
 void BVSCalculator::cacheStructureData()
 {
-    int cntsites = mstructure->countSites();
+    int cntsites = this->countSites();
     mstructure_cache.baresymbols.resize(cntsites);
     mstructure_cache.valences.resize(cntsites);
     mstructure_cache.multiplicities.resize(cntsites);
@@ -174,6 +175,32 @@ void BVSCalculator::cacheStructureData()
         }
     }
     mstructure_cache.total_occupancy = mstructure->totalOccupancy();
+}
+
+
+double BVSCalculator::rmaxFromPrecision(double eps) const
+{
+    const BVParametersTable& bptb = this->getBVParamTable();
+    BVParametersTable::SetOfBVParam bpused;
+    for (int i0 = 0; i0 < this->countSites(); ++i0)
+    {
+        for (int i1 = i0; i1 < this->countSites(); ++i1)
+        {
+            const string& a0 = mstructure_cache.baresymbols[i0];
+            const string& a1 = mstructure_cache.baresymbols[i1];
+            int v0 = mstructure_cache.valences[i0];
+            int v1 = mstructure_cache.valences[i1];
+            const BVParam& bp = bptb.lookup(a0, v0, a1, v1);
+            bpused.insert(bp);
+        }
+    }
+    double rv = 0.0;
+    BVParametersTable::SetOfBVParam::iterator bpit;
+    for (bpit = bpused.begin(); bpit != bpused.end(); ++bpit)
+    {
+        rv = max(rv, bpit->bondvalenceToDistance(eps));
+    }
+    return rv;
 }
 
 }   // namespace srreal

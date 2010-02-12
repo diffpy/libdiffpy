@@ -141,14 +141,14 @@ VR3BondGenerator::VR3BondGenerator(const VR3Adapter* adpt) :
 inline
 const R3::Vector& VR3BondGenerator::r0() const
 {
-    return mvr3structure->at(msite_anchor);
+    return mvr3structure->at(this->site0());
 }
 
 
 inline
 const R3::Vector& VR3BondGenerator::r1() const
 {
-    return mvr3structure->at(msite_current);
+    return mvr3structure->at(this->site1());
 }
 
 // Inline Routines -----------------------------------------------------------
