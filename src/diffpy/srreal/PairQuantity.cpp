@@ -35,6 +35,7 @@ PairQuantity::PairQuantity()
     this->setRmax(DOUBLE_MAX);
     this->resizeValue(1);
     this->setEvaluator(BASIC);
+    mcountsites = 0;
 }
 
 // Public Methods ------------------------------------------------------------
@@ -42,6 +43,7 @@ PairQuantity::PairQuantity()
 const QuantityType& PairQuantity::eval(const StructureAdapter& stru)
 {
     mstructure = &stru;
+    mcountsites = mstructure->countSites();
     mstructure->customPQConfig(*this);
     mevaluator->updateValue(*this);
     mstructure = NULL;
@@ -84,6 +86,12 @@ void PairQuantity::setEvaluator(PQEvaluatorType evtp)
     if (mevaluator.get() && mevaluator->typeint() == evtp)  return;
     mevaluator.reset(createPQEvaluator(evtp));
     this->resetValue();
+}
+
+
+int PairQuantity::countSites() const
+{
+    return mcountsites;
 }
 
 // Protected Methods ---------------------------------------------------------

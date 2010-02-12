@@ -56,6 +56,7 @@ class PairQuantity : public diffpy::Attributes
         virtual void setRmax(double);
         const double& getRmax() const;
         void setEvaluator(PQEvaluatorType evtp);
+        int countSites() const;
 
     protected:
 
@@ -74,6 +75,7 @@ class PairQuantity : public diffpy::Attributes
         double mrmin;
         double mrmax;
         boost::shared_ptr<PQEvaluatorBasic> mevaluator;
+        int mcountsites;
 
 };
 
