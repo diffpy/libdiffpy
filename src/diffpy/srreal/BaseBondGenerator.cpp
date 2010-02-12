@@ -57,6 +57,13 @@ void BaseBondGenerator::next()
 }
 
 
+void BaseBondGenerator::nextsite()
+{
+    msite_current += 1;
+    this->rewindSymmetry();
+}
+
+
 bool BaseBondGenerator::finished() const
 {
     return msite_current >= msite_last;
@@ -178,8 +185,7 @@ bool BaseBondGenerator::iterateSymmetry()
 void BaseBondGenerator::getNextBond()
 {
     if (this->iterateSymmetry())  return;
-    msite_current += 1;
-    this->rewindSymmetry();
+    this->nextsite();
 }
 
 

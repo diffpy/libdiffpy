@@ -42,6 +42,7 @@ class BaseBondGenerator
         virtual void rewind();
         bool finished() const;
         void next();
+        void nextsite();
 
         // configuration
         void selectAnchorSite(int);
