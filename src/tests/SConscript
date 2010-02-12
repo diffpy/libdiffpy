@@ -35,6 +35,7 @@ tdcpp = env_test.Build_tests_dir_cpp(['tests_dir.cpp'],
 test_sources += tdcpp
 
 alltests = env_test.CxxTest('alltests', test_sources)
+Alias('alltests', alltests)
 
 # test -- alias for executing unit tests.
 test = env_test.Alias('test', alltests, alltests[0].abspath)

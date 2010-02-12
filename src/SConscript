@@ -53,7 +53,7 @@ SConscript('diffpy/SConscript')
 
 # Define targets related to testing.  Do so only when testing is requested.
 # This enables library build on machines without cxxtest.
-if 'test' in COMMAND_LINE_TARGETS:
+if 'test' in COMMAND_LINE_TARGETS or 'alltests' in COMMAND_LINE_TARGETS:
     SConscript('tests/SConscript')
 
 # Top Level Targets ----------------------------------------------------------

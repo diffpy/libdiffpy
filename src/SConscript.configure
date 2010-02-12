@@ -23,7 +23,7 @@ def CheckBoostVersion(context, version):
 def CheckExecutable(context, cmd):
     '''Check if specified shell command executes successfully.
     '''
-    context.Message('Checking executable "%s"...' % cmd)
+    context.Message('Checking executable "%s"... ' % cmd)
     rv = context.TryAction(Action(cmd))[0]
     context.Result(rv)
     return rv
