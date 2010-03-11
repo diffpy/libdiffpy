@@ -59,22 +59,21 @@ const BVParam& BVParametersTable::lookup(const BVParam& bpk) const
 {
     assert(mstandardtable);
     SetOfBVParam::const_iterator bpit;
-    const BVParam* rv = NULL;
-    if (!rv)
-    {
-        bpit = mcustomtable.find(bpk);
-        if (bpit != mcustomtable.end())  rv = &(*bpit);
-    }
-    if (!rv)
-    {
-        bpit = mstandardtable->find(bpk);
-        if (bpit != mstandardtable->end())  rv = &(*bpit);
-    }
-    if (!rv)
-    {
-        rv = &(this->none());
-    }
-    return *rv;
+    bpit = mcustomtable.find(bpk);
+    if (bpit != mcustomtable.end())  return *bpit;
+    bpit = mstandardtable->find(bpk);
+    if (bpit != mstandardtable->end())  return *bpit;
+    // unspecified cations are marked with valence 9
+    // perform this search only if the first atom is indeed a cation
+    if (!(bpk.mvalence0 > 0))  return this->none();
+    BVParam bpk9 = bpk;
+    bpk9.mvalence0 = 9;
+    bpit = mcustomtable.find(bpk9);
+    if (bpit != mcustomtable.end())  return *bpit;
+    bpit = mstandardtable->find(bpk9);
+    if (bpit != mstandardtable->end())  return *bpit;
+    // not found - return blank BVParam
+    return this->none();
 }
 
 
