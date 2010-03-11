@@ -39,7 +39,8 @@ class BVSCalculator : public PairQuantity
         // results
         /// expected valence per each site
         QuantityType valences() const;
-        /// difference between expected and calculated valence per each site
+        /// difference between expected and calculated absolute valence at
+        /// each site.  Positive for underbonding, negative for overbonding.
         QuantityType bvdiff() const;
         /// mean square difference of BVS from the expected values
         double bvmsdiff() const;

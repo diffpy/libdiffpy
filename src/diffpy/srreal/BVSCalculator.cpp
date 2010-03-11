@@ -61,8 +61,11 @@ QuantityType BVSCalculator::bvdiff() const
     assert(vobs.size() == this->value().size());
     int cntsites = this->countSites();
     QuantityType rv(cntsites);
-    transform(vobs.begin(), vobs.end(), this->value().begin(),
-            rv.begin(), minus<double>());
+    const QuantityType& vsim = this->value();
+    for (int i = 0; i < cntsites; ++i)
+    {
+        rv[i] = fabs(vobs[i]) - fabs(vsim[i]);
+    }
     return rv;
 }
 
