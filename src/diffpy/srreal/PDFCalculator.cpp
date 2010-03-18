@@ -400,6 +400,12 @@ void PDFCalculator::addEnvelope(const string& tp)
 
 void PDFCalculator::popEnvelope(const string& tp)
 {
+    if (!getPDFEnvelopeTypes().count(tp))
+    {
+        ostringstream emsg;
+        emsg << "Unknown PDFEnvelope type '" << tp << "'.";
+        throw invalid_argument(emsg.str());
+    }
     menvelope.erase(tp);
 }
 
