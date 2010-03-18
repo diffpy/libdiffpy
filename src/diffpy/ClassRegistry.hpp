@@ -53,12 +53,16 @@ class ClassRegistry
             RegistryType& reg = getRegistry();
             if (reg.count(prot.type()))
             {
+                // do nothing when registering the same class twice
+                const TBase& regprot = *(reg[prot.type()]);
+                if (typeid(prot) == typeid(regprot))    return true;
+                // raise exception if trying to register a different class
                 ostringstream emsg;
                 emsg << "Prototype type '" << prot.type() <<
                     "' is already registered.";
                 throw logic_error(emsg.str());
             }
-            reg[prot.type()].reset(prot.copy());
+            reg[prot.type()].reset(prot.create());
             return true;
         }
 
