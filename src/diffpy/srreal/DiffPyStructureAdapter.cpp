@@ -211,19 +211,17 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
         pdfc.setDoubleAttr("delta2", delta2);
     }
     // spdiameter
-    double spdiameter = python::extract<double>(pfget("spdiameter", 0.0));
-    pdfc.popEnvelope("spdiameter");
-    if (spdiameter > 0.0)
+    if (pfget("spdiameter").ptr() != Py_None)
     {
+        double spdiameter = python::extract<double>(pfget("spdiameter"));
         auto_ptr<PDFEnvelope> envlp(createPDFEnvelope("sphericalshape"));
         envlp->setDoubleAttr("spdiameter", spdiameter);
         pdfc.addEnvelope(*envlp);
     }
     // stepcut
-    pdfc.popEnvelope("stepcut");
-    double stepcut = python::extract<double>(pfget("stepcut", 0.0));
-    if (stepcut > 0.0)
+    if (pfget("stepcut").ptr() != Py_None)
     {
+        double stepcut = python::extract<double>(pfget("stepcut"));
         auto_ptr<PDFEnvelope> envlp(createPDFEnvelope("stepcut"));
         envlp->setDoubleAttr("stepcut", stepcut);
         pdfc.addEnvelope(*envlp);
