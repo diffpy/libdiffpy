@@ -37,8 +37,6 @@
 #include <ObjCryst/Crystal.h>
 #include <ObjCryst/ScatteringPower.h>
 
-struct _cmpVector;
-
 namespace diffpy {
 namespace srreal {
 
