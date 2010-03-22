@@ -68,26 +68,11 @@ class ObjCrystStructureAdapter : public StructureAdapter
 
     private:
 
+        typedef std::set<R3::Vector, R3::EpsCompare> SymPosSet;
+
         // methods - own
         void getUnitCell();
-
-
-        // For comparing vectors - this is needed by the R3::Vector set that holds
-        // symmetry operations.
-        struct cmp
-        {
-            bool operator()(const R3::Vector& v1, const R3::Vector& v2) const
-            {
-                for(size_t l = 0; l < 3; ++l)
-                {
-                    if( fabs(v1[l] - v2[l]) > toler )
-                    {
-                        return v1[l] < v2[l];
-                    }
-                }
-                return false;
-            }
-        };
+        SymPosSet makeSymPosSet() const;
 
         // Tolerance on distance measurments
         static const double toler;
@@ -96,7 +81,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
         // The asymmetric unit cell of ScatteringComponent instances
         std::vector< ObjCryst::ScatteringComponent > vsc;
         // The symmetry-related operations on the asymmetric unit cell
-        std::vector< std::set< R3::Vector, cmp > > vsym;
+        std::vector<SymPosSet> vsym;
         // The Uij for the scatterers
         std::vector< R3::Matrix > vuij;
         // The Lattice instance needed by the ObjCrystBondGenerator
@@ -135,7 +120,7 @@ class ObjCrystBondGenerator : public BaseBondGenerator
 
         // data
         const ObjCrystStructureAdapter* pstructure;
-        std::set< R3::Vector >::const_iterator symiter;
+        ObjCrystStructureAdapter::SymPosSet::const_iterator symiter;
         std::auto_ptr<PointsInSphere> msphere;
 
         double msdSiteDir(int siteidx, const R3::Vector& s) const;

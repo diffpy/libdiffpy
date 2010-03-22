@@ -22,17 +22,22 @@
 #ifndef R3LINALG_HPP_INCLUDED
 #define R3LINALG_HPP_INCLUDED
 
+#include <algorithm>
 #include <blitz/tinyvec-et.h>
 #include <blitz/tinymat.h>
+#include <diffpy/mathutils.hpp>
 
 namespace diffpy {
 namespace srreal {
 namespace R3 {
 
+// Declarations --------------------------------------------------------------
+
 // Constants
 
 const int Ndim = 3;
 using blitz::product;
+using ::diffpy::mathutils::SQRT_DOUBLE_EPS;
 
 // Types
 
@@ -52,12 +57,10 @@ template <class V> Vector cross(const V& u, const V& v);
 template <class V> const Vector& mxvecproduct(const Matrix&, const V&);
 template <class V> const Vector& mxvecproduct(const V&, const Matrix&);
 
-template <class M>
-    bool MatricesAlmostEqual(const M& A, const M& B, double precision=0.0);
+class EpsCompare;
 
-template <class V>
-    bool VectorsAlmostEqual(const V& A, const V& B, double precision=0.0);
-
+template <class T>
+    bool EpsEqual(const T& A, const T& B, double eps=SQRT_DOUBLE_EPS);
 
 // Template functions --------------------------------------------------------
 
@@ -119,28 +122,40 @@ const Vector& mxvecproduct(const V& u, const Matrix& M)
 }
 
 
-template <class M>
-bool MatricesAlmostEqual(const M& A, const M& B, double precision)
+class EpsCompare
 {
-    for (int i = 0; i < Ndim; ++i)
-    {
-	for (int j = 0; j < Ndim; ++j)
-	{
-	    if (fabs(A(i,j) - B(i,j)) > precision)  return false;
-	}
-    }
-    return true;
-}
+    public:
+
+        // constructor
+        EpsCompare(double eps) : mepscmp(eps)  { }
+
+        bool operator()(const Vector& u, const Vector& v) const
+        {
+            bool rv = std::lexicographical_compare(
+                    &(u[0]), &(u[0]) + Ndim,
+                    &(v[0]), &(v[0]) + Ndim, mepscmp);
+            return rv;
+        }
+
+        bool operator()(const Matrix& A, const Matrix& B) const
+        {
+            bool rv = std::lexicographical_compare(
+                    A.data(), A.data() + Ndim * Ndim,
+                    B.data(), B.data() + Ndim * Ndim, mepscmp);
+            return rv;
+        }
+
+    private:
+
+        diffpy::mathutils::EpsilonCompare mepscmp;
+};
 
 
-template <class V>
-bool VectorsAlmostEqual(const V& u, const V& v, double precision)
+template <class T>
+bool EpsEqual(const T& A, const T& B, double eps)
 {
-    for (int i = 0; i < Ndim; ++i)
-    {
-	if (fabs(u[i] - v[i]) > precision)  return false;
-    }
-    return true;
+    EpsCompare epscmp(eps);
+    return !epscmp(A, B) && !epscmp(B, A);
 }
 
 

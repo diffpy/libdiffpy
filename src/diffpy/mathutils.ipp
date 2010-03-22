@@ -21,8 +21,6 @@
 #ifndef MATHUTILS_IPP_INCLUDED
 #define MATHUTILS_IPP_INCLUDED
 
-#include <cmath>
-
 namespace diffpy {
 namespace mathutils {
 
@@ -94,7 +92,7 @@ double asind(double x)
 inline
 bool eps_eq(const double& x, const double& y, double eps)
 {
-    return fabs(x-y) < eps;
+    return fabs(x - y) <= eps;
 }
 
 

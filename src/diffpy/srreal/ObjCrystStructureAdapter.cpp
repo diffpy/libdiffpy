@@ -187,7 +187,7 @@ getUnitCell()
     vsym.clear();
     vuij.clear();
     vsc.resize(nbComponent);
-    vsym.resize(nbComponent);
+    vsym.resize(nbComponent, this->makeSymPosSet());
     vuij.resize(nbComponent);
 
     // For each scattering component, find its position in the primitive cell
@@ -257,6 +257,16 @@ getUnitCell()
         vuij[i] = Ucart;
     }
 }
+
+
+ObjCrystStructureAdapter::SymPosSet
+ObjCrystStructureAdapter::
+makeSymPosSet() const
+{
+    R3::EpsCompare vcmp(toler);
+    return SymPosSet(vcmp);
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 // class ObjCrystBondGenerator

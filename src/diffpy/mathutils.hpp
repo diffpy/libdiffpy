@@ -23,6 +23,7 @@
 
 #include <limits>
 #include <cmath>
+#include <functional>
 
 namespace diffpy {
 namespace mathutils {
@@ -45,6 +46,28 @@ double asind(double x);
 bool eps_eq(const double& x, const double& y, double eps=SQRT_DOUBLE_EPS);
 bool eps_gt(const double& x, const double& y, double eps=SQRT_DOUBLE_EPS);
 bool eps_lt(const double& x, const double& y, double eps=SQRT_DOUBLE_EPS);
+
+// binary functor for round-off aware comparison
+
+class EpsilonCompare : public std::binary_function<double, double, bool>
+{
+    public:
+
+        // constructor
+        EpsilonCompare(double eps=SQRT_DOUBLE_EPS) : meps(eps)  { }
+
+        // comparison method
+        template <class T1, class T2>
+        bool operator()(const T1& x, const T2& y)
+        {
+            return eps_lt(x, y, meps);
+        }
+
+    private:
+
+        double meps;
+};
+
 
 }   // namespace mathutils
 }   // namespace diffpy

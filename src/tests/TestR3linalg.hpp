@@ -24,8 +24,6 @@
 
 using namespace std;
 using namespace diffpy::srreal;
-using diffpy::srreal::R3::MatricesAlmostEqual;
-using diffpy::srreal::R3::VectorsAlmostEqual;
 
 
 class TestR3linalg : public CxxTest::TestSuite
@@ -64,7 +62,7 @@ public:
 	    0.49063197005867, 1.42323870111089, -0.83420736316541,
 	   -0.24089965988852, 1.32489393619466, -0.15249839300481,
 	    0.68609361943181, 0.02249568627913,  0.41178393851247;
-	TS_ASSERT(MatricesAlmostEqual(invA, R3::inverse(A), precision));
+	TS_ASSERT(R3::EpsEqual(invA, R3::inverse(A), precision));
     }
 
 
@@ -79,7 +77,7 @@ public:
 	    0.5359, -0.0053, -0.8926,
            -0.5904, 0.7559, 0.9424,
             0.8670, 0.2692, 0.9692;
-	TS_ASSERT(MatricesAlmostEqual(Atrans, R3::transpose(A), 0.0));
+	TS_ASSERT(R3::EpsEqual(Atrans, R3::transpose(A), 0.0));
     }
 
 
@@ -109,7 +107,7 @@ public:
         v1 = -0.55160549932839, -0.58291452407504,  0.12378162306543;
         v2 =  0.60842511285200, -0.97946444006248, -0.02828214306095;
         v1xv2 = 0.13772577008800,  0.05971126233738,  0.89493780662849;
-        TS_ASSERT(VectorsAlmostEqual(v1xv2,
+        TS_ASSERT(R3::EpsEqual(v1xv2,
                     R3::cross(v1, v2), precision));
     }
 
@@ -124,9 +122,9 @@ public:
         v = 0.608652521912322, 0.519716469261062, 0.842577887601566;
         prod_Mv = 0.729633980805669, 0.872890409522479, 0.925388343907868;
         prod_vM = 0.715502648789536, 1.056153454546559, 0.822556602046019;
-        TS_ASSERT(VectorsAlmostEqual(prod_Mv,
+        TS_ASSERT(R3::EpsEqual(prod_Mv,
                     R3::mxvecproduct(M, v), precision));
-        TS_ASSERT(VectorsAlmostEqual(prod_vM,
+        TS_ASSERT(R3::EpsEqual(prod_vM,
                     R3::mxvecproduct(v, M), precision));
     }
 
