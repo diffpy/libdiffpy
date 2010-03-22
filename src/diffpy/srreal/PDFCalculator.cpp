@@ -55,7 +55,6 @@ const double DEFAULT_PEAK_PRECISION = 3.33e-6;
 
 PDFCalculator::PDFCalculator()
 {
-    using diffpy::mathutils::SQRT_DOUBLE_EPS;
     // initialize mstructure_cache
     mstructure_cache.sfaverage = 0.0;
     mstructure_cache.totaloccupancy = 0.0;
@@ -115,7 +114,8 @@ QuantityType PDFCalculator::getPDF() const
 QuantityType PDFCalculator::getRDF() const
 {
     QuantityType rdf = this->getExtendedRDF();
-    assert(this->rippleshiPoints() + this->ripplesloPoints() <= (int) rdf.size());
+    assert(this->rippleshiPoints() + this->ripplesloPoints() <=
+            int(rdf.size()));
     rdf.erase(rdf.end() - this->rippleshiPoints(), rdf.end());
     rdf.erase(rdf.begin(), rdf.begin() + this->ripplesloPoints());
     return rdf;
@@ -148,7 +148,7 @@ QuantityType PDFCalculator::getExtendedPDF() const
     QuantityType::const_iterator ri = rgrid_ext.begin();
     for (; pdfi != pdf_ext.end(); ++pdfi, ++rdfi, ++ri)
     {
-        *pdfi = (*ri == 0.0) ? (0.0) :
+        *pdfi = (*ri <= 0.0) ? (0.0) :
             (*rdfi / *ri + baseline(*ri));
     }
     // fixme - factor out baseline application to a separate method
@@ -184,6 +184,8 @@ QuantityType PDFCalculator::getExtendedRDF() const
 
 QuantityType PDFCalculator::getExtendedRgrid() const
 {
+    using diffpy::mathutils::eps_lt;
+    using diffpy::mathutils::eps_gt;
     QuantityType rv(this->extendedPoints());
     QuantityType::iterator ri = rv.begin();
     // make sure exact value of rmin will be in the extended grid
@@ -191,8 +193,8 @@ QuantityType PDFCalculator::getExtendedRgrid() const
     {
         *ri = this->getRmin() + i * this->getRstep();
     }
-    assert(rv.empty() || rv.front() >= this->getExtendedRmin());
-    assert(rv.empty() || rv.back() <= this->getExtendedRmax());
+    assert(rv.empty() || !eps_lt(rv.front(), this->getExtendedRmin()));
+    assert(rv.empty() || !eps_gt(rv.back(), this->getExtendedRmax()));
     return rv;
 }
 
