@@ -61,8 +61,10 @@ PDFCalculator::PDFCalculator()
     // initialize mrlimits_cache
     mrlimits_cache.extendedrmin = 0.0;
     mrlimits_cache.extendedrmax = 0.0;
+    mrlimits_cache.rippleslopoints = 0;
     mrlimits_cache.rcalclow = 0.0;
     mrlimits_cache.rcalchigh = 0.0;
+    mrlimits_cache.calclopoints = 0;
     // default configuration
     this->setPeakWidthModel("jeong");
     GaussianProfile pkf;
@@ -605,9 +607,7 @@ double PDFCalculator::extFromPeakTails() const
 
 int PDFCalculator::calcloPoints() const
 {
-    int npts;
-    npts = int(floor((this->getRmin() - this->rcalclo()) / this->getRstep()));
-    return npts;
+    return mrlimits_cache.calclopoints;
 }
 
 
@@ -623,9 +623,7 @@ int PDFCalculator::calchiPoints() const
 
 int PDFCalculator::ripplesloPoints() const
 {
-    int npts = int(floor((this->getRmin() - this->getExtendedRmin()) /
-                this->getRstep()));
-    return npts;
+    return mrlimits_cache.rippleslopoints;
 }
 
 
@@ -721,13 +719,20 @@ void PDFCalculator::cacheRlimitsData()
         ext_pktails *= sc;
         ext_total = this->getMaxExtension();
     }
+    // abbreviations
+    const double& rmin = this->getRmin();
+    const double& rstep = this->getRstep();
+    const double nstepmax = floor(rmin / rstep);
     // r-range extended by termination ripples:
-    mrlimits_cache.extendedrmin = this->getRmin() - ext_ripples;
-    mrlimits_cache.extendedrmin = max(0.0, mrlimits_cache.extendedrmin);
+    int nstep;
+    nstep = int(min(ceil(ext_ripples / rstep), nstepmax));
+    mrlimits_cache.rippleslopoints = nstep;
+    mrlimits_cache.extendedrmin = rmin - nstep * rstep;
     mrlimits_cache.extendedrmax = this->getRmax() + ext_ripples;
     // complete calculation range, extended for both ripples and peak tails
-    mrlimits_cache.rcalclow = this->getRmin() - ext_total;
-    mrlimits_cache.rcalclow = max(0.0, mrlimits_cache.rcalclow);
+    nstep = int(min(ceil(ext_total / rstep), nstepmax));
+    mrlimits_cache.calclopoints = nstep;
+    mrlimits_cache.rcalclow = rmin - nstep * rstep;
     mrlimits_cache.rcalchigh = this->getRmax() + ext_total;
 }
 

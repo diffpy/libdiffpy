@@ -180,8 +180,10 @@ class PDFCalculator : public PairQuantity
         struct {
             double extendedrmin;
             double extendedrmax;
+            int rippleslopoints;
             double rcalclow;
             double rcalchigh;
+            int calclopoints;
         } mrlimits_cache;
 
 };  // class PDFCalculator
