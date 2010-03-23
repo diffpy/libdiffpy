@@ -143,10 +143,6 @@ void DiffPyStructureAdapter::fetchPythonData()
     mcartesian_uijs.clear();
     matomtypes.clear();
     int num_atoms = python::len(*mdpstructure);
-    // We need to call python::eval to avoid problems with numpy.bool
-    python::object py_main = python::import("__main__");
-    python::object py_globals = py_main.attr("__dict__");
-    python::dict py_locals;
     for (int i = 0; i < num_atoms; ++i)
     {
         python::object ai;
@@ -165,11 +161,7 @@ void DiffPyStructureAdapter::fetchPythonData()
         double occupancy = python::extract<double>(ai.attr("occupancy"));
         moccupancies.push_back(occupancy);
         // manisotropies
-        bool aniso;
-        py_locals["ai"] = ai;
-        python::object anisotropy =
-            python::eval("bool(ai.anisotropy)", py_globals, py_locals);
-        aniso = python::extract<bool>(anisotropy);
+        bool aniso = ai.attr("anisotropy");
         manisotropies.push_back(aniso);
         // mcartesian_uijs
         R3::Matrix Ufrac;
