@@ -171,6 +171,10 @@ void
 ObjCrystStructureAdapter::
 getUnitCell()
 {
+    // local constants
+    SymPosSet emptyset = this->makeSymPosSet();
+    R3::Matrix zeros; zeros = 0.0;
+
     // Expand each scattering component in the primitive cell and record the
     // new scatterers.
     const ObjCryst::ScatteringComponentList& scl =
@@ -187,8 +191,8 @@ getUnitCell()
     vsym.clear();
     vuij.clear();
     vsc.resize(nbComponent);
-    vsym.resize(nbComponent, this->makeSymPosSet());
-    vuij.resize(nbComponent);
+    vsym.resize(nbComponent, emptyset);
+    vuij.resize(nbComponent, zeros);
 
     // For each scattering component, find its position in the primitive cell
     // and expand that position. Record the translation from the original
