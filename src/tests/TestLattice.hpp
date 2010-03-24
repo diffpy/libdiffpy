@@ -42,11 +42,7 @@ public:
     void test_Lattice()
     {
 	// default lattice should be cartesian
-	R3::Matrix identity;
-	identity = 1, 0, 0,
-		   0, 1, 0,
-		   0, 0, 1;
-	TS_ASSERT(R3::EpsEqual(lattice->base(), identity));
+	TS_ASSERT(R3::EpsEqual(lattice->base(), R3::identity()));
 	// lattice parameters constructor
 	Lattice lattice1(1.0, 2.0, 3.0, 90, 90, 120);
 	R3::Vector va = lattice1.va();

@@ -13,7 +13,23 @@
 #include <gsl/gsl_matrix.h>
 #include <diffpy/srreal/R3linalg.hpp>
 
-using namespace diffpy::srreal;
+namespace diffpy {
+namespace srreal {
+
+const R3::Matrix& R3::identity()
+{
+    static R3::Matrix mx;
+    static bool mx_ready = false;
+    if (!mx_ready)
+    {
+        mx = 1.0, 0.0, 0.0,
+             0.0, 1.0, 0.0,
+             0.0, 0.0, 1.0;
+        mx_ready = true;
+    }
+    return mx;
+}
+
 
 double R3::determinant(const R3::Matrix& A)
 {
@@ -66,5 +82,7 @@ R3::Matrix R3::transpose(const R3::Matrix& A)
     return res;
 }
 
+}   // namespace srreal
+}   // namespace diffpy
 
 // End of file
