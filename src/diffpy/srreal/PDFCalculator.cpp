@@ -237,12 +237,16 @@ const double& PDFCalculator::getQmax() const
 
 QuantityType PDFCalculator::applyBandPassFilter(const QuantityType& a) const
 {
-    QuantityType rv(a);
+    // constants and abbreviations
     const double infinite_Qmax = 1e6;
-    if (0 < this->getQmax() && this->getQmax() < infinite_Qmax)
+    const double& qmin = this->getQmin();
+    // zero or negative Qmax is in effect the same as infinite
+    double qmax = (this->getQmax() <= 0.0) ? infinite_Qmax : this->getQmax();
+    QuantityType rv(a);
+    bool skipfilter = (qmin <= 0.0) && (qmax >= infinite_Qmax);
+    if (!skipfilter)
     {
-        bandPassFilter(rv.begin(), rv.end(),
-                this->getRstep(), this->getQmin(), this->getQmax());
+        bandPassFilter(rv.begin(), rv.end(), this->getRstep(), qmin, qmax);
     }
     return rv;
 }
