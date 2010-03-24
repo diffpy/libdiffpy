@@ -14,8 +14,12 @@
 *
 * class DiffPyStructureAdapter -- adapter to the Structure class from the
 *     Python diffpy.Structure package.
-* class DiffPyStructureBondGenerator -- related bond generator
 *
+* class DiffPyStructureBaseBondGenerator -- bond generator for
+*     non-periodic structures
+*
+* class DiffPyStructurePeriodicBondGenerator -- bond generator for
+*     periodic structures
 *
 * $Id$
 *
@@ -53,7 +57,11 @@ DiffPyStructureAdapter::DiffPyStructureAdapter(const python::object& dpstru)
 
 BaseBondGenerator* DiffPyStructureAdapter::createBondGenerator() const
 {
-    BaseBondGenerator* bnds = new DiffPyStructureBondGenerator(this);
+    // FIXME: hack for handling non-periodic structures
+    // should diffpy.Structure get an isPeriodic method?
+    BaseBondGenerator* bnds = this->isPeriodic() ?
+        new DiffPyStructurePeriodicBondGenerator(this) :
+        new DiffPyStructureBaseBondGenerator(this);
     return bnds;
 }
 
@@ -66,7 +74,8 @@ int DiffPyStructureAdapter::countSites() const
 
 double DiffPyStructureAdapter::numberDensity() const
 {
-    double rv = this->totalOccupancy() / mlattice.volume();
+    double rv = this->isPeriodic() ?
+        (this->totalOccupancy() / mlattice.volume()) : 0.0;
     return rv;
 }
 
@@ -181,6 +190,7 @@ void DiffPyStructureAdapter::fetchPythonData()
     assert(int(matomtypes.size()) == this->countSites());
 }
 
+
 void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
 {
     // this is only needed if diffpy.Structure instance has pdffit attribute
@@ -221,13 +231,20 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
 }
 
 
+bool DiffPyStructureAdapter::isPeriodic() const
+{
+    const Lattice& L = this->getLattice();
+    bool rv = !(R3::EpsEqual(R3::identity(), L.base()));
+    return rv;
+}
+
 //////////////////////////////////////////////////////////////////////////////
-// class DiffPyStructureBondGenerator
+// class DiffPyStructureBaseBondGenerator
 //////////////////////////////////////////////////////////////////////////////
 
 // Constructor ---------------------------------------------------------------
 
-DiffPyStructureBondGenerator::DiffPyStructureBondGenerator(
+DiffPyStructureBaseBondGenerator::DiffPyStructureBaseBondGenerator(
         const DiffPyStructureAdapter* adpt) : BaseBondGenerator(adpt)
 {
     mdpstructure = adpt;
@@ -235,7 +252,44 @@ DiffPyStructureBondGenerator::DiffPyStructureBondGenerator(
 
 // Public Methods ------------------------------------------------------------
 
-void DiffPyStructureBondGenerator::rewind()
+double DiffPyStructureBaseBondGenerator::msd0() const
+{
+    double rv = this->msdSiteDir(this->site0(), this->r01());
+    return rv;
+}
+
+
+double DiffPyStructureBaseBondGenerator::msd1() const
+{
+    double rv = this->msdSiteDir(this->site1(), this->r01());
+    return rv;
+}
+
+// Private Methods -----------------------------------------------------------
+
+double DiffPyStructureBaseBondGenerator::msdSiteDir(
+        int siteidx, const R3::Vector& s) const
+{
+    const R3::Matrix& Uijcartn = mdpstructure->siteCartesianUij(siteidx);
+    bool anisotropy = mdpstructure->siteAnisotropy(siteidx);
+    double rv = meanSquareDisplacement(Uijcartn, s, anisotropy);
+    return rv;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// class DiffPyStructurePeriodicBondGenerator
+//////////////////////////////////////////////////////////////////////////////
+
+// Constructor ---------------------------------------------------------------
+
+DiffPyStructurePeriodicBondGenerator::DiffPyStructurePeriodicBondGenerator(
+        const DiffPyStructureAdapter* adpt
+        ) : DiffPyStructureBaseBondGenerator(adpt)
+{ }
+
+// Public Methods ------------------------------------------------------------
+
+void DiffPyStructurePeriodicBondGenerator::rewind()
 {
     // Delay msphere instantiation to here instead of in constructor,
     // so it is possible to use setRmin, setRmax.
@@ -252,7 +306,7 @@ void DiffPyStructureBondGenerator::rewind()
 }
 
 
-void DiffPyStructureBondGenerator::setRmin(double rmin)
+void DiffPyStructurePeriodicBondGenerator::setRmin(double rmin)
 {
     // destroy msphere so it will be created on rewind with new rmin
     if (this->getRmin() != rmin)    msphere.reset(NULL);
@@ -260,7 +314,7 @@ void DiffPyStructureBondGenerator::setRmin(double rmin)
 }
 
 
-void DiffPyStructureBondGenerator::setRmax(double rmax)
+void DiffPyStructurePeriodicBondGenerator::setRmax(double rmax)
 {
     // destroy msphere so it will be created on rewind with new rmax
     if (this->getRmax() != rmax)    msphere.reset(NULL);
@@ -268,7 +322,7 @@ void DiffPyStructureBondGenerator::setRmax(double rmax)
 }
 
 
-const R3::Vector& DiffPyStructureBondGenerator::r1() const
+const R3::Vector& DiffPyStructurePeriodicBondGenerator::r1() const
 {
     static R3::Vector rv;
     const Lattice& L = mdpstructure->getLattice();
@@ -276,43 +330,18 @@ const R3::Vector& DiffPyStructureBondGenerator::r1() const
     return rv;
 }
 
+// Protected Methods ---------------------------------------------------------
 
-double DiffPyStructureBondGenerator::msd0() const
-{
-    double rv = this->msdSiteDir(this->site0(), this->r01());
-    return rv;
-}
-
-
-double DiffPyStructureBondGenerator::msd1() const
-{
-    double rv = this->msdSiteDir(this->site1(), this->r01());
-    return rv;
-}
-
-
-bool DiffPyStructureBondGenerator::iterateSymmetry()
+bool DiffPyStructurePeriodicBondGenerator::iterateSymmetry()
 {
     msphere->next();
     return !msphere->finished();
 }
 
 
-void DiffPyStructureBondGenerator::rewindSymmetry()
+void DiffPyStructurePeriodicBondGenerator::rewindSymmetry()
 {
     msphere->rewind();
-}
-
-
-// Private Methods -----------------------------------------------------------
-
-double DiffPyStructureBondGenerator::msdSiteDir(
-        int siteidx, const R3::Vector& s) const
-{
-    const R3::Matrix& Uijcartn = mdpstructure->siteCartesianUij(siteidx);
-    bool anisotropy = mdpstructure->siteAnisotropy(siteidx);
-    double rv = meanSquareDisplacement(Uijcartn, s, anisotropy);
-    return rv;
 }
 
 // Factory Function and its Registration -------------------------------------

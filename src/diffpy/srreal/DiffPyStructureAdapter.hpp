@@ -65,6 +65,7 @@ class DiffPyStructureAdapter : public StructureAdapter
         // methods
         void fetchPythonData();
         void configurePDFCalculator(PDFCalculator& pdfc) const;
+        bool isPeriodic() const;
 
     private:
 
@@ -81,12 +82,36 @@ class DiffPyStructureAdapter : public StructureAdapter
 };
 
 
-class DiffPyStructureBondGenerator : public BaseBondGenerator
+class DiffPyStructureBaseBondGenerator : public BaseBondGenerator
 {
     public:
 
         // constructors
-        DiffPyStructureBondGenerator(const DiffPyStructureAdapter*);
+        DiffPyStructureBaseBondGenerator(const DiffPyStructureAdapter*);
+
+        // methods
+        // data access
+        virtual double msd0() const;
+        virtual double msd1() const;
+
+    protected:
+
+        // data
+        const DiffPyStructureAdapter* mdpstructure;
+
+    private:
+
+        // methods
+        double msdSiteDir(int siteidx, const R3::Vector& s) const;
+};
+
+
+class DiffPyStructurePeriodicBondGenerator : public DiffPyStructureBaseBondGenerator
+{
+    public:
+
+        // constructors
+        DiffPyStructurePeriodicBondGenerator(const DiffPyStructureAdapter*);
 
         // methods
         // loop control
@@ -98,8 +123,6 @@ class DiffPyStructureBondGenerator : public BaseBondGenerator
 
         // data access
         virtual const R3::Vector& r1() const;
-        virtual double msd0() const;
-        virtual double msd1() const;
 
     protected:
 
@@ -110,13 +133,7 @@ class DiffPyStructureBondGenerator : public BaseBondGenerator
     private:
 
         // data
-        const DiffPyStructureAdapter* mdpstructure;
         std::auto_ptr<PointsInSphere> msphere;
-        R3::Vector mr0ucv;
-        R3::Vector mr1ucv;
-
-        // methods
-        double msdSiteDir(int siteidx, const R3::Vector& s) const;
 };
 
 
