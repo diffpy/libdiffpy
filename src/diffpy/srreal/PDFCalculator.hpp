@@ -44,13 +44,16 @@ class PDFCalculator : public PairQuantity
         // results
         QuantityType getPDF() const;
         QuantityType getRDF() const;
+        QuantityType getRDFperR() const;
         QuantityType getRgrid() const;
 
-        /// PDF on extended range to allow propagation of termination ripples
+        /// PDF on an r-range extended for termination ripples
         QuantityType getExtendedPDF() const;
-        /// RDF on extended range to allow propagation of termination ripples
+        /// RDF on an r-range extended for termination ripples
         QuantityType getExtendedRDF() const;
-        /// extended r-grid that allows propagation of termination ripples
+        /// RDF divided by r on an r-range extended for termination ripples
+        QuantityType getExtendedRDFperR() const;
+        /// r-grid extended for termination ripples
         QuantityType getExtendedRgrid() const;
 
         // Q-range configuration
@@ -87,6 +90,8 @@ class PDFCalculator : public PairQuantity
         const PeakProfile& getPeakProfile() const;
 
         // PDF baseline configuration
+        // application on an array
+        QuantityType applyBaseline(const QuantityType& x, const QuantityType& y) const;
         void setBaseline(const PDFBaseline&);
         void setBaseline(const std::string& tp);
         const PDFBaseline& getBaseline() const;
@@ -152,6 +157,10 @@ class PDFCalculator : public PairQuantity
         int calcPoints() const;
         /// index of a nearby point in the complete calculated r-grid
         int calcIndex(double r) const;
+        /// remove ripplesloPoints from head and rippleshiPoints from tail
+        /// of a QuantityType array.  Used for reducing extended to result
+        /// arrays.
+        void cutRipplePoints(QuantityType& y) const;
 
         // structure factors - fast lookup by site index
         /// effective scattering factor at a given site scaled by occupancy

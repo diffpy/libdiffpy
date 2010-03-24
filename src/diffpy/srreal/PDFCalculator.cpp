@@ -106,9 +106,7 @@ PDFCalculator::PDFCalculator()
 QuantityType PDFCalculator::getPDF() const
 {
     QuantityType pdf = this->getExtendedPDF();
-    assert(this->ripplesloPoints() + this->rippleshiPoints() <= (int) pdf.size());
-    pdf.erase(pdf.end() - this->rippleshiPoints(), pdf.end());
-    pdf.erase(pdf.begin(), pdf.begin() + this->ripplesloPoints());
+    this->cutRipplePoints(pdf);
     return pdf;
 }
 
@@ -116,11 +114,16 @@ QuantityType PDFCalculator::getPDF() const
 QuantityType PDFCalculator::getRDF() const
 {
     QuantityType rdf = this->getExtendedRDF();
-    assert(this->rippleshiPoints() + this->ripplesloPoints() <=
-            int(rdf.size()));
-    rdf.erase(rdf.end() - this->rippleshiPoints(), rdf.end());
-    rdf.erase(rdf.begin(), rdf.begin() + this->ripplesloPoints());
+    this->cutRipplePoints(rdf);
     return rdf;
+}
+
+
+QuantityType PDFCalculator::getRDFperR() const
+{
+    QuantityType rdfperr = this->getExtendedRDFperR();
+    this->cutRipplePoints(rdfperr);
+    return rdfperr;
 }
 
 
@@ -139,23 +142,11 @@ QuantityType PDFCalculator::getRgrid() const
 QuantityType PDFCalculator::getExtendedPDF() const
 {
     // we need a full range PDF to apply termination ripples correctly
-    QuantityType pdf_ext(this->extendedPoints());
-    QuantityType rdf_ext = this->getExtendedRDF();
+    QuantityType rdfperr_ext = this->getExtendedRDFperR();
     QuantityType rgrid_ext = this->getExtendedRgrid();
-    assert(pdf_ext.size() == rdf_ext.size());
-    assert(pdf_ext.size() == rgrid_ext.size());
-    const PDFBaseline& baseline = this->getBaseline();
-    QuantityType::iterator pdfi = pdf_ext.begin();
-    QuantityType::const_iterator rdfi = rdf_ext.begin();
-    QuantityType::const_iterator ri = rgrid_ext.begin();
-    for (; pdfi != pdf_ext.end(); ++pdfi, ++rdfi, ++ri)
-    {
-        *pdfi = (*ri <= 0.0) ? (0.0) :
-            (*rdfi / *ri + baseline(*ri));
-    }
-    // fixme - factor out baseline application to a separate method
-    QuantityType pdf1 = this->applyEnvelopes(rgrid_ext, pdf_ext);
-    QuantityType pdf2 = this->applyBandPassFilter(pdf1);
+    QuantityType pdf0 = this->applyBandPassFilter(rdfperr_ext);
+    QuantityType pdf1 = this->applyBaseline(rgrid_ext, pdf0);
+    QuantityType pdf2 = this->applyEnvelopes(rgrid_ext, pdf1);
     return pdf2;
 }
 
@@ -181,6 +172,22 @@ QuantityType PDFCalculator::getExtendedRDF() const
         *iirdf = *iival * rdf_scale;
     }
     return rdf;
+}
+
+
+QuantityType PDFCalculator::getExtendedRDFperR() const
+{
+    using diffpy::mathutils::eps_gt;
+    QuantityType rdf_ext = this->getExtendedRDF();
+    QuantityType rgrid_ext = this->getExtendedRgrid();
+    assert(rdf_ext.size() == rgrid_ext.size());
+    QuantityType::const_iterator ri = rgrid_ext.begin();
+    QuantityType::iterator rdfi = rdf_ext.begin();
+    for (; ri != rgrid_ext.end(); ++ri, ++rdfi)
+    {
+        *rdfi = eps_gt(*ri, 0) ? (*rdfi / *ri) : 0.0;
+    }
+    return rdf_ext;
 }
 
 
@@ -343,7 +350,23 @@ const PeakProfile& PDFCalculator::getPeakProfile() const
     return *mpeakprofile;
 }
 
-// PDF baseline configuration
+// PDF baseline methods
+
+QuantityType PDFCalculator::applyBaseline(
+        const QuantityType& x, const QuantityType& y) const
+{
+    assert(x.size() == y.size());
+    QuantityType z = y;
+    const PDFBaseline& baseline = this->getBaseline();
+    QuantityType::const_iterator xi = x.begin();
+    QuantityType::iterator zi = z.begin();
+    for (; xi != x.end(); ++xi, ++zi)
+    {
+        *zi += baseline(*xi);
+    }
+    return z;
+}
+
 
 void PDFCalculator::setBaseline(const PDFBaseline& baseline)
 {
@@ -666,6 +689,14 @@ int PDFCalculator::calcIndex(double r) const
     int npts;
     npts = int(ceil((r - this->rcalclo()) / this->getRstep()));
     return npts;
+}
+
+
+void PDFCalculator::cutRipplePoints(QuantityType& y) const
+{
+    assert(this->rippleshiPoints() + this->ripplesloPoints() <= int(y.size()));
+    y.erase(y.end() - this->rippleshiPoints(), y.end());
+    y.erase(y.begin(), y.begin() + this->ripplesloPoints());
 }
 
 
