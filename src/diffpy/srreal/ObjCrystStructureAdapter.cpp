@@ -249,6 +249,7 @@ getUnitCell()
         }
         else
         {
+            // FIXME anisotropic tensors must be symmetry rotated.
             R3::Matrix Ufrac;
             Ufrac(0,0) = sp->GetBij(1,1) * BtoU;
             Ufrac(1,1) = sp->GetBij(2,2) * BtoU;
