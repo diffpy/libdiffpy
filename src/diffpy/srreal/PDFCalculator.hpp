@@ -128,7 +128,7 @@ class PDFCalculator : public PairQuantity
         // PairQuantity overloads
         virtual void resetValue();
         virtual void configureBondGenerator(BaseBondGenerator&);
-        virtual void addPairContribution(BaseBondGenerator&);
+        virtual void addPairContribution(const BaseBondGenerator&);
 
     private:
 
