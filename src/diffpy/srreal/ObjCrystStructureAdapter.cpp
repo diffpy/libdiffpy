@@ -172,7 +172,7 @@ ObjCrystStructureAdapter::
 getUnitCell()
 {
     // local constants
-    SymPosSet emptyset = this->makeSymPosSet();
+    const SymPosSet emptyset = SymPosSet(R3::EpsCompare(toler));
     R3::Matrix zeros; zeros = 0.0;
 
     // Expand each scattering component in the primitive cell and record the
@@ -261,16 +261,6 @@ getUnitCell()
         vuij[i] = Ucart;
     }
 }
-
-
-ObjCrystStructureAdapter::SymPosSet
-ObjCrystStructureAdapter::
-makeSymPosSet() const
-{
-    R3::EpsCompare vcmp(toler);
-    return SymPosSet(vcmp);
-}
-
 
 //////////////////////////////////////////////////////////////////////////////
 // class ObjCrystBondGenerator

@@ -72,7 +72,6 @@ class ObjCrystStructureAdapter : public StructureAdapter
 
         // methods - own
         void getUnitCell();
-        SymPosSet makeSymPosSet() const;
 
         // Tolerance on distance measurments
         static const double toler;
