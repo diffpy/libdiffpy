@@ -292,8 +292,8 @@ rewind()
         double rsphmax = this->getRmax() + buffzone;
         msphere.reset(new PointsInSphere(rsphmin, rsphmax, L));
     }
-    msphere->rewind();
-    symiter = pstructure->vsym[msite_first].begin();
+    // BaseBondGenerator::rewind calls this->rewindSymmetry,
+    // which takes care of msphere and symiter configuration
     this->BaseBondGenerator::rewind();
 }
 

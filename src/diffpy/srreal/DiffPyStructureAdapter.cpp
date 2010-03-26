@@ -301,7 +301,8 @@ void DiffPyStructurePeriodicBondGenerator::rewind()
         double rsphmax = this->getRmax() + buffzone;
         msphere.reset(new PointsInSphere(rsphmin, rsphmax, L));
     }
-    msphere->rewind();
+    // BaseBondGenerator::rewind calls this->rewindSymmetry,
+    // which takes care of msphere configuration
     this->BaseBondGenerator::rewind();
 }
 
