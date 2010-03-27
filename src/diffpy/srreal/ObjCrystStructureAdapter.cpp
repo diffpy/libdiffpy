@@ -64,14 +64,14 @@ const double BtoU = 1.0 / UtoB;
 const double ObjCrystStructureAdapter::toler = 1e-5;
 
 ObjCrystStructureAdapter::
-ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst) : pcryst(&cryst)
+ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst) : mpcryst(&cryst)
 {
-    mlattice.setLatPar( pcryst->GetLatticePar(0), 
-                        pcryst->GetLatticePar(1),
-                        pcryst->GetLatticePar(2), 
-                        rtod * pcryst->GetLatticePar(3),
-                        rtod * pcryst->GetLatticePar(4), 
-                        rtod * pcryst->GetLatticePar(5) );
+    mlattice.setLatPar( mpcryst->GetLatticePar(0), 
+                        mpcryst->GetLatticePar(1),
+                        mpcryst->GetLatticePar(2), 
+                        rtod * mpcryst->GetLatticePar(3),
+                        rtod * mpcryst->GetLatticePar(4), 
+                        rtod * mpcryst->GetLatticePar(5) );
     this->getUnitCell();
 }
 
@@ -90,7 +90,7 @@ int
 ObjCrystStructureAdapter::
 countSites() const
 {
-    return vsc.size();
+    return mvsc.size();
 }
 
 
@@ -98,7 +98,7 @@ double
 ObjCrystStructureAdapter::
 numberDensity() const
 {
-    double rv = this->totalOccupancy() / pcryst->GetVolume();
+    double rv = this->totalOccupancy() / mpcryst->GetVolume();
     return rv;
 }
 
@@ -116,7 +116,7 @@ ObjCrystStructureAdapter::
 siteCartesianPosition(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return *(vsym[idx].begin());
+    return *(mvsym[idx].begin());
 }
 
 
@@ -125,7 +125,7 @@ ObjCrystStructureAdapter::
 siteOccupancy(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return vsc[idx].mOccupancy;
+    return mvsc[idx].mOccupancy;
 }
 
 
@@ -134,7 +134,7 @@ ObjCrystStructureAdapter::
 siteAnisotropy(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return vsc[idx].mpScattPow->IsIsotropic();
+    return mvsc[idx].mpScattPow->IsIsotropic();
 }
 
 double
@@ -143,7 +143,7 @@ siteMultiplicity(int idx) const
 {
 
     assert(0 <= idx && idx < this->countSites());
-    return vsym[idx].size();
+    return mvsym[idx].size();
 }
 
 const R3::Matrix&
@@ -151,7 +151,7 @@ ObjCrystStructureAdapter::
 siteCartesianUij(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return vuij[idx];
+    return mvuij[idx];
 }
 
 
@@ -160,7 +160,7 @@ ObjCrystStructureAdapter::
 siteAtomType(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return vsc[idx].mpScattPow->GetSymbol();
+    return mvsc[idx].mpScattPow->GetSymbol();
 }
 
 
@@ -178,53 +178,51 @@ getUnitCell()
     // Expand each scattering component in the primitive cell and record the
     // new scatterers.
     const ObjCryst::ScatteringComponentList& scl =
-        pcryst->GetScatteringComponentList();
+        mpcryst->GetScatteringComponentList();
     size_t nbComponent = scl.GetNbComponent();
 
-    size_t nbSymmetrics = pcryst->GetSpaceGroup().GetNbSymmetrics();
+    size_t nbSymmetrics = mpcryst->GetSpaceGroup().GetNbSymmetrics();
 
     double x, y, z, junk;
     const ObjCryst::ScatteringPower* sp  = NULL;
     CrystMatrix<double> symmetricsCoords;
 
-    vsc.clear();
-    vsym.clear();
-    vuij.clear();
-    vsc.resize(nbComponent);
-    vsym.resize(nbComponent, emptyset);
-    vuij.resize(nbComponent, zeros);
+    mvsc.clear();
+    mvsym.clear();
+    mvuij.clear();
+    mvsc.resize(nbComponent);
+    mvsym.resize(nbComponent, emptyset);
+    mvuij.resize(nbComponent, zeros);
 
     // For each scattering component, find its position in the primitive cell
     // and expand that position. Record the translation from the original
     // position.
-    for(size_t i=0;i<nbComponent;++i)
+    for (size_t i = 0; i < nbComponent; ++i)
     {
-
-
-        vsc[i] = scl(i);
+        mvsc[i] = scl(i);
 
         // Get all the symmetric coordinates
-        symmetricsCoords = pcryst->GetSpaceGroup().GetAllSymmetrics(
+        symmetricsCoords = mpcryst->GetSpaceGroup().GetAllSymmetrics(
             scl(i).mX, 
             scl(i).mY, 
             scl(i).mZ
             );
 
         // Collect the unique symmetry operations.
-        for(size_t j=0;j<nbSymmetrics;++j)
+        for (size_t j = 0; j < nbSymmetrics; ++j)
         {
-            x=modf(symmetricsCoords(j,0),&junk);
-            y=modf(symmetricsCoords(j,1),&junk);
-            z=modf(symmetricsCoords(j,2),&junk);
-            if(fabs(x) < toler) x = 0;
-            if(fabs(y) < toler) y = 0;
-            if(fabs(z) < toler) z = 0;
-            if(x<0) x += 1.;
-            if(y<0) y += 1.;
-            if(z<0) z += 1.;
+            x = modf(symmetricsCoords(j, 0), &junk);
+            y = modf(symmetricsCoords(j, 1), &junk);
+            z = modf(symmetricsCoords(j, 2), &junk);
+            if (fabs(x) < toler) x = 0;
+            if (fabs(y) < toler) y = 0;
+            if (fabs(z) < toler) z = 0;
+            if (x < 0) x += 1.;
+            if (y < 0) y += 1.;
+            if (z < 0) z += 1.;
 
             // Get this in cartesian
-            pcryst->FractionalToOrthonormalCoords(x,y,z);
+            mpcryst->FractionalToOrthonormalCoords(x, y, z);
 
             // Record the position
             R3::Vector xyz;
@@ -232,15 +230,15 @@ getUnitCell()
             xyz[1] = y;
             xyz[2] = z;
 
-            vsym[i].insert(xyz);
+            mvsym[i].insert(xyz);
 
         }
 
 
         // Store the uij tensor
         R3::Matrix Ucart;
-        sp = vsc[i].mpScattPow;
-        if( sp->IsIsotropic() )
+        sp = mvsc[i].mpScattPow;
+        if (sp->IsIsotropic())
         {
             Ucart(0,0) = Ucart(1,1) = Ucart(2,2) = sp->GetBiso() * BtoU;
             Ucart(0,1) = Ucart(1,0) = 0;
@@ -259,7 +257,7 @@ getUnitCell()
             Ufrac(1,2) = Ufrac(2,1) = sp->GetBij(2,3) * BtoU;
             Ucart = mlattice.cartesianMatrix(Ufrac);
         }
-        vuij[i] = Ucart;
+        mvuij[i] = Ucart;
     }
 }
 
@@ -293,7 +291,7 @@ rewind()
         msphere.reset(new PointsInSphere(rsphmin, rsphmax, L));
     }
     // BaseBondGenerator::rewind calls this->rewindSymmetry,
-    // which takes care of msphere and symiter configuration
+    // which takes care of msphere and msymiter configuration
     this->BaseBondGenerator::rewind();
 }
 
@@ -324,8 +322,8 @@ r1() const
 {
     static R3::Vector rv;
     const Lattice& L = pstructure->getLattice();
-    assert( symiter != pstructure->vsym[msite_current].end() );
-    rv = *symiter + L.cartesian(msphere->mno());
+    assert(msymiter != pstructure->mvsym[this->site1()].end());
+    rv = *msymiter + L.cartesian(msphere->mno());
     return rv;
 }
 
@@ -355,9 +353,9 @@ iterateSymmetry()
     // Iterate the sphere. If it is finished, rewind and iterate the symmetry
     // iterator. If that is also finished, then we're done.
     msphere->next();
-    if( msphere->finished() )
+    if (msphere->finished())
     {
-        if(++symiter == pstructure->vsym[msite_current].end())
+        if (++msymiter == pstructure->mvsym[this->site1()].end())
         {
             return false;
         }
@@ -372,7 +370,7 @@ ObjCrystBondGenerator::
 rewindSymmetry()
 {
     msphere->rewind();
-    symiter = pstructure->vsym[msite_current].begin();
+    msymiter = pstructure->mvsym[this->site1()].begin();
 }
 
 

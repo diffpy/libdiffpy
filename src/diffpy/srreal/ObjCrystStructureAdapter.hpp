@@ -76,13 +76,13 @@ class ObjCrystStructureAdapter : public StructureAdapter
         // Tolerance on distance measurments
         static const double toler;
         // The ObjCryst::Crystal
-        const ObjCryst::Crystal* pcryst;
+        const ObjCryst::Crystal* mpcryst;
         // The asymmetric unit cell of ScatteringComponent instances
-        std::vector< ObjCryst::ScatteringComponent > vsc;
+        std::vector< ObjCryst::ScatteringComponent > mvsc;
         // The symmetry-related operations on the asymmetric unit cell
-        std::vector<SymPosSet> vsym;
+        std::vector<SymPosSet> mvsym;
         // The Uij for the scatterers
-        std::vector< R3::Matrix > vuij;
+        std::vector< R3::Matrix > mvuij;
         // The Lattice instance needed by the ObjCrystBondGenerator
         Lattice mlattice;
 
@@ -119,7 +119,7 @@ class ObjCrystBondGenerator : public BaseBondGenerator
 
         // data
         const ObjCrystStructureAdapter* pstructure;
-        ObjCrystStructureAdapter::SymPosSet::const_iterator symiter;
+        ObjCrystStructureAdapter::SymPosSet::const_iterator msymiter;
         std::auto_ptr<PointsInSphere> msphere;
 
         double msdSiteDir(int siteidx, const R3::Vector& s) const;
