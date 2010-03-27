@@ -64,9 +64,10 @@ class BaseEwaldSum : public PairQuantity
         virtual void addPairContribution(const BaseBondGenerator&);
 
         // own methods
-        virtual double pairScale(const BaseBondGenerator&, const double&) const;
-        virtual double sfSiteAtQ(int, const double&) const;
-        virtual double sfAverageAtQ(const double&) const;
+        virtual void setupPairScale(const BaseBondGenerator&);
+        virtual double pairScale(const double& Q) const;
+        virtual double sfSiteAtQ(int, const double& Q) const;
+        virtual double sfAverageAtQ(const double& Q) const;
 
     private:
 

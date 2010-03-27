@@ -81,13 +81,13 @@ QuantityType BaseEwaldSum::getExtendedF() const
     const double& dq = this->getQstep();
     const double totocc = mstructure->totalOccupancy();
     const int npts = this->totalPoints();
-    for (int i = this->qminPoints(); i < npts; ++i)
+    for (int kq = this->qminPoints(); kq < npts; ++kq)
     {
-        double q = i * dq;
+        double q = kq * dq;
         double sfavg = this->sfAverageAtQ(q);
         double fscale = (sfavg * totocc) == 0 ? 0.0 :
             1.0 / (sfavg * sfavg * totocc);
-        rv[i] *= fscale;
+        rv[kq] *= fscale;
     }
     return rv;
 }
@@ -98,7 +98,7 @@ QuantityType BaseEwaldSum::getExtendedQgrid() const
     const int npts = this->totalPoints();
     QuantityType rv;
     rv.reserve(npts);
-    for (int i = 0; i < npts; ++i)  rv.push_back(i * this->getQstep());
+    for (int kq = 0; kq < npts; ++kq)  rv.push_back(kq * this->getQstep());
     return rv;
 }
 
@@ -177,21 +177,27 @@ void BaseEwaldSum::addPairContribution(const BaseBondGenerator& bnds)
     const int summationscale = 2;
     const double dist = bnds.distance();
     if (eps_eq(0.0, dist))  return;
-    for (int i = this->qminPoints(); i < this->totalPoints(); ++i)
+    this->setupPairScale(bnds);
+    for (int kq = this->qminPoints(); kq < this->totalPoints(); ++kq)
     {
-        double q = i * this->getQstep();
-        double pairscale = this->pairScale(bnds, q);
+        const double q = kq * this->getQstep();
+        double pairscale = this->pairScale(q);
         if (pairscale / dist < this->getEwaldPrecision())   break;
         double scaledsfprod = summationscale * pairscale *
             this->sfSiteAtQ(bnds.site0(), q) *
             this->sfSiteAtQ(bnds.site1(), q);
-        mvalue[i] += scaledsfprod * sin(q * dist) / dist;
+        mvalue[kq] += scaledsfprod * sin(q * dist) / dist;
     }
 }
 
 
-double BaseEwaldSum::pairScale(const BaseBondGenerator& bnds,
-        const double& q) const
+void BaseEwaldSum::setupPairScale(const BaseBondGenerator& bnds)
+{
+    return;
+}
+
+
+double BaseEwaldSum::pairScale(const double& q) const
 {
     return 1.0;
 }
