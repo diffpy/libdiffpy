@@ -482,13 +482,6 @@ const string& PDFCalculator::getRadiationType() const
 }
 
 
-double PDFCalculator::sfAtomType(const string& smbl) const
-{
-    const ScatteringFactorTable& sft = this->getScatteringFactorTable();
-    double rv = sft.lookup(smbl);
-    return rv;
-}
-
 // Protected Methods ---------------------------------------------------------
 
 // Attributes overloads
@@ -700,10 +693,11 @@ void PDFCalculator::cacheStructureData()
     int cntsites = mstructure->countSites();
     // sfsite
     mstructure_cache.sfsite.resize(cntsites);
+    const ScatteringFactorTable& sftable = this->getScatteringFactorTable();
     for (int i = 0; i < cntsites; ++i)
     {
         const string& smbl = mstructure->siteAtomType(i);
-        mstructure_cache.sfsite[i] = this->sfAtomType(smbl) *
+        mstructure_cache.sfsite[i] = sftable.lookup(smbl) *
             mstructure->siteOccupancy(i);
     }
     // sfaverage

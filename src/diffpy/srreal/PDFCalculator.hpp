@@ -108,8 +108,6 @@ class PDFCalculator : public PairQuantity, public PeakWidthModelOwner
         void setScatteringFactorTable(const std::string& tp);
         const ScatteringFactorTable& getScatteringFactorTable() const;
         const std::string& getRadiationType() const;
-        // scattering factors lookup
-        double sfAtomType(const std::string&) const;
 
     protected:
 
