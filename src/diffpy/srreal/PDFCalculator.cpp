@@ -308,28 +308,6 @@ const double& PDFCalculator::getExtendedRmax() const
     return mrlimits_cache.extendedrmax;
 }
 
-// PDF peak width configuration
-
-void PDFCalculator::setPeakWidthModel(const PeakWidthModel& pwm)
-{
-    if (mpwmodel.get() == &pwm)   return;
-    mpwmodel.reset(pwm.copy());
-}
-
-
-void PDFCalculator::setPeakWidthModel(const string& tp)
-{
-    auto_ptr<PeakWidthModel> ppwm(createPeakWidthModel(tp));
-    this->setPeakWidthModel(*ppwm);
-}
-
-
-const PeakWidthModel& PDFCalculator::getPeakWidthModel() const
-{
-    assert(mpwmodel.get());
-    return *mpwmodel;
-}
-
 // PDF peak profile configuration
 
 void PDFCalculator::setPeakProfile(const PeakProfile& pkf)
@@ -517,7 +495,7 @@ double PDFCalculator::sfAtomType(const string& smbl) const
 
 void PDFCalculator::accept(diffpy::BaseAttributesVisitor& v)
 {
-    mpwmodel->accept(v);
+    this->getPeakWidthModel().accept(v);
     mpeakprofile->accept(v);
     mbaseline->accept(v);
     // PDF envelopes
@@ -532,7 +510,7 @@ void PDFCalculator::accept(diffpy::BaseAttributesVisitor& v)
 
 void PDFCalculator::accept(diffpy::BaseAttributesVisitor& v) const
 {
-    mpwmodel->accept(v);
+    this->getPeakWidthModel().accept(v);
     mpeakprofile->accept(v);
     mbaseline->accept(v);
     // PDF envelopes

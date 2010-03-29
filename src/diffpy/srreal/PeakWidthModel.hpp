@@ -17,6 +17,9 @@
 *     returns full width at half maximum, based on peak model parameters
 *     and anisotropic displacement parameters of atoms in the pair.
 *
+* class PeakWidthModelOwner -- to be used as a base class for classes
+*     that own PeakWidthModel
+*
 * $Id$
 *
 *****************************************************************************/
@@ -26,6 +29,7 @@
 
 #include <string>
 #include <set>
+#include <boost/shared_ptr.hpp>
 
 #include <diffpy/Attributes.hpp>
 
@@ -50,6 +54,23 @@ class PeakWidthModel : public diffpy::Attributes
 
         // comparison with derived classes
         virtual bool operator==(const PeakWidthModel&) const = 0;
+};
+
+
+class PeakWidthModelOwner
+{
+    public:
+
+        // PDF peak width configuration
+        void setPeakWidthModel(const PeakWidthModel&);
+        void setPeakWidthModel(const std::string& tp);
+        PeakWidthModel& getPeakWidthModel();
+        const PeakWidthModel& getPeakWidthModel() const;
+
+    private:
+
+        // data
+        boost::shared_ptr<PeakWidthModel> mpwmodel;
 };
 
 // Factory functions for Peak Width Models -----------------------------------

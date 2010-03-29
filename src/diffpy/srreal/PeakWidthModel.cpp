@@ -27,6 +27,36 @@ using diffpy::ClassRegistry;
 namespace diffpy {
 namespace srreal {
 
+// class PeakWidthModelOwner -------------------------------------------------
+
+void PeakWidthModelOwner::setPeakWidthModel(const PeakWidthModel& pwm)
+{
+    if (mpwmodel.get() == &pwm)   return;
+    mpwmodel.reset(pwm.copy());
+}
+
+
+void PeakWidthModelOwner::setPeakWidthModel(const string& tp)
+{
+    auto_ptr<PeakWidthModel> ppwm(createPeakWidthModel(tp));
+    this->setPeakWidthModel(*ppwm);
+}
+
+
+PeakWidthModel& PeakWidthModelOwner::getPeakWidthModel()
+{
+    assert(mpwmodel.get());
+    return *mpwmodel;
+}
+
+
+const PeakWidthModel& PeakWidthModelOwner::getPeakWidthModel() const
+{
+    assert(mpwmodel.get());
+    return *mpwmodel;
+}
+
+
 // Factory Functions ---------------------------------------------------------
 
 PeakWidthModel* createPeakWidthModel(const string& tp)

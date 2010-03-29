@@ -34,7 +34,7 @@
 namespace diffpy {
 namespace srreal {
 
-class PDFCalculator : public PairQuantity
+class PDFCalculator : public PairQuantity, public PeakWidthModelOwner
 {
     public:
 
@@ -78,11 +78,6 @@ class PDFCalculator : public PairQuantity
         const double& getExtendedRmin() const;
         /// upper bound of the r-range extended for termination ripples
         const double& getExtendedRmax() const;
-
-        // PDF peak width configuration
-        void setPeakWidthModel(const PeakWidthModel&);
-        void setPeakWidthModel(const std::string& tp);
-        const PeakWidthModel& getPeakWidthModel() const;
 
         // PDF profile configuration
         void setPeakProfile(const PeakProfile&);
@@ -176,7 +171,6 @@ class PDFCalculator : public PairQuantity
         double mqmax;
         double mrstep;
         double mmaxextension;
-        boost::shared_ptr<PeakWidthModel> mpwmodel;
         boost::shared_ptr<PeakProfile> mpeakprofile;
         boost::shared_ptr<PDFBaseline> mbaseline;
         EnvelopeStorage menvelope;
