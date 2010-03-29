@@ -12,26 +12,26 @@
 *
 ******************************************************************************
 *
-* class BaseEwaldSum -- base class for concrete Ewald sum calculators
+* class BaseDebyeSum -- base class for concrete Debye sum calculators
 *
 * $Id$
 *
 *****************************************************************************/
 
-#ifndef BASEEWALDSUM_HPP_INCLUDED
-#define BASEEWALDSUM_HPP_INCLUDED
+#ifndef BASEDEBYESUM_HPP_INCLUDED
+#define BASEDEBYESUM_HPP_INCLUDED
 
 #include <diffpy/srreal/PairQuantity.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class BaseEwaldSum : public PairQuantity
+class BaseDebyeSum : public PairQuantity
 {
     public:
 
         // constructor
-        BaseEwaldSum();
+        BaseDebyeSum();
 
         // results
         /// F(Q) values on a Q-grid cut off at Qmin
@@ -52,10 +52,10 @@ class BaseEwaldSum : public PairQuantity
         const double& getQstep() const;
 
         // Summation cutoff due to Q-dependent pair scaling or large distance
-        /// set relative cutoff value for Ewald sum contribution
-        void setEwaldPrecision(double);
-        /// return relative cutoff value for Ewald sum contribution
-        const double& getEwaldPrecision() const;
+        /// set relative cutoff value for Debye sum contribution
+        void setDebyePrecision(double);
+        /// return relative cutoff value for Debye sum contribution
+        const double& getDebyePrecision() const;
 
     protected:
 
@@ -84,15 +84,15 @@ class BaseEwaldSum : public PairQuantity
         double mqmin;
         double mqmax;
         double mqstep;
-        double mewaldprecision;
+        double mdebyeprecision;
         struct {
             int qminpoints;
             int totalpoints;
         } mqpoints_cache;
 
-};  // class BaseEwaldSum
+};  // class BaseDebyeSum
 
 }   // namespace srreal
 }   // namespace diffpy
 
-#endif  // BASEEWALDSUM_HPP_INCLUDED
+#endif  // BASEDEBYESUM_HPP_INCLUDED

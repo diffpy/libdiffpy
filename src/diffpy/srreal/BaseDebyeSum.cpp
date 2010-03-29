@@ -12,7 +12,7 @@
 *
 ******************************************************************************
 *
-* class BaseEwaldSum -- base class for concrete Ewald sum calculators
+* class BaseDebyeSum -- base class for concrete Debye sum calculators
 *
 * $Id$
 *
@@ -23,7 +23,7 @@
 #include <stdexcept>
 #include <sstream>
 
-#include <diffpy/srreal/BaseEwaldSum.hpp>
+#include <diffpy/srreal/BaseDebyeSum.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
@@ -39,27 +39,27 @@ namespace srreal {
 
 namespace {
 
-const double DEFAULT_EWALD_PRECISION = 1e-5;
+const double DEFAULT_DEBYE_PRECISION = 1e-5;
 void ensureNonNegative(const string& vname, double value);
 
 }   // namespace
 
 // Constructor ---------------------------------------------------------------
 
-BaseEwaldSum::BaseEwaldSum()
+BaseDebyeSum::BaseDebyeSum()
 {
     // default configuration
     this->setQmin(0.0);
     this->setQmax(10.0);
     this->setQmin(0.05);
-    this->setEwaldPrecision(DEFAULT_EWALD_PRECISION);
+    this->setDebyePrecision(DEFAULT_DEBYE_PRECISION);
 }
 
 // Public Methods ------------------------------------------------------------
 
 // results
 
-QuantityType BaseEwaldSum::getF() const
+QuantityType BaseDebyeSum::getF() const
 {
     QuantityType rv = this->getExtendedF();
     rv.erase(rv.begin(), rv.begin() + this->qminPoints());
@@ -67,7 +67,7 @@ QuantityType BaseEwaldSum::getF() const
 }
 
 
-QuantityType BaseEwaldSum::getQgrid() const
+QuantityType BaseDebyeSum::getQgrid() const
 {
     QuantityType rv = this->getExtendedQgrid();
     rv.erase(rv.begin(), rv.begin() + this->qminPoints());
@@ -75,7 +75,7 @@ QuantityType BaseEwaldSum::getQgrid() const
 }
 
 
-QuantityType BaseEwaldSum::getExtendedF() const
+QuantityType BaseDebyeSum::getExtendedF() const
 {
     QuantityType rv = mvalue;
     const double& dq = this->getQstep();
@@ -93,7 +93,7 @@ QuantityType BaseEwaldSum::getExtendedF() const
 }
 
 
-QuantityType BaseEwaldSum::getExtendedQgrid() const
+QuantityType BaseDebyeSum::getExtendedQgrid() const
 {
     const int npts = this->totalPoints();
     QuantityType rv;
@@ -104,7 +104,7 @@ QuantityType BaseEwaldSum::getExtendedQgrid() const
 
 // Q-range configuration
 
-void BaseEwaldSum::setQmin(double qmin)
+void BaseDebyeSum::setQmin(double qmin)
 {
     ensureNonNegative("Qmin", qmin);
     mqmin = qmin;
@@ -112,13 +112,13 @@ void BaseEwaldSum::setQmin(double qmin)
 }
 
 
-const double& BaseEwaldSum::getQmin() const
+const double& BaseDebyeSum::getQmin() const
 {
     return mqmin;
 }
 
 
-void BaseEwaldSum::setQmax(double qmax)
+void BaseDebyeSum::setQmax(double qmax)
 {
     ensureNonNegative("Qmax", qmax);
     mqmax = qmax;
@@ -126,13 +126,13 @@ void BaseEwaldSum::setQmax(double qmax)
 }
 
 
-const double& BaseEwaldSum::getQmax() const
+const double& BaseDebyeSum::getQmax() const
 {
     return mqmax;
 }
 
 
-void BaseEwaldSum::setQstep(double qstep)
+void BaseDebyeSum::setQstep(double qstep)
 {
     if (!eps_gt(qstep, 0))
     {
@@ -144,35 +144,35 @@ void BaseEwaldSum::setQstep(double qstep)
 }
 
 
-const double& BaseEwaldSum::getQstep() const
+const double& BaseDebyeSum::getQstep() const
 {
     return mqstep;
 }
 
 
-void BaseEwaldSum::setEwaldPrecision(double precision)
+void BaseDebyeSum::setDebyePrecision(double precision)
 {
-    mewaldprecision = precision;
+    mdebyeprecision = precision;
 }
 
 
-const double& BaseEwaldSum::getEwaldPrecision() const
+const double& BaseDebyeSum::getDebyePrecision() const
 {
-    return mewaldprecision;
+    return mdebyeprecision;
 }
 
 // Protected Methods ---------------------------------------------------------
 
 // PairQuantity overloads
 
-void BaseEwaldSum::resetValue()
+void BaseDebyeSum::resetValue()
 {
     this->resizeValue(this->totalPoints());
     this->PairQuantity::resetValue();
 }
 
 
-void BaseEwaldSum::addPairContribution(const BaseBondGenerator& bnds)
+void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds)
 {
     const int summationscale = 2;
     const double dist = bnds.distance();
@@ -182,7 +182,7 @@ void BaseEwaldSum::addPairContribution(const BaseBondGenerator& bnds)
     {
         const double q = kq * this->getQstep();
         double pairscale = this->pairScale(q);
-        if (pairscale / dist < this->getEwaldPrecision())   break;
+        if (pairscale / dist < this->getDebyePrecision())   break;
         double scaledsfprod = summationscale * pairscale *
             this->sfSiteAtQ(bnds.site0(), q) *
             this->sfSiteAtQ(bnds.site1(), q);
@@ -191,44 +191,44 @@ void BaseEwaldSum::addPairContribution(const BaseBondGenerator& bnds)
 }
 
 
-void BaseEwaldSum::setupPairScale(const BaseBondGenerator& bnds)
+void BaseDebyeSum::setupPairScale(const BaseBondGenerator& bnds)
 {
     return;
 }
 
 
-double BaseEwaldSum::pairScale(const double& q) const
+double BaseDebyeSum::pairScale(const double& q) const
 {
     return 1.0;
 }
 
 
-double BaseEwaldSum::sfSiteAtQ(int siteidx, const double& q) const
+double BaseDebyeSum::sfSiteAtQ(int siteidx, const double& q) const
 {
     return 1.0;
 }
 
 
-double BaseEwaldSum::sfAverageAtQ(const double&q) const
+double BaseDebyeSum::sfAverageAtQ(const double&q) const
 {
     return 1.0;
 }
 
 // Private Methods -----------------------------------------------------------
 
-int BaseEwaldSum::qminPoints() const
+int BaseDebyeSum::qminPoints() const
 {
     return mqpoints_cache.qminpoints;
 }
 
 
-int BaseEwaldSum::totalPoints() const
+int BaseDebyeSum::totalPoints() const
 {
     return mqpoints_cache.totalpoints;
 }
 
 
-void BaseEwaldSum::cacheQpointsData()
+void BaseDebyeSum::cacheQpointsData()
 {
     const double& dq = this->getQstep();
     mqpoints_cache.qminpoints = int(this->getQmin() / dq);
