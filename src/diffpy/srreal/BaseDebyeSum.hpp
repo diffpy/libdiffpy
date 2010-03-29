@@ -67,17 +67,20 @@ class BaseDebyeSum : public PairQuantity
         virtual void setupPairScale(const BaseBondGenerator&);
         virtual double pairScale(const double& Q) const;
         virtual double sfSiteAtQ(int, const double& Q) const;
-        virtual double sfAverageAtQ(const double& Q) const;
-
-    private:
-
-        // methods
         /// number of ignored points in the extended r-grid below qmin
         int qminPoints() const;
         /// total number of points in mvalue
         int totalPoints() const;
+
+    private:
+
+        // methods
         /// cache integer Q-grid limits from Qmin, Qmax, Qstep
         void cacheQpointsData();
+        /// cache structure factors data for a quick access during summation
+        double sfSiteAtkQ(int siteidx, int kq) const;
+        double sfAverageAtkQ(int kq) const;
+        void cacheStructureData();
 
         // data
         // configuration
@@ -89,6 +92,10 @@ class BaseDebyeSum : public PairQuantity
             int qminpoints;
             int totalpoints;
         } mqpoints_cache;
+        struct {
+            std::vector< boost::shared_ptr<QuantityType> > sfsiteatkq;
+            QuantityType sfaverageatkq;
+        } mstructure_cache;
 
 };  // class BaseDebyeSum
 

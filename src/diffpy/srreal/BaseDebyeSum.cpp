@@ -22,6 +22,7 @@
 #include <string>
 #include <stdexcept>
 #include <sstream>
+#include <functional>
 
 #include <diffpy/srreal/BaseDebyeSum.hpp>
 #include <diffpy/mathutils.hpp>
@@ -78,13 +79,11 @@ QuantityType BaseDebyeSum::getQgrid() const
 QuantityType BaseDebyeSum::getExtendedF() const
 {
     QuantityType rv = mvalue;
-    const double& dq = this->getQstep();
     const double totocc = mstructure->totalOccupancy();
     const int npts = this->totalPoints();
     for (int kq = this->qminPoints(); kq < npts; ++kq)
     {
-        double q = kq * dq;
-        double sfavg = this->sfAverageAtQ(q);
+        double sfavg = this->sfAverageAtkQ(kq);
         double fscale = (sfavg * totocc) == 0 ? 0.0 :
             1.0 / (sfavg * sfavg * totocc);
         rv[kq] *= fscale;
@@ -167,6 +166,8 @@ const double& BaseDebyeSum::getDebyePrecision() const
 
 void BaseDebyeSum::resetValue()
 {
+    this->cacheQpointsData();
+    this->cacheStructureData();
     this->resizeValue(this->totalPoints());
     this->PairQuantity::resetValue();
 }
@@ -184,8 +185,8 @@ void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds)
         double pairscale = this->pairScale(q);
         if (pairscale / dist < this->getDebyePrecision())   break;
         double scaledsfprod = summationscale * pairscale *
-            this->sfSiteAtQ(bnds.site0(), q) *
-            this->sfSiteAtQ(bnds.site1(), q);
+            this->sfSiteAtkQ(bnds.site0(), kq) *
+            this->sfSiteAtkQ(bnds.site1(), kq);
         mvalue[kq] += scaledsfprod * sin(q * dist) / dist;
     }
 }
@@ -209,13 +210,6 @@ double BaseDebyeSum::sfSiteAtQ(int siteidx, const double& q) const
 }
 
 
-double BaseDebyeSum::sfAverageAtQ(const double&q) const
-{
-    return 1.0;
-}
-
-// Private Methods -----------------------------------------------------------
-
 int BaseDebyeSum::qminPoints() const
 {
     return mqpoints_cache.qminpoints;
@@ -227,6 +221,7 @@ int BaseDebyeSum::totalPoints() const
     return mqpoints_cache.totalpoints;
 }
 
+// Private Methods -----------------------------------------------------------
 
 void BaseDebyeSum::cacheQpointsData()
 {
@@ -238,6 +233,76 @@ void BaseDebyeSum::cacheQpointsData()
     {
         mqpoints_cache.totalpoints += 1;
     }
+}
+
+
+double BaseDebyeSum::sfSiteAtkQ(int siteidx, int kq) const
+{
+    assert(siteidx < int(mstructure_cache.sfsiteatkq.size()));
+    assert(mstructure_cache.sfsiteatkq[siteidx].get());
+    const QuantityType& sfarray = *(mstructure_cache.sfsiteatkq[siteidx]);
+    assert(0 <= kq && kq < int(sfarray.size()));
+    return sfarray[kq];
+}
+
+
+double BaseDebyeSum::sfAverageAtkQ(int kq) const
+{
+    assert(kq < int(mstructure_cache.sfaverageatkq.size()));
+    return mstructure_cache.sfaverageatkq[kq];
+}
+
+
+void BaseDebyeSum::cacheStructureData()
+{
+    int cntsites = mstructure->countSites();
+    QuantityType zeros(this->totalPoints(), 0.0);
+    map<string,int> atomtypeidx;
+    // sfsiteatkq
+    mstructure_cache.sfsiteatkq.clear();
+    for (int siteidx = 0; siteidx < cntsites; ++siteidx)
+    {
+        const string& smbl = mstructure->siteAtomType(siteidx);
+        if (!atomtypeidx.count(smbl))  atomtypeidx[smbl] = siteidx;
+        int idx = atomtypeidx[smbl];
+        assert(mstructure->siteAtomType(siteidx) ==
+                mstructure->siteAtomType(idx));
+        assert(idx <= int(mstructure_cache.sfsiteatkq.size()));
+        // link to an existing array
+        if (idx < int(mstructure_cache.sfsiteatkq.size()))
+        {
+            assert(mstructure_cache.sfsiteatkq[idx].get());
+            mstructure_cache.sfsiteatkq.push_back(
+                    mstructure_cache.sfsiteatkq[idx]);
+            continue;
+        }
+        // here we need to build a new array
+        boost::shared_ptr<QuantityType> pa(new QuantityType(zeros));
+        mstructure_cache.sfsiteatkq.push_back(pa);
+        QuantityType& sfarray = *(mstructure_cache.sfsiteatkq.back());
+        for (int kq = this->qminPoints(); kq < this->totalPoints(); ++kq)
+        {
+            double q = this->getQstep() * kq;
+            sfarray[kq] = this->sfSiteAtQ(siteidx, q);
+        }
+    }
+    assert(cntsites == int(mstructure_cache.sfsiteatkq.size()));
+    // sfaverageatkq
+    QuantityType& sfak = mstructure_cache.sfaverageatkq;
+    sfak = zeros;
+    for (int siteidx = 0; siteidx < cntsites; ++siteidx)
+    {
+        QuantityType& sfarray = *(mstructure_cache.sfsiteatkq[siteidx]);
+        const int multipl = mstructure->siteMultiplicity(siteidx);
+        for (int kq = this->qminPoints(); kq < this->totalPoints(); ++kq)
+        {
+            sfak[kq] += sfarray[kq] * multipl;
+        }
+    }
+    double tosc = eps_gt(mstructure->totalOccupancy(), 0.0) ?
+        (1.0 / mstructure->totalOccupancy()) : 1.0;
+    transform(sfak.begin(), sfak.end(), sfak.begin(),
+            bind1st(multiplies<double>(), tosc));
 }
 
 // Local Helpers -------------------------------------------------------------
