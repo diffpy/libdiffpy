@@ -70,7 +70,7 @@ class BaseDebyeSum : public PairQuantity
         /// number of ignored points in the extended r-grid below qmin
         int qminPoints() const;
         /// total number of points in mvalue
-        int totalPoints() const;
+        int totalQPoints() const;
 
     private:
 
