@@ -36,6 +36,8 @@
 
 using namespace std;
 using namespace diffpy::srreal;
+using diffpy::mathutils::eps_lt;
+using diffpy::mathutils::eps_gt;
 
 // Declaration of Local Helpers ----------------------------------------------
 
@@ -177,7 +179,6 @@ QuantityType PDFCalculator::getExtendedRDF() const
 
 QuantityType PDFCalculator::getExtendedRDFperR() const
 {
-    using diffpy::mathutils::eps_gt;
     QuantityType rdf_ext = this->getExtendedRDF();
     QuantityType rgrid_ext = this->getExtendedRgrid();
     assert(rdf_ext.size() == rgrid_ext.size());
@@ -193,8 +194,6 @@ QuantityType PDFCalculator::getExtendedRDFperR() const
 
 QuantityType PDFCalculator::getExtendedRgrid() const
 {
-    using diffpy::mathutils::eps_lt;
-    using diffpy::mathutils::eps_gt;
     QuantityType rv(this->extendedPoints());
     QuantityType::iterator ri = rv.begin();
     // make sure exact value of rmin will be in the extended grid
@@ -270,7 +269,7 @@ void PDFCalculator::setRmax(double rmax)
 
 void PDFCalculator::setRstep(double rstep)
 {
-    if (rstep <= 0)
+    if (!(eps_gt(rstep, 0.0)))
     {
         const char* emsg = "Rstep must be positive.";
         throw invalid_argument(emsg);

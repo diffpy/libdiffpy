@@ -79,3 +79,5 @@ bool registerPythonStructureAdapterFactory(PythonStructureAdapterFactory fctr)
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// End of file

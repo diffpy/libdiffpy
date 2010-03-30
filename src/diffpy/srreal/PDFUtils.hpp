@@ -29,15 +29,15 @@
 namespace diffpy {
 namespace srreal {
 
-// Calculate MSD along specified direction in Cartesian space.
+/// Calculate MSD along specified direction in Cartesian space.
 double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
         bool anisotropy=false);
 
-// Apply band pass filter to a sequence of doubles
+/// Apply band pass filter to a sequence of doubles
 template <class Ti>
 void bandPassFilter(Ti first, Ti last, double dr, double qmin, double qmax);
 
-// Implementation of bandPassFilter using padded complex valarray
+/// Implementation of bandPassFilter using padded complex valarray
 void bandPassFilterCValarray(std::valarray<double>& ycpa,
         double dr, double qmin, double qmax);
 

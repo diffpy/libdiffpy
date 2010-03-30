@@ -31,9 +31,9 @@ template <class Ti>
 void bandPassFilter(Ti first, Ti last, double dr, double qmin, double qmax)
 {
     if (!(first < last))    return;
-    size_t datalen = last - first;
+    int datalen = last - first;
     // pad data with the same number of zeros up to the next power of 2
-    size_t padlen = (size_t) pow(2, ceil(log2(datalen) + 1));
+    int padlen = (int) pow(2, int(ceil(log2(datalen) + 1)));
     // ycpad is complex, so it needs to be twice as long
     std::valarray<double> ycpa(0.0, 2 * padlen);
     double* ycfirst = &(ycpa[0]);
