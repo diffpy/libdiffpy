@@ -26,6 +26,8 @@
 #include <gsl/gsl_fft_complex.h>
 
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
+#include <diffpy/srreal/PDFUtils.hpp>
+#include <diffpy/srreal/GaussianProfile.hpp>
 #include <diffpy/mathutils.hpp>
 
 using namespace std;
@@ -146,15 +148,18 @@ const double& DebyePDFCalculator::getMaxExtension() const
 
 const double& DebyePDFCalculator::getExtendedRmin() const
 {
-    // FIXME
-    return this->getRmin();
+    static double extrmin;
+    extrmin = this->getRmin() - this->extFromPeakTails();
+    if (extrmin < 0)  extrmin = 0.0;
+    return extrmin;
 }
 
 
 const double& DebyePDFCalculator::getExtendedRmax() const
 {
-    // FIXME
-    return this->getRmax();
+    static double extrmax;
+    extrmax = this->getRmax() + this->extFromPeakTails();
+    return extrmax;
 }
 
 // Protected Methods ---------------------------------------------------------
@@ -164,12 +169,18 @@ const double& DebyePDFCalculator::getExtendedRmax() const
 void DebyePDFCalculator::accept(diffpy::BaseAttributesVisitor& v)
 {
     // FIXME
+    this->getPeakWidthModel().accept(v);
+    // finally call standard accept
+    this->diffpy::Attributes::accept(v);
 }
 
 
 void DebyePDFCalculator::accept(diffpy::BaseAttributesVisitor& v) const
 {
     // FIXME
+    this->getPeakWidthModel().accept(v);
+    // finally call standard accept
+    this->diffpy::Attributes::accept(v);
 }
 
 // BaseDebyeSum overloads
@@ -193,6 +204,20 @@ double DebyePDFCalculator::sfSiteAtQ(int, const double& Q) const
     return 1.0;
 }
 
+// Private Methods -----------------------------------------------------------
+
+double DebyePDFCalculator::extFromPeakTails() const
+{
+    double maxmsd = 2 * maxUii(mstructure);
+    double maxfwhm = this->getPeakWidthModel().calculateFromMSD(maxmsd);
+    // assume Gaussian peak profile
+    GaussianProfile pkf;
+    pkf.setPrecision(this->getDebyePrecision());
+    // Gaussian function is symmetric, no need to use xboundlo
+    double rv = pkf.xboundhi(maxfwhm);
+    rv = min(rv, this->getMaxExtension());
+    return rv;
+}
 
 }   // namespace srreal
 }   // namespace diffpy

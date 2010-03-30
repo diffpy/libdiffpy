@@ -44,7 +44,6 @@ using diffpy::mathutils::eps_gt;
 namespace {
 
 void ensureNonNegative(const string& vname, double value);
-double maxUii(const StructureAdapter*);
 
 /// Default peak precision was obtained from the tunePeakPrecision.py script
 /// and it was tuned to give average zero slope in the difference curve
@@ -592,6 +591,7 @@ double PDFCalculator::extFromTerminationRipples() const
 
 double PDFCalculator::extFromPeakTails() const
 {
+    // assume uncorrelated neighbors with maxUii
     double maxmsd = 2 * maxUii(mstructure);
     double maxfwhm = this->getPeakWidthModel().calculateFromMSD(maxmsd);
     const PeakProfile& pkf = this->getPeakProfile();
@@ -757,20 +757,6 @@ void ensureNonNegative(const string& vname, double value)
 }
 
 
-double maxUii(const StructureAdapter* stru)
-{
-    if (!stru)  return 0.0;
-    double rv = 0.0;
-    for (int i = 0; i < stru->countSites(); ++i)
-    {
-        const R3::Matrix& U = stru->siteCartesianUij(i);
-        for (int k = 0; k < R3::Ndim; k++)
-        {
-            if (U(k,k) > rv)   rv = U(k,k);
-        }
-    }
-    return rv;
-}
 
 }   // namespace
 

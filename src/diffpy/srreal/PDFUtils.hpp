@@ -25,6 +25,7 @@
 
 #include <valarray>
 #include <diffpy/srreal/R3linalg.hpp>
+#include <diffpy/srreal/StructureAdapter.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -32,6 +33,9 @@ namespace srreal {
 /// Calculate MSD along specified direction in Cartesian space.
 double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
         bool anisotropy=false);
+
+/// Maximum diagonal Uii element from all atoms in the structure.
+double maxUii(const StructureAdapter* stru);
 
 /// Apply band pass filter to a sequence of doubles
 template <class Ti>

@@ -63,6 +63,23 @@ double meanSquareDisplacement(const R3::Matrix& Uijcartn,
     return rv;
 }
 
+
+double maxUii(const StructureAdapter* stru)
+{
+    if (!stru)  return 0.0;
+    double rv = 0.0;
+    for (int i = 0; i < stru->countSites(); ++i)
+    {
+        const R3::Matrix& U = stru->siteCartesianUij(i);
+        for (int k = 0; k < R3::Ndim; k++)
+        {
+            if (U(k,k) > rv)   rv = U(k,k);
+        }
+    }
+    return rv;
+}
+
+
 void bandPassFilterCValarray(valarray<double>& ycpa, double dr,
         double qmin, double qmax)
 {

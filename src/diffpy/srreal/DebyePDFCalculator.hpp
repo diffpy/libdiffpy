@@ -100,6 +100,9 @@ class DebyePDFCalculator : public BaseDebyeSum,
         double mrstep;
         double mmaxextension;
 
+        // methods
+        double extFromPeakTails() const;
+
 };  // class DebyePDFCalculator
 
 }   // namespace srreal
