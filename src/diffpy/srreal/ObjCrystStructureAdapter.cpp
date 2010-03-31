@@ -134,7 +134,7 @@ ObjCrystStructureAdapter::
 siteAnisotropy(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return mvsc[idx].mpScattPow->IsIsotropic();
+    return !(mvsc[idx].mpScattPow->IsIsotropic());
 }
 
 double
@@ -247,7 +247,8 @@ getUnitCell()
         }
         else
         {
-            // FIXME anisotropic tensors must be symmetry rotated.
+            // anisotropic tensors need not be symmetry rotated, since we only
+            // calculate distances between primitive scatterers.
             R3::Matrix Ufrac;
             Ufrac(0,0) = sp->GetBij(1,1) * BtoU;
             Ufrac(1,1) = sp->GetBij(2,2) * BtoU;
