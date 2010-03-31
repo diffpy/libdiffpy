@@ -76,7 +76,8 @@ DebyePDFCalculator::DebyePDFCalculator()
 
 QuantityType DebyePDFCalculator::getPDF() const
 {
-    int nfromdr = M_PI / this->getRstep() / this->getQstep();
+    // FIXME - check this especially the coefficient 2
+    int nfromdr = 2 * M_PI / this->getRstep() / this->getQstep();
     int nrequired = max(this->totalQPoints(), nfromdr);
     int nlog2 = int(floor(log2(nrequired))) + 1;
     int padlen = int(pow(2, nlog2));
