@@ -26,12 +26,14 @@
 
 #include <diffpy/srreal/BaseDebyeSum.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/validators.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 
 using namespace std;
-using diffpy::mathutils::eps_eq;
+using namespace diffpy::validators;
 using diffpy::mathutils::eps_gt;
+using diffpy::mathutils::eps_eq;
 
 namespace diffpy {
 namespace srreal {
@@ -42,7 +44,6 @@ namespace {
 
 /// Default cutoff for the Q-decreasing scale of the sine contributions.
 const double DEFAULT_DEBYE_PRECISION = 1e-6;
-void ensureNonNegative(const string& vname, double value);
 
 }   // namespace
 
@@ -135,11 +136,7 @@ const double& BaseDebyeSum::getQmax() const
 
 void BaseDebyeSum::setQstep(double qstep)
 {
-    if (!eps_gt(qstep, 0))
-    {
-        const char* emsg = "Qstep must be positive.";
-        throw invalid_argument(emsg);
-    }
+    ensureEpsilonPositive("Qstep", qstep);
     mqstep = qstep;
     this->cacheQpointsData();
 }
@@ -298,21 +295,6 @@ void BaseDebyeSum::cacheStructureData()
             bind1st(multiplies<double>(), tosc));
 }
 
-// Local Helpers -------------------------------------------------------------
-
-namespace {
-
-void ensureNonNegative(const string& vname, double value)
-{
-    if (value < 0.0)
-    {
-        stringstream emsg;
-        emsg << vname << " cannot be negative.";
-        throw invalid_argument(emsg.str());
-    }
-}
-
-}   // namespace
 
 }   // namespace srreal
 }   // namespace diffpy

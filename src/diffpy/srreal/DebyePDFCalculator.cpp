@@ -30,8 +30,10 @@
 #include <diffpy/srreal/GaussianProfile.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/validators.hpp>
 
 using namespace std;
+using namespace diffpy::validators;
 using diffpy::mathutils::eps_gt;
 
 namespace diffpy {
@@ -130,16 +132,14 @@ void DebyePDFCalculator::setOptimumQstep()
 
 void DebyePDFCalculator::setRmin(double rmin)
 {
-// FIXME
-//    ensureNonNegative("Rmin", rmin);
+    ensureNonNegative("Rmin", rmin);
     this->PairQuantity::setRmin(rmin);
 }
 
 
 void DebyePDFCalculator::setRmax(double rmax)
 {
-// FIXME
-//    ensureNonNegative("Rmax", rmax);
+    ensureNonNegative("Rmax", rmax);
     this->PairQuantity::setRmax(rmax);
     this->updateQstep();
 }
@@ -147,11 +147,7 @@ void DebyePDFCalculator::setRmax(double rmax)
 
 void DebyePDFCalculator::setRstep(double rstep)
 {
-    if (!(eps_gt(rstep, 0.0)))
-    {
-        const char* emsg = "Rstep must be positive.";
-        throw invalid_argument(emsg);
-    }
+    ensureEpsilonPositive("Rstep", rstep);
     mrstep = rstep;
 }
 
@@ -164,11 +160,7 @@ const double& DebyePDFCalculator::getRstep() const
 
 void DebyePDFCalculator::setMaxExtension(double maxextension)
 {
-    if (maxextension < 0.0)
-    {
-        const char* emsg = "maxextension cannot be negative.";
-        throw invalid_argument(emsg);
-    }
+    ensureNonNegative("maxextension", maxextension);
     mmaxextension = maxextension;
 }
 

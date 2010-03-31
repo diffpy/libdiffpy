@@ -33,17 +33,17 @@
 #include <diffpy/srreal/LinearBaseline.hpp>
 #include <diffpy/srreal/GaussianProfile.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/validators.hpp>
 
 using namespace std;
 using namespace diffpy::srreal;
+using namespace diffpy::validators;
 using diffpy::mathutils::eps_lt;
 using diffpy::mathutils::eps_gt;
 
 // Declaration of Local Helpers ----------------------------------------------
 
 namespace {
-
-void ensureNonNegative(const string& vname, double value);
 
 /// Default peak precision was obtained from the tunePeakPrecision.py script
 /// and it was tuned to give average zero slope in the difference curve
@@ -268,11 +268,7 @@ void PDFCalculator::setRmax(double rmax)
 
 void PDFCalculator::setRstep(double rstep)
 {
-    if (!(eps_gt(rstep, 0.0)))
-    {
-        const char* emsg = "Rstep must be positive.";
-        throw invalid_argument(emsg);
-    }
+    ensureEpsilonPositive("Rstep", rstep);
     mrstep = rstep;
 }
 
@@ -712,22 +708,5 @@ void PDFCalculator::cacheRlimitsData()
     mrlimits_cache.rcalchigh = this->getRmax() + ext_total;
 }
 
-// Local Helpers -------------------------------------------------------------
-
-namespace {
-
-void ensureNonNegative(const string& vname, double value)
-{
-    if (value < 0.0)
-    {
-        stringstream emsg;
-        emsg << vname << " cannot be negative.";
-        throw invalid_argument(emsg.str());
-    }
-}
-
-
-
-}   // namespace
 
 // End of file
