@@ -84,10 +84,6 @@ class DebyePDFCalculator : public BaseDebyeSum,
         /// maximum total extension of the r-range accounting for both
         /// termination ripples and peak tails
         const double& getMaxExtension() const;
-        /// lower bound for the r-range extended for termination ripples
-        double getExtendedRmin() const;
-        /// upper bound of the r-range extended for termination ripples
-        double getExtendedRmax() const;
 
     protected:
 
@@ -104,7 +100,13 @@ class DebyePDFCalculator : public BaseDebyeSum,
 
         // methods
         void updateQstep();
+        /// complete lower bound extension of the calculated grid
+        double rcalclo() const;
+        /// complete upper bound extension of the calculated grid
+        double rcalchi() const;
+        /// r-range extension to allow propagation of termination ripples
         double extFromTerminationRipples() const;
+        /// r-range extension to account for tails from out-of-range peaks
         double extFromPeakTails() const;
         void cacheRlimitsData();
 

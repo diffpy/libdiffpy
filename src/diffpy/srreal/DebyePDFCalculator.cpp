@@ -178,21 +178,6 @@ const double& DebyePDFCalculator::getMaxExtension() const
     return mmaxextension;
 }
 
-
-double DebyePDFCalculator::getExtendedRmin() const
-{
-    double rv = this->getRmin() - mrlimits_cache.totalextension;
-    rv = max(rv, 0.0);
-    return rv;
-}
-
-
-double DebyePDFCalculator::getExtendedRmax() const
-{
-    double rv = this->getRmax() + mrlimits_cache.totalextension;
-    return rv;
-}
-
 // Protected Methods ---------------------------------------------------------
 
 // attributes overload to direct visitors around data structures
@@ -228,8 +213,8 @@ void DebyePDFCalculator::resetValue()
 
 void DebyePDFCalculator::configureBondGenerator(BaseBondGenerator& bnds)
 {
-    bnds.setRmin(this->getExtendedRmin());
-    bnds.setRmax(this->getExtendedRmax());
+    bnds.setRmin(this->rcalclo());
+    bnds.setRmax(this->rcalchi());
 }
 
 
@@ -246,12 +231,27 @@ double DebyePDFCalculator::sfSiteAtQ(int siteidx, const double& Q) const
 void DebyePDFCalculator::updateQstep()
 {
     if (!moptimumqstep)  return;
-    double extrmax = this->getExtendedRmax();
-    // Use at least 4 steps to Qmax even for tiny extrmax.
+    double rmaxext = this->rcalchi();
+    // Use at least 4 steps to Qmax even for tiny rmaxext.
     // Avoid division by zero.
-    double qstep = (this->getQmax() * extrmax / M_PI > 4) ?
-        (M_PI / extrmax) : (this->getQmax() / 4);
+    double qstep = (this->getQmax() * rmaxext / M_PI > 4) ?
+        (M_PI / rmaxext) : (this->getQmax() / 4);
     this->BaseDebyeSum::setQstep(qstep);
+}
+
+
+double DebyePDFCalculator::rcalclo() const
+{
+    double rv = this->getRmin() - mrlimits_cache.totalextension;
+    rv = max(rv, 0.0);
+    return rv;
+}
+
+
+double DebyePDFCalculator::rcalchi() const
+{
+    double rv = this->getRmax() + mrlimits_cache.totalextension;
+    return rv;
 }
 
 
