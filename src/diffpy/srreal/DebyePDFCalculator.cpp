@@ -49,7 +49,25 @@ DebyePDFCalculator::DebyePDFCalculator()
     this->setRmax(10.0);
     this->setMaxExtension(10.0);
     // attributes
-    // FIXME
+    this->registerDoubleAttribute("qmin", this,
+            &DebyePDFCalculator::getQmin, &DebyePDFCalculator::setQmin);
+    this->registerDoubleAttribute("qmax", this,
+            &DebyePDFCalculator::getQmax, &DebyePDFCalculator::setQmax);
+    this->registerDoubleAttribute("qstep", this,
+            &DebyePDFCalculator::getQstep, &DebyePDFCalculator::setQstep);
+    this->registerDoubleAttribute("rmin", this,
+            &DebyePDFCalculator::getRmin, &DebyePDFCalculator::setRmin);
+    this->registerDoubleAttribute("rmax", this,
+            &DebyePDFCalculator::getRmax, &DebyePDFCalculator::setRmax);
+    this->registerDoubleAttribute("rstep", this,
+            &DebyePDFCalculator::getRmax, &DebyePDFCalculator::setRmax);
+    this->registerDoubleAttribute("maxextension", this,
+            &DebyePDFCalculator::getMaxExtension,
+            &DebyePDFCalculator::setMaxExtension);
+    this->registerDoubleAttribute("extendedrmin", this,
+            &DebyePDFCalculator::rcalclo);
+    this->registerDoubleAttribute("extendedrmax", this,
+            &DebyePDFCalculator::rcalchi);
 }
 
 // Public Methods ------------------------------------------------------------
@@ -176,7 +194,6 @@ const double& DebyePDFCalculator::getMaxExtension() const
 
 void DebyePDFCalculator::accept(diffpy::BaseAttributesVisitor& v)
 {
-    // FIXME
     using ::diffpy::Attributes;
     this->getPeakWidthModel().accept(v);
     // finally call standard accept
@@ -186,7 +203,6 @@ void DebyePDFCalculator::accept(diffpy::BaseAttributesVisitor& v)
 
 void DebyePDFCalculator::accept(diffpy::BaseAttributesVisitor& v) const
 {
-    // FIXME
     using ::diffpy::Attributes;
     this->getPeakWidthModel().accept(v);
     // finally call standard accept

@@ -57,6 +57,10 @@ BaseDebyeSum::BaseDebyeSum()
     this->setQmax(10.0);
     this->setQstep(0.05);
     this->setDebyePrecision(DEFAULT_DEBYE_PRECISION);
+    // attributes
+    this->registerDoubleAttribute("debyeprecision", this,
+            &BaseDebyeSum::getDebyePrecision,
+            &BaseDebyeSum::setDebyePrecision);
 }
 
 // Public Methods ------------------------------------------------------------
