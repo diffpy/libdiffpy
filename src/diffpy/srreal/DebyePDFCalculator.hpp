@@ -72,6 +72,7 @@ class DebyePDFCalculator : public BaseDebyeSum,
         // Q-range configuration
         virtual void setQstep(double);
         void setOptimumQstep();
+        bool isOptimumQstep() const;
 
         // R-range configuration
         virtual void setRmin(double);

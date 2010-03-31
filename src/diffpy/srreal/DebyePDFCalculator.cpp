@@ -148,6 +148,12 @@ void DebyePDFCalculator::setOptimumQstep()
     this->updateQstep();
 }
 
+
+bool DebyePDFCalculator::isOptimumQstep() const
+{
+    return moptimumqstep;
+}
+
 // R-range configuration
 
 void DebyePDFCalculator::setRmin(double rmin)
