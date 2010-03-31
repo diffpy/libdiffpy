@@ -35,14 +35,10 @@ class BaseDebyeSum : public PairQuantity, public PeakWidthModelOwner
         BaseDebyeSum();
 
         // results
-        /// F(Q) values on a Q-grid cut off at Qmin
-        QuantityType getF() const;
-        /// output Q-grid that is cut off at Qmin
-        QuantityType getQgrid() const;
         /// F values on a full Q-grid starting at 0
-        QuantityType getExtendedF() const;
+        QuantityType getF() const;
         /// Full Q-grid starting at 0
-        QuantityType getExtendedQgrid() const;
+        QuantityType getQgrid() const;
 
         // Q-range configuration
         void setQmin(double);
@@ -94,6 +90,7 @@ class BaseDebyeSum : public PairQuantity, public PeakWidthModelOwner
         struct {
             std::vector< boost::shared_ptr<QuantityType> > sfsiteatkq;
             QuantityType sfaverageatkq;
+            double totaloccupancy;
         } mstructure_cache;
 
 };  // class BaseDebyeSum

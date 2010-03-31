@@ -69,24 +69,8 @@ BaseDebyeSum::BaseDebyeSum()
 
 QuantityType BaseDebyeSum::getF() const
 {
-    QuantityType rv = this->getExtendedF();
-    rv.erase(rv.begin(), rv.begin() + this->qminPoints());
-    return rv;
-}
-
-
-QuantityType BaseDebyeSum::getQgrid() const
-{
-    QuantityType rv = this->getExtendedQgrid();
-    rv.erase(rv.begin(), rv.begin() + this->qminPoints());
-    return rv;
-}
-
-
-QuantityType BaseDebyeSum::getExtendedF() const
-{
     QuantityType rv = mvalue;
-    const double totocc = mstructure->totalOccupancy();
+    const double& totocc = mstructure_cache.totaloccupancy;
     const int npts = this->totalQPoints();
     for (int kq = this->qminPoints(); kq < npts; ++kq)
     {
@@ -99,7 +83,7 @@ QuantityType BaseDebyeSum::getExtendedF() const
 }
 
 
-QuantityType BaseDebyeSum::getExtendedQgrid() const
+QuantityType BaseDebyeSum::getQgrid() const
 {
     const int npts = this->totalQPoints();
     QuantityType rv;
@@ -297,6 +281,8 @@ void BaseDebyeSum::cacheStructureData()
         (1.0 / mstructure->totalOccupancy()) : 1.0;
     transform(sfak.begin(), sfak.end(), sfak.begin(),
             bind1st(multiplies<double>(), tosc));
+    // totaloccupancy
+    mstructure_cache.totaloccupancy = mstructure->totalOccupancy();
 }
 
 
