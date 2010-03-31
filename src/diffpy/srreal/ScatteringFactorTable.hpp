@@ -13,6 +13,9 @@
 ******************************************************************************
 *
 * class ScatteringFactorTable -- base class for looking up scattering factors
+
+* class ScatteringFactorTableOwner -- to be used as a base class for classes
+*     that own ScatteringFactorTable
 *
 * $Id$
 *
@@ -24,6 +27,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <boost/shared_ptr.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -50,6 +54,26 @@ class ScatteringFactorTable
         virtual double fetch(const std::string& smbl) const = 0;
         mutable std::map<std::string,double> mtable;
 };
+
+
+class ScatteringFactorTableOwner
+{
+    public:
+
+        // access and configuration of scattering factors
+        void setScatteringFactorTable(const ScatteringFactorTable&);
+        void setScatteringFactorTable(const std::string& tp);
+        ScatteringFactorTable& getScatteringFactorTable();
+        const ScatteringFactorTable& getScatteringFactorTable() const;
+        const std::string& getRadiationType() const;
+
+
+    private:
+
+        // data
+        boost::shared_ptr<ScatteringFactorTable> msftable;
+};
+
 
 // Factory functions for Scattering Factor Tables ----------------------------
 

@@ -41,7 +41,9 @@ namespace srreal {
 DebyePDFCalculator::DebyePDFCalculator()
 {
     // default configuration
+    this->setScatteringFactorTable("SFTperiodictableXray");
     this->setRstep(0.01);
+    this->setRmax(10.0);
     this->setMaxExtension(10.0);
     // attributes
     // FIXME

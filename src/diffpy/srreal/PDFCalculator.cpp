@@ -450,36 +450,6 @@ void PDFCalculator::clearEnvelopes()
     menvelope.clear();
 }
 
-// access and configuration of scattering factors
-
-void PDFCalculator::setScatteringFactorTable(const ScatteringFactorTable& sft)
-{
-    if (msftable.get() == &sft)   return;
-    msftable.reset(sft.copy());
-}
-
-
-void PDFCalculator::setScatteringFactorTable(const string& tp)
-{
-    auto_ptr<ScatteringFactorTable> sft(createScatteringFactorTable(tp));
-    this->setScatteringFactorTable(*sft);
-}
-
-
-const ScatteringFactorTable& PDFCalculator::getScatteringFactorTable() const
-{
-    assert(msftable.get());
-    return *msftable;
-}
-
-
-const string& PDFCalculator::getRadiationType() const
-{
-    const string& tp = this->getScatteringFactorTable().radiationType();
-    return tp;
-}
-
-
 // Protected Methods ---------------------------------------------------------
 
 // Attributes overloads

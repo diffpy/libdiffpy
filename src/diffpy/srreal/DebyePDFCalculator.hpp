@@ -51,11 +51,13 @@
 #define DEBYEPDFCALCULATOR_HPP_INCLUDED
 
 #include <diffpy/srreal/BaseDebyeSum.hpp>
+#include <diffpy/srreal/ScatteringFactorTable.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class DebyePDFCalculator : public BaseDebyeSum
+class DebyePDFCalculator : public BaseDebyeSum,
+    public ScatteringFactorTableOwner
 {
     public:
 

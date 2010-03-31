@@ -34,7 +34,9 @@
 namespace diffpy {
 namespace srreal {
 
-class PDFCalculator : public PairQuantity, public PeakWidthModelOwner
+class PDFCalculator : public PairQuantity,
+    public PeakWidthModelOwner,
+    public ScatteringFactorTableOwner
 {
     public:
 
@@ -103,12 +105,6 @@ class PDFCalculator : public PairQuantity, public PeakWidthModelOwner
         std::set<std::string> usedEnvelopeTypes() const;
         void clearEnvelopes();
 
-        // access and configuration of scattering factors
-        void setScatteringFactorTable(const ScatteringFactorTable&);
-        void setScatteringFactorTable(const std::string& tp);
-        const ScatteringFactorTable& getScatteringFactorTable() const;
-        const std::string& getRadiationType() const;
-
     protected:
 
         // types
@@ -172,7 +168,6 @@ class PDFCalculator : public PairQuantity, public PeakWidthModelOwner
         boost::shared_ptr<PeakProfile> mpeakprofile;
         boost::shared_ptr<PDFBaseline> mbaseline;
         EnvelopeStorage menvelope;
-        boost::shared_ptr<ScatteringFactorTable> msftable;
         struct {
             std::vector<double> sfsite;
             double sfaverage;

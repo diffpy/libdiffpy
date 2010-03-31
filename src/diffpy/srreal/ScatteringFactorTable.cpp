@@ -63,6 +63,45 @@ void ScatteringFactorTable::resetAll()
     mtable.clear();
 }
 
+// class ScatteringFactorTableOwner ------------------------------------------
+
+void ScatteringFactorTableOwner::setScatteringFactorTable(
+        const ScatteringFactorTable& sft)
+{
+    if (msftable.get() == &sft)   return;
+    msftable.reset(sft.copy());
+}
+
+
+void ScatteringFactorTableOwner::setScatteringFactorTable(const string& tp)
+{
+    auto_ptr<ScatteringFactorTable> sft(createScatteringFactorTable(tp));
+    this->setScatteringFactorTable(*sft);
+}
+
+
+ScatteringFactorTable&
+ScatteringFactorTableOwner::getScatteringFactorTable()
+{
+    assert(msftable.get());
+    return *msftable;
+}
+
+
+const ScatteringFactorTable&
+ScatteringFactorTableOwner::getScatteringFactorTable() const
+{
+    assert(msftable.get());
+    return *msftable;
+}
+
+
+const string& ScatteringFactorTableOwner::getRadiationType() const
+{
+    const string& tp = this->getScatteringFactorTable().radiationType();
+    return tp;
+}
+
 // Factory Functions ---------------------------------------------------------
 
 ScatteringFactorTable* createScatteringFactorTable(const string& tp)
