@@ -28,6 +28,7 @@
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/srreal/GaussianProfile.hpp>
+#include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/mathutils.hpp>
 
 using namespace std;
@@ -112,6 +113,38 @@ QuantityType DebyePDFCalculator::getRgrid() const
 }
 
 
+void DebyePDFCalculator::setQstep(double qstep)
+{
+    moptimumqstep = false;
+    this->BaseDebyeSum::setQstep(qstep);
+}
+
+
+void DebyePDFCalculator::setOptimumQstep()
+{
+    moptimumqstep = true;
+    this->updateQstep();
+}
+
+// R-range configuration
+
+void DebyePDFCalculator::setRmin(double rmin)
+{
+// FIXME
+//    ensureNonNegative("Rmin", rmin);
+    this->PairQuantity::setRmin(rmin);
+}
+
+
+void DebyePDFCalculator::setRmax(double rmax)
+{
+// FIXME
+//    ensureNonNegative("Rmax", rmax);
+    this->PairQuantity::setRmax(rmax);
+    this->updateQstep();
+}
+
+
 void DebyePDFCalculator::setRstep(double rstep)
 {
     if (!(eps_gt(rstep, 0.0)))
@@ -146,15 +179,18 @@ const double& DebyePDFCalculator::getMaxExtension() const
 }
 
 
-const double& DebyePDFCalculator::getExtendedRmin() const
+double DebyePDFCalculator::getExtendedRmin() const
 {
-    return mrlimits_cache.extendedrmin;
+    double rv = this->getRmin() - mrlimits_cache.totalextension;
+    rv = max(rv, 0.0);
+    return rv;
 }
 
 
-const double& DebyePDFCalculator::getExtendedRmax() const
+double DebyePDFCalculator::getExtendedRmax() const
 {
-    return mrlimits_cache.extendedrmax;
+    double rv = this->getRmax() + mrlimits_cache.totalextension;
+    return rv;
 }
 
 // Protected Methods ---------------------------------------------------------
@@ -185,22 +221,50 @@ void DebyePDFCalculator::accept(diffpy::BaseAttributesVisitor& v) const
 void DebyePDFCalculator::resetValue()
 {
     this->cacheRlimitsData();
+    this->updateQstep();
     this->BaseDebyeSum::resetValue();
+}
+
+
+void DebyePDFCalculator::configureBondGenerator(BaseBondGenerator& bnds)
+{
+    bnds.setRmin(this->getExtendedRmin());
+    bnds.setRmax(this->getExtendedRmax());
 }
 
 
 double DebyePDFCalculator::sfSiteAtQ(int siteidx, const double& Q) const
 {
-    /*
     const ScatteringFactorTable& sftable = this->getScatteringFactorTable();
     const string& smbl = mstructure->siteAtomType(siteidx);
     double rv = sftable.lookup(smbl) * mstructure->siteOccupancy(siteidx);
     return rv;
-    */
-    return 1.0;
 }
 
 // Private Methods -----------------------------------------------------------
+
+void DebyePDFCalculator::updateQstep()
+{
+    if (!moptimumqstep)  return;
+    double extrmax = this->getExtendedRmax();
+    // Use at least 4 steps to Qmax even for tiny extrmax.
+    // Avoid division by zero.
+    double qstep = (this->getQmax() * extrmax / M_PI > 4) ?
+        (M_PI / extrmax) : (this->getQmax() / 4);
+    this->BaseDebyeSum::setQstep(qstep);
+}
+
+
+double DebyePDFCalculator::extFromTerminationRipples() const
+{
+    // number of termination ripples for extending the r-range
+    const int nripples = 6;
+    // extension due to termination ripples
+    double rv = (this->getQmax() > 0.0) ?
+        (nripples*2*M_PI / this->getQmax()) : 0.0;
+    return rv;
+}
+
 
 double DebyePDFCalculator::extFromPeakTails() const
 {
@@ -211,17 +275,15 @@ double DebyePDFCalculator::extFromPeakTails() const
     pkf.setPrecision(this->getDebyePrecision());
     // Gaussian function is symmetric, no need to use xboundlo
     double rv = pkf.xboundhi(maxfwhm);
-    rv = min(rv, this->getMaxExtension());
     return rv;
 }
 
 
 void DebyePDFCalculator::cacheRlimitsData()
 {
-    double ext_tails = this->extFromPeakTails();
-    mrlimits_cache.extendedrmin = this->getRmin() - ext_tails;
-    mrlimits_cache.extendedrmin = max(0.0, mrlimits_cache.extendedrmin);
-    mrlimits_cache.extendedrmax = this->getRmax() + ext_tails;
+    double totext =
+        this->extFromTerminationRipples() + this->extFromPeakTails();
+    mrlimits_cache.totalextension = min(totext, this->getMaxExtension());
 }
 
 }   // namespace srreal

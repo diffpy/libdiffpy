@@ -54,7 +54,7 @@ BaseDebyeSum::BaseDebyeSum()
     this->setPeakWidthModel("jeong");
     this->setQmin(0.0);
     this->setQmax(10.0);
-    this->setQmin(0.05);
+    this->setQstep(0.05);
     this->setDebyePrecision(DEFAULT_DEBYE_PRECISION);
 }
 

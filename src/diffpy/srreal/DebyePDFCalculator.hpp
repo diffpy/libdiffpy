@@ -69,7 +69,13 @@ class DebyePDFCalculator : public BaseDebyeSum,
         QuantityType getPDF() const;
         QuantityType getRgrid() const;
 
+        // Q-range configuration
+        virtual void setQstep(double);
+        void setOptimumQstep();
+
         // R-range configuration
+        virtual void setRmin(double);
+        virtual void setRmax(double);
         void setRstep(double);
         const double& getRstep() const;
         /// maximum total extension of the r-range accounting for both
@@ -79,9 +85,9 @@ class DebyePDFCalculator : public BaseDebyeSum,
         /// termination ripples and peak tails
         const double& getMaxExtension() const;
         /// lower bound for the r-range extended for termination ripples
-        const double& getExtendedRmin() const;
+        double getExtendedRmin() const;
         /// upper bound of the r-range extended for termination ripples
-        const double& getExtendedRmax() const;
+        double getExtendedRmax() const;
 
     protected:
 
@@ -91,23 +97,25 @@ class DebyePDFCalculator : public BaseDebyeSum,
 
         // BaseDebyeSum overloads
         virtual void resetValue();
+        virtual void configureBondGenerator(BaseBondGenerator&);
         virtual double sfSiteAtQ(int, const double& Q) const;
 
     private:
 
         // methods
+        void updateQstep();
+        double extFromTerminationRipples() const;
         double extFromPeakTails() const;
         void cacheRlimitsData();
 
         // data
+        bool moptimumqstep;
         double mrstep;
         double mmaxextension;
         struct RLimitsCache {
-            double extendedrmin;
-            double extendedrmax;
+            double totalextension;
             RLimitsCache() :
-                extendedrmin(0.0),
-                extendedrmax(0.0)
+                totalextension(0.0)
             { }
         };
         RLimitsCache mrlimits_cache;

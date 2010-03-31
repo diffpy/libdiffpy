@@ -49,7 +49,7 @@ class BaseDebyeSum : public PairQuantity, public PeakWidthModelOwner
         const double& getQmin() const;
         void setQmax(double);
         const double& getQmax() const;
-        void setQstep(double);
+        virtual void setQstep(double);
         const double& getQstep() const;
 
         // Summation cutoff due to Q-dependent pair scaling or large distance
