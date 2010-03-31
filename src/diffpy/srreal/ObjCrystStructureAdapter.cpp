@@ -238,7 +238,8 @@ getUnitCell()
         // Store the uij tensor
         R3::Matrix Ucart;
         sp = mvsc[i].mpScattPow;
-        if (sp->IsIsotropic())
+        //if (sp->IsIsotropic())
+        if (true)
         {
             Ucart(0,0) = Ucart(1,1) = Ucart(2,2) = sp->GetBiso() * BtoU;
             Ucart(0,1) = Ucart(1,0) = 0;
