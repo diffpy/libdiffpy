@@ -48,6 +48,7 @@ DebyePDFCalculator::DebyePDFCalculator()
     this->setRstep(0.01);
     this->setRmax(10.0);
     this->setMaxExtension(10.0);
+    this->setOptimumQstep();
     // attributes
     this->registerDoubleAttribute("qmin", this,
             &DebyePDFCalculator::getQmin, &DebyePDFCalculator::setQmin);
@@ -80,11 +81,11 @@ QuantityType DebyePDFCalculator::getPDF() const
     int padlen = int(pow(2, nlog2));
     // complex valarray needs to have twice as many elements
     valarray<double> ftog(0.0, 2 * padlen);
-    QuantityType fqext = this->getExtendedF();
-    assert(fqext.size() * 2 <= ftog.size());
-    QuantityType::const_iterator fe = fqext.begin();
+    QuantityType F = this->getF();
+    assert(F.size() * 2 <= ftog.size());
+    QuantityType::const_iterator fe = F.begin();
     double* pfc = &(ftog[0]);
-    for (; fe != fqext.end(); ++fe, pfc += 2)  { *pfc = *fe; }
+    for (; fe != F.end(); ++fe, pfc += 2)  { *pfc = *fe; }
     // apply inverse fft
     int status;
     status = gsl_fft_complex_radix2_inverse(&(ftog[0]), 1, padlen);
@@ -93,14 +94,15 @@ QuantityType DebyePDFCalculator::getPDF() const
         const char* emsgft = "Fourier Transformation failed.";
         throw invalid_argument(emsgft);
     }
-    // normalize complex part by drpad = 2 * pi / Qmax_padded
-    double drpad = 2 * M_PI / (padlen * this->getQstep());
+    // normalize the complex part
+    double qmaxpad = padlen * this->getQstep();
     valarray<double> gpad(0.0, padlen / 2);
     for (int i = 0; i < padlen / 2; ++i)
     {
-        gpad[i] = drpad * ftog[2 * i + 1];
+        gpad[i] = ftog[2 * i + 1] * 2 / M_PI * qmaxpad;
     }
     // interpolate to the output r-grid
+    const double drpad = 2 * M_PI / qmaxpad;
     QuantityType rgrid = this->getRgrid();
     QuantityType pdf(rgrid.size());
     QuantityType::const_iterator ri = rgrid.begin();
