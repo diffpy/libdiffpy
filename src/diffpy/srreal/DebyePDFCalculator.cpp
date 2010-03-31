@@ -41,7 +41,6 @@ namespace srreal {
 DebyePDFCalculator::DebyePDFCalculator()
 {
     // default configuration
-    this->setPeakWidthModel("jeong");
     this->setRstep(0.01);
     this->setMaxExtension(10.0);
     // attributes
@@ -93,7 +92,6 @@ QuantityType DebyePDFCalculator::getPDF() const
         assert(iphi < int(gpad.size()));
         *pdfi = wplo * gpad[iplo] + wphi * gpad[iphi];
     }
-    // Heureka should be ready here
     return pdf;
 }
 
@@ -148,18 +146,13 @@ const double& DebyePDFCalculator::getMaxExtension() const
 
 const double& DebyePDFCalculator::getExtendedRmin() const
 {
-    static double extrmin;
-    extrmin = this->getRmin() - this->extFromPeakTails();
-    if (extrmin < 0)  extrmin = 0.0;
-    return extrmin;
+    return mrlimits_cache.extendedrmin;
 }
 
 
 const double& DebyePDFCalculator::getExtendedRmax() const
 {
-    static double extrmax;
-    extrmax = this->getRmax() + this->extFromPeakTails();
-    return extrmax;
+    return mrlimits_cache.extendedrmax;
 }
 
 // Protected Methods ---------------------------------------------------------
@@ -169,38 +162,39 @@ const double& DebyePDFCalculator::getExtendedRmax() const
 void DebyePDFCalculator::accept(diffpy::BaseAttributesVisitor& v)
 {
     // FIXME
+    using ::diffpy::Attributes;
     this->getPeakWidthModel().accept(v);
     // finally call standard accept
-    this->diffpy::Attributes::accept(v);
+    this->Attributes::accept(v);
 }
 
 
 void DebyePDFCalculator::accept(diffpy::BaseAttributesVisitor& v) const
 {
     // FIXME
+    using ::diffpy::Attributes;
     this->getPeakWidthModel().accept(v);
     // finally call standard accept
-    this->diffpy::Attributes::accept(v);
+    this->Attributes::accept(v);
 }
 
 // BaseDebyeSum overloads
 
-void DebyePDFCalculator::setupPairScale(const BaseBondGenerator& bnds)
+void DebyePDFCalculator::resetValue()
 {
-    // FIXME
+    this->cacheRlimitsData();
+    this->BaseDebyeSum::resetValue();
 }
 
 
-double DebyePDFCalculator::pairScale(const double& Q) const
+double DebyePDFCalculator::sfSiteAtQ(int siteidx, const double& Q) const
 {
-    // FIXME
-    return 1.0;
-}
-
-
-double DebyePDFCalculator::sfSiteAtQ(int, const double& Q) const
-{
-    // FIXME
+    /*
+    const ScatteringFactorTable& sftable = this->getScatteringFactorTable();
+    const string& smbl = mstructure->siteAtomType(siteidx);
+    double rv = sftable.lookup(smbl) * mstructure->siteOccupancy(siteidx);
+    return rv;
+    */
     return 1.0;
 }
 
@@ -217,6 +211,15 @@ double DebyePDFCalculator::extFromPeakTails() const
     double rv = pkf.xboundhi(maxfwhm);
     rv = min(rv, this->getMaxExtension());
     return rv;
+}
+
+
+void DebyePDFCalculator::cacheRlimitsData()
+{
+    double ext_tails = this->extFromPeakTails();
+    mrlimits_cache.extendedrmin = this->getRmin() - ext_tails;
+    mrlimits_cache.extendedrmin = max(0.0, mrlimits_cache.extendedrmin);
+    mrlimits_cache.extendedrmax = this->getRmax() + ext_tails;
 }
 
 }   // namespace srreal

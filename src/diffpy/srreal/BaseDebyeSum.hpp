@@ -22,11 +22,12 @@
 #define BASEDEBYESUM_HPP_INCLUDED
 
 #include <diffpy/srreal/PairQuantity.hpp>
+#include <diffpy/srreal/PeakWidthModel.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class BaseDebyeSum : public PairQuantity
+class BaseDebyeSum : public PairQuantity, public PeakWidthModelOwner
 {
     public:
 
@@ -64,8 +65,6 @@ class BaseDebyeSum : public PairQuantity
         virtual void addPairContribution(const BaseBondGenerator&);
 
         // own methods
-        virtual void setupPairScale(const BaseBondGenerator&);
-        virtual double pairScale(const double& Q) const;
         virtual double sfSiteAtQ(int, const double& Q) const;
         /// number of ignored points in the extended r-grid below qmin
         int qminPoints() const;

@@ -40,7 +40,8 @@ namespace srreal {
 
 namespace {
 
-const double DEFAULT_DEBYE_PRECISION = 1e-5;
+/// Default cutoff for the Q-decreasing scale of the sine contributions.
+const double DEFAULT_DEBYE_PRECISION = 1e-6;
 void ensureNonNegative(const string& vname, double value);
 
 }   // namespace
@@ -50,6 +51,7 @@ void ensureNonNegative(const string& vname, double value);
 BaseDebyeSum::BaseDebyeSum()
 {
     // default configuration
+    this->setPeakWidthModel("jeong");
     this->setQmin(0.0);
     this->setQmax(10.0);
     this->setQmin(0.05);
@@ -178,29 +180,20 @@ void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds)
     const int summationscale = 2;
     const double dist = bnds.distance();
     if (eps_eq(0.0, dist))  return;
-    this->setupPairScale(bnds);
+    // calculate sigma parameter for the Debye-Waller dampign Gaussian
+    const double fwhm = this->getPeakWidthModel().calculate(bnds);
+    const double fwhmtosigma = 1.0 / (2 * sqrt(2 * M_LN2));
+    const double dwsigma = fwhmtosigma * fwhm;
     for (int kq = this->qminPoints(); kq < this->totalQPoints(); ++kq)
     {
         const double q = kq * this->getQstep();
-        double pairscale = this->pairScale(q);
-        if (pairscale / dist < this->getDebyePrecision())   break;
-        double scaledsfprod = summationscale * pairscale *
+        const double dwscale = exp(-0.5 * pow(dwsigma * q, 2));
+        const double sinescale = summationscale * dwscale *
             this->sfSiteAtkQ(bnds.site0(), kq) *
-            this->sfSiteAtkQ(bnds.site1(), kq);
-        mvalue[kq] += scaledsfprod * sin(q * dist) / dist;
+            this->sfSiteAtkQ(bnds.site1(), kq) / dist;
+        if (sinescale < this->getDebyePrecision())   break;
+        mvalue[kq] += sinescale * sin(q * dist);
     }
-}
-
-
-void BaseDebyeSum::setupPairScale(const BaseBondGenerator& bnds)
-{
-    return;
-}
-
-
-double BaseDebyeSum::pairScale(const double& q) const
-{
-    return 1.0;
 }
 
 

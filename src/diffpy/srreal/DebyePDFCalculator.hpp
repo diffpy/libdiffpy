@@ -51,13 +51,11 @@
 #define DEBYEPDFCALCULATOR_HPP_INCLUDED
 
 #include <diffpy/srreal/BaseDebyeSum.hpp>
-#include <diffpy/srreal/PeakWidthModel.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class DebyePDFCalculator : public BaseDebyeSum,
-    public PeakWidthModelOwner
+class DebyePDFCalculator : public BaseDebyeSum
 {
     public:
 
@@ -90,18 +88,27 @@ class DebyePDFCalculator : public BaseDebyeSum,
         virtual void accept(diffpy::BaseAttributesVisitor& v) const;
 
         // BaseDebyeSum overloads
-        virtual void setupPairScale(const BaseBondGenerator&);
-        virtual double pairScale(const double& Q) const;
+        virtual void resetValue();
         virtual double sfSiteAtQ(int, const double& Q) const;
 
     private:
 
+        // methods
+        double extFromPeakTails() const;
+        void cacheRlimitsData();
+
         // data
         double mrstep;
         double mmaxextension;
-
-        // methods
-        double extFromPeakTails() const;
+        struct RLimitsCache {
+            double extendedrmin;
+            double extendedrmax;
+            RLimitsCache() :
+                extendedrmin(0.0),
+                extendedrmax(0.0)
+            { }
+        };
+        RLimitsCache mrlimits_cache;
 
 };  // class DebyePDFCalculator
 
