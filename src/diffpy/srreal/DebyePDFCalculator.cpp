@@ -49,6 +49,7 @@ DebyePDFCalculator::DebyePDFCalculator()
     this->setRmax(10.0);
     this->setMaxExtension(10.0);
     this->setOptimumQstep();
+    this->setQmax(25.0);
     // attributes
     this->registerDoubleAttribute("qmin", this,
             &DebyePDFCalculator::getQmin, &DebyePDFCalculator::setQmin);
@@ -61,7 +62,7 @@ DebyePDFCalculator::DebyePDFCalculator()
     this->registerDoubleAttribute("rmax", this,
             &DebyePDFCalculator::getRmax, &DebyePDFCalculator::setRmax);
     this->registerDoubleAttribute("rstep", this,
-            &DebyePDFCalculator::getRmax, &DebyePDFCalculator::setRmax);
+            &DebyePDFCalculator::getRstep, &DebyePDFCalculator::setRstep);
     this->registerDoubleAttribute("maxextension", this,
             &DebyePDFCalculator::getMaxExtension,
             &DebyePDFCalculator::setMaxExtension);
