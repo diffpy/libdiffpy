@@ -238,6 +238,7 @@ getUnitCell()
         // Store the uij tensor
         R3::Matrix Ucart;
         sp = mvsc[i].mpScattPow;
+        // anisotropy not yet supported in ObjCryst
         //if (sp->IsIsotropic())
         if (true)
         {
@@ -248,8 +249,13 @@ getUnitCell()
         }
         else
         {
-            // anisotropic tensors need not be symmetry rotated, since we only
-            // calculate distances between primitive scatterers.
+            // Once objcryst starts supporting anisotropy, we will need
+            // to get the rotated Ucart tensors per each equivalent position
+            // in mvsym.  There is no guarantee Ucart will be the same for
+            // all equivalent positions, in fact they will certainly differ in
+            // case of tripple rotation axis with displacement elipsoid
+            // pointing towards the axis.  We don't need to fix it yet, since
+            // only isotropic Uij-s are allowed.
             R3::Matrix Ufrac;
             Ufrac(0,0) = sp->GetBij(1,1) * BtoU;
             Ufrac(1,1) = sp->GetBij(2,2) * BtoU;
