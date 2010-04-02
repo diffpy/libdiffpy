@@ -43,7 +43,6 @@ class PeakProfile : public diffpy::Attributes
         virtual PeakProfile* clone() const = 0;
         PeakProfile();
         virtual ~PeakProfile()  { }
-        PeakProfile& operator=(const PeakProfile&);
 
         // methods
         virtual const std::string& type() const = 0;

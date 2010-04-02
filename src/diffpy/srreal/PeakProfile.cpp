@@ -44,14 +44,6 @@ PeakProfile::PeakProfile() : mprecision(0.0)
             this, &PeakProfile::getPrecision, &PeakProfile::setPrecision);
 }
 
-
-PeakProfile& PeakProfile::operator=(const PeakProfile& other)
-{
-    this->setPrecision(other.getPrecision());
-    return *this;
-}
-
-
 // Public Methods ------------------------------------------------------------
 
 void PeakProfile::setPrecision(double eps)
