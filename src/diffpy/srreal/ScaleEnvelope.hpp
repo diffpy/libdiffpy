@@ -36,7 +36,7 @@ class ScaleEnvelope : public PDFEnvelope
         // constructors
         ScaleEnvelope();
         PDFEnvelope* create() const;
-        PDFEnvelope* copy() const;
+        PDFEnvelope* clone() const;
 
         // methods
         const std::string& type() const;

@@ -35,7 +35,7 @@ class ZeroBaseline : public PDFBaseline
 
         // constructors
         PDFBaseline* create() const;
-        PDFBaseline* copy() const;
+        PDFBaseline* clone() const;
 
         // methods
         const std::string& type() const;

@@ -42,7 +42,7 @@ PDFEnvelope* StepCutEnvelope::create() const
 }
 
 
-PDFEnvelope* StepCutEnvelope::copy() const
+PDFEnvelope* StepCutEnvelope::clone() const
 {
     PDFEnvelope* rv = new StepCutEnvelope(*this);
     return rv;

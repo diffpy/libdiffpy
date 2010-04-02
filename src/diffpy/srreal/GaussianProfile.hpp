@@ -34,7 +34,7 @@ class GaussianProfile : public PeakProfile
         // constructors
         GaussianProfile();
         PeakProfile* create() const;
-        PeakProfile* copy() const;
+        PeakProfile* clone() const;
 
         // methods
         const std::string& type() const;

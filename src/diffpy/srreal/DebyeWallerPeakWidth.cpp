@@ -36,7 +36,7 @@ PeakWidthModel* DebyeWallerPeakWidth::create() const
 }
 
 
-PeakWidthModel* DebyeWallerPeakWidth::copy() const
+PeakWidthModel* DebyeWallerPeakWidth::clone() const
 {
     PeakWidthModel* rv = new DebyeWallerPeakWidth(*this);
     return rv;

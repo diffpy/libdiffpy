@@ -42,7 +42,7 @@ PDFEnvelope* ScaleEnvelope::create() const
 }
 
 
-PDFEnvelope* ScaleEnvelope::copy() const
+PDFEnvelope* ScaleEnvelope::clone() const
 {
     PDFEnvelope* rv = new ScaleEnvelope(*this);
     return rv;

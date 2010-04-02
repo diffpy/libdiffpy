@@ -69,7 +69,7 @@ void ScatteringFactorTableOwner::setScatteringFactorTable(
         const ScatteringFactorTable& sft)
 {
     if (msftable.get() == &sft)   return;
-    msftable.reset(sft.copy());
+    msftable.reset(sft.clone());
 }
 
 

@@ -39,7 +39,7 @@ class BVParametersTable
 
         // constructors
         BVParametersTable();
-        BVParametersTable* copy() const;
+        BVParametersTable* clone() const;
 
         // methods
         const BVParam& none() const;

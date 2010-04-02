@@ -42,7 +42,7 @@ PeakProfile* GaussianProfile::create() const
 }
 
 
-PeakProfile* GaussianProfile::copy() const
+PeakProfile* GaussianProfile::clone() const
 {
     PeakProfile* rv = new GaussianProfile(*this);
     return rv;

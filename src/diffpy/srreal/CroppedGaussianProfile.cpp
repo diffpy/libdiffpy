@@ -46,7 +46,7 @@ PeakProfile* CroppedGaussianProfile::create() const
 }
 
 
-PeakProfile* CroppedGaussianProfile::copy() const
+PeakProfile* CroppedGaussianProfile::clone() const
 {
     PeakProfile* rv = new CroppedGaussianProfile(*this);
     return rv;

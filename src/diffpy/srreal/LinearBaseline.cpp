@@ -43,7 +43,7 @@ PDFBaseline* LinearBaseline::create() const
 }
 
 
-PDFBaseline* LinearBaseline::copy() const
+PDFBaseline* LinearBaseline::clone() const
 {
     PDFBaseline* rv = new LinearBaseline(*this);
     return rv;

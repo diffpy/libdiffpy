@@ -36,7 +36,7 @@ class QResolutionEnvelope : public PDFEnvelope
         // constructors
         QResolutionEnvelope();
         virtual PDFEnvelope* create() const;
-        virtual PDFEnvelope* copy() const;
+        virtual PDFEnvelope* clone() const;
 
         // methods
 

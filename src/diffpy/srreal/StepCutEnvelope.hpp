@@ -37,7 +37,7 @@ class StepCutEnvelope : public PDFEnvelope
         // constructors
         StepCutEnvelope();
         virtual PDFEnvelope* create() const;
-        virtual PDFEnvelope* copy() const;
+        virtual PDFEnvelope* clone() const;
 
         // methods
 

@@ -45,7 +45,7 @@ PDFEnvelope* SphericalShapeEnvelope::create() const
 }
 
 
-PDFEnvelope* SphericalShapeEnvelope::copy() const
+PDFEnvelope* SphericalShapeEnvelope::clone() const
 {
     PDFEnvelope* rv = new SphericalShapeEnvelope(*this);
     return rv;

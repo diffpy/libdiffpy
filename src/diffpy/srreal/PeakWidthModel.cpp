@@ -32,7 +32,7 @@ namespace srreal {
 void PeakWidthModelOwner::setPeakWidthModel(const PeakWidthModel& pwm)
 {
     if (mpwmodel.get() == &pwm)   return;
-    mpwmodel.reset(pwm.copy());
+    mpwmodel.reset(pwm.clone());
 }
 
 

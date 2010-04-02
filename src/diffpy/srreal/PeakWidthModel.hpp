@@ -44,7 +44,7 @@ class PeakWidthModel : public diffpy::Attributes
 
         // constructors
         virtual PeakWidthModel* create() const = 0;
-        virtual PeakWidthModel* copy() const = 0;
+        virtual PeakWidthModel* clone() const = 0;
         virtual ~PeakWidthModel()  { }
 
         // methods

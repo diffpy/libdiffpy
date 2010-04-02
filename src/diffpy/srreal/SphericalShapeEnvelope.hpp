@@ -37,7 +37,7 @@ class SphericalShapeEnvelope : public PDFEnvelope
         // constructors
         SphericalShapeEnvelope();
         virtual PDFEnvelope* create() const;
-        virtual PDFEnvelope* copy() const;
+        virtual PDFEnvelope* clone() const;
 
         // methods
 

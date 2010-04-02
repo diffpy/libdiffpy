@@ -38,7 +38,7 @@ class ScatteringFactorTable
 
         // constructors
         virtual ScatteringFactorTable* create() const = 0;
-        virtual ScatteringFactorTable* copy() const = 0;
+        virtual ScatteringFactorTable* clone() const = 0;
         ~ScatteringFactorTable()  { }
 
         // methods

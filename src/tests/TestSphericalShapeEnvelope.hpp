@@ -54,7 +54,7 @@ public:
     {
         menvelope->setDoubleAttr("spdiameter", 13.0);
         TS_ASSERT_EQUALS(13.0, menvelope->getDoubleAttr("spdiameter"));
-        auto_ptr<PDFEnvelope> e1(menvelope->copy());
+        auto_ptr<PDFEnvelope> e1(menvelope->clone());
         TS_ASSERT_EQUALS(13.0, e1->getDoubleAttr("spdiameter"));
     }
 

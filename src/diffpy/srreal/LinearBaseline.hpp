@@ -36,7 +36,7 @@ class LinearBaseline : public PDFBaseline
         // constructors
         LinearBaseline();
         PDFBaseline* create() const;
-        PDFBaseline* copy() const;
+        PDFBaseline* clone() const;
 
         // methods
         const std::string& type() const;

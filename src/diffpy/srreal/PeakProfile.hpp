@@ -40,7 +40,7 @@ class PeakProfile : public diffpy::Attributes
 
         // constructors
         virtual PeakProfile* create() const = 0;
-        virtual PeakProfile* copy() const = 0;
+        virtual PeakProfile* clone() const = 0;
         PeakProfile();
         virtual ~PeakProfile()  { }
         PeakProfile& operator=(const PeakProfile&);

@@ -34,7 +34,7 @@ PDFBaseline* ZeroBaseline::create() const
 }
 
 
-PDFBaseline* ZeroBaseline::copy() const
+PDFBaseline* ZeroBaseline::clone() const
 {
     PDFBaseline* rv = new ZeroBaseline(*this);
     return rv;

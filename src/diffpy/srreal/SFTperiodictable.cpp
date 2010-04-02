@@ -79,7 +79,7 @@ class SFTperiodictableXray : public ScatteringFactorTable
         }
 
 
-        ScatteringFactorTable* copy() const
+        ScatteringFactorTable* clone() const
         {
             ScatteringFactorTable* rv = new SFTperiodictableXray(*this);
             return rv;
@@ -142,7 +142,7 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
         }
 
 
-        ScatteringFactorTable* copy() const
+        ScatteringFactorTable* clone() const
         {
             ScatteringFactorTable* rv = new SFTperiodictableNeutron(*this);
             return rv;

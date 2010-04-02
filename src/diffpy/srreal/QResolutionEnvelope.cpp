@@ -44,7 +44,7 @@ PDFEnvelope* QResolutionEnvelope::create() const
 }
 
 
-PDFEnvelope* QResolutionEnvelope::copy() const
+PDFEnvelope* QResolutionEnvelope::clone() const
 {
     PDFEnvelope* rv = new QResolutionEnvelope(*this);
     return rv;

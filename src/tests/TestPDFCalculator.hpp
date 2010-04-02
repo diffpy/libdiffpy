@@ -77,7 +77,7 @@ public:
 
     void test_access_PeakProfile()
     {
-        auto_ptr<PeakProfile> pkf(mpdfc->getPeakProfile().copy());
+        auto_ptr<PeakProfile> pkf(mpdfc->getPeakProfile().clone());
         pkf->setPrecision(1.1);
         mpdfc->setPeakProfile(*pkf);
         TS_ASSERT_EQUALS(1.1, mpdfc->getPeakProfile().getPrecision());

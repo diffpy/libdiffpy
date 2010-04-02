@@ -41,7 +41,7 @@ class PDFEnvelope : public diffpy::Attributes
 
         // constructors
         virtual PDFEnvelope* create() const = 0;
-        virtual PDFEnvelope* copy() const = 0;
+        virtual PDFEnvelope* clone() const = 0;
         virtual ~PDFEnvelope()  { }
 
         // methods

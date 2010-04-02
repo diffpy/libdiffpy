@@ -96,7 +96,7 @@ double BVSCalculator::bvrmsdiff() const
 void BVSCalculator::setBVParamTable(const BVParametersTable& bvpt)
 {
     if (mbvptable.get() == &bvpt)   return;
-    mbvptable.reset(bvpt.copy());
+    mbvptable.reset(bvpt.clone());
 }
 
 

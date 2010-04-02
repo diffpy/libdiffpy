@@ -41,7 +41,7 @@ class PDFBaseline : public diffpy::Attributes
 
         // constructors
         virtual PDFBaseline* create() const = 0;
-        virtual PDFBaseline* copy() const = 0;
+        virtual PDFBaseline* clone() const = 0;
         virtual ~PDFBaseline()  { }
 
         // methods

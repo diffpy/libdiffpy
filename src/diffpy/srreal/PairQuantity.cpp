@@ -36,6 +36,11 @@ PairQuantity::PairQuantity()
     this->resizeValue(1);
     this->setEvaluator(BASIC);
     mcountsites = 0;
+    // attributes
+    this->registerDoubleAttribute("rmin", this,
+            &PairQuantity::getRmin, &PairQuantity::setRmin);
+    this->registerDoubleAttribute("rmax", this,
+            &PairQuantity::getRmax, &PairQuantity::setRmax);
 }
 
 // Public Methods ------------------------------------------------------------

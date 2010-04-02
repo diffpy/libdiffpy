@@ -307,7 +307,7 @@ const double& PDFCalculator::getExtendedRmax() const
 void PDFCalculator::setPeakProfile(const PeakProfile& pkf)
 {
     if (mpeakprofile.get() == &pkf)  return;
-    mpeakprofile.reset(pkf.copy());
+    mpeakprofile.reset(pkf.clone());
 }
 
 
@@ -347,7 +347,7 @@ QuantityType PDFCalculator::applyBaseline(
 void PDFCalculator::setBaseline(const PDFBaseline& baseline)
 {
     if (mbaseline.get() == &baseline)  return;
-    mbaseline.reset(baseline.copy());
+    mbaseline.reset(baseline.clone());
 }
 
 
@@ -388,7 +388,7 @@ QuantityType PDFCalculator::applyEnvelopes(
 
 void PDFCalculator::addEnvelope(const PDFEnvelope& envlp)
 {
-    menvelope[envlp.type()].reset(envlp.copy());
+    menvelope[envlp.type()].reset(envlp.clone());
 }
 
 

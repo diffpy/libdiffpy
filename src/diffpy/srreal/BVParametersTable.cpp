@@ -40,7 +40,7 @@ BVParametersTable::BVParametersTable()
 }
 
 
-BVParametersTable* BVParametersTable::copy() const
+BVParametersTable* BVParametersTable::clone() const
 {
     BVParametersTable* rv = new BVParametersTable(*this);
     return rv;

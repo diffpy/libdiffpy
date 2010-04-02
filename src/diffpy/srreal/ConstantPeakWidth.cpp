@@ -41,7 +41,7 @@ PeakWidthModel* ConstantPeakWidth::create() const
 }
 
 
-PeakWidthModel* ConstantPeakWidth::copy() const
+PeakWidthModel* ConstantPeakWidth::clone() const
 {
     PeakWidthModel* rv = new ConstantPeakWidth(*this);
     return rv;

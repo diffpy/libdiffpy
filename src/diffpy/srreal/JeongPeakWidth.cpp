@@ -50,7 +50,7 @@ PeakWidthModel* JeongPeakWidth::create() const
 }
 
 
-PeakWidthModel* JeongPeakWidth::copy() const
+PeakWidthModel* JeongPeakWidth::clone() const
 {
     PeakWidthModel* rv = new JeongPeakWidth(*this);
     return rv;

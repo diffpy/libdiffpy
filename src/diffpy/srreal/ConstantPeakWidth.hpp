@@ -34,7 +34,7 @@ class ConstantPeakWidth : public PeakWidthModel
         // constructors
         ConstantPeakWidth();
         virtual PeakWidthModel* create() const;
-        virtual PeakWidthModel* copy() const;
+        virtual PeakWidthModel* clone() const;
 
         // comparison with derived classes
         virtual bool operator==(const PeakWidthModel&) const;

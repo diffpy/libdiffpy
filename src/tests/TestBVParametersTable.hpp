@@ -53,7 +53,7 @@ public:
         bvtb->setCustom(mynacl);
         TS_ASSERT_EQUALS(1.23, bvtb->lookup("Na", 1, "Cl", -1).mRo);
         TS_ASSERT_EQUALS(0.377, bvtb->lookup("Na", 1, "Cl", -1).mB);
-        bvcp.reset(bvtb->copy());
+        bvcp.reset(bvtb->clone());
         TS_ASSERT_EQUALS(1.23, bvcp->lookup("Na", 1, "Cl", -1).mRo);
         TS_ASSERT_EQUALS(0.377, bvcp->lookup("Na", 1, "Cl", -1).mB);
         bvcp->resetAll();

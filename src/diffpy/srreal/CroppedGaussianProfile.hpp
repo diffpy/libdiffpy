@@ -35,7 +35,7 @@ class CroppedGaussianProfile : public GaussianProfile
         // constructors
         CroppedGaussianProfile();
         PeakProfile* create() const;
-        PeakProfile* copy() const;
+        PeakProfile* clone() const;
 
         // methods
         const std::string& type() const;
