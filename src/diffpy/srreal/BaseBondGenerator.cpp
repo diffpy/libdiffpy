@@ -46,6 +46,8 @@ BaseBondGenerator::BaseBondGenerator(const StructureAdapter* stru)
 void BaseBondGenerator::rewind()
 {
     msite_current = msite_first;
+    // avoid calling rewindSymmetry at an invalid site
+    if (this->finished())   return;
     this->rewindSymmetry();
     this->advanceWhileInvalid();
 }
@@ -61,6 +63,8 @@ void BaseBondGenerator::next()
 void BaseBondGenerator::nextsite()
 {
     msite_current += 1;
+    // avoid calling rewindSymmetry at an invalid site
+    if (this->finished())   return;
     this->rewindSymmetry();
 }
 
