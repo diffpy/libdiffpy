@@ -59,6 +59,7 @@ const string& GaussianProfile::type() const
 
 double GaussianProfile::yvalue(double x, double fwhm) const
 {
+    if ( fwhm <= 0 ) return 0.0;
     double xrel = x / fwhm;
     double rv = 2 * sqrt(M_LN2 / M_PI) / fwhm * exp(-4 * M_LN2 * xrel * xrel);
     return rv;
