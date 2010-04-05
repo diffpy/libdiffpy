@@ -320,6 +320,13 @@ void PDFCalculator::setPeakProfile(const string& tp)
 }
 
 
+PeakProfile& PDFCalculator::getPeakProfile()
+{
+    assert(mpeakprofile.get());
+    return *mpeakprofile;
+}
+
+
 const PeakProfile& PDFCalculator::getPeakProfile() const
 {
     assert(mpeakprofile.get());
