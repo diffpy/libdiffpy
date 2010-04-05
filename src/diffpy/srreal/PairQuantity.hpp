@@ -46,9 +46,9 @@ class PairQuantity : public diffpy::Attributes
         virtual ~PairQuantity()  { }
 
         // methods
-        virtual const QuantityType& eval(const StructureAdapter&);
+        const QuantityType& eval(const StructureAdapter&);
         template <class T> const QuantityType& eval(const T&);
-        virtual const QuantityType& value() const;
+        const QuantityType& value() const;
 
         // configuration
         virtual void setRmin(double);
