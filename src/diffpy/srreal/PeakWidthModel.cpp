@@ -77,7 +77,7 @@ bool aliasPeakWidthModel(const string& tp, const string& al)
 }
 
 
-set<string> getPeakWidthTypes()
+set<string> getPeakWidthModelTypes()
 {
     return ClassRegistry<PeakWidthModel>::getTypes();
 }

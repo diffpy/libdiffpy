@@ -78,7 +78,7 @@ class PeakWidthModelOwner
 PeakWidthModel* createPeakWidthModel(const std::string& tp);
 bool registerPeakWidthModel(const PeakWidthModel&);
 bool aliasPeakWidthModel(const std::string& tp, const std::string& al);
-std::set<std::string> getPeakWidthTypes();
+std::set<std::string> getPeakWidthModelTypes();
 
 }   // namespace srreal
 }   // namespace diffpy
