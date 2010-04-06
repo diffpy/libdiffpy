@@ -172,7 +172,6 @@ ObjCrystStructureAdapter::
 getUnitCell()
 {
     // local constants
-    const SymPosSet emptyset = SymPosSet(R3::EpsCompare(toler));
     R3::Matrix zeros; zeros = 0.0;
 
     // Expand each scattering component in the primitive cell and record the
@@ -190,23 +189,28 @@ getUnitCell()
     mvsc.clear();
     mvsym.clear();
     mvuij.clear();
-    mvsc.resize(nbComponent);
-    mvsym.resize(nbComponent, emptyset);
-    mvuij.resize(nbComponent, zeros);
+    mvsc.reserve(nbComponent);
+    mvsym.reserve(nbComponent);
+    mvuij.reserve(nbComponent);
 
     // For each scattering component, find its position in the primitive cell
-    // and expand that position. Record the translation from the original
-    // position.
+    // and expand that position.
     for (size_t i = 0; i < nbComponent; ++i)
     {
-        mvsc[i] = scl(i);
+        sp = scl(i).mpScattPow;
+
+        // Skip over this if it is a dummy atom. A dummy atom has no
+        // mpScattPow, and therefore no type. It's just in a structure as a
+        // reference position.
+        if (sp == NULL) continue;
+
+        mvsc.push_back(scl(i));
+        SymPosSet symset = SymPosSet(R3::EpsCompare(toler));
+        mvuij.push_back(zeros);
 
         // Get all the symmetric coordinates
         symmetricsCoords = mpcryst->GetSpaceGroup().GetAllSymmetrics(
-            scl(i).mX, 
-            scl(i).mY, 
-            scl(i).mZ
-            );
+            scl(i).mX, scl(i).mY, scl(i).mZ);
 
         // Collect the unique symmetry operations.
         for (size_t j = 0; j < nbSymmetrics; ++j)
@@ -230,18 +234,20 @@ getUnitCell()
             xyz[1] = y;
             xyz[2] = z;
 
-            mvsym[i].insert(xyz);
+            symset.insert(xyz);
 
         }
 
+        // Store symmetry operations
+        mvsym.push_back(symset);
 
         // Store the uij tensor
         R3::Matrix Ucart;
-        sp = mvsc[i].mpScattPow;
         // anisotropy not yet supported in ObjCryst
         //if (sp->IsIsotropic())
         if (true)
         {
+            // Check for dummy atoms. These don't have a scattering power.
             Ucart(0,0) = Ucart(1,1) = Ucart(2,2) = sp->GetBiso() * BtoU;
             Ucart(0,1) = Ucart(1,0) = 0;
             Ucart(0,2) = Ucart(2,0) = 0;
