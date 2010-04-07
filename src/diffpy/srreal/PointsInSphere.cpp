@@ -160,19 +160,19 @@ const int* PointsInSphere::mno() const
 }
 
 
-const int& PointsInSphere::m() const
+int PointsInSphere::m() const
 {
     return this->_mno[0];
 }
 
 
-const int& PointsInSphere::n() const
+int PointsInSphere::n() const
 {
     return this->_mno[1];
 }
 
 
-const int& PointsInSphere::o() const
+int PointsInSphere::o() const
 {
     return this->_mno[2];
 }
@@ -333,19 +333,19 @@ const int* ReflectionsInQminQmax::hkl() const
 }
 
 
-const int& ReflectionsInQminQmax::h() const
+int ReflectionsInQminQmax::h() const
 {
     return this->sph.m();
 }
 
 
-const int& ReflectionsInQminQmax::k() const
+int ReflectionsInQminQmax::k() const
 {
     return this->sph.n();
 }
 
 
-const int& ReflectionsInQminQmax::l() const
+int ReflectionsInQminQmax::l() const
 {
     return this->sph.o();
 }

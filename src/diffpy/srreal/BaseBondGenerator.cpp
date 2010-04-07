@@ -120,13 +120,13 @@ const double& BaseBondGenerator::getRmax() const
 }
 
 
-const int& BaseBondGenerator::site0() const
+int BaseBondGenerator::site0() const
 {
     return msite_anchor;
 }
 
 
-const int& BaseBondGenerator::site1() const
+int BaseBondGenerator::site1() const
 {
     return msite_current;
 }

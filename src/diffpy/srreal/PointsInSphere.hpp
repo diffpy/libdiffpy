@@ -112,9 +112,9 @@ class PointsInSphere
         const double& Rmin() const;
         const double& Rmax() const;
         const int* mno() const;
-        const int& m() const;
-        const int& n() const;
-        const int& o() const;
+        int m() const;
+        int n() const;
+        int o() const;
         double r() const;
 
     private:
@@ -176,9 +176,9 @@ class ReflectionsInQminQmax
         const double& Qmin() const;
         const double& Qmax() const;
         const int* hkl() const;
-        const int& h() const;
-        const int& k() const;
-        const int& l() const;
+        int h() const;
+        int k() const;
+        int l() const;
         double Q() const;
         double d() const;
 
