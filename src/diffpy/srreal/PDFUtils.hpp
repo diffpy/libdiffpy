@@ -32,7 +32,7 @@ namespace srreal {
 
 /// Calculate MSD along specified direction in Cartesian space.
 double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
-        bool anisotropy=false);
+        bool anisotropy=true);
 
 /// Maximum diagonal Uii element from all atoms in the structure.
 double maxUii(const StructureAdapter* stru);
