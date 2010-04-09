@@ -20,14 +20,6 @@ def CheckBoostVersion(context, version):
     return rv
 
 
-def CheckExecutable(context, cmd):
-    '''Check if specified shell command executes successfully.
-    '''
-    context.Message('Checking executable "%s"... ' % cmd)
-    rv = context.TryAction(Action(cmd))[0]
-    context.Result(rv)
-    return rv
-
 # Helper functions -----------------------------------------------------------
 
 boostlibtags = ['-mt', '']
@@ -53,7 +45,6 @@ def configure_boost_library(libname):
 
 conf = Configure(env, custom_tests={
     'CheckBoostVersion' : CheckBoostVersion,
-    'CheckExecutable' : CheckExecutable,
     })
 
 # boost_python
@@ -62,14 +53,15 @@ configure_boost_library('boost_python')
 if conf.CheckBoostVersion('1.35'):
     configure_boost_library('boost_system')
 
-# optional ObjCryst library
-cfgcmd = "pyobjcryst-config --cflags --ldflags"
-if conf.CheckExecutable(cfgcmd):
-    conf.env.ParseConfig(cfgcmd)
-# check for ObjCryst even if pyobjcryst-config failed
-conf.env['has_objcryst'] = conf.CheckLibWithHeader('objcryst',
-        'ObjCryst/Crystal.h', language='C++')
+# check for ObjCryst and configure
+conf.env['has_objcryst'] = conf.CheckLibWithHeader('ObjCryst',
+        'ObjCryst/ObjCryst/Crystal.h', language='C++')
 
+if conf.env['has_objcryst']:
+    conf.env.AppendUnique(CPPDEFINES = [("REAL", "double")])
+    conf.env.AppendUnique(LIBS = ["ObjCryst",])
+else:
+    print "Skipping ObjCryst++ support."
 
 env = conf.Finish()
 

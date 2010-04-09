@@ -36,7 +36,7 @@ if env['build'] == 'debug':
     env.Append(CCFLAGS='-g')
 elif env['build'] == 'fast':
     env.AppendUnique(CCFLAGS=['-O3'] + fast_optimflags)
-    env.AppendUnique(CPPDEFINES='NDEBUG')
+    env.AppendUnique(CPPDEFINES=['NDEBUG'])
 
 if env['profile']:
     env.AppendUnique(CCFLAGS='-pg')

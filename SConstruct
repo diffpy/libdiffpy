@@ -12,12 +12,13 @@ import os
 DIFFPY_VERSION_STR = "1.0"
 
 # copy system environment variables related to compilation
-DefaultEnvironment(ENV={
-        'PATH' : os.environ['PATH'],
-        'PYTHONPATH' : os.environ.get('PYTHONPATH', ''),
-        'LD_LIBRARY_PATH' : os.environ.get('LD_LIBRARY_PATH', ''),
-    }
-)
+extenv = {
+        'CPPPATH' : os.environ.get('CPLUS_INCLUDE_PATH', '').split(os.pathsep),
+        'LIBPATH' : os.environ.get('LIBRARY_PATH', '').split(os.pathsep)
+                  + os.environ.get('LD_LIBRARY_PATH', '').split(os.pathsep),
+        }
+extenv['RPATH'] = extenv['LIBPATH']
+DefaultEnvironment(**extenv)
 
 
 # Create construction environment

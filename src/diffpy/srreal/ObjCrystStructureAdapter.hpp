@@ -34,8 +34,8 @@
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/Lattice.hpp>
 
-#include <ObjCryst/Crystal.h>
-#include <ObjCryst/ScatteringPower.h>
+#include <ObjCryst/ObjCryst/Crystal.h>
+#include <ObjCryst/ObjCryst/ScatteringPower.h>
 
 namespace diffpy {
 namespace srreal {

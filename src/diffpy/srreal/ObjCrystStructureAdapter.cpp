@@ -9,8 +9,7 @@
 *
 * See AUTHORS.txt for a list of people who contributed.
 * See LICENSE.txt for license information.
-*
-******************************************************************************
+* ******************************************************************************
 *
 * class ObjCrystStructureAdapter -- adapter to the Crystal class from
 * ObjCryst++.
@@ -29,9 +28,6 @@
 #include <set>
 #include <string>
 #include <vector>
-
-#include <ObjCryst/Crystal.h>
-#include <ObjCryst/ScatteringPower.h>
 
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
