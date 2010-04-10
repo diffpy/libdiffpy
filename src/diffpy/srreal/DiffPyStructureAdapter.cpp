@@ -353,7 +353,7 @@ StructureAdapter* createDiffPyStructureAdapter(const python::object& stru)
     python::object cls_Structure;
     cls_Structure = importFromPyModule("diffpy.Structure", "Structure");
     StructureAdapter* rv = NULL;
-    if (cls_Structure.ptr() &&
+    if (cls_Structure.ptr() != Py_None &&
         PyObject_IsInstance(stru.ptr(), cls_Structure.ptr()) == 1)
     {
         rv = new DiffPyStructureAdapter(stru);
