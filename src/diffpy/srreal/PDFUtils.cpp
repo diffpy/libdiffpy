@@ -95,6 +95,10 @@ void bandPassFilterCValarray(valarray<double>& ycpa, double dr,
     {
         throw invalid_argument(emsgft);
     }
+// FIXME: the following 2 lines would force sine FFT, but I would
+// rather have a shared FtoG function for all PDF calculators.
+//    ycpa[slice(0, padlen, 2)] = 0.0;
+//    ycpa *= 2.0;
     // Q step for yc
     double dQ = 2 * M_PI / ((padlen - 1) * dr);
     // Cut away high-Q frequencies -
