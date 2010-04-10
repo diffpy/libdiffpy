@@ -60,9 +60,8 @@ public:
 
     void setUp()
     {
-        const python::object pynone;
         diffpy::initializePython();
-        if (mnacl.ptr() == pynone.ptr())
+        if (mnacl.ptr() == Py_None)
         {
             mnacl = loadTestStructure("NaCl.cif");
         }
