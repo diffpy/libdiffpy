@@ -53,15 +53,12 @@ configure_boost_library('boost_python')
 if conf.CheckBoostVersion('1.35'):
     configure_boost_library('boost_system')
 
-# check for ObjCryst and configure
+# check for ObjCryst, autoadd appends to LIBS if found.
 conf.env['has_objcryst'] = conf.CheckLibWithHeader('ObjCryst',
-        'ObjCryst/ObjCryst/Crystal.h', language='C++')
+        'ObjCryst/ObjCryst/Crystal.h', language='C++', autoadd=True)
 
 if conf.env['has_objcryst']:
-    conf.env.AppendUnique(CPPDEFINES = [("REAL", "double")])
-    conf.env.AppendUnique(LIBS = ["ObjCryst",])
-else:
-    print "Skipping ObjCryst++ support."
+    conf.env.AppendUnique(CPPDEFINES=[("REAL", "double")])
 
 env = conf.Finish()
 
