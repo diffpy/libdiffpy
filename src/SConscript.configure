@@ -57,9 +57,6 @@ if conf.CheckBoostVersion('1.35'):
 conf.env['has_objcryst'] = conf.CheckLibWithHeader('ObjCryst',
         'ObjCryst/ObjCryst/Crystal.h', language='C++', autoadd=True)
 
-if not conf.env['has_objcryst']:
-    print "Skipping ObjCryst++ support."
-
 env = conf.Finish()
 
 # vim: ft=python
