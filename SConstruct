@@ -22,7 +22,6 @@ DefaultEnvironment(ENV=subdictionary(os.environ, [
     ])
 )
 
-
 # Create construction environment
 env = DefaultEnvironment().Clone()
 
