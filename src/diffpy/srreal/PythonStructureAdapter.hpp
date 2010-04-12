@@ -23,11 +23,10 @@
 #define PYTHONSTRUCTUREADAPTER_HPP_INCLUDED
 
 #include <boost/python.hpp>
+#include <diffpy/srreal/StructureAdapter.hpp>
 
 namespace diffpy {
 namespace srreal {
-
-class StructureAdapter;
 
 /// Factory for constructing appropriate StructureAdapter for a Python object.
 StructureAdapter* createPQAdapter(const boost::python::object& stru);
