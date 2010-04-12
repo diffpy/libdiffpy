@@ -30,6 +30,8 @@
 namespace diffpy {
 namespace srreal {
 
+const double DEFAULT_PDFCALCULATOR_RMAX = 10.0;
+
 /// Calculate MSD along specified direction in Cartesian space.
 double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
         bool anisotropy=true);

@@ -24,15 +24,16 @@
 #include <diffpy/mathutils.hpp>
 
 using namespace std;
-using namespace diffpy::srreal;
+
+namespace diffpy {
+namespace srreal {
 
 // Constructor ---------------------------------------------------------------
 
 PairQuantity::PairQuantity()
 {
-    using diffpy::mathutils::DOUBLE_MAX;
     this->setRmin(0.0);
-    this->setRmax(DOUBLE_MAX);
+    this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
     this->resizeValue(1);
     this->setEvaluator(BASIC);
     mcountsites = 0;
@@ -118,5 +119,8 @@ void PairQuantity::configureBondGenerator(BaseBondGenerator& bnds)
     bnds.setRmin(this->getRmin());
     bnds.setRmax(this->getRmax());
 }
+
+}   // namespace srreal
+}   // namespace diffpy
 
 // End of file

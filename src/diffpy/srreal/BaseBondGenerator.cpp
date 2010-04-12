@@ -23,10 +23,12 @@
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/mathutils.hpp>
 
-using namespace std;
-using namespace diffpy::srreal;
-using diffpy::mathutils::DOUBLE_MAX;
-using diffpy::mathutils::SQRT_DOUBLE_EPS;
+using diffpy::mathutils::eps_eq;
+
+namespace diffpy {
+namespace srreal {
+
+//using namespace std;
 
 // Constructor ---------------------------------------------------------------
 
@@ -34,7 +36,7 @@ BaseBondGenerator::BaseBondGenerator(const StructureAdapter* stru)
 {
     mstructure = stru;
     this->setRmin(0.0);
-    this->setRmax(DOUBLE_MAX);
+    this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
     this->selectAnchorSite(0);
     this->selectSiteRange(0, mstructure->countSites());
 }
@@ -218,14 +220,15 @@ bool BaseBondGenerator::bondOutOfRange() const
 
 void BaseBondGenerator::checkIfRangeSet()
 {
-    mrangeset = (this->getRmin() > 0.0) || (this->getRmax() != DOUBLE_MAX);
+    mrangeset = (this->getRmin() > 0.0) ||
+        (this->getRmax() != DEFAULT_BONDGENERATOR_RMAX);
 }
 
 
 bool BaseBondGenerator::atSelfPair() const
 {
     bool rv = (this->site0() == this->site1()) &&
-        (this->distance() < SQRT_DOUBLE_EPS);
+        eps_eq(this->distance(), 0.0);
     return rv;
 }
 
@@ -234,5 +237,8 @@ void BaseBondGenerator::setFinishedFlag()
 {
     msite_current = msite_last;
 }
+
+}   // namespace srreal
+}   // namespace diffpy
 
 // End of file

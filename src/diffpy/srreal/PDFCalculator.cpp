@@ -73,7 +73,7 @@ PDFCalculator::PDFCalculator()
     this->setPeakProfile(pkf);
     this->setBaseline("linear");
     this->setScatteringFactorTable("SFTperiodictableXray");
-    this->setRmax(10.0);
+    this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
     this->setRstep(0.01);
     this->setQmin(0.0);
     this->setQmax(0.0);

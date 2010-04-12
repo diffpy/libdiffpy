@@ -27,6 +27,9 @@
 namespace diffpy {
 namespace srreal {
 
+/// Default rmax is very large, but still within the integer type limits.
+const double DEFAULT_BONDGENERATOR_RMAX = 1.0e6;
+
 class StructureAdapter;
 
 class BaseBondGenerator
