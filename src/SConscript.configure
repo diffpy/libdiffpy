@@ -54,8 +54,9 @@ if conf.CheckBoostVersion('1.35'):
     configure_boost_library('boost_system')
 
 # check for ObjCryst, autoadd appends to LIBS if found.
-conf.env['has_objcryst'] = conf.CheckLibWithHeader('ObjCryst',
-        'ObjCryst/ObjCryst/Crystal.h', language='C++', autoadd=True)
+conf.env['has_objcryst'] = (conf.env['enable_objcryst'] and
+    conf.CheckLibWithHeader('ObjCryst', 'ObjCryst/ObjCryst/Crystal.h',
+        language='C++', autoadd=True))
 
 env = conf.Finish()
 

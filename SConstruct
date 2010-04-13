@@ -48,6 +48,8 @@ vars.Add(PathVariable('includedir',
     'installation directory for C++ header files [prefix/include]',
     env['prefix'] + '/include',
     PathVariable.PathIsDirCreate))
+vars.Add(BoolVariable('enable_objcryst',
+    'enable objcryst support, when installed', True))
 vars.Update(env)
 env.Help(vars.GenerateHelpText(env))
 

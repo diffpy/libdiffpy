@@ -10,12 +10,16 @@ env_test.PrependENVPath('LD_LIBRARY_PATH', lib_dir)
 
 # Targets --------------------------------------------------------------------
 
+def srcsupported(f):
+    rv = env.get('has_objcryst') or 'objcryst' not in str(f).lower()
+    return rv
+
 # alltests -- the unit test driver
 test_sources = []
 
 # add all unit test modules when variable tests was not set.
 if env_test.get('tests') is None:
-    test_sources += Glob('Test*.hpp')
+    test_sources += filter(srcsupported, Glob('Test*.hpp'))
 else:
     test_sources = Split(env_test['tests']) 
 
