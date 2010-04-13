@@ -14,7 +14,7 @@
 * class ObjCrystStructureAdapter -- adapter to the Crystal class from
 * ObjCryst++.
 * class ObjCrystBondGenerator -- Generate bonds from ObjCrystStructureAdapter.
-*     
+*
 * class ObjCrystBondGenerator -- bond generator
 *
 *
@@ -42,7 +42,6 @@ using namespace diffpy::srreal;
 
 namespace {
 
-// Two coordinates are the same if they are within this tolerance
 const double rtod = 180 / M_PI;
 const double UtoB = 8 * M_PI * M_PI;
 const double BtoU = 1.0 / UtoB;
@@ -362,6 +361,7 @@ iterateSymmetry()
 {
     // Iterate the sphere. If it is finished, rewind and iterate the symmetry
     // iterator. If that is also finished, then we're done.
+    this->uncache();
     msphere->next();
     if (msphere->finished())
     {
@@ -379,6 +379,7 @@ void
 ObjCrystBondGenerator::
 rewindSymmetry()
 {
+    this->uncache();
     msphere->rewind();
     msymiter = pstructure->mvsym[this->site1()].begin();
 }

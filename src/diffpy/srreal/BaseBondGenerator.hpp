@@ -77,24 +77,21 @@ class BaseBondGenerator
         double mrmax;
         const StructureAdapter* mstructure;
 
-        // bond data
-        R3::Vector mbond_r0;
-        R3::Vector mbond_r1;
-
         // methods
         virtual bool iterateSymmetry();
-        virtual void rewindSymmetry()  { }
+        virtual void rewindSymmetry();
+        void uncache();
 
     private:
 
         // data
-        bool mrangeset;
+        mutable bool mdistance_cached;
+        mutable double mdistance;
 
         // methods
         void getNextBond();
         void advanceWhileInvalid();
         bool bondOutOfRange() const;
-        void checkIfRangeSet();
         bool atSelfPair() const;
         void setFinishedFlag();
 

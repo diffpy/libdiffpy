@@ -73,7 +73,8 @@ class ObjCrystStructureAdapter : public StructureAdapter
         // methods - own
         void getUnitCell();
 
-        // Tolerance on distance measurments
+        // Tolerance on distance measurements.  Two sites are the same if
+        // their fractional coordinates are within this tolerance
         static const double toler;
         // The ObjCryst::Crystal
         const ObjCryst::Crystal* mpcryst;

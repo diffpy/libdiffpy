@@ -35,6 +35,7 @@ namespace srreal {
 BaseBondGenerator::BaseBondGenerator(const StructureAdapter* stru)
 {
     mstructure = stru;
+    this->uncache();
     this->setRmin(0.0);
     this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
     this->selectAnchorSite(0);
@@ -47,6 +48,7 @@ BaseBondGenerator::BaseBondGenerator(const StructureAdapter* stru)
 
 void BaseBondGenerator::rewind()
 {
+    this->uncache();
     msite_current = msite_first;
     // avoid calling rewindSymmetry at an invalid site
     if (this->finished())   return;
@@ -57,6 +59,7 @@ void BaseBondGenerator::rewind()
 
 void BaseBondGenerator::next()
 {
+    this->uncache();
     this->getNextBond();
     this->advanceWhileInvalid();
 }
@@ -64,6 +67,7 @@ void BaseBondGenerator::next()
 
 void BaseBondGenerator::nextsite()
 {
+    this->uncache();
     msite_current += 1;
     // avoid calling rewindSymmetry at an invalid site
     if (this->finished())   return;
@@ -95,17 +99,17 @@ void BaseBondGenerator::selectSiteRange(int first, int last)
 
 void BaseBondGenerator::setRmin(double rmin)
 {
+    this->uncache();
     if (rmin != mrmin)  this->setFinishedFlag();
     mrmin = rmin;
-    this->checkIfRangeSet();
 }
 
 
 void BaseBondGenerator::setRmax(double rmax)
 {
+    this->uncache();
     if (rmax != mrmax)  this->setFinishedFlag();
     mrmax = rmax;
-    this->checkIfRangeSet();
 }
 
 // data query
@@ -150,8 +154,12 @@ const R3::Vector& BaseBondGenerator::r1() const
 
 double BaseBondGenerator::distance() const
 {
-    double d = R3::distance(this->r0(), this->r1());
-    return d;
+    if (!mdistance_cached)
+    {
+        mdistance = R3::distance(this->r0(), this->r1());
+        mdistance_cached = true;
+    }
+    return mdistance;
 }
 
 
@@ -184,13 +192,27 @@ double BaseBondGenerator::msd() const
 
 bool BaseBondGenerator::iterateSymmetry()
 {
+    this->uncache();
     return false;
+}
+
+
+void BaseBondGenerator::rewindSymmetry()
+{
+    this->uncache();
+}
+
+
+void BaseBondGenerator::uncache()
+{
+    mdistance_cached = false;
 }
 
 // Private Methods -----------------------------------------------------------
 
 void BaseBondGenerator::getNextBond()
 {
+    this->uncache();
     if (this->iterateSymmetry())  return;
     this->nextsite();
 }
@@ -198,6 +220,7 @@ void BaseBondGenerator::getNextBond()
 
 void BaseBondGenerator::advanceWhileInvalid()
 {
+    this->uncache();
     while (!this->finished() &&
             (this->bondOutOfRange() || this->atSelfPair()))
     {
@@ -208,20 +231,9 @@ void BaseBondGenerator::advanceWhileInvalid()
 
 bool BaseBondGenerator::bondOutOfRange() const
 {
-    bool rv = false;
-    if (mrangeset)
-    {
-        double d = this->distance();
-        rv = (d < this->getRmin()) || (d > this->getRmax());
-    }
+    double d = this->distance();
+    bool rv = (d < this->getRmin()) || (d > this->getRmax());
     return rv;
-}
-
-
-void BaseBondGenerator::checkIfRangeSet()
-{
-    mrangeset = (this->getRmin() > 0.0) ||
-        (this->getRmax() != DEFAULT_BONDGENERATOR_RMAX);
 }
 
 
@@ -235,6 +247,7 @@ bool BaseBondGenerator::atSelfPair() const
 
 void BaseBondGenerator::setFinishedFlag()
 {
+    this->uncache();
     msite_current = msite_last;
 }
 

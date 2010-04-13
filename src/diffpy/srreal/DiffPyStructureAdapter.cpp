@@ -335,6 +335,7 @@ const R3::Vector& DiffPyStructurePeriodicBondGenerator::r1() const
 
 bool DiffPyStructurePeriodicBondGenerator::iterateSymmetry()
 {
+    this->uncache();
     msphere->next();
     return !msphere->finished();
 }
@@ -342,6 +343,7 @@ bool DiffPyStructurePeriodicBondGenerator::iterateSymmetry()
 
 void DiffPyStructurePeriodicBondGenerator::rewindSymmetry()
 {
+    this->uncache();
     msphere->rewind();
 }
 
