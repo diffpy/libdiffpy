@@ -36,7 +36,7 @@ namespace {
 python::object loadTestStructure(const string& tailname)
 {
     python::object Structure_class =
-        diffpy::importFromPyModule( "diffpy.Structure", "Structure");
+        diffpy::importFromPyModule("diffpy.Structure", "Structure");
     python::object stru = Structure_class();
     string fp = prepend_testdata_dir(tailname);
     stru.attr("read")(fp);

@@ -36,8 +36,9 @@ namespace {
 
 python::object newDiffPyStructure()
 {
-    python::object mod = python::import("diffpy.Structure");
-    python::object stru = mod.attr("Structure")();
+    python::object Structure =
+        diffpy::importFromPyModule("diffpy.Structure", "Structure");
+    python::object stru = Structure();
     return stru;
 }
 

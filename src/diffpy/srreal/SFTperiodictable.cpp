@@ -47,8 +47,8 @@ python::object periodictable_elements_symbol()
     if (did_import)  return symbol;
     // first pass requires actual import
     diffpy::initializePython();
-    python::object mod = python::import("periodictable");
-    python::object elements = mod.attr("elements");
+    python::object elements;
+    elements = diffpy::importFromPyModule("periodictable", "elements");
     symbol = elements.attr("symbol");
     did_import = true;
     return symbol;

@@ -496,8 +496,8 @@ StructureAdapter*
 createPyObjCrystStructureAdapter(const boost::python::object& stru)
 {
     using diffpy::importFromPyModule;
-    boost::python::object cls_Crystal;
-    cls_Crystal = importFromPyModule("pyobjcryst.crystal", "Crystal");
+    boost::python::object cls_Crystal, none;
+    cls_Crystal = importFromPyModule("pyobjcryst.crystal", "Crystal", none);
     StructureAdapter* rv = NULL;
     if (cls_Crystal.ptr() != Py_None &&
         PyObject_IsInstance(stru.ptr(), cls_Crystal.ptr()) == 1)

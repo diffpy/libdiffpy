@@ -352,8 +352,8 @@ void DiffPyStructurePeriodicBondGenerator::rewindSymmetry()
 StructureAdapter* createDiffPyStructureAdapter(const python::object& stru)
 {
     using diffpy::importFromPyModule;
-    python::object cls_Structure;
-    cls_Structure = importFromPyModule("diffpy.Structure", "Structure");
+    python::object cls_Structure, none;
+    cls_Structure = importFromPyModule("diffpy.Structure", "Structure", none);
     StructureAdapter* rv = NULL;
     if (cls_Structure.ptr() != Py_None &&
         PyObject_IsInstance(stru.ptr(), cls_Structure.ptr()) == 1)

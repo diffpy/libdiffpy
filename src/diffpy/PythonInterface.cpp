@@ -20,13 +20,44 @@
 
 #include <diffpy/PythonInterface.hpp>
 
+#include <iostream>
 #include <csignal>
 #include <map>
 
-using std::string;
+using namespace std;
 using namespace boost;
 
 namespace diffpy {
+
+// Local Helpers -------------------------------------------------------------
+
+namespace {
+
+// Flag if Python has been launched from C++.  This means there is no
+// Python interpreter to handle error_already_set exceptions.
+
+bool python_is_embedded = false;
+
+
+// Execute import from python without any error handling
+python::object do_python_import(const string& modname, const string& item)
+{
+    typedef std::map<string, python::object> ObjectCache;
+    static ObjectCache cacheditems; 
+    string fullname = modname + ":" + item;
+    ObjectCache::iterator ii = cacheditems.find(fullname);
+    if (ii == cacheditems.end())
+    {
+        cacheditems[fullname] = 
+            python::import(modname.c_str()).attr(item.c_str());
+        ii = cacheditems.find(fullname);
+    }
+    return ii->second;
+}
+
+}   // namespace
+
+// Public Functions ----------------------------------------------------------
 
 void initializePython(int py_argc, char* py_argv[])
 {
@@ -42,6 +73,7 @@ void initializePython(int py_argc, char* py_argv[])
     Py_Initialize();
     PySys_SetArgv(py_argc, py_argv);
     // Make sure Python does not eat SIGINT.
+    python_is_embedded = true;
     signal(SIGINT, SIG_DFL);
 }
 
@@ -62,24 +94,36 @@ string getPythonErrorString()
 }
 
 
+python::object importFromPyModule(const string& modname, const string& item,
+        python::object fallback)
+{
+    python::object rv;
+    try {
+        rv = do_python_import(modname, item);
+    }
+    catch (python::error_already_set e) {
+        PyErr_Clear();
+        rv = fallback;
+    }
+    return rv;
+}
+
+
 python::object importFromPyModule(const string& modname, const string& item)
 {
-    static std::map<string, python::object> cacheditems;
-    string fullname = modname + ":" + item;
-    // perform import when not in the cache
-    if (!cacheditems.count(fullname))
-    {
-        try {
-            cacheditems[fullname] =
-                python::import(modname.c_str()).attr(item.c_str());
-        }
-        // Ignore import errors when item could not be recovered.
-        catch (python::error_already_set e) {
-            PyErr_Clear();
-            cacheditems[fullname] = python::object();
-        }
+    python::object rv;
+    try {
+        rv = do_python_import(modname, item);
     }
-    return cacheditems[fullname];
+    catch (python::error_already_set e) {
+        // display error message when running embedded
+        if (python_is_embedded)
+        {
+            cerr << getPythonErrorString() << endl;
+        }
+        throw;
+    }
+    return rv;
 }
 
 
