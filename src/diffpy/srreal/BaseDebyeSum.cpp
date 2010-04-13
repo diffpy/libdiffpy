@@ -160,9 +160,9 @@ void BaseDebyeSum::resetValue()
 }
 
 
-void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds)
+void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds,
+        int summationscale)
 {
-    const int summationscale = 2;
     const double dist = bnds.distance();
     if (eps_eq(0.0, dist))  return;
     // calculate sigma parameter for the Debye-Waller dampign Gaussian

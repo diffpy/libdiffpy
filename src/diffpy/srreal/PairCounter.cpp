@@ -24,9 +24,10 @@ using namespace diffpy::srreal;
 
 // Protected Methods ---------------------------------------------------------
 
-void PairCounter::addPairContribution(const BaseBondGenerator& bnds)
+void PairCounter::addPairContribution(const BaseBondGenerator& bnds,
+        int summationscale)
 {
-    mvalue.front() += 1;
+    mvalue.front() += summationscale / 2.0;
 }
 
 // End of file

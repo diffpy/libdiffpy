@@ -139,9 +139,9 @@ void BVSCalculator::configureBondGenerator(BaseBondGenerator& bnds)
 }
 
 
-void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds)
+void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds,
+        int summationscale)
 {
-    int summationscale = (bnds.site0() == bnds.site1()) ? 1 : 2;
     const string& a0 = mstructure_cache.baresymbols[bnds.site0()];
     const string& a1 = mstructure_cache.baresymbols[bnds.site1()];
     int v0 = mstructure_cache.valences[bnds.site0()];
@@ -151,10 +151,11 @@ void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds)
     // do nothing if there are no bond parameters for this pair
     if (&bp == &bvtb.none())    return;
     double valencehalf = bp.bondvalence(bnds.distance()) / 2.0;
+    int bvscale = summationscale * bnds.multiplicity();
     int plusminus0 = (v0 >= 0) ? 1 : -1;
     int plusminus1 = (v1 >= 0) ? 1 : -1;
-    mvalue[bnds.site0()] += summationscale * plusminus0 * valencehalf;
-    mvalue[bnds.site1()] += summationscale * plusminus1 * valencehalf;
+    mvalue[bnds.site0()] += bvscale * plusminus0 * valencehalf;
+    mvalue[bnds.site1()] += bvscale * plusminus1 * valencehalf;
 }
 
 // Private Methods -----------------------------------------------------------

@@ -515,11 +515,11 @@ void PDFCalculator::configureBondGenerator(BaseBondGenerator& bnds)
 }
 
 
-void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds)
+void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
+        int summationscale)
 {
-    int summationscale = (bnds.site0() == bnds.site1()) ? 1 : 2;
     double sfprod = this->sfSite(bnds.site0()) * this->sfSite(bnds.site1());
-    double peakscale = sfprod * mstructure->siteMultiplicity(bnds.site0());
+    double peakscale = sfprod * bnds.multiplicity() * summationscale;
     double fwhm = this->getPeakWidthModel().calculate(bnds);
     const PeakProfile& pkf = this->getPeakProfile();
     double dist = bnds.distance();
@@ -533,7 +533,7 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds)
     {
         double x = x0 + i * this->getRstep() - dist;
         double y = pkf.yvalue(x, fwhm);
-        mvalue[i] += summationscale * peakscale * y;
+        mvalue[i] += peakscale * y;
     }
 }
 

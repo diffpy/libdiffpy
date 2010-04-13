@@ -138,6 +138,12 @@ int BaseBondGenerator::site1() const
 }
 
 
+int BaseBondGenerator::multiplicity() const
+{
+    return mstructure->siteMultiplicity(this->site0());
+}
+
+
 const R3::Vector& BaseBondGenerator::r0() const
 {
     const R3::Vector& rv = mstructure->siteCartesianPosition(this->site0());

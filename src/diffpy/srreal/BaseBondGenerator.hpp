@@ -58,6 +58,7 @@ class BaseBondGenerator
         const double& getRmax() const;
         int site0() const;
         int site1() const;
+        int multiplicity() const;
         virtual const R3::Vector& r0() const;
         virtual const R3::Vector& r1() const;
         double distance() const;

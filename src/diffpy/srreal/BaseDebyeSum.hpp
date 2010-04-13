@@ -58,7 +58,7 @@ class BaseDebyeSum : public PairQuantity, public PeakWidthModelOwner
 
         // PairQuantity overloads
         virtual void resetValue();
-        virtual void addPairContribution(const BaseBondGenerator&);
+        virtual void addPairContribution(const BaseBondGenerator&, int);
 
         // own methods
         virtual double sfSiteAtQ(int, const double& Q) const;
