@@ -272,11 +272,6 @@ getUnitCell()
                     R3::Matrix tmp, Urot; 
                     tmp = R3::product(UCart, M);
                     Urot = R3::product(R3::transpose(M), tmp);
-                    // Check for centro-symmetry
-                    if(j >= nbRot * nbTrans)
-                    {
-                        Urot = R3::transpose(Urot);
-                    }
                     uijvec.push_back(Urot);
                 }
                 else
