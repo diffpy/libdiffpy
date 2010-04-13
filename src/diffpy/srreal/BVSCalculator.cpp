@@ -151,11 +151,10 @@ void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds,
     // do nothing if there are no bond parameters for this pair
     if (&bp == &bvtb.none())    return;
     double valencehalf = bp.bondvalence(bnds.distance()) / 2.0;
-    int bvscale = summationscale * bnds.multiplicity();
     int plusminus0 = (v0 >= 0) ? 1 : -1;
     int plusminus1 = (v1 >= 0) ? 1 : -1;
-    mvalue[bnds.site0()] += bvscale * plusminus0 * valencehalf;
-    mvalue[bnds.site1()] += bvscale * plusminus1 * valencehalf;
+    mvalue[bnds.site0()] += summationscale * plusminus0 * valencehalf;
+    mvalue[bnds.site1()] += summationscale * plusminus1 * valencehalf;
 }
 
 // Private Methods -----------------------------------------------------------
