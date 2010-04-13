@@ -36,6 +36,7 @@
 
 #include <ObjCryst/ObjCryst/Crystal.h>
 #include <ObjCryst/ObjCryst/ScatteringPower.h>
+#include <ObjCryst/ObjCryst/SpaceGroup.h>
 
 namespace diffpy {
 namespace srreal {
@@ -68,10 +69,13 @@ class ObjCrystStructureAdapter : public StructureAdapter
 
     private:
 
-        typedef std::set<R3::Vector, R3::EpsCompare> SymPosSet;
+        typedef std::vector<R3::Vector> SymPosVec;
+        typedef std::vector<R3::Matrix> SymUijVec;
 
         // methods - own
         void getUnitCell();
+        R3::Matrix getUCart(const ObjCryst::ScatteringPower* sp) const;
+        std::vector< R3::Matrix > getRotations() const;
 
         // Tolerance on distance measurements.  Two sites are the same if
         // their fractional coordinates are within this tolerance
@@ -80,10 +84,10 @@ class ObjCrystStructureAdapter : public StructureAdapter
         const ObjCryst::Crystal* mpcryst;
         // The asymmetric unit cell of ScatteringComponent instances
         std::vector< ObjCryst::ScatteringComponent > mvsc;
-        // The symmetry-related operations on the asymmetric unit cell
-        std::vector<SymPosSet> mvsym;
-        // The Uij for the scatterers
-        std::vector< R3::Matrix > mvuij;
+        // The symmetry-related positions of the asymmetric unit cell
+        std::vector<SymPosVec> mvsym;
+        // The Uij for scatterers. Stored in same order as mvsym.
+        std::vector<SymUijVec> mvuij;
         // The Lattice instance needed by the ObjCrystBondGenerator
         Lattice mlattice;
 
@@ -119,11 +123,11 @@ class ObjCrystBondGenerator : public BaseBondGenerator
     private:
 
         // data
-        const ObjCrystStructureAdapter* pstructure;
-        ObjCrystStructureAdapter::SymPosSet::const_iterator msymiter;
+        const ObjCrystStructureAdapter* mpstructure;
+        // Index over symmetry;
+        size_t msymidx;
         std::auto_ptr<PointsInSphere> msphere;
-
-        double msdSiteDir(int siteidx, const R3::Vector& s) const;
+        double msd(int siteidx, int symidx) const;
 
 };
 

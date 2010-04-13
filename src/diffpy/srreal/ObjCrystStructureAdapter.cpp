@@ -49,7 +49,6 @@ const double BtoU = 1.0 / UtoB;
 }
 
 
-
 //////////////////////////////////////////////////////////////////////////////
 // class ObjCrystStructureAdapter
 //////////////////////////////////////////////////////////////////////////////
@@ -111,7 +110,7 @@ ObjCrystStructureAdapter::
 siteCartesianPosition(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return *(mvsym[idx].begin());
+    return mvsym[idx][0];
 }
 
 
@@ -146,7 +145,7 @@ ObjCrystStructureAdapter::
 siteCartesianUij(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return mvuij[idx];
+    return mvuij[idx][0];
 }
 
 
@@ -175,10 +174,15 @@ getUnitCell()
         mpcryst->GetScatteringComponentList();
     size_t nbComponent = scl.GetNbComponent();
 
-    size_t nbSymmetrics = mpcryst->GetSpaceGroup().GetNbSymmetrics();
+    // Various things we need to know about the symmetry operations
+    const ObjCryst::SpaceGroup& spacegroup = mpcryst->GetSpaceGroup();
+    size_t nbSymmetrics = spacegroup.GetNbSymmetrics();
+    size_t nbTrans = spacegroup.GetNbTranslationVectors();
+    size_t cmult = spacegroup.IsCentrosymmetric() ? 2 : 1;
+    size_t nbRot = nbSymmetrics / nbTrans / cmult;
+    assert( nbSymmetrics = nbTrans * nbRot * cmult );
 
     double x, y, z, junk;
-    const ObjCryst::ScatteringPower* sp  = NULL;
     CrystMatrix<double> symmetricsCoords;
 
     mvsc.clear();
@@ -188,11 +192,17 @@ getUnitCell()
     mvsym.reserve(nbComponent);
     mvuij.reserve(nbComponent);
 
+    typedef std::set<R3::Vector, R3::EpsCompare> SymPosSet;
+
+    // Get the symmetry rotations
+    std::vector< R3::Matrix > rotations = getRotations();
+
     // For each scattering component, find its position in the primitive cell
     // and expand that position.
     for (size_t i = 0; i < nbComponent; ++i)
     {
-        sp = scl(i).mpScattPow;
+
+        const ObjCryst::ScatteringPower* sp = scl(i).mpScattPow;
 
         // Skip over this if it is a dummy atom. A dummy atom has no
         // mpScattPow, and therefore no type. It's just in a structure as a
@@ -201,14 +211,23 @@ getUnitCell()
 
         mvsc.push_back(scl(i));
         SymPosSet symset = SymPosSet(R3::EpsCompare(toler));
-        mvuij.push_back(zeros);
+        SymPosVec symvec = SymPosVec();
+        SymUijVec uijvec = SymUijVec();
+        size_t numsym = 0;
+        size_t rotidx = 0;
 
-        // Get all the symmetric coordinates
-        symmetricsCoords = mpcryst->GetSpaceGroup().GetAllSymmetrics(
+        // Store Uij in cartesian
+        R3::Matrix UCart = getUCart(sp);
+
+        // Get all the symmetric coordinates. Symmetric coordinates are created
+        // by translation vector in the outer loop, and rotation matrix in the
+        // inner loop. The first translation is [0,0,0]. We need to know this
+        // to determine the rotation matrices.
+        symmetricsCoords = spacegroup.GetAllSymmetrics(
             scl(i).mX, scl(i).mY, scl(i).mZ);
 
-        // Collect the unique symmetry operations.
-        for (size_t j = 0; j < nbSymmetrics; ++j)
+        // Collect the unique symmetry positions.
+        for (size_t j = 0; j < nbSymmetrics; ++j, ++rotidx)
         {
             x = modf(symmetricsCoords(j, 0), &junk);
             y = modf(symmetricsCoords(j, 1), &junk);
@@ -224,50 +243,127 @@ getUnitCell()
             mpcryst->FractionalToOrthonormalCoords(x, y, z);
 
             // Record the position
-            R3::Vector xyz;
-            xyz[0] = x;
-            xyz[1] = y;
-            xyz[2] = z;
+            R3::Vector xyz; 
+            xyz = x, y, z;
 
+            // We use this to filter unique positions
             symset.insert(xyz);
 
+            // Keep track of the rotation index. We use the fact that the
+            // translations are in the outer loop when the symmetric
+            // coordinates are created. This is a hack.
+            if(rotidx >= nbRot) rotidx -= nbRot;
+
+            // See if we've got a new position
+            if(symset.size() > numsym)
+            {
+                ++numsym;
+                
+                // Store this in the symvec so we are assured that the order
+                // will not change.
+                symvec.push_back(xyz);
+
+                if(numsym > 0)
+                {
+                    // Get the symmetry operation used to generate this postion.
+                    const R3::Matrix& M = rotations[rotidx];
+
+                    // rotate the UCart matrix
+                    R3::Matrix tmp, Urot; 
+                    tmp = R3::product(UCart, M);
+                    Urot = R3::product(R3::transpose(M), tmp);
+                    // Check for centro-symmetry
+                    if(j >= nbRot * nbTrans)
+                    {
+                        Urot = R3::transpose(Urot);
+                    }
+                    uijvec.push_back(Urot);
+                }
+                else
+                {
+                    uijvec.push_back(UCart);
+                }
+            }
         }
 
-        // Store symmetry operations
-        mvsym.push_back(symset);
+        assert( uijvec.size() == symvec.size() );
 
-        // Store the uij tensor
-        R3::Matrix Ucart;
-        // anisotropy not yet supported in ObjCryst
-        //if (sp->IsIsotropic())
-        if (true)
-        {
-            // Check for dummy atoms. These don't have a scattering power.
-            Ucart(0,0) = Ucart(1,1) = Ucart(2,2) = sp->GetBiso() * BtoU;
-            Ucart(0,1) = Ucart(1,0) = 0;
-            Ucart(0,2) = Ucart(2,0) = 0;
-            Ucart(2,1) = Ucart(1,2) = 0;
-        }
-        else
-        {
-            // Once objcryst starts supporting anisotropy, we will need
-            // to get the rotated Ucart tensors per each equivalent position
-            // in mvsym.  There is no guarantee Ucart will be the same for
-            // all equivalent positions, in fact they will certainly differ in
-            // case of tripple rotation axis with displacement elipsoid
-            // pointing towards the axis.  We don't need to fix it yet, since
-            // only isotropic Uij-s are allowed.
-            R3::Matrix Ufrac;
-            Ufrac(0,0) = sp->GetBij(1,1) * BtoU;
-            Ufrac(1,1) = sp->GetBij(2,2) * BtoU;
-            Ufrac(2,2) = sp->GetBij(3,3) * BtoU;
-            Ufrac(0,1) = Ufrac(1,0) = sp->GetBij(1,2) * BtoU;
-            Ufrac(0,2) = Ufrac(2,0) = sp->GetBij(1,3) * BtoU;
-            Ufrac(1,2) = Ufrac(2,1) = sp->GetBij(2,3) * BtoU;
-            Ucart = mlattice.cartesianMatrix(Ufrac);
-        }
-        mvuij[i] = Ucart;
+        // Store symmetric positions and Uij matrices
+        mvsym.push_back(symvec);
+        mvuij.push_back(uijvec);
+
     }
+
+}
+
+R3::Matrix 
+ObjCrystStructureAdapter::
+getUCart(const ObjCryst::ScatteringPower* sp) const
+{
+    R3::Matrix UCart;
+    if (sp->IsIsotropic())
+    {
+        UCart(0,0) = UCart(1,1) = UCart(2,2) = sp->GetBiso() * BtoU;
+        UCart(0,1) = UCart(1,0) = 0;
+        UCart(0,2) = UCart(2,0) = 0;
+        UCart(2,1) = UCart(1,2) = 0;
+    }
+    else
+    {
+        R3::Matrix Ufrac;
+        Ufrac(0,0) = sp->GetBij(1,1) * BtoU;
+        Ufrac(1,1) = sp->GetBij(2,2) * BtoU;
+        Ufrac(2,2) = sp->GetBij(3,3) * BtoU;
+        Ufrac(0,1) = Ufrac(1,0) = sp->GetBij(1,2) * BtoU;
+        Ufrac(0,2) = Ufrac(2,0) = sp->GetBij(1,3) * BtoU;
+        Ufrac(1,2) = Ufrac(2,1) = sp->GetBij(2,3) * BtoU;
+        UCart = mlattice.cartesianMatrix(Ufrac);
+    }
+
+    return UCart;
+
+}
+
+std::vector< R3::Matrix >
+ObjCrystStructureAdapter::
+getRotations() const
+{
+    const ObjCryst::SpaceGroup& spacegroup = mpcryst->GetSpaceGroup();
+    size_t nbSymmetrics = spacegroup.GetNbSymmetrics();
+    size_t nbTrans = spacegroup.GetNbTranslationVectors();
+    size_t cmult = spacegroup.IsCentrosymmetric() ? 2 : 1;
+    size_t nbRot = nbSymmetrics / nbTrans / cmult;
+
+    std::vector< R3::Matrix > rotations(nbRot);
+    rotations[0] = R3::identity();
+
+    // Expand a single postion that is not at the origin and use this to
+    // determine the symmetry operations. We use the fact that the symmetric
+    // postions are expanded using the [0, 0, 0] translation first.
+    double x = 0.1, y = 0.11, z = 0.2;
+    CrystMatrix<double> coords = spacegroup.GetAllSymmetrics(x, y, z);
+    mpcryst->FractionalToOrthonormalCoords(x, y, z);
+    R3::Vector p0; 
+    p0 = x, y, z;
+
+    for(size_t i = 1; i < nbRot; ++i)
+    {
+        x = coords(i, 0);
+        y = coords(i, 1);
+        z = coords(i, 2);
+        mpcryst->FractionalToOrthonormalCoords(x, y, z);
+
+        R3::Vector p1;
+        p1 = x, y, z;
+
+        // Get _a_ rotation matrix that takes p0 to p1
+        R3::Matrix M = R3::rotationfrom(p0, p1);
+
+        rotations[i] = M;
+    }
+
+    return rotations;
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -278,7 +374,7 @@ getUnitCell()
 
 ObjCrystBondGenerator::
 ObjCrystBondGenerator(const ObjCrystStructureAdapter* adpt) 
-    : BaseBondGenerator(adpt), pstructure(adpt)
+    : BaseBondGenerator(adpt), mpstructure(adpt), msymidx(0)
 {
 }
 
@@ -293,14 +389,14 @@ rewind()
     if (!msphere.get())
     {
         // Make a Lattice instance
-        const Lattice& L = pstructure->getLattice();
+        const Lattice& L = mpstructure->getLattice();
         double buffzone = L.ucMaxDiagonalLength();
         double rsphmin = this->getRmin() - buffzone;
         double rsphmax = this->getRmax() + buffzone;
         msphere.reset(new PointsInSphere(rsphmin, rsphmax, L));
     }
     // BaseBondGenerator::rewind calls this->rewindSymmetry,
-    // which takes care of msphere and msymiter configuration
+    // which takes care of msphere and msymidx configuration
     this->BaseBondGenerator::rewind();
 }
 
@@ -329,10 +425,12 @@ const R3::Vector&
 ObjCrystBondGenerator::
 r1() const
 {
+    size_t siteidx = this->site1();
     static R3::Vector rv;
-    const Lattice& L = pstructure->getLattice();
-    assert(msymiter != pstructure->mvsym[this->site1()].end());
-    rv = *msymiter + L.cartesian(msphere->mno());
+    const Lattice& L = mpstructure->getLattice();
+    assert(msymidx < mpstructure->mvsym[siteidx].size());
+    rv = mpstructure->mvsym[siteidx][msymidx];
+    rv += L.cartesian(msphere->mno());
     return rv;
 }
 
@@ -341,7 +439,7 @@ double
 ObjCrystBondGenerator::
 msd0() const
 {
-    double rv = this->msdSiteDir(this->site0(), this->r01());
+    double rv = msd(this->site0(), 0);
     return rv;
 }
 
@@ -350,22 +448,21 @@ double
 ObjCrystBondGenerator::
 msd1() const
 {
-    double rv = this->msdSiteDir(this->site1(), this->r01());
+    double rv = msd(this->site1(), msymidx);
     return rv;
 }
-
 
 bool 
 ObjCrystBondGenerator::
 iterateSymmetry()
 {
     // Iterate the sphere. If it is finished, rewind and iterate the symmetry
-    // iterator. If that is also finished, then we're done.
+    // counter. If that is also finished, then we're done.
     this->uncache();
     msphere->next();
     if (msphere->finished())
     {
-        if (++msymiter == pstructure->mvsym[this->site1()].end())
+        if (++msymidx == mpstructure->mvsym[this->site1()].size())
         {
             return false;
         }
@@ -381,19 +478,22 @@ rewindSymmetry()
 {
     this->uncache();
     msphere->rewind();
-    msymiter = pstructure->mvsym[this->site1()].begin();
+    msymidx = 0;
 }
 
 
 double 
 ObjCrystBondGenerator::
-msdSiteDir(int siteidx, const R3::Vector& s) const
+msd(int siteidx, int symidx) const
 {
-    const R3::Matrix& Uijcartn = pstructure->siteCartesianUij(siteidx);
-    bool anisotropy = pstructure->siteAnisotropy(siteidx);
-    double rv = meanSquareDisplacement(Uijcartn, s, anisotropy);
+    // Get the proper Uij tensor for the given site, and symmetry indices
+    const R3::Matrix& UCart = mpstructure->mvuij[siteidx][symidx];
+    const R3::Vector& s = this->r01();
+    bool anisotropy = mpstructure->siteAnisotropy(siteidx);
+    double rv = meanSquareDisplacement(UCart, s, anisotropy);
     return rv;
 }
+
 
 // Factory Function and its Registration -------------------------------------
 
@@ -413,6 +513,7 @@ createPyObjCrystStructureAdapter(const boost::python::object& stru)
     }
     return rv;
 }
+
 
 bool reg_PyObjCrystStructureAdapter =
 registerPythonStructureAdapterFactory(createPyObjCrystStructureAdapter);

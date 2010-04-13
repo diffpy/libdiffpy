@@ -82,6 +82,7 @@ R3::Matrix R3::transpose(const R3::Matrix& A)
     return res;
 }
 
+
 }   // namespace srreal
 }   // namespace diffpy
 
