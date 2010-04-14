@@ -365,6 +365,13 @@ void PDFCalculator::setBaseline(const std::string& tp)
 }
 
 
+PDFBaseline& PDFCalculator::getBaseline()
+{
+    assert(mbaseline.get());
+    return *mbaseline;
+}
+
+
 const PDFBaseline& PDFCalculator::getBaseline() const
 {
     assert(mbaseline.get());
@@ -423,14 +430,19 @@ void PDFCalculator::popEnvelope(const string& tp)
 const PDFEnvelope& PDFCalculator::getEnvelope(const string& tp) const
 {
     // call non-constant method
-    PDFEnvelope& rv = const_cast<PDFCalculator*>(this)->getEnvelope(tp);
+    const PDFEnvelope& rv = const_cast<PDFCalculator*>(this)->getEnvelope(tp);
     return rv;
 }
 
 
 PDFEnvelope& PDFCalculator::getEnvelope(const string& tp)
 {
-    if (!menvelope.count(tp))  this->addEnvelope(tp);
+    if (!menvelope.count(tp))
+    {
+        ostringstream emsg;
+        emsg << "Invalid or missing PDFEnvelope type '" << tp << "'.";
+        throw invalid_argument(emsg.str());
+    }
     PDFEnvelope& rv = *(menvelope[tp]);
     return rv;
 }
@@ -457,34 +469,37 @@ void PDFCalculator::clearEnvelopes()
 
 // Attributes overloads
 
-void PDFCalculator::accept(diffpy::BaseAttributesVisitor& v)
+namespace {
+
+template <class T>
+void pdfcalc_accept(T* obj, diffpy::BaseAttributesVisitor& v)
 {
-    this->getPeakWidthModel().accept(v);
-    mpeakprofile->accept(v);
-    mbaseline->accept(v);
+    obj->getPeakWidthModel().accept(v);
+    obj->getPeakProfile().accept(v);
+    obj->getBaseline().accept(v);
     // PDF envelopes
-    EnvelopeStorage::iterator evit;
-    for (evit = menvelope.begin(); evit != menvelope.end(); ++evit)
+    set<string> evnames = obj->usedEnvelopeTypes();
+    set<string>::const_iterator nm = evnames.begin();
+    for (; nm != evnames.end(); ++nm)
     {
-        evit->second->accept(v);
+        obj->getEnvelope(*nm).accept(v);
     }
     // finally call standard accept
-    this->diffpy::Attributes::accept(v);
+    obj->diffpy::Attributes::accept(v);
 }
+
+}   // namespace
+
+
+void PDFCalculator::accept(diffpy::BaseAttributesVisitor& v)
+{
+    pdfcalc_accept(this, v);
+}
+
 
 void PDFCalculator::accept(diffpy::BaseAttributesVisitor& v) const
 {
-    this->getPeakWidthModel().accept(v);
-    mpeakprofile->accept(v);
-    mbaseline->accept(v);
-    // PDF envelopes
-    EnvelopeStorage::const_iterator evit;
-    for (evit = menvelope.begin(); evit != menvelope.end(); ++evit)
-    {
-        evit->second->accept(v);
-    }
-    // finally call standard accept
-    this->diffpy::Attributes::accept(v);
+    pdfcalc_accept(this, v);
 }
 
 // PairQuantity overloads

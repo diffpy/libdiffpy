@@ -202,21 +202,29 @@ const double& DebyePDFCalculator::getMaxExtension() const
 
 // attributes overload to direct visitors around data structures
 
+namespace {
+
+// single implementation for constant and non-constant accept
+template <class T>
+void debyepdfcalc_accept(T* obj, diffpy::BaseAttributesVisitor& v)
+{
+    obj->getPeakWidthModel().accept(v);
+    // finally call standard accept
+    obj->diffpy::Attributes::accept(v);
+}
+
+}   // namespace
+
+
 void DebyePDFCalculator::accept(diffpy::BaseAttributesVisitor& v)
 {
-    using ::diffpy::Attributes;
-    this->getPeakWidthModel().accept(v);
-    // finally call standard accept
-    this->Attributes::accept(v);
+    debyepdfcalc_accept(this, v);
 }
 
 
 void DebyePDFCalculator::accept(diffpy::BaseAttributesVisitor& v) const
 {
-    using ::diffpy::Attributes;
-    this->getPeakWidthModel().accept(v);
-    // finally call standard accept
-    this->Attributes::accept(v);
+    debyepdfcalc_accept(this, v);
 }
 
 // BaseDebyeSum overloads

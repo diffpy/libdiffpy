@@ -92,6 +92,7 @@ class PDFCalculator : public PairQuantity,
         QuantityType applyBaseline(const QuantityType& x, const QuantityType& y) const;
         void setBaseline(const PDFBaseline&);
         void setBaseline(const std::string& tp);
+        PDFBaseline& getBaseline();
         const PDFBaseline& getBaseline() const;
 
         // PDF envelope functions
