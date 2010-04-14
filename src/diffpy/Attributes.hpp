@@ -75,8 +75,12 @@ class Attributes
 {
     public:
 
-        // class needs to be virtual to allow dynamic_cast in getValue
+        // class is virtual
         virtual ~Attributes()  { }
+
+        // assignments in derived classes should not change mdoubleattrs
+        // mdoubleattrs should be only changed via registerDoubleAttribute
+        Attributes& operator=(const Attributes& other)  { return *this; }
 
         // methods
         double getDoubleAttr(const std::string& name) const;
