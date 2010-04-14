@@ -448,7 +448,7 @@ PDFEnvelope& PDFCalculator::getEnvelope(const string& tp)
 }
 
 
-set<string> PDFCalculator::usedEnvelopeTypes() const
+set<string> PDFCalculator::usedPDFEnvelopeTypes() const
 {
     set<string> rv;
     EnvelopeStorage::const_iterator evit;
@@ -478,7 +478,7 @@ void pdfcalc_accept(T* obj, diffpy::BaseAttributesVisitor& v)
     obj->getPeakProfile().accept(v);
     obj->getBaseline().accept(v);
     // PDF envelopes
-    set<string> evnames = obj->usedEnvelopeTypes();
+    set<string> evnames = obj->usedPDFEnvelopeTypes();
     set<string>::const_iterator nm = evnames.begin();
     for (; nm != evnames.end(); ++nm)
     {

@@ -104,7 +104,7 @@ class PDFCalculator : public PairQuantity,
         void popEnvelope(const std::string& tp);
         const PDFEnvelope& getEnvelope(const std::string& tp) const;
         PDFEnvelope& getEnvelope(const std::string& tp);
-        std::set<std::string> usedEnvelopeTypes() const;
+        std::set<std::string> usedPDFEnvelopeTypes() const;
         void clearEnvelopes();
 
     protected:

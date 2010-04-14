@@ -93,7 +93,7 @@ public:
 
     void test_access_Envelopes()
     {
-        TS_ASSERT_EQUALS(2u, mpdfc->usedEnvelopeTypes().size());
+        TS_ASSERT_EQUALS(2u, mpdfc->usedPDFEnvelopeTypes().size());
         TS_ASSERT_EQUALS(1.0, mpdfc->getDoubleAttr("scale"));
         TS_ASSERT_EQUALS(0.0, mpdfc->getDoubleAttr("qdamp"));
         mpdfc->setDoubleAttr("scale", 3.0);

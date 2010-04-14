@@ -46,6 +46,7 @@ bool aliasPDFBaseline(const string& tp, const string& al)
     return ClassRegistry<PDFBaseline>::alias(tp, al);
 }
 
+
 set<string> getPDFBaselineTypes()
 {
     return ClassRegistry<PDFBaseline>::getTypes();
