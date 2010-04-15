@@ -12,11 +12,12 @@
 *
 ******************************************************************************
 *
-* class ObjCrystStructureAdapter -- adapter to the Crystal class from
-* ObjCryst++.
-*     
-* class ObjCrystBondGenerator -- bond generator
-*
+* class ObjCrystStructureAdapter   
+*   -- adapter to the Crystal class from ObjCryst++.
+* class ObjCrystAperiodicBondGenerator 
+*   -- Generate bonds from aperiodic ObjCrystStructureAdapter.
+* class ObjCrystPeriodicBondGenerator     
+*   -- Generate bonds from periodic ObjCrystStructureAdapter.
 *
 * $Id$
 *
@@ -43,11 +44,12 @@ namespace srreal {
 
 
 class PointsInSphere;
-class PDFCalculator;
 
 class ObjCrystStructureAdapter : public StructureAdapter
 {
-    friend class ObjCrystBondGenerator;
+    friend class ObjCrystAperiodicBondGenerator;
+    friend class ObjCrystPeriodicBondGenerator;
+
     public:
 
         // constructors
@@ -63,8 +65,8 @@ class ObjCrystStructureAdapter : public StructureAdapter
         virtual double siteMultiplicity(int idx) const;
         virtual const R3::Matrix& siteCartesianUij(int idx) const;
         virtual const std::string& siteAtomType(int idx) const;
-
         const Lattice& getLattice() const;
+        bool isPeriodic() const;
 
 
     private:
@@ -79,7 +81,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
 
         // Tolerance on distance measurements.  Two sites are the same if
         // their fractional coordinates are within this tolerance
-        static const double toler;
+        static const double mtoler;
         // The ObjCryst::Crystal
         const ObjCryst::Crystal* mpcryst;
         // The asymmetric unit cell of ScatteringComponent instances
@@ -88,26 +90,20 @@ class ObjCrystStructureAdapter : public StructureAdapter
         std::vector<SymPosVec> mvsym;
         // The Uij for scatterers. Stored in same order as mvsym.
         std::vector<SymUijVec> mvuij;
-        // The Lattice instance needed by the ObjCrystBondGenerator
+        // The Lattice instance needed by the bond generator
         Lattice mlattice;
 
 };
 
 
-class ObjCrystBondGenerator : public BaseBondGenerator
+class ObjCrystAperiodicBondGenerator : public BaseBondGenerator
 {
     public:
 
         // constructors
-        ObjCrystBondGenerator(const ObjCrystStructureAdapter*);
+        ObjCrystAperiodicBondGenerator(const ObjCrystStructureAdapter*);
 
         // methods
-        // loop control
-        virtual void rewind();
-
-        // configuration
-        virtual void setRmin(double);
-        virtual void setRmax(double);
 
         // data access
         virtual const R3::Vector& r1() const;
@@ -120,15 +116,47 @@ class ObjCrystBondGenerator : public BaseBondGenerator
         virtual bool iterateSymmetry();
         virtual void rewindSymmetry();
 
+        // data
+
+        // The adapted structure
+        const ObjCrystStructureAdapter* mpstructure;
+        // Index over symmetry
+        size_t msymidx;
+
     private:
 
-        // data
-        const ObjCrystStructureAdapter* mpstructure;
-        // Index over symmetry;
-        size_t msymidx;
-        std::auto_ptr<PointsInSphere> msphere;
         double msd(int siteidx, int symidx) const;
 
+};
+
+
+class ObjCrystPeriodicBondGenerator : public ObjCrystAperiodicBondGenerator
+{
+
+    public:
+
+        // constructors
+        ObjCrystPeriodicBondGenerator(const ObjCrystStructureAdapter*);
+
+        // loop control
+        virtual void rewind();
+
+        // data access
+        virtual const R3::Vector& r1() const;
+
+        // configuration
+        virtual void setRmin(double);
+        virtual void setRmax(double);
+
+    protected:
+
+        // methods
+        virtual bool iterateSymmetry();
+        virtual void rewindSymmetry();
+
+    private:
+
+        std::auto_ptr<PointsInSphere> msphere;
 };
 
 

@@ -9,14 +9,15 @@
 *
 * See AUTHORS.txt for a list of people who contributed.
 * See LICENSE.txt for license information.
-* ******************************************************************************
 *
-* class ObjCrystStructureAdapter -- adapter to the Crystal class from
-* ObjCryst++.
-* class ObjCrystBondGenerator -- Generate bonds from ObjCrystStructureAdapter.
+******************************************************************************
 *
-* class ObjCrystBondGenerator -- bond generator
-*
+* class ObjCrystStructureAdapter   
+*   -- adapter to the Crystal class from ObjCryst++.
+* class ObjCrystAperiodicBondGenerator 
+*   -- Generate bonds from aperiodic ObjCrystStructureAdapter.
+* class ObjCrystPeriodicBondGenerator     
+*   -- Generate bonds from periodic ObjCrystStructureAdapter.
 *
 * $Id$
 *
@@ -33,7 +34,6 @@
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/Lattice.hpp>
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
-#include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
 
@@ -53,9 +53,11 @@ const double BtoU = 1.0 / UtoB;
 // class ObjCrystStructureAdapter
 //////////////////////////////////////////////////////////////////////////////
 
-// Constructor ---------------------------------------------------------------
+// static data
 
-const double ObjCrystStructureAdapter::toler = 1e-5;
+const double ObjCrystStructureAdapter::mtoler = 1e-5;
+
+// Constructor ---------------------------------------------------------------
 
 ObjCrystStructureAdapter::
 ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst) : mpcryst(&cryst)
@@ -75,7 +77,10 @@ BaseBondGenerator*
 ObjCrystStructureAdapter::
 createBondGenerator() const
 {
-    BaseBondGenerator* bnds = new ObjCrystBondGenerator(this);
+
+    BaseBondGenerator* bnds = this->isPeriodic() ?
+        new ObjCrystPeriodicBondGenerator(this) :
+        new ObjCrystAperiodicBondGenerator(this);
     return bnds;
 }
 
@@ -92,7 +97,8 @@ double
 ObjCrystStructureAdapter::
 numberDensity() const
 {
-    double rv = this->totalOccupancy() / mpcryst->GetVolume();
+    double rv = this->isPeriodic() ?
+        (this->totalOccupancy() / mlattice.volume()) : 0.0;
     return rv;
 }
 
@@ -158,6 +164,16 @@ siteAtomType(int idx) const
 }
 
 
+bool 
+ObjCrystStructureAdapter::
+isPeriodic() const
+{
+    const Lattice& L = this->getLattice();
+    bool rv = !(R3::EpsEqual(R3::identity(), L.base()));
+    return rv;
+}
+
+
 // Private Methods -----------------------------------------------------------
 
 /* Get the conventional unit cell from the crystal. */
@@ -210,7 +226,7 @@ getUnitCell()
         if (sp == NULL) continue;
 
         mvsc.push_back(scl(i));
-        SymPosSet symset = SymPosSet(R3::EpsCompare(toler));
+        SymPosSet symset = SymPosSet(R3::EpsCompare(mtoler));
         SymPosVec symvec = SymPosVec();
         SymUijVec uijvec = SymUijVec();
         size_t numsym = 0;
@@ -232,9 +248,9 @@ getUnitCell()
             x = modf(symmetricsCoords(j, 0), &junk);
             y = modf(symmetricsCoords(j, 1), &junk);
             z = modf(symmetricsCoords(j, 2), &junk);
-            if (fabs(x) < toler) x = 0;
-            if (fabs(y) < toler) y = 0;
-            if (fabs(z) < toler) z = 0;
+            if (fabs(x) < mtoler) x = 0;
+            if (fabs(y) < mtoler) y = 0;
+            if (fabs(z) < mtoler) z = 0;
             if (x < 0) x += 1.;
             if (y < 0) y += 1.;
             if (z < 0) z += 1.;
@@ -362,21 +378,100 @@ getRotations() const
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// class ObjCrystBondGenerator
+// class ObjCrystAperiodicBondGenerator
 //////////////////////////////////////////////////////////////////////////////
 
 // Constructor ---------------------------------------------------------------
 
-ObjCrystBondGenerator::
-ObjCrystBondGenerator(const ObjCrystStructureAdapter* adpt) 
+ObjCrystAperiodicBondGenerator::
+ObjCrystAperiodicBondGenerator(const ObjCrystStructureAdapter* adpt) 
     : BaseBondGenerator(adpt), mpstructure(adpt), msymidx(0)
 {
 }
 
 // Public Methods ------------------------------------------------------------
 
+const R3::Vector& 
+ObjCrystAperiodicBondGenerator::
+r1() const
+{
+    size_t siteidx = this->site1();
+    static R3::Vector rv;
+    assert(msymidx < mpstructure->mvsym[siteidx].size());
+    rv = mpstructure->mvsym[siteidx][msymidx];
+    return rv;
+}
+
+
+double 
+ObjCrystAperiodicBondGenerator::
+msd0() const
+{
+    double rv = msd(this->site0(), 0);
+    return rv;
+}
+
+
+double 
+ObjCrystAperiodicBondGenerator::
+msd1() const
+{
+    double rv = msd(this->site1(), msymidx);
+    return rv;
+}
+
+bool 
+ObjCrystAperiodicBondGenerator::
+iterateSymmetry()
+{
+    // Rewind and iterate the symmetry counter. 
+    // If that is finished, then we're done.
+    this->uncache();
+    if (++msymidx == mpstructure->mvsym[this->site1()].size())
+    {
+        return false;
+    }
+    return true;
+}
+
+
 void 
-ObjCrystBondGenerator::
+ObjCrystAperiodicBondGenerator::
+rewindSymmetry()
+{
+    this->uncache();
+    this->msymidx = 0;
+}
+
+
+double 
+ObjCrystAperiodicBondGenerator::
+msd(int siteidx, int symidx) const
+{
+    // Get the proper Uij tensor for the given site, and symmetry indices
+    const R3::Matrix& UCart = mpstructure->mvuij[siteidx][symidx];
+    const R3::Vector& s = this->r01();
+    bool anisotropy = mpstructure->siteAnisotropy(siteidx);
+    double rv = meanSquareDisplacement(UCart, s, anisotropy);
+    return rv;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// class ObjCrystPeriodicBondGenerator
+//////////////////////////////////////////////////////////////////////////////
+
+// Constructor ---------------------------------------------------------------
+
+ObjCrystPeriodicBondGenerator::
+ObjCrystPeriodicBondGenerator(const ObjCrystStructureAdapter* adpt) 
+    : ObjCrystAperiodicBondGenerator(adpt)
+{
+}
+
+// Public Methods ------------------------------------------------------------
+
+void 
+ObjCrystPeriodicBondGenerator::
 rewind()
 {
     // Delay msphere instantiation to here instead of in constructor,
@@ -392,63 +487,43 @@ rewind()
     }
     // BaseBondGenerator::rewind calls this->rewindSymmetry,
     // which takes care of msphere and msymidx configuration
-    this->BaseBondGenerator::rewind();
-}
-
-
-void
-ObjCrystBondGenerator::
-setRmin(double rmin)
-{
-    // destroy msphere so it will be created on rewind with new rmin
-    if (this->getRmin() != rmin)    msphere.reset(NULL);
-    this->BaseBondGenerator::setRmin(rmin);
-}
-
-
-void 
-ObjCrystBondGenerator::
-setRmax(double rmax)
-{
-    // destroy msphere so it will be created on rewind with new rmax
-    if (this->getRmax() != rmax)    msphere.reset(NULL);
-    this->BaseBondGenerator::setRmax(rmax);
+    this->ObjCrystAperiodicBondGenerator::rewind();
 }
 
 
 const R3::Vector& 
-ObjCrystBondGenerator::
+ObjCrystPeriodicBondGenerator::
 r1() const
 {
-    size_t siteidx = this->site1();
-    static R3::Vector rv;
     const Lattice& L = mpstructure->getLattice();
-    assert(msymidx < mpstructure->mvsym[siteidx].size());
-    rv = mpstructure->mvsym[siteidx][msymidx];
-    rv += L.cartesian(msphere->mno());
+    static R3::Vector rv; 
+    rv = L.cartesian(msphere->mno()) + ObjCrystAperiodicBondGenerator::r1();
     return rv;
 }
 
 
-double 
-ObjCrystBondGenerator::
-msd0() const
+void
+ObjCrystPeriodicBondGenerator::
+setRmin(double rmin)
 {
-    double rv = msd(this->site0(), 0);
-    return rv;
+    // destroy msphere so it will be created on rewind with new rmin
+    if (this->getRmin() != rmin)    msphere.reset(NULL);
+    this->ObjCrystAperiodicBondGenerator::setRmin(rmin);
 }
 
 
-double 
-ObjCrystBondGenerator::
-msd1() const
+void 
+ObjCrystPeriodicBondGenerator::
+setRmax(double rmax)
 {
-    double rv = msd(this->site1(), msymidx);
-    return rv;
+    // destroy msphere so it will be created on rewind with new rmax
+    if (this->getRmax() != rmax)    msphere.reset(NULL);
+    this->ObjCrystAperiodicBondGenerator::setRmax(rmax);
 }
+
 
 bool 
-ObjCrystBondGenerator::
+ObjCrystPeriodicBondGenerator::
 iterateSymmetry()
 {
     // Iterate the sphere. If it is finished, rewind and iterate the symmetry
@@ -468,25 +543,11 @@ iterateSymmetry()
 
 
 void 
-ObjCrystBondGenerator::
+ObjCrystPeriodicBondGenerator::
 rewindSymmetry()
 {
-    this->uncache();
-    msphere->rewind();
-    msymidx = 0;
-}
-
-
-double 
-ObjCrystBondGenerator::
-msd(int siteidx, int symidx) const
-{
-    // Get the proper Uij tensor for the given site, and symmetry indices
-    const R3::Matrix& UCart = mpstructure->mvuij[siteidx][symidx];
-    const R3::Vector& s = this->r01();
-    bool anisotropy = mpstructure->siteAnisotropy(siteidx);
-    double rv = meanSquareDisplacement(UCart, s, anisotropy);
-    return rv;
+    this->msphere->rewind();
+    ObjCrystAperiodicBondGenerator::rewindSymmetry();
 }
 
 
