@@ -60,7 +60,7 @@ const double ObjCrystStructureAdapter::mtoler = 1e-5;
 // Constructor ---------------------------------------------------------------
 
 ObjCrystStructureAdapter::
-ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst) : mpcryst(&cryst)
+ObjCrystStructureAdapter(ObjCryst::Crystal& cryst) : mpcryst(&cryst)
 {
     mlattice.setLatPar( mpcryst->GetLatticePar(0), 
                         mpcryst->GetLatticePar(1),
@@ -68,7 +68,24 @@ ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst) : mpcryst(&cryst)
                         rtod * mpcryst->GetLatticePar(3),
                         rtod * mpcryst->GetLatticePar(4), 
                         rtod * mpcryst->GetLatticePar(5) );
-    this->getUnitCell();
+
+    // The dynamic population correction in ObjCryst is used by its interal
+    // calculators, but slows down the calculation of atom positions. This is
+    // also required to get the proper ScatteringComponentList for aperiodic
+    // structures. Since we're not using any ObjCryst calculators, we turn it
+    // off momentarily.
+    int usepopcorr = mpcryst->GetUseDynPopCorr();
+    mpcryst->SetUseDynPopCorr(0);
+    if (isPeriodic())
+    {
+        this->getPeriodicUnitCell();
+    }
+    else
+    {
+        this->getAperiodicUnitCell();
+    }
+    // Undo change
+    mpcryst->SetUseDynPopCorr(usepopcorr);
 }
 
 // Public Methods ------------------------------------------------------------
@@ -179,10 +196,8 @@ isPeriodic() const
 /* Get the conventional unit cell from the crystal. */
 void
 ObjCrystStructureAdapter::
-getUnitCell()
+getPeriodicUnitCell()
 {
-    // local constants
-    R3::Matrix zeros; zeros = 0.0;
 
     // Expand each scattering component in the primitive cell and record the
     // new scatterers.
@@ -306,6 +321,60 @@ getUnitCell()
     }
 
 }
+
+
+void
+ObjCrystStructureAdapter::
+getAperiodicUnitCell()
+{
+
+    // Aperiodic implies P1 symmetry. We speed things up a bit for this case.
+
+    const ObjCryst::ScatteringComponentList& scl =
+        mpcryst->GetScatteringComponentList();
+    size_t nbComponent = scl.GetNbComponent();
+
+    // Clear old vectors and make room for the new
+    mvsc.clear();
+    mvsym.clear();
+    mvuij.clear();
+    mvsc.reserve(nbComponent);
+    mvsym.reserve(nbComponent);
+    mvuij.reserve(nbComponent);
+
+    // For each scattering component, find and record its position.
+    for (size_t i = 0; i < nbComponent; ++i)
+    {
+
+        const ObjCryst::ScatteringPower* sp = scl(i).mpScattPow;
+
+        // Skip over this if it is a dummy atom. A dummy atom has no
+        // mpScattPow, and therefore no type. It's just in a structure as a
+        // reference position.
+        if (sp == NULL) continue;
+
+        // Make the requisite storage vectors
+        SymPosVec symvec = SymPosVec();
+        SymUijVec uijvec = SymUijVec();
+
+        // Record the ScatteringPower
+        mvsc.push_back(scl(i));
+
+        // Record the position
+        R3::Vector xyz; 
+        xyz = scl(i).mX, scl(i).mY, scl(i).mZ;
+        symvec.push_back(xyz);
+
+        // Record UCart
+        R3::Matrix UCart = getUCart(sp);
+        uijvec.push_back(UCart);
+
+        // Store teh requisite vectors
+        mvsym.push_back(symvec);
+        mvuij.push_back(uijvec);
+    }
+}
+
 
 R3::Matrix 
 ObjCrystStructureAdapter::
@@ -563,7 +632,7 @@ createPyObjCrystStructureAdapter(const boost::python::object& stru)
     if (cls_Crystal.ptr() != Py_None &&
         PyObject_IsInstance(stru.ptr(), cls_Crystal.ptr()) == 1)
     {
-        const ObjCryst::Crystal* pcryst =
+        ObjCryst::Crystal* pcryst =
             boost::python::extract<ObjCryst::Crystal*>(stru);
         rv = createPQAdapter(*pcryst);
     }

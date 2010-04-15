@@ -53,7 +53,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
     public:
 
         // constructors
-        ObjCrystStructureAdapter(const ObjCryst::Crystal&);
+        ObjCrystStructureAdapter(ObjCryst::Crystal&);
 
         // methods - overloaded
         virtual BaseBondGenerator* createBondGenerator() const;
@@ -75,7 +75,8 @@ class ObjCrystStructureAdapter : public StructureAdapter
         typedef std::vector<R3::Matrix> SymUijVec;
 
         // methods - own
-        void getUnitCell();
+        void getPeriodicUnitCell();
+        void getAperiodicUnitCell();
         R3::Matrix getUCart(const ObjCryst::ScatteringPower* sp) const;
         std::vector< R3::Matrix > getRotations() const;
 
@@ -83,7 +84,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
         // their fractional coordinates are within this tolerance
         static const double mtoler;
         // The ObjCryst::Crystal
-        const ObjCryst::Crystal* mpcryst;
+        ObjCryst::Crystal* mpcryst;
         // The asymmetric unit cell of ScatteringComponent instances
         std::vector< ObjCryst::ScatteringComponent > mvsc;
         // The symmetry-related positions of the asymmetric unit cell
@@ -162,7 +163,7 @@ class ObjCrystPeriodicBondGenerator : public ObjCrystAperiodicBondGenerator
 
 inline
 StructureAdapter* 
-createPQAdapter(const ObjCryst::Crystal& cryst)
+createPQAdapter(ObjCryst::Crystal& cryst)
 {
     StructureAdapter* adapter = new ObjCrystStructureAdapter(cryst);
     return adapter;
