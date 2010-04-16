@@ -53,7 +53,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
     public:
 
         // constructors
-        ObjCrystStructureAdapter(ObjCryst::Crystal&);
+        ObjCrystStructureAdapter(const ObjCryst::Crystal&);
 
         // methods - overloaded
         virtual BaseBondGenerator* createBondGenerator() const;
@@ -84,7 +84,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
         // their fractional coordinates are within this tolerance
         static const double mtoler;
         // The ObjCryst::Crystal
-        ObjCryst::Crystal* mpcryst;
+        const ObjCryst::Crystal* mpcryst;
         // The asymmetric unit cell of ScatteringComponent instances
         std::vector< ObjCryst::ScatteringComponent > mvsc;
         // The symmetry-related positions of the asymmetric unit cell
@@ -163,7 +163,7 @@ class ObjCrystPeriodicBondGenerator : public ObjCrystAperiodicBondGenerator
 
 inline
 StructureAdapter* 
-createPQAdapter(ObjCryst::Crystal& cryst)
+createPQAdapter(const ObjCryst::Crystal& cryst)
 {
     StructureAdapter* adapter = new ObjCrystStructureAdapter(cryst);
     return adapter;

@@ -60,8 +60,9 @@ const double ObjCrystStructureAdapter::mtoler = 1e-5;
 // Constructor ---------------------------------------------------------------
 
 ObjCrystStructureAdapter::
-ObjCrystStructureAdapter(ObjCryst::Crystal& cryst) : mpcryst(&cryst)
+ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst) : mpcryst(&cryst)
 {
+    using ObjCryst::Crystal;
     mlattice.setLatPar( mpcryst->GetLatticePar(0), 
                         mpcryst->GetLatticePar(1),
                         mpcryst->GetLatticePar(2), 
@@ -75,8 +76,8 @@ ObjCrystStructureAdapter(ObjCryst::Crystal& cryst) : mpcryst(&cryst)
     // structures. Since we're not using any ObjCryst calculators, we turn it
     // off momentarily.
     int usepopcorr = mpcryst->GetUseDynPopCorr();
-    mpcryst->SetUseDynPopCorr(0);
-    if (isPeriodic())
+    const_cast<Crystal*>(mpcryst)->SetUseDynPopCorr(0);
+    if (this->isPeriodic())
     {
         this->getPeriodicUnitCell();
     }
@@ -85,7 +86,7 @@ ObjCrystStructureAdapter(ObjCryst::Crystal& cryst) : mpcryst(&cryst)
         this->getAperiodicUnitCell();
     }
     // Undo change
-    mpcryst->SetUseDynPopCorr(usepopcorr);
+    const_cast<Crystal*>(mpcryst)->SetUseDynPopCorr(usepopcorr);
 }
 
 // Public Methods ------------------------------------------------------------
