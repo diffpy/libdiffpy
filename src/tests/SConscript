@@ -36,9 +36,11 @@ env_test.Append(BUILDERS={'Build_tests_dir_cpp' :
 tdcpp = env_test.Build_tests_dir_cpp(['tests_dir.cpp'],
         [env_test.File('tests_dir.tpl').srcnode(),
          env_test.Value(Dir('.').srcnode().abspath)])
-test_sources += tdcpp
 
-alltests = env_test.CxxTest('alltests', test_sources)
+test_helpers = [tdcpp, 'python_helpers.cpp']
+
+
+alltests = env_test.CxxTest('alltests', test_sources + test_helpers)
 Alias('alltests', alltests)
 
 # test -- alias for executing unit tests.

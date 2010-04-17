@@ -23,27 +23,11 @@
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
-#include "tests_dir.hpp"
+#include "python_helpers.hpp"
 
 using namespace std;
 using namespace boost;
 using diffpy::srreal::BVSCalculator;
-
-// Local Helpers -------------------------------------------------------------
-
-namespace {
-
-python::object loadTestStructure(const string& tailname)
-{
-    python::object Structure_class =
-        diffpy::importFromPyModule("diffpy.Structure", "Structure");
-    python::object stru = Structure_class();
-    string fp = prepend_testdata_dir(tailname);
-    stru.attr("read")(fp);
-    return stru;
-}
-
-}   // namespace
 
 //////////////////////////////////////////////////////////////////////////////
 // class TestBVSCalculator

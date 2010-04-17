@@ -20,11 +20,10 @@
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>
-#include <boost/python.hpp>
 
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
 #include <diffpy/PythonInterface.hpp>
-#include "tests_dir.hpp"
+#include "python_helpers.hpp"
 
 using namespace std;
 using namespace boost;
@@ -33,24 +32,6 @@ using namespace diffpy::srreal;
 // Local Helpers -------------------------------------------------------------
 
 namespace {
-
-python::object newDiffPyStructure()
-{
-    python::object Structure =
-        diffpy::importFromPyModule("diffpy.Structure", "Structure");
-    python::object stru = Structure();
-    return stru;
-}
-
-
-python::object loadTestStructure(const string& tailname)
-{
-    python::object stru = newDiffPyStructure();
-    string fp = prepend_testdata_dir(tailname);
-    stru.attr("read")(fp);
-    return stru;
-}
-
 
 int countBonds(BaseBondGenerator& bnds)
 {
