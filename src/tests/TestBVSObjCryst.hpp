@@ -19,16 +19,12 @@
 *
 *****************************************************************************/
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
-#include <ObjCryst/ObjCryst/CIF.h>
 
-#include "tests_dir.hpp"
+#include "objcryst_helpers.hpp"
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -36,21 +32,6 @@ using namespace diffpy::srreal;
 // Local Helpers -------------------------------------------------------------
 
 namespace {
-
-ObjCryst::Crystal* loadTestCIF(const string& tailname)
-{
-    string fp = prepend_testdata_dir(tailname);
-    ifstream in(fp.c_str());
-    ObjCryst::CIF cif(in);
-    // redirect cout to hide the CreateCrystalFromCIF chatty output
-    streambuf* cout_sb = cout.rdbuf();
-    ostringstream cifout;
-    cout.rdbuf(cifout.rdbuf());
-    ObjCryst::Crystal* crst = ObjCryst::CreateCrystalFromCIF(cif, false);
-    // restore cout
-    cout.rdbuf(cout_sb);
-    return crst;
-}
 
 }   // namespace
 
@@ -71,7 +52,7 @@ class TestBVSObjCryst : public CxxTest::TestSuite
         {
             if (!mcrystal.get())
             {
-                mcrystal.reset(loadTestCIF("NaCl.cif"));
+                mcrystal.reset(loadTestCrystal("NaCl.cif"));
             }
             mbvc.reset(new BVSCalculator);
         }
