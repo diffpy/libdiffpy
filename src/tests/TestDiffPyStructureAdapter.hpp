@@ -22,7 +22,6 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
-#include <diffpy/PythonInterface.hpp>
 #include "python_helpers.hpp"
 
 using namespace std;
@@ -59,7 +58,6 @@ public:
 
     void setUp()
     {
-        diffpy::initializePython();
         if (!m_ni.get())
         {
             python::object stru;
@@ -194,7 +192,6 @@ public:
 
     void setUp()
     {
-        diffpy::initializePython();
         if (!m_ni.get())
         {
             python::object stru;
