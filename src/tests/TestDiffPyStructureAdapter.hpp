@@ -62,27 +62,24 @@ class TestDiffPyStructureAdapter : public CxxTest::TestSuite
 
         void setUp()
         {
+            python::object stru;
             if (!m_ni.get())
             {
-                python::object stru;
                 stru = loadTestStructure("Ni.cif");
                 m_ni.reset(createPQAdapter(stru));
             }
             if (!m_kbise.get())
             {
-                python::object stru;
                 stru = loadTestStructure("alpha_K2Bi8Se13.cif");
                 m_kbise.reset(createPQAdapter(stru));
             }
             if (!m_catio3.get())
             {
-                python::object stru;
                 stru = loadTestStructure("icsd_62149.cif");
                 m_catio3.reset(createPQAdapter(stru));
             }
             if (!m_pswt.get())
             {
-                python::object stru;
                 stru = loadTestStructure("PbScW25TiO3.stru");
                 m_pswt.reset(createPQAdapter(stru));
             }
@@ -302,6 +299,61 @@ class TestDiffPyStructureBondGenerator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(17, countBonds(*bnds));
         }
 
+
+        void test_LiTaO3()
+        {
+            const string lithium = "Li1+";
+            const string tantalum = "Ta5+";
+            const string oxygen = "O2-";
+            const double epsu = 1e-5;
+            python::object stru = loadTestStructure("LiTaO3.cif");
+            auto_ptr<StructureAdapter> litao3(createPQAdapter(stru));
+            TS_ASSERT_EQUALS(30, litao3->countSites());
+            auto_ptr<BaseBondGenerator> bnds(litao3->createBondGenerator());
+            bnds->selectAnchorSite(0);
+            bnds->selectSiteRange(0, 30);
+            // there are 3 oxygen neighbors at 2.065
+            bnds->setRmax(2.1);
+            TS_ASSERT_EQUALS(3, countBonds(*bnds));
+            // Li at site 0 is isotropic, oxygens have equal msd-s towards Li
+            for (bnds->rewind(); !bnds->finished(); bnds->next())
+            {
+                TS_ASSERT_EQUALS(lithium, litao3->siteAtomType(bnds->site0()));
+                TS_ASSERT_EQUALS(oxygen, litao3->siteAtomType(bnds->site1()));
+                TS_ASSERT_DELTA(0.00265968, bnds->msd0(), epsu);
+                TS_ASSERT_DELTA(0.00710945, bnds->msd1(), epsu);
+            }
+            // there are 3 oxygen neighbors at 2.26
+            bnds->setRmin(2.2);
+            bnds->setRmax(2.3);
+            TS_ASSERT_EQUALS(3, countBonds(*bnds));
+            for (bnds->rewind(); !bnds->finished(); bnds->next())
+            {
+                TS_ASSERT_EQUALS(oxygen, litao3->siteAtomType(bnds->site1()));
+                TS_ASSERT_DELTA(0.00265968, bnds->msd0(), epsu);
+                TS_ASSERT_DELTA(0.00824319, bnds->msd1(), epsu);
+            }
+            // finally there are 4 Ta neighbors between 2.8 and 3.1
+            bnds->setRmin(2.8);
+            bnds->setRmax(3.1);
+            TS_ASSERT_EQUALS(4, countBonds(*bnds));
+            for (bnds->rewind(); !bnds->finished(); bnds->next())
+            {
+                TS_ASSERT_DELTA(0.00265968, bnds->msd0(), epsu);
+                TS_ASSERT_EQUALS(tantalum, litao3->siteAtomType(bnds->site1()));
+                R3::Vector r01xy = bnds->r01();
+                r01xy[2] = 0.0;
+                // for the tantalum above Li the msd equals U33
+                if (R3::norm(r01xy) < 0.1) {
+                    TS_ASSERT_DELTA(0.00356, bnds->msd1(), epsu);
+                }
+                // other 3 tantalums are related by tripple axis and
+                // have the same msd towards the central Li
+                else {
+                    TS_ASSERT_DELTA(0.00486942, bnds->msd1(), epsu);
+                }
+            }
+        }
 
 };  // class TestDiffPyStructureBondGenerator
 
