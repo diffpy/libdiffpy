@@ -209,10 +209,6 @@ getPeriodicUnitCell()
     // Various things we need to know about the symmetry operations
     const ObjCryst::SpaceGroup& spacegroup = mpcryst->GetSpaceGroup();
     size_t nbSymmetrics = spacegroup.GetNbSymmetrics();
-    size_t nbTrans = spacegroup.GetNbTranslationVectors();
-    size_t cmult = spacegroup.IsCentrosymmetric() ? 2 : 1;
-    size_t nbRot = nbSymmetrics / nbTrans / cmult;
-    assert( nbSymmetrics = nbTrans * nbRot * cmult );
 
     double x, y, z, junk;
     CrystMatrix<double> symmetricsCoords;
@@ -226,8 +222,10 @@ getPeriodicUnitCell()
 
     typedef std::set<R3::Vector, R3::EpsCompare> SymPosSet;
 
-    // Get the symmetry rotations
-    std::vector< R3::Matrix > rotations = getRotations();
+    // Get the symmetry operations
+    const std::vector<ObjCryst::SpaceGroup::SMx>& symops = 
+        spacegroup.GetSymmetryOperations();
+    const size_t symsize = symops.size();
 
     // For each scattering component, find its position in the primitive cell
     // and expand that position.
@@ -246,10 +244,9 @@ getPeriodicUnitCell()
         SymPosVec symvec = SymPosVec();
         SymUijVec uijvec = SymUijVec();
         size_t numsym = 0;
-        size_t rotidx = 0;
 
-        // Store Uij in cartesian
-        R3::Matrix UCart = getUCart(sp);
+        // Store Uij.
+        R3::Matrix Uij = getUij(sp);
 
         // Get all the symmetric coordinates. Symmetric coordinates are created
         // by translation vector in the outer loop, and rotation matrix in the
@@ -259,7 +256,7 @@ getPeriodicUnitCell()
             scl(i).mX, scl(i).mY, scl(i).mZ);
 
         // Collect the unique symmetry positions.
-        for (size_t j = 0; j < nbSymmetrics; ++j, ++rotidx)
+        for (size_t j = 0; j < nbSymmetrics; ++j)
         {
             x = modf(symmetricsCoords(j, 0), &junk);
             y = modf(symmetricsCoords(j, 1), &junk);
@@ -271,9 +268,6 @@ getPeriodicUnitCell()
             if (y < 0) y += 1.;
             if (z < 0) z += 1.;
 
-            // Get this in cartesian
-            mpcryst->FractionalToOrthonormalCoords(x, y, z);
-
             // Record the position
             R3::Vector xyz; 
             xyz = x, y, z;
@@ -281,35 +275,39 @@ getPeriodicUnitCell()
             // We use this to filter unique positions
             symset.insert(xyz);
 
-            // Keep track of the rotation index. We use the fact that the
-            // translations are in the outer loop when the symmetric
-            // coordinates are created. This is a hack.
-            if(rotidx >= nbRot) rotidx -= nbRot;
-
             // See if we've got a new position
             if(symset.size() > numsym)
             {
                 ++numsym;
+
+                // Get this in Cartesian
+                R3::Vector xyzc = mlattice.cartesian(xyz);
                 
                 // Store this in the symvec so we are assured that the order
                 // will not change.
-                symvec.push_back(xyz);
+                symvec.push_back(xyzc);
 
-                if(numsym > 0)
+                // Get the symmetry operation used to generate this position.
+                R3::Matrix M;
+                size_t k = j % symsize;
+                M = symops[k].mx[0], symops[k].mx[1], symops[k].mx[2],
+                    symops[k].mx[3], symops[k].mx[4], symops[k].mx[5],
+                    symops[k].mx[6], symops[k].mx[7], symops[k].mx[8];
+
+                // rotate the Uij matrix
+                R3::Matrix Utmp, Urot, UCart; 
+                // Get UCart
+                if (sp->IsIsotropic())
                 {
-                    // Get the symmetry operation used to generate this postion.
-                    const R3::Matrix& M = rotations[rotidx];
-
-                    // rotate the UCart matrix
-                    R3::Matrix tmp, Urot; 
-                    tmp = R3::product(UCart, M);
-                    Urot = R3::product(R3::transpose(M), tmp);
-                    uijvec.push_back(Urot);
+                    UCart = Uij;
                 }
                 else
                 {
-                    uijvec.push_back(UCart);
+                    Utmp = R3::product(Uij, R3::transpose(M));
+                    Urot = R3::product(M, Utmp);
+                    UCart = mlattice.cartesianMatrix(Urot);
                 }
+                uijvec.push_back(UCart);
             }
         }
 
@@ -367,7 +365,16 @@ getAperiodicUnitCell()
         symvec.push_back(xyz);
 
         // Record UCart
-        R3::Matrix UCart = getUCart(sp);
+        R3::Matrix Uij = getUij(sp);
+        R3::Matrix UCart;
+        if (!sp->IsIsotropic())
+        {
+            UCart = mlattice.cartesianMatrix(Uij);
+        }
+        else
+        {
+            UCart = Uij;
+        }
         uijvec.push_back(UCart);
 
         // Store teh requisite vectors
@@ -379,71 +386,27 @@ getAperiodicUnitCell()
 
 R3::Matrix 
 ObjCrystStructureAdapter::
-getUCart(const ObjCryst::ScatteringPower* sp) const
+getUij(const ObjCryst::ScatteringPower* sp) const
 {
-    R3::Matrix UCart;
+    R3::Matrix Uij;
     if (sp->IsIsotropic())
     {
-        UCart(0,0) = UCart(1,1) = UCart(2,2) = sp->GetBiso() * BtoU;
-        UCart(0,1) = UCart(1,0) = 0;
-        UCart(0,2) = UCart(2,0) = 0;
-        UCart(2,1) = UCart(1,2) = 0;
+        Uij(0,0) = Uij(1,1) = Uij(2,2) = sp->GetBiso() * BtoU;
+        Uij(0,1) = Uij(1,0) = 0;
+        Uij(0,2) = Uij(2,0) = 0;
+        Uij(2,1) = Uij(1,2) = 0;
     }
     else
     {
-        R3::Matrix Ufrac;
-        Ufrac(0,0) = sp->GetBij(1,1) * BtoU;
-        Ufrac(1,1) = sp->GetBij(2,2) * BtoU;
-        Ufrac(2,2) = sp->GetBij(3,3) * BtoU;
-        Ufrac(0,1) = Ufrac(1,0) = sp->GetBij(1,2) * BtoU;
-        Ufrac(0,2) = Ufrac(2,0) = sp->GetBij(1,3) * BtoU;
-        Ufrac(1,2) = Ufrac(2,1) = sp->GetBij(2,3) * BtoU;
-        UCart = mlattice.cartesianMatrix(Ufrac);
+        Uij(0,0) = sp->GetBij(1,1) * BtoU;
+        Uij(1,1) = sp->GetBij(2,2) * BtoU;
+        Uij(2,2) = sp->GetBij(3,3) * BtoU;
+        Uij(0,1) = Uij(1,0) = sp->GetBij(1,2) * BtoU;
+        Uij(0,2) = Uij(2,0) = sp->GetBij(1,3) * BtoU;
+        Uij(1,2) = Uij(2,1) = sp->GetBij(2,3) * BtoU;
     }
 
-    return UCart;
-
-}
-
-std::vector< R3::Matrix >
-ObjCrystStructureAdapter::
-getRotations() const
-{
-    const ObjCryst::SpaceGroup& spacegroup = mpcryst->GetSpaceGroup();
-    size_t nbSymmetrics = spacegroup.GetNbSymmetrics();
-    size_t nbTrans = spacegroup.GetNbTranslationVectors();
-    size_t cmult = spacegroup.IsCentrosymmetric() ? 2 : 1;
-    size_t nbRot = nbSymmetrics / nbTrans / cmult;
-
-    std::vector< R3::Matrix > rotations(nbRot);
-    rotations[0] = R3::identity();
-
-    // Expand a single postion that is not at the origin and use this to
-    // determine the symmetry operations. We use the fact that the symmetric
-    // postions are expanded using the [0, 0, 0] translation first.
-    double x = 0.1, y = 0.11, z = 0.2;
-    CrystMatrix<double> coords = spacegroup.GetAllSymmetrics(x, y, z);
-    mpcryst->FractionalToOrthonormalCoords(x, y, z);
-    R3::Vector p0; 
-    p0 = x, y, z;
-
-    for(size_t i = 1; i < nbRot; ++i)
-    {
-        x = coords(i, 0);
-        y = coords(i, 1);
-        z = coords(i, 2);
-        mpcryst->FractionalToOrthonormalCoords(x, y, z);
-
-        R3::Vector p1;
-        p1 = x, y, z;
-
-        // Get _a_ rotation matrix that takes p0 to p1
-        R3::Matrix M = R3::rotationfrom(p0, p1);
-
-        rotations[i] = M;
-    }
-
-    return rotations;
+    return Uij;
 
 }
 

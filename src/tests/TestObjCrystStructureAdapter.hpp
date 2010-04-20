@@ -286,7 +286,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(17, countBonds(*bnds));
             // and the same happens for all other sites
             bnds->selectAnchorSite(1);
-            TS_ASSERT_EQUALS(16, countBonds(*bnds));
+            TS_ASSERT_EQUALS(17, countBonds(*bnds));
         }
 
 

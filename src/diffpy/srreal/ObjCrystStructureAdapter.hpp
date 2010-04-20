@@ -77,8 +77,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
         // methods - own
         void getPeriodicUnitCell();
         void getAperiodicUnitCell();
-        R3::Matrix getUCart(const ObjCryst::ScatteringPower* sp) const;
-        std::vector< R3::Matrix > getRotations() const;
+        R3::Matrix getUij(const ObjCryst::ScatteringPower* sp) const;
 
         // Tolerance on distance measurements.  Two sites are the same if
         // their fractional coordinates are within this tolerance

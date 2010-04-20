@@ -57,7 +57,6 @@ template <class V> double dot(const V& u, const V& v);
 template <class V> Vector cross(const V& u, const V& v);
 template <class V> const Vector& mxvecproduct(const Matrix&, const V&);
 template <class V> const Vector& mxvecproduct(const V&, const Matrix&);
-template <class V> Matrix rotationfrom(const V& u, const V& v);
 
 class EpsCompare;
 
@@ -123,54 +122,6 @@ const Vector& mxvecproduct(const V& u, const Matrix& M)
     return res;
 }
 
-
-template <class V>
-R3::Matrix rotationfrom(const V& u, const V& v)
-{
-    // Normalize the vectors
-    double nu = R3::norm(u);
-    double nv = R3::norm(v);
-    if(nu == 0 || nv == 0)
-    {
-        return R3::identity();
-    }
-
-    Vector un = u / nu;
-    Vector vn = v / nv;
-
-    if( EpsEqual(un, vn) ) return R3::identity();
-
-    // Get angle of rotation between u and v, and the axis of rotation;
-    double cosa = R3::dot(un, vn);
-    double sina = sqrt(1.0 - cosa * cosa);
-    assert( diffpy::mathutils::eps_eq(1, cosa * cosa + sina * sina) );
-    Vector axis = R3::cross(un, vn);
-    axis /= R3::norm(axis);
-    double ax = axis[0];
-    double ay = axis[1];
-    double az = axis[2];
-
-    R3::Matrix res;
-
-    res =   ax * ax + (1 - ax * ax ) * cosa,
-            ax * ay * (1 - cosa) - az * sina,
-            ax * az * (1 - cosa) + ay * sina,
-            ax * ay * (1 - cosa) + az * sina,
-            ay * ay + (1 - ay * ay) * cosa,
-            ay * az * (1 - cosa) - ax * sina,
-            ax * az * (1 - cosa) - ay * sina,
-            ay * az * (1 - cosa) + ax * sina,
-            az * az + (1 - az * az) * cosa;
-
-    // Make sure this is a rotation matrix
-    assert( diffpy::mathutils::eps_eq(1, R3::determinant(res)) );
-    assert( R3::EpsEqual( R3::inverse(res), R3::transpose(res)) );
-
-    // Make sure it performs as advertised
-    assert( R3::EpsEqual(vn, R3::mxvecproduct(res, un)) );
-
-    return res;
-}
 
 class EpsCompare
 {
