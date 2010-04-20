@@ -80,6 +80,7 @@ class BVSCalculator : public PairQuantity
             std::vector<std::string> baresymbols;
             std::vector<int> valences;
             QuantityType multiplicities;
+            QuantityType occupancies;
             double total_occupancy;
         } mstructure_cache;
 

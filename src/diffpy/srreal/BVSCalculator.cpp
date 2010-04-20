@@ -48,9 +48,8 @@ BVSCalculator::BVSCalculator()
 
 QuantityType BVSCalculator::valences() const
 {
-    QuantityType rv(mstructure_cache.valences.size());
-    copy(mstructure_cache.valences.begin(), mstructure_cache.valences.end(),
-            rv.begin());
+    QuantityType rv(mstructure_cache.valences.begin(),
+            mstructure_cache.valences.end());
     return rv;
 }
 
@@ -74,11 +73,13 @@ double BVSCalculator::bvmsdiff() const
 {
     QuantityType bd = this->bvdiff();
     assert(bd.size() == mstructure_cache.multiplicities.size());
+    assert(bd.size() == mstructure_cache.occupancies.size());
     int cntsites = this->countSites();
     double sumofsquares = 0.0;
     for (int i = 0; i < cntsites; ++i)
     {
-        sumofsquares += mstructure_cache.multiplicities[i] * bd[i] * bd[i];
+        sumofsquares += mstructure_cache.multiplicities[i] *
+            mstructure_cache.occupancies[i] * bd[i] * bd[i];
     }
     double rv = (mstructure_cache.total_occupancy > 0.0) ?
         (sumofsquares / mstructure_cache.total_occupancy) : 0.0;
@@ -151,10 +152,12 @@ void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds,
     // do nothing if there are no bond parameters for this pair
     if (&bp == &bvtb.none())    return;
     double valencehalf = bp.bondvalence(bnds.distance()) / 2.0;
-    int plusminus0 = (v0 >= 0) ? 1 : -1;
-    int plusminus1 = (v1 >= 0) ? 1 : -1;
-    mvalue[bnds.site0()] += summationscale * plusminus0 * valencehalf;
-    mvalue[bnds.site1()] += summationscale * plusminus1 * valencehalf;
+    int pm0 = (v0 >= 0) ? 1 : -1;
+    int pm1 = (v1 >= 0) ? 1 : -1;
+    const double& o0 = mstructure_cache.occupancies[bnds.site0()];
+    const double& o1 = mstructure_cache.occupancies[bnds.site1()];
+    mvalue[bnds.site0()] += summationscale * pm0 * valencehalf * o1;
+    mvalue[bnds.site1()] += summationscale * pm1 * valencehalf * o0;
 }
 
 // Private Methods -----------------------------------------------------------
@@ -165,17 +168,14 @@ void BVSCalculator::cacheStructureData()
     mstructure_cache.baresymbols.resize(cntsites);
     mstructure_cache.valences.resize(cntsites);
     mstructure_cache.multiplicities.resize(cntsites);
+    mstructure_cache.occupancies.resize(cntsites);
     for (int i = 0; i < cntsites; ++i)
     {
         const string& smbl = mstructure->siteAtomType(i);
         mstructure_cache.baresymbols[i] = atomBareSymbol(smbl);
         mstructure_cache.valences[i] = atomValence(smbl);
         mstructure_cache.multiplicities[i] = mstructure->siteMultiplicity(i);
-        if (mstructure->siteOccupancy(i) != 1.0)
-        {
-            const char* emsg = "Non unit occupancy is not supported.";
-            throw invalid_argument(emsg);
-        }
+        mstructure_cache.occupancies[i] = mstructure->siteOccupancy(i);
     }
     mstructure_cache.total_occupancy = mstructure->totalOccupancy();
 }
