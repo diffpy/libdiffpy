@@ -78,6 +78,30 @@ class TestBVSCalculator : public CxxTest::TestSuite
             TS_ASSERT_DELTA(mbvc->bvrmsdiff(), bvc.bvrmsdiff(), 1e-12);
         }
 
+
+        void test_setValencePrecision()
+        {
+            TS_ASSERT_THROWS(mbvc->setValencePrecision(0), invalid_argument);
+            TS_ASSERT_THROWS(mbvc->setValencePrecision(-1), invalid_argument);
+            TS_ASSERT_THROWS(mbvc->setDoubleAttr("valenceprecision", 0),
+                    invalid_argument);
+        }
+        
+
+        void test_getRmaxUsed()
+        {
+            mbvc->eval(mnacl);
+            double rmaxused = mbvc->getDoubleAttr("rmaxused");
+            TS_ASSERT_EQUALS(rmaxused, mbvc->getRmaxUsed());
+            TS_ASSERT_LESS_THAN(rmaxused, mbvc->getRmax());
+            mbvc->setDoubleAttr("valenceprecision",
+                    mbvc->getDoubleAttr("valenceprecision") / 10.0);
+            TS_ASSERT_LESS_THAN(rmaxused, mbvc->getDoubleAttr("rmaxused"));
+            mbvc->setValencePrecision(1e-7);
+            mbvc->setDoubleAttr("rmax", 5.0);
+            TS_ASSERT_EQUALS(5.0, mbvc->getDoubleAttr("rmaxused"));
+        }
+
 };  // class TestBVSCalculator
 
 // End of file

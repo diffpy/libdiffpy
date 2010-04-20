@@ -21,12 +21,14 @@
 #include <cmath>
 #include <cassert>
 
+#include <diffpy/validators.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
 
 using namespace std;
+using namespace diffpy::validators;
 
 namespace diffpy {
 namespace srreal {
@@ -40,6 +42,12 @@ BVSCalculator::BVSCalculator()
     BVParametersTable bvtb;
     this->setBVParamTable(bvtb);
     this->setValencePrecision(valence_precision);
+    // attributes
+    this->registerDoubleAttribute("valenceprecision", this,
+            &BVSCalculator::getValencePrecision,
+            &BVSCalculator::setValencePrecision);
+    this->registerDoubleAttribute("rmaxused", this,
+            &BVSCalculator::getRmaxUsed);
 }
 
 // Public Methods ------------------------------------------------------------
@@ -110,6 +118,7 @@ const BVParametersTable& BVSCalculator::getBVParamTable() const
 
 void BVSCalculator::setValencePrecision(double eps)
 {
+    ensureEpsilonPositive("valenceprecision", eps);
     mvalenceprecision = eps;
 }
 
@@ -117,6 +126,14 @@ void BVSCalculator::setValencePrecision(double eps)
 double BVSCalculator::getValencePrecision() const
 {
     return mvalenceprecision;
+}
+
+
+double BVSCalculator::getRmaxUsed() const
+{
+    double rv = min(this->getRmax(),
+            this->rmaxFromPrecision(this->getValencePrecision()));
+    return rv;
 }
 
 // Protected Methods ---------------------------------------------------------
@@ -134,9 +151,7 @@ void BVSCalculator::resetValue()
 
 void BVSCalculator::configureBondGenerator(BaseBondGenerator& bnds)
 {
-    double rmaxused = min(this->getRmax(),
-            this->rmaxFromPrecision(this->getValencePrecision()));
-    bnds.setRmax(rmaxused);
+    bnds.setRmax(this->getRmaxUsed());
 }
 
 

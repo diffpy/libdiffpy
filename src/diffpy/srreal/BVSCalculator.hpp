@@ -56,6 +56,9 @@ class BVSCalculator : public PairQuantity
         void setValencePrecision(double);
         /// return cutoff value for bond valence contributions
         double getValencePrecision() const;
+        /// effective rmax value, where valence contributions become smaller
+        /// than the valence precision cutoff.  Always less or equal to rmax.
+        double getRmaxUsed() const;
 
     protected:
 
