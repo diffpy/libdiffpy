@@ -42,19 +42,6 @@ int countBonds(BaseBondGenerator& bnds)
     return rv;
 }
 
-// FIXME temporary debug helper, to be removed
-void printBonds(BaseBondGenerator& bnds)
-{
-    for (bnds.rewind(); !bnds.finished(); bnds.next())
-    {
-        cout << "d01 = " << bnds.distance() << "  ";
-        cout << "r0 = (" << bnds.r0()[0] << ' ' <<
-            bnds.r0()[1] << ' '<< bnds.r0()[2] << ")  ";
-        cout << "r1 = (" << bnds.r1()[0] << ' ' <<
-            bnds.r1()[1] << ' '<< bnds.r1()[2] << ")\n";
-    }
-}
-
 }   // namespace
 
 //////////////////////////////////////////////////////////////////////////////
@@ -187,9 +174,7 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
                 dynamic_cast<ObjCrystStructureAdapter*>(m_kbise.get());
             TS_ASSERT(pkbise);
             const Lattice& L = pkbise->getLattice();
-            // FIXME - why such a low precision? 
-            // Are we still using floats in ObjCryst?
-            const double eps = 1.0e-5;
+            const double eps = 1.0e-12;
             TS_ASSERT_DELTA(13.768, L.a(), eps);
             TS_ASSERT_DELTA(12.096, L.b(), eps);
             TS_ASSERT_DELTA(4.1656, L.c(), eps);
@@ -268,7 +253,6 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
             // there should be no bond below the ZnS distance 2.31
             bnds->setRmax(2.2);
             TS_ASSERT_EQUALS(0, countBonds(*bnds));
-            printBonds(*bnds);
             // z-neighbor is slightly more distant than 3 in the lower plane
             bnds->setRmax(2.35);
             TS_ASSERT_EQUALS(3, countBonds(*bnds));
