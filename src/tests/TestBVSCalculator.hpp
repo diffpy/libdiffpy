@@ -35,38 +35,48 @@ using diffpy::srreal::BVSCalculator;
 
 class TestBVSCalculator : public CxxTest::TestSuite
 {
-private:
+    private:
 
-    python::object mnacl;
-    auto_ptr<BVSCalculator> mbvc;
+        python::object mnacl;
+        auto_ptr<BVSCalculator> mbvc;
 
-public:
+    public:
 
-    void setUp()
-    {
-        diffpy::initializePython();
-        if (mnacl.ptr() == Py_None)
+        void setUp()
         {
-            mnacl = loadTestStructure("NaCl.cif");
+            diffpy::initializePython();
+            if (mnacl.ptr() == Py_None)
+            {
+                mnacl = loadTestStructure("NaCl.cif");
+            }
+            mbvc.reset(new BVSCalculator);
         }
-        mbvc.reset(new BVSCalculator);
-    }
 
 
-    void test_NaCl()
-    {
-        const double eps = 0.02;
-        mbvc->eval(mnacl);
-        TS_ASSERT_EQUALS(8u, mbvc->value().size());
-        TS_ASSERT_DELTA(+1, mbvc->value()[0], eps);
-        TS_ASSERT_DELTA(+1, mbvc->value()[1], eps);
-        TS_ASSERT_DELTA(+1, mbvc->value()[2], eps);
-        TS_ASSERT_DELTA(+1, mbvc->value()[3], eps);
-        TS_ASSERT_DELTA(-1, mbvc->value()[4], eps);
-        TS_ASSERT_DELTA(-1, mbvc->value()[5], eps);
-        TS_ASSERT_DELTA(-1, mbvc->value()[6], eps);
-        TS_ASSERT_DELTA(-1, mbvc->value()[7], eps);
-    }
+        void test_NaCl()
+        {
+            const double eps = 0.02;
+            mbvc->eval(mnacl);
+            TS_ASSERT_EQUALS(8u, mbvc->value().size());
+            TS_ASSERT_DELTA(+1, mbvc->value()[0], eps);
+            TS_ASSERT_DELTA(+1, mbvc->value()[1], eps);
+            TS_ASSERT_DELTA(+1, mbvc->value()[2], eps);
+            TS_ASSERT_DELTA(+1, mbvc->value()[3], eps);
+            TS_ASSERT_DELTA(-1, mbvc->value()[4], eps);
+            TS_ASSERT_DELTA(-1, mbvc->value()[5], eps);
+            TS_ASSERT_DELTA(-1, mbvc->value()[6], eps);
+            TS_ASSERT_DELTA(-1, mbvc->value()[7], eps);
+        }
+
+
+        void test_NaCl_mixed()
+        {
+            python::object nacl_mixed = loadTestStructure("NaCl_mixed.cif");
+            mbvc->eval(mnacl);
+            BVSCalculator bvc;
+            bvc.eval(nacl_mixed);
+            TS_ASSERT_DELTA(mbvc->bvrmsdiff(), bvc.bvrmsdiff(), 1e-12);
+        }
 
 };  // class TestBVSCalculator
 

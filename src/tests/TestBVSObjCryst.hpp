@@ -43,16 +43,16 @@ class TestBVSObjCryst : public CxxTest::TestSuite
 {
     private:
 
-        auto_ptr<ObjCryst::Crystal> mcrystal;
+        auto_ptr<ObjCryst::Crystal> mnacl;
         auto_ptr<BVSCalculator> mbvc;
 
     public:
 
         void setUp()
         {
-            if (!mcrystal.get())
+            if (!mnacl.get())
             {
-                mcrystal.reset(loadTestCrystal("NaCl.cif"));
+                mnacl.reset(loadTestCrystal("NaCl.cif"));
             }
             mbvc.reset(new BVSCalculator);
         }
@@ -61,10 +61,21 @@ class TestBVSObjCryst : public CxxTest::TestSuite
         void test_NaCl()
         {
             const double eps = 0.02;
-            mbvc->eval(*mcrystal);
+            mbvc->eval(*mnacl);
             TS_ASSERT_EQUALS(2u, mbvc->value().size());
             TS_ASSERT_DELTA(+1, mbvc->value()[0], eps);
             TS_ASSERT_DELTA(-1, mbvc->value()[1], eps);
+        }
+
+
+        void test_NaCl_mixed()
+        {
+            auto_ptr<ObjCryst::Crystal> nacl_mixed;
+            nacl_mixed.reset(loadTestCrystal("NaCl_mixed.cif"));
+            mbvc->eval(*mnacl);
+            BVSCalculator bvc;
+            bvc.eval(*nacl_mixed);
+            TS_ASSERT_DELTA(mbvc->bvrmsdiff(), bvc.bvrmsdiff(), 1e-12);
         }
 
 };  // class TestBVSObjCryst
