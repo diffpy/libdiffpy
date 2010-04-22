@@ -32,6 +32,9 @@ class PairCounter : public PairQuantity
 {
     public:
 
+        // constructor
+        PairCounter();
+
         // methods
         template <class T> int operator()(const T&);
 

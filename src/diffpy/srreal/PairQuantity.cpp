@@ -34,7 +34,6 @@ PairQuantity::PairQuantity()
 {
     this->setRmin(0.0);
     this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
-    this->resizeValue(1);
     this->setEvaluator(BASIC);
     mcountsites = 0;
     // attributes

@@ -22,6 +22,13 @@
 
 using namespace diffpy::srreal;
 
+// Constructor ---------------------------------------------------------------
+
+PairCounter::PairCounter()
+{
+    this->resizeValue(1);
+}
+
 // Protected Methods ---------------------------------------------------------
 
 void PairCounter::addPairContribution(const BaseBondGenerator& bnds,
