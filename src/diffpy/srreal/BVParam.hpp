@@ -34,7 +34,7 @@ class BVParam
         BVParam();
         BVParam(const std::string& atom0, int valence0,
                 const std::string& atom1, int valence1,
-                double Ro=0.0, double B=0.37, std::string ref_id="");
+                double Ro=0.0, double B=0.0, std::string ref_id="");
 
         // methods
         /// Return bond valence at a specified distance

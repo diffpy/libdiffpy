@@ -36,7 +36,7 @@ BVParam::BVParam()
     mvalence0 = 0;
     mvalence1 = 0;
     mRo = 0.0;
-    mB = 0.37;
+    mB = 0.0;
 }
 
 BVParam::BVParam(const string& atom0, int valence0,

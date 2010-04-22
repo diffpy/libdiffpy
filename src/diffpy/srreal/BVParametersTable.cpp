@@ -32,6 +32,14 @@ namespace srreal {
 
 extern const char* bvparm2009cif_lines[];
 
+// Static Methods ------------------------------------------------------------
+
+const BVParam& BVParametersTable::none()
+{
+    static const BVParam bpnone;
+    return bpnone;
+}
+
 // Constructor ---------------------------------------------------------------
 
 BVParametersTable::BVParametersTable()
@@ -47,13 +55,6 @@ BVParametersTable* BVParametersTable::clone() const
 }
 
 // Public Methods ------------------------------------------------------------
-
-const BVParam& BVParametersTable::none() const
-{
-    static const BVParam bpnone;
-    return bpnone;
-}
-
 
 const BVParam& BVParametersTable::lookup(const BVParam& bpk) const
 {

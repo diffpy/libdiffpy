@@ -64,6 +64,17 @@ public:
     }
 
 
+    void test_none()
+    {
+        const BVParam& bpnone = BVParametersTable::none();
+        TS_ASSERT_EQUALS(&bpnone, &(bvtb->none()));
+        TS_ASSERT_EQUALS(0.0, bpnone.bondvalence(0));
+        TS_ASSERT_EQUALS(0.0, bpnone.bondvalence(3));
+        TS_ASSERT_EQUALS(0.0, bpnone.bondvalence(10));
+        TS_ASSERT_EQUALS(0.0, bpnone.bondvalenceToDistance(0.5));
+    }
+
+
     void test_lookup()
     {
         BVParam bp = bvtb->lookup("Xx", 0, "Yy", 3);
@@ -72,7 +83,7 @@ public:
         TS_ASSERT_EQUALS(0, bp.mvalence0);
         TS_ASSERT_EQUALS(0, bp.mvalence1);
         TS_ASSERT_EQUALS(0.0, bp.mRo);
-        TS_ASSERT_EQUALS(0.37, bp.mB);
+        TS_ASSERT_EQUALS(0.0, bp.mB);
         TS_ASSERT_EQUALS(&bvtb->lookup("Xx", 0, "Yy", 3),
                 &bvtb->lookup("Na", 33, "Cl", -11));
         BVParam bk("Na", 1, "Cl", -1);

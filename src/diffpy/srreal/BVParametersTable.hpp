@@ -37,12 +37,14 @@ class BVParametersTable
         // types
         typedef std::set<BVParam,BVParam::CompareIons> SetOfBVParam;
 
+        // static methods
+        static const BVParam& none();
+
         // constructors
         BVParametersTable();
         BVParametersTable* clone() const;
 
         // methods
-        const BVParam& none() const;
         const BVParam& lookup(const BVParam&) const;
         const BVParam& lookup(const std::string& atom0, int valence0,
                 const std::string& atom1, int valence1) const;
