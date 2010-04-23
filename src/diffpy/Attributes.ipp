@@ -54,13 +54,7 @@ class DoubleAttribute : public BaseDoubleAttribute
 
         void setValue(Attributes* obj, double value)
         {
-            if (!msetter)
-            {
-                const char* emsg =
-                    "Cannot change value of read-only DoubleAttribute.";
-                // FIXME: replace with custom attribute exception
-                throw std::logic_error(emsg);
-            }
+            if (!msetter)   throwDoubleAttributeReadOnly();
             T* tobj = dynamic_cast<T*>(obj);
             assert(tobj);
             (tobj->*msetter)(value);

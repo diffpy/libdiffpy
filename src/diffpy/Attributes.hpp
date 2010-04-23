@@ -181,6 +181,8 @@ class Attributes
 void registerBaseDoubleAttribute(Attributes* obj,
         const std::string& name, BaseDoubleAttribute* pa);
 
+void throwDoubleAttributeReadOnly();
+
 }   // namespace attributes
 }   // namespace diffpy
 

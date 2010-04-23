@@ -185,6 +185,15 @@ void registerBaseDoubleAttribute(Attributes* obj,
 }
 
 
+void throwDoubleAttributeReadOnly()
+{
+    const char* emsg =
+        "Cannot change value of read-only DoubleAttribute.";
+    // FIXME: replace with custom attribute exception
+    throw logic_error(emsg);
+}
+
+
 }   // namespace attributes
 }   // namespace diffpy
 
