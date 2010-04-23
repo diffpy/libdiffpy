@@ -55,17 +55,17 @@ class TestBVSCalculator : public CxxTest::TestSuite
 
         void test_NaCl()
         {
-            const double eps = 0.02;
+            const double eps = 1e-4;
             mbvc->eval(mnacl);
             TS_ASSERT_EQUALS(8u, mbvc->value().size());
-            TS_ASSERT_DELTA(+1, mbvc->value()[0], eps);
-            TS_ASSERT_DELTA(+1, mbvc->value()[1], eps);
-            TS_ASSERT_DELTA(+1, mbvc->value()[2], eps);
-            TS_ASSERT_DELTA(+1, mbvc->value()[3], eps);
-            TS_ASSERT_DELTA(-1, mbvc->value()[4], eps);
-            TS_ASSERT_DELTA(-1, mbvc->value()[5], eps);
-            TS_ASSERT_DELTA(-1, mbvc->value()[6], eps);
-            TS_ASSERT_DELTA(-1, mbvc->value()[7], eps);
+            TS_ASSERT_DELTA(+1.01352, mbvc->value()[0], eps);
+            TS_ASSERT_DELTA(+1.01352, mbvc->value()[1], eps);
+            TS_ASSERT_DELTA(+1.01352, mbvc->value()[2], eps);
+            TS_ASSERT_DELTA(+1.01352, mbvc->value()[3], eps);
+            TS_ASSERT_DELTA(-1.01352, mbvc->value()[4], eps);
+            TS_ASSERT_DELTA(-1.01352, mbvc->value()[5], eps);
+            TS_ASSERT_DELTA(-1.01352, mbvc->value()[6], eps);
+            TS_ASSERT_DELTA(-1.01352, mbvc->value()[7], eps);
         }
 
 
