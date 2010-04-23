@@ -93,6 +93,8 @@ class Attributes
 
     protected:
 
+        friend void registerBaseDoubleAttribute(Attributes*,
+                const std::string&, attributes::BaseDoubleAttribute* pa);
         template <class T, class Getter>
             void registerDoubleAttribute(const std::string& name, T* obj, Getter);
         template <class T, class Getter, class Setter>
@@ -174,6 +176,10 @@ class Attributes
 
 };  // class Attributes
 
+// non-member helpers
+
+void registerBaseDoubleAttribute(Attributes* obj,
+        const std::string& name, BaseDoubleAttribute* pa);
 
 }   // namespace attributes
 }   // namespace diffpy

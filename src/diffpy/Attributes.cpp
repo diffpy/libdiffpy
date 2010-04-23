@@ -176,6 +176,14 @@ names() const
     return mnames;
 }
 
+// Non-member Helpers --------------------------------------------------------
+
+void registerBaseDoubleAttribute(Attributes* obj,
+        const string& name, BaseDoubleAttribute* pa)
+{
+    obj->mdoubleattrs[name].reset(pa);
+}
+
 
 }   // namespace attributes
 }   // namespace diffpy

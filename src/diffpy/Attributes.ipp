@@ -84,7 +84,8 @@ void Attributes::registerDoubleAttribute(
         const std::string& name, T* obj, Getter g)
 {
     typedef  void (T::*Setter)(double x);
-    mdoubleattrs[name].reset(new DoubleAttribute<T, Getter, Setter>(g, NULL));
+    registerBaseDoubleAttribute(this, name,
+            new DoubleAttribute<T, Getter, Setter>(g, NULL));
 }
 
 
@@ -92,9 +93,8 @@ template <class T, class Getter, class Setter>
 void Attributes::registerDoubleAttribute(
         const std::string& name, T* obj, Getter g, Setter s)
 {
-    mdoubleattrs[name].reset(
-        new DoubleAttribute<T, Getter, Setter>(g, s)
-        );
+    registerBaseDoubleAttribute(this, name,
+            new DoubleAttribute<T, Getter, Setter>(g, s));
 }
 
 }   // namespace attributes
