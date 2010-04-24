@@ -40,8 +40,8 @@ class PDFEnvelope : public diffpy::Attributes
     public:
 
         // constructors
-        virtual PDFEnvelope* create() const = 0;
-        virtual PDFEnvelope* clone() const = 0;
+        virtual boost::shared_ptr<PDFEnvelope> create() const = 0;
+        virtual boost::shared_ptr<PDFEnvelope> clone() const = 0;
         virtual ~PDFEnvelope()  { }
 
         // methods
@@ -51,7 +51,7 @@ class PDFEnvelope : public diffpy::Attributes
 
 // Factory functions for concrete PDF envelopes ------------------------------
 
-PDFEnvelope* createPDFEnvelope(const std::string& tp);
+boost::shared_ptr<PDFEnvelope> createPDFEnvelope(const std::string& tp);
 bool registerPDFEnvelope(const PDFEnvelope&);
 bool aliasPDFEnvelope(const std::string& tp, const std::string& al);
 std::set<std::string> getPDFEnvelopeTypes();

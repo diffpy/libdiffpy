@@ -34,8 +34,8 @@ class ZeroBaseline : public PDFBaseline
     public:
 
         // constructors
-        PDFBaseline* create() const;
-        PDFBaseline* clone() const;
+        boost::shared_ptr<PDFBaseline> create() const;
+        boost::shared_ptr<PDFBaseline> clone() const;
 
         // methods
         const std::string& type() const;

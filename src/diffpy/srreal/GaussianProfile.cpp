@@ -35,16 +35,16 @@ GaussianProfile::GaussianProfile() : mhalfboundrel(0.0)
 { }
 
 
-PeakProfile* GaussianProfile::create() const
+boost::shared_ptr<PeakProfile> GaussianProfile::create() const
 {
-    PeakProfile* rv = new GaussianProfile();
+    boost::shared_ptr<PeakProfile> rv(new GaussianProfile());
     return rv;
 }
 
 
-PeakProfile* GaussianProfile::clone() const
+boost::shared_ptr<PeakProfile> GaussianProfile::clone() const
 {
-    PeakProfile* rv = new GaussianProfile(*this);
+    boost::shared_ptr<PeakProfile> rv(new GaussianProfile(*this));
     return rv;
 }
 

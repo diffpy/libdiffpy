@@ -37,8 +37,8 @@ class ScatteringFactorTable
     public:
 
         // constructors
-        virtual ScatteringFactorTable* create() const = 0;
-        virtual ScatteringFactorTable* clone() const = 0;
+        virtual boost::shared_ptr<ScatteringFactorTable> create() const = 0;
+        virtual boost::shared_ptr<ScatteringFactorTable> clone() const = 0;
         ~ScatteringFactorTable()  { }
 
         // methods
@@ -77,7 +77,8 @@ class ScatteringFactorTableOwner
 
 // Factory functions for Scattering Factor Tables ----------------------------
 
-ScatteringFactorTable* createScatteringFactorTable(const std::string& tp);
+boost::shared_ptr<ScatteringFactorTable>
+createScatteringFactorTable(const std::string& tp);
 bool registerScatteringFactorTable(const ScatteringFactorTable&);
 bool aliasScatteringFactorTable(const std::string& tp, const std::string& al);
 std::set<std::string> getScatteringFactorTableTypes();

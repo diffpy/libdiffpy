@@ -43,8 +43,8 @@ class PeakWidthModel : public diffpy::Attributes
     public:
 
         // constructors
-        virtual PeakWidthModel* create() const = 0;
-        virtual PeakWidthModel* clone() const = 0;
+        virtual boost::shared_ptr<PeakWidthModel> create() const = 0;
+        virtual boost::shared_ptr<PeakWidthModel> clone() const = 0;
         virtual ~PeakWidthModel()  { }
 
         // methods
@@ -75,7 +75,7 @@ class PeakWidthModelOwner
 
 // Factory functions for Peak Width Models -----------------------------------
 
-PeakWidthModel* createPeakWidthModel(const std::string& tp);
+boost::shared_ptr<PeakWidthModel> createPeakWidthModel(const std::string& tp);
 bool registerPeakWidthModel(const PeakWidthModel&);
 bool aliasPeakWidthModel(const std::string& tp, const std::string& al);
 std::set<std::string> getPeakWidthModelTypes();

@@ -69,14 +69,13 @@ void ScatteringFactorTableOwner::setScatteringFactorTable(
         const ScatteringFactorTable& sft)
 {
     if (msftable.get() == &sft)   return;
-    msftable.reset(sft.clone());
+    msftable = sft.clone();
 }
 
 
 void ScatteringFactorTableOwner::setScatteringFactorTable(const string& tp)
 {
-    auto_ptr<ScatteringFactorTable> sft(createScatteringFactorTable(tp));
-    this->setScatteringFactorTable(*sft);
+    msftable = createScatteringFactorTable(tp);
 }
 
 
@@ -104,7 +103,8 @@ const string& ScatteringFactorTableOwner::getRadiationType() const
 
 // Factory Functions ---------------------------------------------------------
 
-ScatteringFactorTable* createScatteringFactorTable(const string& tp)
+boost::shared_ptr<ScatteringFactorTable>
+createScatteringFactorTable(const string& tp)
 {
     return ClassRegistry<ScatteringFactorTable>::create(tp);
 }

@@ -43,16 +43,16 @@ JeongPeakWidth::JeongPeakWidth()
 }
 
 
-PeakWidthModel* JeongPeakWidth::create() const
+boost::shared_ptr<PeakWidthModel> JeongPeakWidth::create() const
 {
-    PeakWidthModel* rv = new JeongPeakWidth();
+    boost::shared_ptr<PeakWidthModel> rv(new JeongPeakWidth());
     return rv;
 }
 
 
-PeakWidthModel* JeongPeakWidth::clone() const
+boost::shared_ptr<PeakWidthModel> JeongPeakWidth::clone() const
 {
-    PeakWidthModel* rv = new JeongPeakWidth(*this);
+    boost::shared_ptr<PeakWidthModel> rv(new JeongPeakWidth(*this));
     return rv;
 }
 

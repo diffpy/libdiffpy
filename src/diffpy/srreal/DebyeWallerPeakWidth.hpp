@@ -33,8 +33,8 @@ class DebyeWallerPeakWidth : public PeakWidthModel
     public:
 
         // constructors
-        virtual PeakWidthModel* create() const;
-        virtual PeakWidthModel* clone() const;
+        virtual boost::shared_ptr<PeakWidthModel> create() const;
+        virtual boost::shared_ptr<PeakWidthModel> clone() const;
 
         // comparison with derived classes
         virtual bool operator==(const PeakWidthModel&) const;

@@ -29,7 +29,7 @@ namespace srreal {
 
 // Factory Functions ---------------------------------------------------------
 
-PDFEnvelope* createPDFEnvelope(const string& tp)
+boost::shared_ptr<PDFEnvelope> createPDFEnvelope(const string& tp)
 {
     return ClassRegistry<PDFEnvelope>::create(tp);
 }

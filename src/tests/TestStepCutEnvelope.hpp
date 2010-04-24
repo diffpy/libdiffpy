@@ -30,13 +30,13 @@ class TestStepCutEnvelope : public CxxTest::TestSuite
 {
 private:
 
-    auto_ptr<PDFEnvelope> menvelope;
+    boost::shared_ptr<PDFEnvelope> menvelope;
 
 public:
 
     void setUp()
     {
-        menvelope.reset(createPDFEnvelope("stepcut"));
+        menvelope = createPDFEnvelope("stepcut");
     }
 
 
@@ -45,7 +45,7 @@ public:
         TS_ASSERT_EQUALS(0.0, menvelope->getDoubleAttr("stepcut"));
         menvelope->setDoubleAttr("stepcut", 13.0);
         TS_ASSERT_EQUALS(13.0, menvelope->getDoubleAttr("stepcut"));
-        auto_ptr<PDFEnvelope> e1(menvelope->create());
+        boost::shared_ptr<PDFEnvelope> e1(menvelope->create());
         TS_ASSERT_EQUALS(0.0, e1->getDoubleAttr("stepcut"));
     }
 
@@ -54,7 +54,7 @@ public:
     {
         menvelope->setDoubleAttr("stepcut", 13.0);
         TS_ASSERT_EQUALS(13.0, menvelope->getDoubleAttr("stepcut"));
-        auto_ptr<PDFEnvelope> e1(menvelope->clone());
+        boost::shared_ptr<PDFEnvelope> e1(menvelope->clone());
         TS_ASSERT_EQUALS(13.0, e1->getDoubleAttr("stepcut"));
     }
 

@@ -34,16 +34,16 @@ ConstantPeakWidth::ConstantPeakWidth()
 }
 
 
-PeakWidthModel* ConstantPeakWidth::create() const
+boost::shared_ptr<PeakWidthModel> ConstantPeakWidth::create() const
 {
-    PeakWidthModel* rv = new ConstantPeakWidth();
+    boost::shared_ptr<PeakWidthModel> rv(new ConstantPeakWidth());
     return rv;
 }
 
 
-PeakWidthModel* ConstantPeakWidth::clone() const
+boost::shared_ptr<PeakWidthModel> ConstantPeakWidth::clone() const
 {
-    PeakWidthModel* rv = new ConstantPeakWidth(*this);
+    boost::shared_ptr<PeakWidthModel> rv(new ConstantPeakWidth(*this));
     return rv;
 }
 

@@ -33,7 +33,7 @@ class TestPDFCalculator : public CxxTest::TestSuite
 {
 private:
 
-    auto_ptr<PDFCalculator> mpdfc;
+    boost::shared_ptr<PDFCalculator> mpdfc;
 
 public:
 
@@ -65,7 +65,7 @@ public:
     {
         string tp = "jeong";
         TS_ASSERT_EQUALS(tp, mpdfc->getPeakWidthModel().type());
-        auto_ptr<PeakWidthModel> pwm(createPeakWidthModel("debye-waller"));
+        boost::shared_ptr<PeakWidthModel> pwm(createPeakWidthModel("debye-waller"));
         mpdfc->setPeakWidthModel(*pwm);
         tp = "debye-waller";
         TS_ASSERT_EQUALS(tp, mpdfc->getPeakWidthModel().type());
@@ -77,7 +77,7 @@ public:
 
     void test_access_PeakProfile()
     {
-        auto_ptr<PeakProfile> pkf(mpdfc->getPeakProfile().clone());
+        boost::shared_ptr<PeakProfile> pkf(mpdfc->getPeakProfile().clone());
         pkf->setPrecision(1.1);
         mpdfc->setPeakProfile(*pkf);
         TS_ASSERT_EQUALS(1.1, mpdfc->getPeakProfile().getPrecision());

@@ -72,16 +72,18 @@ class SFTperiodictableXray : public ScatteringFactorTable
         SFTperiodictableXray()  { }
 
 
-        ScatteringFactorTable* create() const
+        boost::shared_ptr<ScatteringFactorTable> create() const
         {
-            ScatteringFactorTable* rv = new SFTperiodictableXray();
+            boost::shared_ptr<ScatteringFactorTable> rv(
+                    new SFTperiodictableXray());
             return rv;
         }
 
 
-        ScatteringFactorTable* clone() const
+        boost::shared_ptr<ScatteringFactorTable> clone() const
         {
-            ScatteringFactorTable* rv = new SFTperiodictableXray(*this);
+            boost::shared_ptr<ScatteringFactorTable> rv(
+                    new SFTperiodictableXray(*this));
             return rv;
         }
 
@@ -135,16 +137,18 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
         SFTperiodictableNeutron()  { }
 
 
-        ScatteringFactorTable* create() const
+        boost::shared_ptr<ScatteringFactorTable> create() const
         {
-            ScatteringFactorTable* rv = new SFTperiodictableNeutron();
+            boost::shared_ptr<ScatteringFactorTable> rv(
+                    new SFTperiodictableNeutron());
             return rv;
         }
 
 
-        ScatteringFactorTable* clone() const
+        boost::shared_ptr<ScatteringFactorTable> clone() const
         {
-            ScatteringFactorTable* rv = new SFTperiodictableNeutron(*this);
+            boost::shared_ptr<ScatteringFactorTable> rv(
+                    new SFTperiodictableNeutron(*this));
             return rv;
         }
 

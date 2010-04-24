@@ -48,9 +48,9 @@ BVParametersTable::BVParametersTable()
 }
 
 
-BVParametersTable* BVParametersTable::clone() const
+boost::shared_ptr<BVParametersTable> BVParametersTable::clone() const
 {
-    BVParametersTable* rv = new BVParametersTable(*this);
+    boost::shared_ptr<BVParametersTable> rv(new BVParametersTable(*this));
     return rv;
 }
 

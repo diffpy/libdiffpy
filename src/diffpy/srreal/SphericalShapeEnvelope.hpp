@@ -36,8 +36,8 @@ class SphericalShapeEnvelope : public PDFEnvelope
 
         // constructors
         SphericalShapeEnvelope();
-        virtual PDFEnvelope* create() const;
-        virtual PDFEnvelope* clone() const;
+        virtual boost::shared_ptr<PDFEnvelope> create() const;
+        virtual boost::shared_ptr<PDFEnvelope> clone() const;
 
         // methods
 

@@ -68,9 +68,8 @@ PDFCalculator::PDFCalculator()
     mrlimits_cache.calclopoints = 0;
     // default configuration
     this->setPeakWidthModel("jeong");
-    GaussianProfile pkf;
-    pkf.setPrecision(DEFAULT_PEAK_PRECISION);
-    this->setPeakProfile(pkf);
+    this->setPeakProfile("gaussian");
+    this->getPeakProfile().setPrecision(DEFAULT_PEAK_PRECISION);
     this->setBaseline("linear");
     this->setScatteringFactorTable("SFTperiodictableXray");
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
@@ -307,16 +306,16 @@ const double& PDFCalculator::getExtendedRmax() const
 void PDFCalculator::setPeakProfile(const PeakProfile& pkf)
 {
     if (mpeakprofile.get() == &pkf)  return;
-    mpeakprofile.reset(pkf.clone());
+    mpeakprofile = pkf.clone();
 }
 
 
 void PDFCalculator::setPeakProfile(const string& tp)
 {
-    auto_ptr<PeakProfile> pkf(createPeakProfile(tp));
+    boost::shared_ptr<PeakProfile> pkf(createPeakProfile(tp));
     // If peak profile already exists, copy its precision data
     if (mpeakprofile.get())  *pkf = *mpeakprofile;
-    this->setPeakProfile(*pkf);
+    mpeakprofile = pkf;
 }
 
 
@@ -354,14 +353,13 @@ QuantityType PDFCalculator::applyBaseline(
 void PDFCalculator::setBaseline(const PDFBaseline& baseline)
 {
     if (mbaseline.get() == &baseline)  return;
-    mbaseline.reset(baseline.clone());
+    mbaseline = baseline.clone();
 }
 
 
 void PDFCalculator::setBaseline(const std::string& tp)
 {
-    auto_ptr<PDFBaseline> pbl(createPDFBaseline(tp));
-    this->setBaseline(*pbl);
+    mbaseline = createPDFBaseline(tp);
 }
 
 
@@ -402,16 +400,16 @@ QuantityType PDFCalculator::applyEnvelopes(
 
 void PDFCalculator::addEnvelope(const PDFEnvelope& envlp)
 {
-    menvelope[envlp.type()].reset(envlp.clone());
+    menvelope[envlp.type()] = envlp.clone();
 }
 
 
 void PDFCalculator::addEnvelope(const string& tp)
 {
     // this throws invalid_argument for invalid type
-    PDFEnvelope* penvlp = createPDFEnvelope(tp);
+    boost::shared_ptr<PDFEnvelope> penvlp = createPDFEnvelope(tp);
     // we get here only when createPDFEnvelope was successful
-    menvelope[penvlp->type()].reset(penvlp);
+    menvelope[penvlp->type()] = penvlp;
 }
 
 

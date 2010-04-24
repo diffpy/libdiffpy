@@ -32,14 +32,13 @@ namespace srreal {
 void PeakWidthModelOwner::setPeakWidthModel(const PeakWidthModel& pwm)
 {
     if (mpwmodel.get() == &pwm)   return;
-    mpwmodel.reset(pwm.clone());
+    mpwmodel = pwm.clone();
 }
 
 
 void PeakWidthModelOwner::setPeakWidthModel(const string& tp)
 {
-    auto_ptr<PeakWidthModel> ppwm(createPeakWidthModel(tp));
-    this->setPeakWidthModel(*ppwm);
+    mpwmodel = createPeakWidthModel(tp);
 }
 
 
@@ -59,7 +58,7 @@ const PeakWidthModel& PeakWidthModelOwner::getPeakWidthModel() const
 
 // Factory Functions ---------------------------------------------------------
 
-PeakWidthModel* createPeakWidthModel(const string& tp)
+boost::shared_ptr<PeakWidthModel> createPeakWidthModel(const string& tp)
 {
     return ClassRegistry<PeakWidthModel>::create(tp);
 }

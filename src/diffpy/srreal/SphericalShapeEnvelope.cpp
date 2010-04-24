@@ -38,16 +38,16 @@ SphericalShapeEnvelope::SphericalShapeEnvelope()
 }
 
 
-PDFEnvelope* SphericalShapeEnvelope::create() const
+boost::shared_ptr<PDFEnvelope> SphericalShapeEnvelope::create() const
 {
-    PDFEnvelope* rv = new SphericalShapeEnvelope();
+    boost::shared_ptr<PDFEnvelope> rv(new SphericalShapeEnvelope());
     return rv;
 }
 
 
-PDFEnvelope* SphericalShapeEnvelope::clone() const
+boost::shared_ptr<PDFEnvelope> SphericalShapeEnvelope::clone() const
 {
-    PDFEnvelope* rv = new SphericalShapeEnvelope(*this);
+    boost::shared_ptr<PDFEnvelope> rv(new SphericalShapeEnvelope(*this));
     return rv;
 }
 

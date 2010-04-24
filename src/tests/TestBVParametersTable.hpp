@@ -34,7 +34,7 @@ class TestBVParametersTable : public CxxTest::TestSuite
 
 private:
 
-    auto_ptr<BVParametersTable> bvtb;
+    boost::shared_ptr<BVParametersTable> bvtb;
 
 public:
 
@@ -46,14 +46,14 @@ public:
 
     void test_copy()
     {
-        auto_ptr<BVParametersTable> bvcp;
+        boost::shared_ptr<BVParametersTable> bvcp;
         BVParam mynacl("Na", 1, "Cl", -1);
         mynacl.mRo = 1.23;
         mynacl.mB = 0.377;
         bvtb->setCustom(mynacl);
         TS_ASSERT_EQUALS(1.23, bvtb->lookup("Na", 1, "Cl", -1).mRo);
         TS_ASSERT_EQUALS(0.377, bvtb->lookup("Na", 1, "Cl", -1).mB);
-        bvcp.reset(bvtb->clone());
+        bvcp = bvtb->clone();
         TS_ASSERT_EQUALS(1.23, bvcp->lookup("Na", 1, "Cl", -1).mRo);
         TS_ASSERT_EQUALS(0.377, bvcp->lookup("Na", 1, "Cl", -1).mB);
         bvcp->resetAll();

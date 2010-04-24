@@ -35,16 +35,16 @@ ScaleEnvelope::ScaleEnvelope()
 }
 
 
-PDFEnvelope* ScaleEnvelope::create() const
+boost::shared_ptr<PDFEnvelope> ScaleEnvelope::create() const
 {
-    PDFEnvelope* rv = new ScaleEnvelope();
+    boost::shared_ptr<PDFEnvelope> rv(new ScaleEnvelope());
     return rv;
 }
 
 
-PDFEnvelope* ScaleEnvelope::clone() const
+boost::shared_ptr<PDFEnvelope> ScaleEnvelope::clone() const
 {
-    PDFEnvelope* rv = new ScaleEnvelope(*this);
+    boost::shared_ptr<PDFEnvelope> rv(new ScaleEnvelope(*this));
     return rv;
 }
 

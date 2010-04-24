@@ -62,7 +62,7 @@ class ClassRegistry
                     "' is already registered.";
                 throw logic_error(emsg.str());
             }
-            reg[prot.type()].reset(prot.create());
+            reg[prot.type()] = prot.create();
             return true;
         }
 
@@ -89,7 +89,7 @@ class ClassRegistry
             return true;
         }
 
-        static TBase* create(const std::string& tp)
+        static boost::shared_ptr<TBase> create(const std::string& tp)
         {
             using namespace std;
             typename RegistryType::iterator irg;
@@ -101,7 +101,7 @@ class ClassRegistry
                 emsg << "Unknown type '" << tp << "'.";
                 throw invalid_argument(emsg.str());
             }
-            TBase* rv = irg->second->create();
+            boost::shared_ptr<TBase> rv = irg->second->create();
             return rv;
         }
 

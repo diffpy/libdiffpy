@@ -27,16 +27,16 @@ namespace srreal {
 
 // Constructors --------------------------------------------------------------
 
-PDFBaseline* ZeroBaseline::create() const
+boost::shared_ptr<PDFBaseline> ZeroBaseline::create() const
 {
-    PDFBaseline* rv = new ZeroBaseline();
+    boost::shared_ptr<PDFBaseline> rv(new ZeroBaseline());
     return rv;
 }
 
 
-PDFBaseline* ZeroBaseline::clone() const
+boost::shared_ptr<PDFBaseline> ZeroBaseline::clone() const
 {
-    PDFBaseline* rv = new ZeroBaseline(*this);
+    boost::shared_ptr<PDFBaseline> rv(new ZeroBaseline(*this));
     return rv;
 }
 

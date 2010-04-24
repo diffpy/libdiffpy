@@ -35,14 +35,14 @@ class TestPeakProfile : public CxxTest::TestSuite
 
 private:
 
-    auto_ptr<PeakProfile> mpkgauss;
+    boost::shared_ptr<PeakProfile> mpkgauss;
     static const int mdigits = 12;
 
 public:
 
     void setUp()
     {
-        mpkgauss.reset(createPeakProfile("gaussian"));
+        mpkgauss = createPeakProfile("gaussian");
     }
 
 

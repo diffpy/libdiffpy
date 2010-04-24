@@ -35,8 +35,8 @@ class QResolutionEnvelope : public PDFEnvelope
 
         // constructors
         QResolutionEnvelope();
-        virtual PDFEnvelope* create() const;
-        virtual PDFEnvelope* clone() const;
+        virtual boost::shared_ptr<PDFEnvelope> create() const;
+        virtual boost::shared_ptr<PDFEnvelope> clone() const;
 
         // methods
 

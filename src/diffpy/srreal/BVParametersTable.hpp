@@ -23,6 +23,7 @@
 
 #include <string>
 #include <set>
+#include <boost/smart_ptr.hpp>
 
 #include <diffpy/srreal/BVParam.hpp>
 
@@ -42,7 +43,7 @@ class BVParametersTable
 
         // constructors
         BVParametersTable();
-        BVParametersTable* clone() const;
+        boost::shared_ptr<BVParametersTable> clone() const;
 
         // methods
         const BVParam& lookup(const BVParam&) const;

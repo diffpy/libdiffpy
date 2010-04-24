@@ -29,16 +29,16 @@ using namespace diffpy::srreal;
 
 // Constructors --------------------------------------------------------------
 
-PeakWidthModel* DebyeWallerPeakWidth::create() const
+boost::shared_ptr<PeakWidthModel> DebyeWallerPeakWidth::create() const
 {
-    PeakWidthModel* rv = new DebyeWallerPeakWidth();
+    boost::shared_ptr<PeakWidthModel> rv(new DebyeWallerPeakWidth());
     return rv;
 }
 
 
-PeakWidthModel* DebyeWallerPeakWidth::clone() const
+boost::shared_ptr<PeakWidthModel> DebyeWallerPeakWidth::clone() const
 {
-    PeakWidthModel* rv = new DebyeWallerPeakWidth(*this);
+    boost::shared_ptr<PeakWidthModel> rv(new DebyeWallerPeakWidth(*this));
     return rv;
 }
 
