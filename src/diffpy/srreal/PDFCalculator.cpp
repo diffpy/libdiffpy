@@ -30,7 +30,6 @@
 #include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/srreal/ScaleEnvelope.hpp>
 #include <diffpy/srreal/QResolutionEnvelope.hpp>
-#include <diffpy/srreal/LinearBaseline.hpp>
 #include <diffpy/srreal/GaussianProfile.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
@@ -70,7 +69,7 @@ PDFCalculator::PDFCalculator()
     this->setPeakWidthModel("jeong");
     this->setPeakProfileByType("gaussian");
     this->getPeakProfile()->setPrecision(DEFAULT_PEAK_PRECISION);
-    this->setBaseline("linear");
+    this->setBaselineByType("linear");
     this->setScatteringFactorTable("SFTperiodictableXray");
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
     this->setRstep(0.01);
@@ -338,7 +337,7 @@ QuantityType PDFCalculator::applyBaseline(
 {
     assert(x.size() == y.size());
     QuantityType z = y;
-    const PDFBaseline& baseline = this->getBaseline();
+    const PDFBaseline& baseline = *(this->getBaseline());
     QuantityType::const_iterator xi = x.begin();
     QuantityType::iterator zi = z.begin();
     for (; xi != x.end(); ++xi, ++zi)
@@ -349,30 +348,29 @@ QuantityType PDFCalculator::applyBaseline(
 }
 
 
-void PDFCalculator::setBaseline(const PDFBaseline& baseline)
+void PDFCalculator::setBaseline(PDFBaselinePtr baseline)
 {
-    if (mbaseline.get() == &baseline)  return;
-    mbaseline = baseline.clone();
+    mbaseline = baseline;
 }
 
 
-void PDFCalculator::setBaseline(const std::string& tp)
+void PDFCalculator::setBaselineByType(const std::string& tp)
 {
     mbaseline = createPDFBaseline(tp);
 }
 
 
-PDFBaseline& PDFCalculator::getBaseline()
+PDFBaselinePtr PDFCalculator::getBaseline()
 {
     assert(mbaseline.get());
-    return *mbaseline;
+    return mbaseline;
 }
 
 
-const PDFBaseline& PDFCalculator::getBaseline() const
+const PDFBaselinePtr PDFCalculator::getBaseline() const
 {
     assert(mbaseline.get());
-    return *mbaseline;
+    return mbaseline;
 }
 
 // PDF envelope methods
@@ -473,7 +471,7 @@ void pdfcalc_accept(T* obj, diffpy::BaseAttributesVisitor& v)
 {
     obj->getPeakWidthModel().accept(v);
     obj->getPeakProfile()->accept(v);
-    obj->getBaseline().accept(v);
+    obj->getBaseline()->accept(v);
     // PDF envelopes
     set<string> evnames = obj->usedPDFEnvelopeTypes();
     set<string>::const_iterator nm = evnames.begin();
@@ -508,12 +506,10 @@ void PDFCalculator::resetValue()
     this->cacheRlimitsData();
     // when applicable, configure linear baseline
     double numdensity = mstructure->numberDensity();
-    if (numdensity > 0 && this->getBaseline().type() == "linear")
+    if (numdensity > 0 && this->getBaseline()->type() == "linear")
     {
-        LinearBaseline bl =
-            dynamic_cast<const LinearBaseline&>(this->getBaseline());
-        bl.setSlope(-4 * M_PI * numdensity);
-        this->setBaseline(bl);
+        PDFBaseline& bl = *(this->getBaseline());
+        bl.setDoubleAttr("slope", -4 * M_PI * numdensity);
     }
     this->resizeValue(this->calcPoints());
     this->PairQuantity::resetValue();

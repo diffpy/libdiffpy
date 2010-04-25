@@ -90,10 +90,10 @@ class PDFCalculator : public PairQuantity,
         // PDF baseline configuration
         // application on an array
         QuantityType applyBaseline(const QuantityType& x, const QuantityType& y) const;
-        void setBaseline(const PDFBaseline&);
-        void setBaseline(const std::string& tp);
-        PDFBaseline& getBaseline();
-        const PDFBaseline& getBaseline() const;
+        void setBaseline(PDFBaselinePtr);
+        void setBaselineByType(const std::string& tp);
+        PDFBaselinePtr getBaseline();
+        const PDFBaselinePtr getBaseline() const;
 
         // PDF envelope functions
         // application on an array
