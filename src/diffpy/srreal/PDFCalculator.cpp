@@ -579,7 +579,7 @@ double PDFCalculator::extFromPeakTails() const
     // assume uncorrelated neighbors with maxUii
     double maxmsd = 2 * maxUii(mstructure);
     double maxfwhm = this->getPeakWidthModel().calculateFromMSD(maxmsd);
-    const PeakProfile pkf = *(this->getPeakProfile());
+    const PeakProfile& pkf = *(this->getPeakProfile());
     double xleft = fabs(pkf.xboundlo(maxfwhm));
     double xright = fabs(pkf.xboundhi(maxfwhm));
     double rv = max(xleft, xright);
