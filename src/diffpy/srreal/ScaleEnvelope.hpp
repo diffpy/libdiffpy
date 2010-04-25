@@ -35,8 +35,8 @@ class ScaleEnvelope : public PDFEnvelope
 
         // constructors
         ScaleEnvelope();
-        boost::shared_ptr<PDFEnvelope> create() const;
-        boost::shared_ptr<PDFEnvelope> clone() const;
+        PDFEnvelopePtr create() const;
+        PDFEnvelopePtr clone() const;
 
         // methods
         const std::string& type() const;

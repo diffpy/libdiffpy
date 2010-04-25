@@ -216,8 +216,7 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
     if (pfget("spdiameter").ptr() != Py_None)
     {
         double spdiameter = python::extract<double>(pfget("spdiameter"));
-        boost::shared_ptr<PDFEnvelope> envlp(
-                createPDFEnvelope("sphericalshape"));
+        PDFEnvelopePtr envlp(createPDFEnvelope("sphericalshape"));
         envlp->setDoubleAttr("spdiameter", spdiameter);
         pdfc.addEnvelope(*envlp);
     }
@@ -225,7 +224,7 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
     if (pfget("stepcut").ptr() != Py_None)
     {
         double stepcut = python::extract<double>(pfget("stepcut"));
-        boost::shared_ptr<PDFEnvelope> envlp(createPDFEnvelope("stepcut"));
+        PDFEnvelopePtr envlp(createPDFEnvelope("stepcut"));
         envlp->setDoubleAttr("stepcut", stepcut);
         pdfc.addEnvelope(*envlp);
     }

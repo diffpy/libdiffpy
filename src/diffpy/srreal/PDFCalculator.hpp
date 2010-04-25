@@ -82,10 +82,10 @@ class PDFCalculator : public PairQuantity,
         const double& getExtendedRmax() const;
 
         // PDF profile configuration
-        void setPeakProfile(const PeakProfile&);
-        void setPeakProfile(const std::string& tp);
-        PeakProfile& getPeakProfile();
-        const PeakProfile& getPeakProfile() const;
+        void setPeakProfile(PeakProfilePtr);
+        void setPeakProfileByType(const std::string& tp);
+        PeakProfilePtr getPeakProfile();
+        const PeakProfilePtr getPeakProfile() const;
 
         // PDF baseline configuration
         // application on an array
@@ -110,7 +110,7 @@ class PDFCalculator : public PairQuantity,
     protected:
 
         // types
-        typedef std::map<std::string, boost::shared_ptr<PDFEnvelope> > EnvelopeStorage;
+        typedef std::map<std::string, PDFEnvelopePtr> EnvelopeStorage;
 
         // Attributes overload to direct visitors around data structures
         virtual void accept(diffpy::BaseAttributesVisitor& v);
@@ -168,7 +168,7 @@ class PDFCalculator : public PairQuantity,
         double mrstep;
         double mmaxextension;
         boost::shared_ptr<PeakProfile> mpeakprofile;
-        boost::shared_ptr<PDFBaseline> mbaseline;
+        PDFBaselinePtr mbaseline;
         EnvelopeStorage menvelope;
         struct {
             std::vector<double> sfsite;

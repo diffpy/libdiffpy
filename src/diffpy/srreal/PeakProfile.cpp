@@ -59,7 +59,7 @@ const double& PeakProfile::getPrecision() const
 
 // Factory Functions ---------------------------------------------------------
 
-boost::shared_ptr<PeakProfile> createPeakProfile(const string& tp)
+PeakProfilePtr createPeakProfile(const string& tp)
 {
     return ClassRegistry<PeakProfile>::create(tp);
 }

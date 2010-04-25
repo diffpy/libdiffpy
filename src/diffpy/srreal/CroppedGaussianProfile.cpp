@@ -39,16 +39,16 @@ CroppedGaussianProfile::CroppedGaussianProfile()
 }
 
 
-boost::shared_ptr<PeakProfile> CroppedGaussianProfile::create() const
+PeakProfilePtr CroppedGaussianProfile::create() const
 {
-    boost::shared_ptr<PeakProfile> rv(new CroppedGaussianProfile());
+    PeakProfilePtr rv(new CroppedGaussianProfile());
     return rv;
 }
 
 
-boost::shared_ptr<PeakProfile> CroppedGaussianProfile::clone() const
+PeakProfilePtr CroppedGaussianProfile::clone() const
 {
-    boost::shared_ptr<PeakProfile> rv(new CroppedGaussianProfile(*this));
+    PeakProfilePtr rv(new CroppedGaussianProfile(*this));
     return rv;
 }
 

@@ -32,6 +32,9 @@
 namespace diffpy {
 namespace srreal {
 
+
+typedef boost::shared_ptr<class PDFEnvelope> PDFEnvelopePtr;
+
 /// @class PDFEnvelope
 /// @brief abstract base class for PDF envelope scaling function
 
@@ -40,8 +43,8 @@ class PDFEnvelope : public diffpy::Attributes
     public:
 
         // constructors
-        virtual boost::shared_ptr<PDFEnvelope> create() const = 0;
-        virtual boost::shared_ptr<PDFEnvelope> clone() const = 0;
+        virtual PDFEnvelopePtr create() const = 0;
+        virtual PDFEnvelopePtr clone() const = 0;
         virtual ~PDFEnvelope()  { }
 
         // methods
@@ -51,7 +54,7 @@ class PDFEnvelope : public diffpy::Attributes
 
 // Factory functions for concrete PDF envelopes ------------------------------
 
-boost::shared_ptr<PDFEnvelope> createPDFEnvelope(const std::string& tp);
+PDFEnvelopePtr createPDFEnvelope(const std::string& tp);
 bool registerPDFEnvelope(const PDFEnvelope&);
 bool aliasPDFEnvelope(const std::string& tp, const std::string& al);
 std::set<std::string> getPDFEnvelopeTypes();

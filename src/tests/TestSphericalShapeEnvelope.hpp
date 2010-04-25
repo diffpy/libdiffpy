@@ -28,55 +28,55 @@ using namespace diffpy::srreal;
 
 class TestSphericalShapeEnvelope : public CxxTest::TestSuite
 {
-private:
+    private:
 
-    boost::shared_ptr<PDFEnvelope> menvelope;
+        PDFEnvelopePtr menvelope;
 
-public:
+    public:
 
-    void setUp()
-    {
-        menvelope = createPDFEnvelope("sphericalshape");
-    }
-
-
-    void test_create()
-    {
-        TS_ASSERT_EQUALS(0.0, menvelope->getDoubleAttr("spdiameter"));
-        menvelope->setDoubleAttr("spdiameter", 13.0);
-        TS_ASSERT_EQUALS(13.0, menvelope->getDoubleAttr("spdiameter"));
-        boost::shared_ptr<PDFEnvelope> e1 = menvelope->create();
-        TS_ASSERT_EQUALS(0.0, e1->getDoubleAttr("spdiameter"));
-    }
+        void setUp()
+        {
+            menvelope = createPDFEnvelope("sphericalshape");
+        }
 
 
-    void test_copy()
-    {
-        menvelope->setDoubleAttr("spdiameter", 13.0);
-        TS_ASSERT_EQUALS(13.0, menvelope->getDoubleAttr("spdiameter"));
-        boost::shared_ptr<PDFEnvelope> e1 = menvelope->clone();
-        TS_ASSERT_EQUALS(13.0, e1->getDoubleAttr("spdiameter"));
-    }
+        void test_create()
+        {
+            TS_ASSERT_EQUALS(0.0, menvelope->getDoubleAttr("spdiameter"));
+            menvelope->setDoubleAttr("spdiameter", 13.0);
+            TS_ASSERT_EQUALS(13.0, menvelope->getDoubleAttr("spdiameter"));
+            PDFEnvelopePtr e1 = menvelope->create();
+            TS_ASSERT_EQUALS(0.0, e1->getDoubleAttr("spdiameter"));
+        }
 
 
-    void test_type()
-    {
-        TS_ASSERT_EQUALS("sphericalshape", menvelope->type());
-    }
+        void test_copy()
+        {
+            menvelope->setDoubleAttr("spdiameter", 13.0);
+            TS_ASSERT_EQUALS(13.0, menvelope->getDoubleAttr("spdiameter"));
+            PDFEnvelopePtr e1 = menvelope->clone();
+            TS_ASSERT_EQUALS(13.0, e1->getDoubleAttr("spdiameter"));
+        }
 
 
-    void test_parentheses_operator()
-    {
-        const PDFEnvelope& fne = *menvelope;
-        TS_ASSERT_EQUALS(1.0, fne(0.0));
-        TS_ASSERT_EQUALS(1.0, fne(100.0));
-        menvelope->setDoubleAttr("spdiameter", 10.0);
-        TS_ASSERT_EQUALS(1.0, fne(0.0));
-        TS_ASSERT_EQUALS(0.0, fne(10.0));
-        TS_ASSERT_EQUALS(0.0, fne(100));
-        TS_ASSERT(fne(9.99) > 0.0);
-        TS_ASSERT_DELTA(0.3125, fne(5), 1e-8);
-    }
+        void test_type()
+        {
+            TS_ASSERT_EQUALS("sphericalshape", menvelope->type());
+        }
+
+
+        void test_parentheses_operator()
+        {
+            const PDFEnvelope& fne = *menvelope;
+            TS_ASSERT_EQUALS(1.0, fne(0.0));
+            TS_ASSERT_EQUALS(1.0, fne(100.0));
+            menvelope->setDoubleAttr("spdiameter", 10.0);
+            TS_ASSERT_EQUALS(1.0, fne(0.0));
+            TS_ASSERT_EQUALS(0.0, fne(10.0));
+            TS_ASSERT_EQUALS(0.0, fne(100));
+            TS_ASSERT(fne(9.99) > 0.0);
+            TS_ASSERT_DELTA(0.3125, fne(5), 1e-8);
+        }
 
 };  // class TestDiffPyStructureBondGenerator
 

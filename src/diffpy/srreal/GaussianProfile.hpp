@@ -33,8 +33,8 @@ class GaussianProfile : public PeakProfile
 
         // constructors
         GaussianProfile();
-        boost::shared_ptr<PeakProfile> create() const;
-        boost::shared_ptr<PeakProfile> clone() const;
+        PeakProfilePtr create() const;
+        PeakProfilePtr clone() const;
 
         // methods
         const std::string& type() const;

@@ -29,7 +29,7 @@ namespace srreal {
 
 // Factory Functions ---------------------------------------------------------
 
-boost::shared_ptr<PDFBaseline> createPDFBaseline(const string& tp)
+PDFBaselinePtr createPDFBaseline(const string& tp)
 {
     return ClassRegistry<PDFBaseline>::create(tp);
 }

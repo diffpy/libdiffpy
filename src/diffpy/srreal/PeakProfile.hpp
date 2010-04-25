@@ -34,13 +34,15 @@
 namespace diffpy {
 namespace srreal {
 
+typedef boost::shared_ptr<class PeakProfile> PeakProfilePtr;
+
 class PeakProfile : public diffpy::Attributes
 {
     public:
 
         // constructors
-        virtual boost::shared_ptr<PeakProfile> create() const = 0;
-        virtual boost::shared_ptr<PeakProfile> clone() const = 0;
+        virtual PeakProfilePtr create() const = 0;
+        virtual PeakProfilePtr clone() const = 0;
         PeakProfile();
         virtual ~PeakProfile()  { }
 
@@ -60,7 +62,7 @@ class PeakProfile : public diffpy::Attributes
 
 // Factory functions for Peak Width Models -----------------------------------
 
-boost::shared_ptr<PeakProfile> createPeakProfile(const std::string& tp);
+PeakProfilePtr createPeakProfile(const std::string& tp);
 bool registerPeakProfile(const PeakProfile&);
 bool aliasPeakProfile(const std::string& tp, const std::string& al);
 std::set<std::string> getPeakProfileTypes();

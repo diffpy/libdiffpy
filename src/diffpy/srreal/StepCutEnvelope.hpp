@@ -36,8 +36,8 @@ class StepCutEnvelope : public PDFEnvelope
 
         // constructors
         StepCutEnvelope();
-        virtual boost::shared_ptr<PDFEnvelope> create() const;
-        virtual boost::shared_ptr<PDFEnvelope> clone() const;
+        virtual PDFEnvelopePtr create() const;
+        virtual PDFEnvelopePtr clone() const;
 
         // methods
 

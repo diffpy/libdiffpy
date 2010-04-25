@@ -36,16 +36,16 @@ LinearBaseline::LinearBaseline()
 }
 
 
-boost::shared_ptr<PDFBaseline> LinearBaseline::create() const
+PDFBaselinePtr LinearBaseline::create() const
 {
-    boost::shared_ptr<PDFBaseline> rv(new LinearBaseline());
+    PDFBaselinePtr rv(new LinearBaseline());
     return rv;
 }
 
 
-boost::shared_ptr<PDFBaseline> LinearBaseline::clone() const
+PDFBaselinePtr LinearBaseline::clone() const
 {
-    boost::shared_ptr<PDFBaseline> rv(new LinearBaseline(*this));
+    PDFBaselinePtr rv(new LinearBaseline(*this));
     return rv;
 }
 

@@ -32,6 +32,8 @@
 namespace diffpy {
 namespace srreal {
 
+typedef boost::shared_ptr<class PDFBaseline> PDFBaselinePtr;
+
 /// @class PDFBaseline
 /// @brief abstract base class for PDF baseline function
 
@@ -40,8 +42,8 @@ class PDFBaseline : public diffpy::Attributes
     public:
 
         // constructors
-        virtual boost::shared_ptr<PDFBaseline> create() const = 0;
-        virtual boost::shared_ptr<PDFBaseline> clone() const = 0;
+        virtual PDFBaselinePtr create() const = 0;
+        virtual PDFBaselinePtr clone() const = 0;
         virtual ~PDFBaseline()  { }
 
         // methods
@@ -51,7 +53,7 @@ class PDFBaseline : public diffpy::Attributes
 
 // Factory functions for concrete PDF envelopes ------------------------------
 
-boost::shared_ptr<PDFBaseline> createPDFBaseline(const std::string& tp);
+PDFBaselinePtr createPDFBaseline(const std::string& tp);
 bool registerPDFBaseline(const PDFBaseline&);
 bool aliasPDFBaseline(const std::string& tp, const std::string& al);
 std::set<std::string> getPDFBaselineTypes();

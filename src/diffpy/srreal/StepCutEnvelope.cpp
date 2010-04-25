@@ -35,16 +35,16 @@ StepCutEnvelope::StepCutEnvelope()
 }
 
 
-boost::shared_ptr<PDFEnvelope> StepCutEnvelope::create() const
+PDFEnvelopePtr StepCutEnvelope::create() const
 {
-    boost::shared_ptr<PDFEnvelope> rv(new StepCutEnvelope());
+    PDFEnvelopePtr rv(new StepCutEnvelope());
     return rv;
 }
 
 
-boost::shared_ptr<PDFEnvelope> StepCutEnvelope::clone() const
+PDFEnvelopePtr StepCutEnvelope::clone() const
 {
-    boost::shared_ptr<PDFEnvelope> rv(new StepCutEnvelope(*this));
+    PDFEnvelopePtr rv(new StepCutEnvelope(*this));
     return rv;
 }
 

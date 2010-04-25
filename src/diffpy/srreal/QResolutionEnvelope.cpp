@@ -37,16 +37,16 @@ QResolutionEnvelope::QResolutionEnvelope()
 }
 
 
-boost::shared_ptr<PDFEnvelope> QResolutionEnvelope::create() const
+PDFEnvelopePtr QResolutionEnvelope::create() const
 {
-    boost::shared_ptr<PDFEnvelope> rv(new QResolutionEnvelope());
+    PDFEnvelopePtr rv(new QResolutionEnvelope());
     return rv;
 }
 
 
-boost::shared_ptr<PDFEnvelope> QResolutionEnvelope::clone() const
+PDFEnvelopePtr QResolutionEnvelope::clone() const
 {
-    boost::shared_ptr<PDFEnvelope> rv(new QResolutionEnvelope(*this));
+    PDFEnvelopePtr rv(new QResolutionEnvelope(*this));
     return rv;
 }
 

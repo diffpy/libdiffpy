@@ -68,8 +68,8 @@ PDFCalculator::PDFCalculator()
     mrlimits_cache.calclopoints = 0;
     // default configuration
     this->setPeakWidthModel("jeong");
-    this->setPeakProfile("gaussian");
-    this->getPeakProfile().setPrecision(DEFAULT_PEAK_PRECISION);
+    this->setPeakProfileByType("gaussian");
+    this->getPeakProfile()->setPrecision(DEFAULT_PEAK_PRECISION);
     this->setBaseline("linear");
     this->setScatteringFactorTable("SFTperiodictableXray");
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
@@ -303,33 +303,32 @@ const double& PDFCalculator::getExtendedRmax() const
 
 // PDF peak profile configuration
 
-void PDFCalculator::setPeakProfile(const PeakProfile& pkf)
+void PDFCalculator::setPeakProfile(PeakProfilePtr pkf)
 {
-    if (mpeakprofile.get() == &pkf)  return;
-    mpeakprofile = pkf.clone();
+    mpeakprofile = pkf;
 }
 
 
-void PDFCalculator::setPeakProfile(const string& tp)
+void PDFCalculator::setPeakProfileByType(const string& tp)
 {
-    boost::shared_ptr<PeakProfile> pkf(createPeakProfile(tp));
+    PeakProfilePtr pkf(createPeakProfile(tp));
     // If peak profile already exists, copy its precision data
     if (mpeakprofile.get())  *pkf = *mpeakprofile;
     mpeakprofile = pkf;
 }
 
 
-PeakProfile& PDFCalculator::getPeakProfile()
+PeakProfilePtr PDFCalculator::getPeakProfile()
 {
     assert(mpeakprofile.get());
-    return *mpeakprofile;
+    return mpeakprofile;
 }
 
 
-const PeakProfile& PDFCalculator::getPeakProfile() const
+const PeakProfilePtr PDFCalculator::getPeakProfile() const
 {
     assert(mpeakprofile.get());
-    return *mpeakprofile;
+    return mpeakprofile;
 }
 
 // PDF baseline methods
@@ -407,7 +406,7 @@ void PDFCalculator::addEnvelope(const PDFEnvelope& envlp)
 void PDFCalculator::addEnvelope(const string& tp)
 {
     // this throws invalid_argument for invalid type
-    boost::shared_ptr<PDFEnvelope> penvlp = createPDFEnvelope(tp);
+    PDFEnvelopePtr penvlp = createPDFEnvelope(tp);
     // we get here only when createPDFEnvelope was successful
     menvelope[penvlp->type()] = penvlp;
 }
@@ -473,7 +472,7 @@ template <class T>
 void pdfcalc_accept(T* obj, diffpy::BaseAttributesVisitor& v)
 {
     obj->getPeakWidthModel().accept(v);
-    obj->getPeakProfile().accept(v);
+    obj->getPeakProfile()->accept(v);
     obj->getBaseline().accept(v);
     // PDF envelopes
     set<string> evnames = obj->usedPDFEnvelopeTypes();
@@ -534,7 +533,7 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
     double sfprod = this->sfSite(bnds.site0()) * this->sfSite(bnds.site1());
     double peakscale = sfprod * bnds.multiplicity() * summationscale;
     double fwhm = this->getPeakWidthModel().calculate(bnds);
-    const PeakProfile& pkf = this->getPeakProfile();
+    const PeakProfile& pkf = *(this->getPeakProfile());
     double dist = bnds.distance();
     double xlo = dist + pkf.xboundlo(fwhm);
     double xhi = dist + pkf.xboundhi(fwhm);
@@ -580,7 +579,7 @@ double PDFCalculator::extFromPeakTails() const
     // assume uncorrelated neighbors with maxUii
     double maxmsd = 2 * maxUii(mstructure);
     double maxfwhm = this->getPeakWidthModel().calculateFromMSD(maxmsd);
-    const PeakProfile& pkf = this->getPeakProfile();
+    const PeakProfile pkf = *(this->getPeakProfile());
     double xleft = fabs(pkf.xboundlo(maxfwhm));
     double xright = fabs(pkf.xboundhi(maxfwhm));
     double rv = max(xleft, xright);
