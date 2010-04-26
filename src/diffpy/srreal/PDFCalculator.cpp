@@ -432,15 +432,16 @@ void PDFCalculator::popEnvelopeByType(const string& tp)
 }
 
 
-const PDFEnvelopePtr PDFCalculator::getEnvelope(const string& tp) const
+const PDFEnvelopePtr PDFCalculator::getEnvelopeByType(const string& tp) const
 {
     // call non-constant method
-    const PDFEnvelopePtr rv = const_cast<PDFCalculator*>(this)->getEnvelope(tp);
+    const PDFEnvelopePtr rv =
+        const_cast<PDFCalculator*>(this)->getEnvelopeByType(tp);
     return rv;
 }
 
 
-PDFEnvelopePtr PDFCalculator::getEnvelope(const string& tp)
+PDFEnvelopePtr PDFCalculator::getEnvelopeByType(const string& tp)
 {
     if (!menvelope.count(tp))
     {
@@ -487,7 +488,7 @@ void pdfcalc_accept(T* obj, diffpy::BaseAttributesVisitor& v)
     set<string>::const_iterator nm = evnames.begin();
     for (; nm != evnames.end(); ++nm)
     {
-        obj->getEnvelope(*nm)->accept(v);
+        obj->getEnvelopeByType(*nm)->accept(v);
     }
     // finally call standard accept
     obj->diffpy::Attributes::accept(v);
