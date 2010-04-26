@@ -28,9 +28,6 @@
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
-#include <diffpy/srreal/ScaleEnvelope.hpp>
-#include <diffpy/srreal/QResolutionEnvelope.hpp>
-#include <diffpy/srreal/GaussianProfile.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
 
@@ -77,8 +74,8 @@ PDFCalculator::PDFCalculator()
     this->setQmax(0.0);
     this->setMaxExtension(10.0);
     // envelopes
-    this->addEnvelope(ScaleEnvelope());
-    this->addEnvelope(QResolutionEnvelope());
+    this->addEnvelopeByType("scale");
+    this->addEnvelopeByType("qresolution");
     // attributes
     this->registerDoubleAttribute("qmin", this,
             &PDFCalculator::getQmin, &PDFCalculator::setQmin);
@@ -304,6 +301,7 @@ const double& PDFCalculator::getExtendedRmax() const
 
 void PDFCalculator::setPeakProfile(PeakProfilePtr pkf)
 {
+    assert(pkf.get());
     mpeakprofile = pkf;
 }
 
@@ -350,6 +348,7 @@ QuantityType PDFCalculator::applyBaseline(
 
 void PDFCalculator::setBaseline(PDFBaselinePtr baseline)
 {
+    assert(baseline.get());
     mbaseline = baseline;
 }
 
@@ -395,22 +394,33 @@ QuantityType PDFCalculator::applyEnvelopes(
 }
 
 
-void PDFCalculator::addEnvelope(const PDFEnvelope& envlp)
+void PDFCalculator::addEnvelope(PDFEnvelopePtr envlp)
 {
-    menvelope[envlp.type()] = envlp.clone();
+    assert(envlp.get());
+    menvelope[envlp->type()] = envlp;
 }
 
 
-void PDFCalculator::addEnvelope(const string& tp)
+void PDFCalculator::addEnvelopeByType(const string& tp)
 {
     // this throws invalid_argument for invalid type
-    PDFEnvelopePtr penvlp = createPDFEnvelope(tp);
+    PDFEnvelopePtr envlp = createPDFEnvelope(tp);
     // we get here only when createPDFEnvelope was successful
-    menvelope[penvlp->type()] = penvlp;
+    menvelope[envlp->type()] = envlp;
 }
 
 
-void PDFCalculator::popEnvelope(const string& tp)
+void PDFCalculator::popEnvelope(PDFEnvelopePtr envlp)
+{
+    EnvelopeStorage::iterator evit = menvelope.find(envlp->type());
+    if (evit != menvelope.end() && evit->second.get() == envlp.get())
+    {
+        menvelope.erase(evit);
+    }
+}
+
+
+void PDFCalculator::popEnvelopeByType(const string& tp)
 {
     if (!getPDFEnvelopeTypes().count(tp))
     {
@@ -422,15 +432,15 @@ void PDFCalculator::popEnvelope(const string& tp)
 }
 
 
-const PDFEnvelope& PDFCalculator::getEnvelope(const string& tp) const
+const PDFEnvelopePtr PDFCalculator::getEnvelope(const string& tp) const
 {
     // call non-constant method
-    const PDFEnvelope& rv = const_cast<PDFCalculator*>(this)->getEnvelope(tp);
+    const PDFEnvelopePtr rv = const_cast<PDFCalculator*>(this)->getEnvelope(tp);
     return rv;
 }
 
 
-PDFEnvelope& PDFCalculator::getEnvelope(const string& tp)
+PDFEnvelopePtr PDFCalculator::getEnvelope(const string& tp)
 {
     if (!menvelope.count(tp))
     {
@@ -438,7 +448,7 @@ PDFEnvelope& PDFCalculator::getEnvelope(const string& tp)
         emsg << "Invalid or missing PDFEnvelope type '" << tp << "'.";
         throw invalid_argument(emsg.str());
     }
-    PDFEnvelope& rv = *(menvelope[tp]);
+    PDFEnvelopePtr rv = menvelope[tp];
     return rv;
 }
 
@@ -477,7 +487,7 @@ void pdfcalc_accept(T* obj, diffpy::BaseAttributesVisitor& v)
     set<string>::const_iterator nm = evnames.begin();
     for (; nm != evnames.end(); ++nm)
     {
-        obj->getEnvelope(*nm).accept(v);
+        obj->getEnvelope(*nm)->accept(v);
     }
     // finally call standard accept
     obj->diffpy::Attributes::accept(v);

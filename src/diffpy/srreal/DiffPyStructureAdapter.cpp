@@ -197,12 +197,13 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
     // with PDF-related structure properties
     if (!PyObject_HasAttrString(mdpstructure->ptr(), "pdffit"))  return;
     python::object stru_pdffit = mdpstructure->attr("pdffit");
+    PDFEnvelopePtr envelope;
     // get method of the stru.pdffit dictionary
     python::object pfget = stru_pdffit.attr("get");
     // scale
     double scale = python::extract<double>(pfget("scale", 1.0));
-    ScaleEnvelope envelope;
-    envelope.setScale(scale);
+    envelope = createPDFEnvelope("scale");
+    envelope->setDoubleAttr("scale", scale);
     pdfc.addEnvelope(envelope);
     // delta1, delta2 - set these only when using JeongPeakWidth model
     if (pdfc.getPeakWidthModel().type() == "jeong")
@@ -216,17 +217,17 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
     if (pfget("spdiameter").ptr() != Py_None)
     {
         double spdiameter = python::extract<double>(pfget("spdiameter"));
-        PDFEnvelopePtr envlp(createPDFEnvelope("sphericalshape"));
-        envlp->setDoubleAttr("spdiameter", spdiameter);
-        pdfc.addEnvelope(*envlp);
+        envelope = createPDFEnvelope("sphericalshape");
+        envelope->setDoubleAttr("spdiameter", spdiameter);
+        pdfc.addEnvelope(envelope);
     }
     // stepcut
     if (pfget("stepcut").ptr() != Py_None)
     {
         double stepcut = python::extract<double>(pfget("stepcut"));
-        PDFEnvelopePtr envlp(createPDFEnvelope("stepcut"));
-        envlp->setDoubleAttr("stepcut", stepcut);
-        pdfc.addEnvelope(*envlp);
+        envelope = createPDFEnvelope("stepcut");
+        envelope->setDoubleAttr("stepcut", stepcut);
+        pdfc.addEnvelope(envelope);
     }
 }
 
