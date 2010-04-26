@@ -28,35 +28,23 @@
 #include <set>
 
 #include <diffpy/Attributes.hpp>
+#include <diffpy/HasClassRegistry.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-typedef boost::shared_ptr<class PDFBaseline> PDFBaselinePtr;
-
 /// @class PDFBaseline
 /// @brief abstract base class for PDF baseline function
 
-class PDFBaseline : public diffpy::Attributes
+class PDFBaseline :
+    public Attributes,
+    public HasClassRegistry<PDFBaseline>
 {
     public:
-
-        // constructors
-        virtual PDFBaselinePtr create() const = 0;
-        virtual PDFBaselinePtr clone() const = 0;
-        virtual ~PDFBaseline()  { }
-
-        // methods
-        virtual const std::string& type() const = 0;
         virtual double operator()(const double& r) const = 0;
 };
 
-// Factory functions for concrete PDF envelopes ------------------------------
-
-PDFBaselinePtr createPDFBaseline(const std::string& tp);
-bool registerPDFBaseline(const PDFBaseline&);
-bool aliasPDFBaseline(const std::string& tp, const std::string& al);
-std::set<std::string> getPDFBaselineTypes();
+typedef PDFBaseline::SharedPtr PDFBaselinePtr;
 
 }   // namespace srreal
 }   // namespace diffpy

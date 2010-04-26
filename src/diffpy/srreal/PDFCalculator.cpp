@@ -355,7 +355,7 @@ void PDFCalculator::setBaseline(PDFBaselinePtr baseline)
 
 void PDFCalculator::setBaselineByType(const std::string& tp)
 {
-    mbaseline = createPDFBaseline(tp);
+    mbaseline = PDFBaseline::createByType(tp);
 }
 
 
@@ -422,12 +422,6 @@ void PDFCalculator::popEnvelope(PDFEnvelopePtr envlp)
 
 void PDFCalculator::popEnvelopeByType(const string& tp)
 {
-    if (!getPDFEnvelopeTypes().count(tp))
-    {
-        ostringstream emsg;
-        emsg << "Unknown PDFEnvelope type '" << tp << "'.";
-        throw invalid_argument(emsg.str());
-    }
     menvelope.erase(tp);
 }
 

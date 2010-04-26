@@ -78,7 +78,7 @@ const double& LinearBaseline::getSlope() const
 
 // Registration --------------------------------------------------------------
 
-bool reg_LinearBaseline = registerPDFBaseline(LinearBaseline());
+bool reg_LinearBaseline = LinearBaseline().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

@@ -56,7 +56,7 @@ double ZeroBaseline::operator()(const double& r) const
 
 // Registration --------------------------------------------------------------
 
-bool reg_ZeroBaseline = registerPDFBaseline(ZeroBaseline());
+bool reg_ZeroBaseline = ZeroBaseline().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

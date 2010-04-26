@@ -19,40 +19,10 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/PDFBaseline.hpp>
-#include <diffpy/ClassRegistry.hpp>
+#include <diffpy/HasClassRegistry.ipp>
 
-using namespace std;
-using diffpy::ClassRegistry;
+using diffpy::srreal::PDFBaseline;
 
-namespace diffpy {
-namespace srreal {
-
-// Factory Functions ---------------------------------------------------------
-
-PDFBaselinePtr createPDFBaseline(const string& tp)
-{
-    return ClassRegistry<PDFBaseline>::create(tp);
-}
-
-
-bool registerPDFBaseline(const PDFBaseline& ref)
-{
-    return ClassRegistry<PDFBaseline>::add(ref);
-}
-
-
-bool aliasPDFBaseline(const string& tp, const string& al)
-{
-    return ClassRegistry<PDFBaseline>::alias(tp, al);
-}
-
-
-set<string> getPDFBaselineTypes()
-{
-    return ClassRegistry<PDFBaseline>::getTypes();
-}
-
-}   // namespace srreal
-}   // namespace diffpy
+template class HasClassRegistry<PDFBaseline>;
 
 // End of file
