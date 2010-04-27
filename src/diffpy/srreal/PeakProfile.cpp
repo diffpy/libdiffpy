@@ -20,17 +20,13 @@
 *
 *****************************************************************************/
 
-#include <cmath>
-
 #include <diffpy/srreal/PeakProfile.hpp>
-#include <diffpy/ClassRegistry.hpp>
-#include <diffpy/mathutils.hpp>
+#include <diffpy/HasClassRegistry.ipp>
 
-using namespace std;
-using diffpy::ClassRegistry;
+using diffpy::srreal::PeakProfile;
 
-namespace diffpy {
-namespace srreal {
+// Unique instantiation of the template registry base class.
+template class HasClassRegistry<PeakProfile>;
 
 //////////////////////////////////////////////////////////////////////////////
 // class PeakProfile
@@ -56,33 +52,5 @@ const double& PeakProfile::getPrecision() const
 {
     return mprecision;
 }
-
-// Factory Functions ---------------------------------------------------------
-
-PeakProfilePtr createPeakProfile(const string& tp)
-{
-    return ClassRegistry<PeakProfile>::create(tp);
-}
-
-
-bool registerPeakProfile(const PeakProfile& ref)
-{
-    return ClassRegistry<PeakProfile>::add(ref);
-}
-
-
-bool aliasPeakProfile(const string& tp, const string& al)
-{
-    return ClassRegistry<PeakProfile>::alias(tp, al);
-}
-
-
-set<string> getPeakProfileTypes()
-{
-    return ClassRegistry<PeakProfile>::getTypes();
-}
-
-}   // namespace srreal
-}   // namespace diffpy
 
 // End of file

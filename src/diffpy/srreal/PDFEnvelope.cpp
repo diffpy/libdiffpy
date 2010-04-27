@@ -23,6 +23,7 @@
 
 using diffpy::srreal::PDFEnvelope;
 
+// Unique instantiation of the template registry base class.
 template class HasClassRegistry<PDFEnvelope>;
 
 // End of file

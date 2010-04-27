@@ -85,7 +85,7 @@ void CroppedGaussianProfile::setPrecision(double eps)
 
 // Registration --------------------------------------------------------------
 
-bool reg_CroppedGaussianProfile = registerPeakProfile(CroppedGaussianProfile());
+bool reg_CroppedGaussianProfile = CroppedGaussianProfile().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

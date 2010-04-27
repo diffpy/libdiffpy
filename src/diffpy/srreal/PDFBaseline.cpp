@@ -23,6 +23,7 @@
 
 using diffpy::srreal::PDFBaseline;
 
+// Unique instantiation of the template registry base class.
 template class HasClassRegistry<PDFBaseline>;
 
 // End of file

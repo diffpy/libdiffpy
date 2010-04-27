@@ -92,7 +92,7 @@ void GaussianProfile::setPrecision(double eps)
 
 // Registration --------------------------------------------------------------
 
-bool reg_GaussianProfile = registerPeakProfile(GaussianProfile());
+bool reg_GaussianProfile = GaussianProfile().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

@@ -35,20 +35,20 @@ class TestPeakProfile : public CxxTest::TestSuite
 
 private:
 
-    boost::shared_ptr<PeakProfile> mpkgauss;
+    PeakProfilePtr mpkgauss;
     static const int mdigits = 12;
 
 public:
 
     void setUp()
     {
-        mpkgauss = createPeakProfile("gaussian");
+        mpkgauss = PeakProfile::createByType("gaussian");
     }
 
 
     void test_factory()
     {
-        TS_ASSERT_THROWS(createPeakProfile("invalid"),
+        TS_ASSERT_THROWS(PeakProfile::createByType("invalid"),
                 invalid_argument);
         TS_ASSERT_EQUALS(string("gaussian"), mpkgauss->type());
     }

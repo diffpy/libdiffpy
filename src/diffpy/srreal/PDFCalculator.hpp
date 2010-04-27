@@ -168,7 +168,7 @@ class PDFCalculator : public PairQuantity,
         double mqmax;
         double mrstep;
         double mmaxextension;
-        boost::shared_ptr<PeakProfile> mpeakprofile;
+        PeakProfilePtr mpeakprofile;
         PDFBaselinePtr mbaseline;
         EnvelopeStorage menvelope;
         struct {

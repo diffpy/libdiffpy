@@ -26,28 +26,21 @@
 #ifndef PEAKPROFILE_HPP_INCLUDED
 #define PEAKPROFILE_HPP_INCLUDED
 
-#include <string>
-#include <set>
-
 #include <diffpy/Attributes.hpp>
+#include <diffpy/HasClassRegistry.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-typedef boost::shared_ptr<class PeakProfile> PeakProfilePtr;
-
-class PeakProfile : public diffpy::Attributes
+class PeakProfile :
+    public diffpy::Attributes,
+    public diffpy::HasClassRegistry<PeakProfile>
 {
     public:
 
         // constructors
-        virtual PeakProfilePtr create() const = 0;
-        virtual PeakProfilePtr clone() const = 0;
         PeakProfile();
-        virtual ~PeakProfile()  { }
-
         // methods
-        virtual const std::string& type() const = 0;
         virtual double yvalue(double x, double fwhm) const = 0;
         virtual double xboundlo(double fwhm) const = 0;
         virtual double xboundhi(double fwhm) const = 0;
@@ -60,12 +53,7 @@ class PeakProfile : public diffpy::Attributes
         double mprecision;
 };
 
-// Factory functions for Peak Width Models -----------------------------------
-
-PeakProfilePtr createPeakProfile(const std::string& tp);
-bool registerPeakProfile(const PeakProfile&);
-bool aliasPeakProfile(const std::string& tp, const std::string& al);
-std::set<std::string> getPeakProfileTypes();
+typedef PeakProfile::SharedPtr PeakProfilePtr;
 
 }   // namespace srreal
 }   // namespace diffpy
