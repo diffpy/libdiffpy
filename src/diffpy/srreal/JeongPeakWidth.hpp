@@ -35,11 +35,8 @@ class JeongPeakWidth : public DebyeWallerPeakWidth
 
         // constructors
         JeongPeakWidth();
-        virtual boost::shared_ptr<PeakWidthModel> create() const;
-        virtual boost::shared_ptr<PeakWidthModel> clone() const;
-
-        // comparison with derived classes
-        virtual bool operator==(const PeakWidthModel&) const;
+        virtual PeakWidthModelPtr create() const;
+        virtual PeakWidthModelPtr clone() const;
 
         // methods
         virtual const std::string& type() const;

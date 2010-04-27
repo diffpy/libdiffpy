@@ -43,33 +43,20 @@ JeongPeakWidth::JeongPeakWidth()
 }
 
 
-boost::shared_ptr<PeakWidthModel> JeongPeakWidth::create() const
+PeakWidthModelPtr JeongPeakWidth::create() const
 {
-    boost::shared_ptr<PeakWidthModel> rv(new JeongPeakWidth());
+    PeakWidthModelPtr rv(new JeongPeakWidth());
     return rv;
 }
 
 
-boost::shared_ptr<PeakWidthModel> JeongPeakWidth::clone() const
+PeakWidthModelPtr JeongPeakWidth::clone() const
 {
-    boost::shared_ptr<PeakWidthModel> rv(new JeongPeakWidth(*this));
+    PeakWidthModelPtr rv(new JeongPeakWidth(*this));
     return rv;
 }
 
 // Public Methods ------------------------------------------------------------
-
-bool JeongPeakWidth::operator==(const PeakWidthModel& other) const
-{
-    if (this == &other)  return true;
-    const JeongPeakWidth* jpwm =
-        dynamic_cast<const JeongPeakWidth*>(&other);
-    bool rv = jpwm &&
-        mdelta1 == jpwm->mdelta1 &&
-        mdelta2 == jpwm->mdelta2 &&
-        mqbroad == jpwm->mqbroad;
-    return rv;
-}
-
 
 const string& JeongPeakWidth::type() const
 {

@@ -29,30 +29,20 @@ using namespace diffpy::srreal;
 
 // Constructors --------------------------------------------------------------
 
-boost::shared_ptr<PeakWidthModel> DebyeWallerPeakWidth::create() const
+PeakWidthModelPtr DebyeWallerPeakWidth::create() const
 {
-    boost::shared_ptr<PeakWidthModel> rv(new DebyeWallerPeakWidth());
+    PeakWidthModelPtr rv(new DebyeWallerPeakWidth());
     return rv;
 }
 
 
-boost::shared_ptr<PeakWidthModel> DebyeWallerPeakWidth::clone() const
+PeakWidthModelPtr DebyeWallerPeakWidth::clone() const
 {
-    boost::shared_ptr<PeakWidthModel> rv(new DebyeWallerPeakWidth(*this));
+    PeakWidthModelPtr rv(new DebyeWallerPeakWidth(*this));
     return rv;
 }
 
 // Public Methods ------------------------------------------------------------
-
-bool DebyeWallerPeakWidth::operator==(const PeakWidthModel& other) const
-{
-    // This peak width model has no parameters, therefore we just need
-    // to check if other is of the same type.
-    if (this == &other)  return true;
-    bool rv = dynamic_cast<const DebyeWallerPeakWidth*>(&other);
-    return rv;
-}
-
 
 const string& DebyeWallerPeakWidth::type() const
 {

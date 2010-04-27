@@ -45,8 +45,6 @@ class PeakWidthModel :
         virtual double calculate(const BaseBondGenerator&) const = 0;
         virtual double calculateFromMSD(double msdval) const = 0;
 
-        // comparison with derived classes
-        virtual bool operator==(const PeakWidthModel&) const = 0;
 };
 
 

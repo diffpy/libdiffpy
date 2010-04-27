@@ -34,32 +34,20 @@ ConstantPeakWidth::ConstantPeakWidth()
 }
 
 
-boost::shared_ptr<PeakWidthModel> ConstantPeakWidth::create() const
+PeakWidthModelPtr ConstantPeakWidth::create() const
 {
-    boost::shared_ptr<PeakWidthModel> rv(new ConstantPeakWidth());
+    PeakWidthModelPtr rv(new ConstantPeakWidth());
     return rv;
 }
 
 
-boost::shared_ptr<PeakWidthModel> ConstantPeakWidth::clone() const
+PeakWidthModelPtr ConstantPeakWidth::clone() const
 {
-    boost::shared_ptr<PeakWidthModel> rv(new ConstantPeakWidth(*this));
+    PeakWidthModelPtr rv(new ConstantPeakWidth(*this));
     return rv;
 }
 
 // Public Methods ------------------------------------------------------------
-
-bool ConstantPeakWidth::operator==(const PeakWidthModel& other) const
-{
-    // This peak width model has no parameters, therefore we just need
-    // to check if other is of the same type.
-    if (this == &other)  return true;
-    const ConstantPeakWidth* pw =
-        dynamic_cast<const ConstantPeakWidth*>(&other);
-    bool rv = pw && (this->mwidth == pw->mwidth);
-    return rv;
-}
-
 
 const string& ConstantPeakWidth::type() const
 {
