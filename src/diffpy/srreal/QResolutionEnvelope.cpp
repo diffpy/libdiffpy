@@ -81,7 +81,7 @@ const double& QResolutionEnvelope::getQdamp() const
 
 // Registration --------------------------------------------------------------
 
-bool reg_QResolutionEnvelope = registerPDFEnvelope(QResolutionEnvelope());
+bool reg_QResolutionEnvelope = QResolutionEnvelope().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

@@ -28,36 +28,25 @@
 #include <set>
 
 #include <diffpy/Attributes.hpp>
+#include <diffpy/HasClassRegistry.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 
-typedef boost::shared_ptr<class PDFEnvelope> PDFEnvelopePtr;
-
 /// @class PDFEnvelope
 /// @brief abstract base class for PDF envelope scaling function
 
-class PDFEnvelope : public diffpy::Attributes
+class PDFEnvelope :
+    public diffpy::Attributes,
+    public diffpy::HasClassRegistry<PDFEnvelope>
 {
     public:
-
-        // constructors
-        virtual PDFEnvelopePtr create() const = 0;
-        virtual PDFEnvelopePtr clone() const = 0;
-        virtual ~PDFEnvelope()  { }
-
-        // methods
-        virtual const std::string& type() const = 0;
         virtual double operator()(const double& r) const = 0;
 };
 
-// Factory functions for concrete PDF envelopes ------------------------------
 
-PDFEnvelopePtr createPDFEnvelope(const std::string& tp);
-bool registerPDFEnvelope(const PDFEnvelope&);
-bool aliasPDFEnvelope(const std::string& tp, const std::string& al);
-std::set<std::string> getPDFEnvelopeTypes();
+typedef PDFEnvelope::SharedPtr PDFEnvelopePtr;
 
 }   // namespace srreal
 }   // namespace diffpy

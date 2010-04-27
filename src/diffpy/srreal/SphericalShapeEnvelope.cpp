@@ -83,7 +83,7 @@ const double& SphericalShapeEnvelope::getSPDiameter() const
 
 // Registration --------------------------------------------------------------
 
-bool reg_SphericalShapeEnvelope = registerPDFEnvelope(SphericalShapeEnvelope());
+bool reg_SphericalShapeEnvelope = SphericalShapeEnvelope().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

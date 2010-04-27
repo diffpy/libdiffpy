@@ -77,7 +77,7 @@ const double& ScaleEnvelope::getScale() const
 
 // Registration --------------------------------------------------------------
 
-bool reg_ScaleEnvelope = registerPDFEnvelope(ScaleEnvelope());
+bool reg_ScaleEnvelope = ScaleEnvelope().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

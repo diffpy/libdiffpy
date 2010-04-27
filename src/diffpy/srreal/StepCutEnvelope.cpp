@@ -77,7 +77,7 @@ const double& StepCutEnvelope::getStepCut() const
 
 // Registration --------------------------------------------------------------
 
-bool reg_StepCutEnvelope = registerPDFEnvelope(StepCutEnvelope());
+bool reg_StepCutEnvelope = StepCutEnvelope().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

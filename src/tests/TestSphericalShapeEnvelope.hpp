@@ -36,7 +36,7 @@ class TestSphericalShapeEnvelope : public CxxTest::TestSuite
 
         void setUp()
         {
-            menvelope = createPDFEnvelope("sphericalshape");
+            menvelope = PDFEnvelope::createByType("sphericalshape");
         }
 
 

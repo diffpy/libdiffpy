@@ -202,7 +202,7 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
     python::object pfget = stru_pdffit.attr("get");
     // scale
     double scale = python::extract<double>(pfget("scale", 1.0));
-    envelope = createPDFEnvelope("scale");
+    envelope = PDFEnvelope::createByType("scale");
     envelope->setDoubleAttr("scale", scale);
     pdfc.addEnvelope(envelope);
     // delta1, delta2 - set these only when using JeongPeakWidth model
@@ -217,7 +217,7 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
     if (pfget("spdiameter").ptr() != Py_None)
     {
         double spdiameter = python::extract<double>(pfget("spdiameter"));
-        envelope = createPDFEnvelope("sphericalshape");
+        envelope = PDFEnvelope::createByType("sphericalshape");
         envelope->setDoubleAttr("spdiameter", spdiameter);
         pdfc.addEnvelope(envelope);
     }
@@ -225,7 +225,7 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
     if (pfget("stepcut").ptr() != Py_None)
     {
         double stepcut = python::extract<double>(pfget("stepcut"));
-        envelope = createPDFEnvelope("stepcut");
+        envelope = PDFEnvelope::createByType("stepcut");
         envelope->setDoubleAttr("stepcut", stepcut);
         pdfc.addEnvelope(envelope);
     }

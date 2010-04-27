@@ -404,8 +404,8 @@ void PDFCalculator::addEnvelope(PDFEnvelopePtr envlp)
 void PDFCalculator::addEnvelopeByType(const string& tp)
 {
     // this throws invalid_argument for invalid type
-    PDFEnvelopePtr envlp = createPDFEnvelope(tp);
-    // we get here only when createPDFEnvelope was successful
+    PDFEnvelopePtr envlp = PDFEnvelope::createByType(tp);
+    // we get here only when createByType was successful
     menvelope[envlp->type()] = envlp;
 }
 

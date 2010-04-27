@@ -19,39 +19,10 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/PDFEnvelope.hpp>
-#include <diffpy/ClassRegistry.hpp>
+#include <diffpy/HasClassRegistry.ipp>
 
-using namespace std;
-using diffpy::ClassRegistry;
+using diffpy::srreal::PDFEnvelope;
 
-namespace diffpy {
-namespace srreal {
-
-// Factory Functions ---------------------------------------------------------
-
-PDFEnvelopePtr createPDFEnvelope(const string& tp)
-{
-    return ClassRegistry<PDFEnvelope>::create(tp);
-}
-
-
-bool registerPDFEnvelope(const PDFEnvelope& ref)
-{
-    return ClassRegistry<PDFEnvelope>::add(ref);
-}
-
-
-bool aliasPDFEnvelope(const string& tp, const string& al)
-{
-    return ClassRegistry<PDFEnvelope>::alias(tp, al);
-}
-
-set<string> getPDFEnvelopeTypes()
-{
-    return ClassRegistry<PDFEnvelope>::getTypes();
-}
-
-}   // namespace srreal
-}   // namespace diffpy
+template class HasClassRegistry<PDFEnvelope>;
 
 // End of file

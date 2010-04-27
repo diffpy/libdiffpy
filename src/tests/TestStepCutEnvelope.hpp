@@ -36,7 +36,7 @@ class TestStepCutEnvelope : public CxxTest::TestSuite
 
         void setUp()
         {
-            menvelope = createPDFEnvelope("stepcut");
+            menvelope = PDFEnvelope::createByType("stepcut");
         }
 
 
