@@ -27,28 +27,21 @@
 #ifndef PEAKWIDTHMODEL_HPP_INCLUDED
 #define PEAKWIDTHMODEL_HPP_INCLUDED
 
-#include <string>
-#include <set>
-#include <boost/shared_ptr.hpp>
-
 #include <diffpy/Attributes.hpp>
+#include <diffpy/HasClassRegistry.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 class BaseBondGenerator;
 
-class PeakWidthModel : public diffpy::Attributes
+class PeakWidthModel :
+    public diffpy::Attributes,
+    public diffpy::HasClassRegistry<PeakWidthModel>
 {
     public:
 
-        // constructors
-        virtual boost::shared_ptr<PeakWidthModel> create() const = 0;
-        virtual boost::shared_ptr<PeakWidthModel> clone() const = 0;
-        virtual ~PeakWidthModel()  { }
-
         // methods
-        virtual const std::string& type() const = 0;
         virtual double calculate(const BaseBondGenerator&) const = 0;
         virtual double calculateFromMSD(double msdval) const = 0;
 
@@ -57,28 +50,24 @@ class PeakWidthModel : public diffpy::Attributes
 };
 
 
+typedef PeakWidthModel::SharedPtr PeakWidthModelPtr;
+
+
 class PeakWidthModelOwner
 {
     public:
 
         // PDF peak width configuration
-        void setPeakWidthModel(const PeakWidthModel&);
-        void setPeakWidthModel(const std::string& tp);
-        PeakWidthModel& getPeakWidthModel();
-        const PeakWidthModel& getPeakWidthModel() const;
+        void setPeakWidthModel(PeakWidthModelPtr);
+        void setPeakWidthModelByType(const std::string& tp);
+        PeakWidthModelPtr getPeakWidthModel();
+        const PeakWidthModelPtr getPeakWidthModel() const;
 
     private:
 
         // data
-        boost::shared_ptr<PeakWidthModel> mpwmodel;
+        PeakWidthModelPtr mpwmodel;
 };
-
-// Factory functions for Peak Width Models -----------------------------------
-
-boost::shared_ptr<PeakWidthModel> createPeakWidthModel(const std::string& tp);
-bool registerPeakWidthModel(const PeakWidthModel&);
-bool aliasPeakWidthModel(const std::string& tp, const std::string& al);
-std::set<std::string> getPeakWidthModelTypes();
 
 }   // namespace srreal
 }   // namespace diffpy

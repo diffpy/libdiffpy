@@ -52,7 +52,7 @@ const double DEFAULT_DEBYE_PRECISION = 1e-6;
 BaseDebyeSum::BaseDebyeSum()
 {
     // default configuration
-    this->setPeakWidthModel("jeong");
+    this->setPeakWidthModelByType("jeong");
     this->setQmin(0.0);
     this->setQmax(10.0);
     this->setQstep(0.05);
@@ -166,7 +166,7 @@ void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds,
     const double dist = bnds.distance();
     if (eps_eq(0.0, dist))  return;
     // calculate sigma parameter for the Debye-Waller dampign Gaussian
-    const double fwhm = this->getPeakWidthModel().calculate(bnds);
+    const double fwhm = this->getPeakWidthModel()->calculate(bnds);
     const double fwhmtosigma = 1.0 / (2 * sqrt(2 * M_LN2));
     const double dwsigma = fwhmtosigma * fwhm;
     for (int kq = this->qminPoints(); kq < this->totalQPoints(); ++kq)

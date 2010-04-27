@@ -63,7 +63,7 @@ PDFCalculator::PDFCalculator()
     mrlimits_cache.rcalchigh = 0.0;
     mrlimits_cache.calclopoints = 0;
     // default configuration
-    this->setPeakWidthModel("jeong");
+    this->setPeakWidthModelByType("jeong");
     this->setPeakProfileByType("gaussian");
     this->getPeakProfile()->setPrecision(DEFAULT_PEAK_PRECISION);
     this->setBaselineByType("linear");
@@ -474,7 +474,7 @@ namespace {
 template <class T>
 void pdfcalc_accept(T* obj, diffpy::BaseAttributesVisitor& v)
 {
-    obj->getPeakWidthModel().accept(v);
+    obj->getPeakWidthModel()->accept(v);
     obj->getPeakProfile()->accept(v);
     obj->getBaseline()->accept(v);
     // PDF envelopes
@@ -533,7 +533,7 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
 {
     double sfprod = this->sfSite(bnds.site0()) * this->sfSite(bnds.site1());
     double peakscale = sfprod * bnds.multiplicity() * summationscale;
-    double fwhm = this->getPeakWidthModel().calculate(bnds);
+    double fwhm = this->getPeakWidthModel()->calculate(bnds);
     const PeakProfile& pkf = *(this->getPeakProfile());
     double dist = bnds.distance();
     double xlo = dist + pkf.xboundlo(fwhm);
@@ -579,7 +579,7 @@ double PDFCalculator::extFromPeakTails() const
 {
     // assume uncorrelated neighbors with maxUii
     double maxmsd = 2 * maxUii(mstructure);
-    double maxfwhm = this->getPeakWidthModel().calculateFromMSD(maxmsd);
+    double maxfwhm = this->getPeakWidthModel()->calculateFromMSD(maxmsd);
     const PeakProfile& pkf = *(this->getPeakProfile());
     double xleft = fabs(pkf.xboundlo(maxfwhm));
     double xright = fabs(pkf.xboundhi(maxfwhm));

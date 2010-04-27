@@ -77,6 +77,6 @@ double DebyeWallerPeakWidth::calculateFromMSD(double msdval) const
 
 // Registration --------------------------------------------------------------
 
-bool reg_DebyeWallerPeakWidth = registerPeakWidthModel(DebyeWallerPeakWidth());
+bool reg_DebyeWallerPeakWidth = DebyeWallerPeakWidth().registerThisType();
 
 // End of file

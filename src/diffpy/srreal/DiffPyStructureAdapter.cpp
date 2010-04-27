@@ -206,7 +206,7 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator& pdfc) const
     envelope->setDoubleAttr("scale", scale);
     pdfc.addEnvelope(envelope);
     // delta1, delta2 - set these only when using JeongPeakWidth model
-    if (pdfc.getPeakWidthModel().type() == "jeong")
+    if (pdfc.getPeakWidthModel()->type() == "jeong")
     {
         double delta1 = python::extract<double>(pfget("delta1", 0.0));
         double delta2 = python::extract<double>(pfget("delta2", 0.0));

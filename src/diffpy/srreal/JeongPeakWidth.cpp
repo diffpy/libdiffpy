@@ -130,6 +130,6 @@ void JeongPeakWidth::setQbroad(double qbroad)
 
 // Registration --------------------------------------------------------------
 
-bool reg_JeongPeakWidthModel = registerPeakWidthModel(JeongPeakWidth());
+bool reg_JeongPeakWidthModel = JeongPeakWidth().registerThisType();
 
 // End of file

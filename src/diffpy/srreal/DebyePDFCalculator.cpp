@@ -208,7 +208,7 @@ namespace {
 template <class T>
 void debyepdfcalc_accept(T* obj, diffpy::BaseAttributesVisitor& v)
 {
-    obj->getPeakWidthModel().accept(v);
+    obj->getPeakWidthModel()->accept(v);
     // finally call standard accept
     obj->diffpy::Attributes::accept(v);
 }
@@ -295,7 +295,7 @@ double DebyePDFCalculator::extFromTerminationRipples() const
 double DebyePDFCalculator::extFromPeakTails() const
 {
     double maxmsd = 2 * maxUii(mstructure);
-    double maxfwhm = this->getPeakWidthModel().calculateFromMSD(maxmsd);
+    double maxfwhm = this->getPeakWidthModel()->calculateFromMSD(maxmsd);
     // assume Gaussian peak profile
     GaussianProfile pkf;
     pkf.setPrecision(this->getDebyePrecision());

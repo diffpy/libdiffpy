@@ -45,33 +45,33 @@ class TestPDFCalculator : public CxxTest::TestSuite
 
         void test_setPeakWidthModel()
         {
-            const PeakWidthModel& jpw0 = mpdfc->getPeakWidthModel();
-            TS_ASSERT_EQUALS(0.0, jpw0.getDoubleAttr("delta1"));
-            TS_ASSERT_EQUALS(0.0, jpw0.getDoubleAttr("delta2"));
-            TS_ASSERT_EQUALS(0.0, jpw0.getDoubleAttr("qbroad"));
+            const PeakWidthModelPtr jpw0 = mpdfc->getPeakWidthModel();
+            TS_ASSERT_EQUALS(0.0, jpw0->getDoubleAttr("delta1"));
+            TS_ASSERT_EQUALS(0.0, jpw0->getDoubleAttr("delta2"));
+            TS_ASSERT_EQUALS(0.0, jpw0->getDoubleAttr("qbroad"));
             JeongPeakWidth jpw;
             jpw.setDelta1(1.0);
             jpw.setDelta2(2.0);
             jpw.setQbroad(3.0);
-            mpdfc->setPeakWidthModel(jpw);
-            const PeakWidthModel& jpw1 = mpdfc->getPeakWidthModel();
-            TS_ASSERT_EQUALS(1.0, jpw1.getDoubleAttr("delta1"));
-            TS_ASSERT_EQUALS(2.0, jpw1.getDoubleAttr("delta2"));
-            TS_ASSERT_EQUALS(3.0, jpw1.getDoubleAttr("qbroad"));
+            mpdfc->setPeakWidthModel(jpw.clone());
+            const PeakWidthModelPtr jpw1 = mpdfc->getPeakWidthModel();
+            TS_ASSERT_EQUALS(1.0, jpw1->getDoubleAttr("delta1"));
+            TS_ASSERT_EQUALS(2.0, jpw1->getDoubleAttr("delta2"));
+            TS_ASSERT_EQUALS(3.0, jpw1->getDoubleAttr("qbroad"));
         }
 
 
         void test_getPeakWidthModel()
         {
             string tp = "jeong";
-            TS_ASSERT_EQUALS(tp, mpdfc->getPeakWidthModel().type());
-            boost::shared_ptr<PeakWidthModel> pwm(createPeakWidthModel("debye-waller"));
-            mpdfc->setPeakWidthModel(*pwm);
+            TS_ASSERT_EQUALS(tp, mpdfc->getPeakWidthModel()->type());
+            PeakWidthModelPtr pwm(PeakWidthModel::createByType("debye-waller"));
+            mpdfc->setPeakWidthModel(pwm);
             tp = "debye-waller";
-            TS_ASSERT_EQUALS(tp, mpdfc->getPeakWidthModel().type());
-            mpdfc->setPeakWidthModel(ConstantPeakWidth());
+            TS_ASSERT_EQUALS(tp, mpdfc->getPeakWidthModel()->type());
+            mpdfc->setPeakWidthModel(ConstantPeakWidth().clone());
             tp = "constant";
-            TS_ASSERT_EQUALS(tp, mpdfc->getPeakWidthModel().type());
+            TS_ASSERT_EQUALS(tp, mpdfc->getPeakWidthModel()->type());
         }
 
 

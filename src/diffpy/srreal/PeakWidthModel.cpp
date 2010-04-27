@@ -19,66 +19,45 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/PeakWidthModel.hpp>
-#include <diffpy/ClassRegistry.hpp>
+#include <diffpy/HasClassRegistry.ipp>
 
-using namespace std;
-using diffpy::ClassRegistry;
+using std::string;
+using diffpy::srreal::PeakWidthModel;
+
+// Unique instantiation of the template registry base class.
+template class HasClassRegistry<PeakWidthModel>;
 
 namespace diffpy {
 namespace srreal {
 
+
+
 // class PeakWidthModelOwner -------------------------------------------------
 
-void PeakWidthModelOwner::setPeakWidthModel(const PeakWidthModel& pwm)
+void PeakWidthModelOwner::setPeakWidthModel(PeakWidthModelPtr pwm)
 {
-    if (mpwmodel.get() == &pwm)   return;
-    mpwmodel = pwm.clone();
+    assert(pwm.get());
+    mpwmodel = pwm;
 }
 
 
-void PeakWidthModelOwner::setPeakWidthModel(const string& tp)
+void PeakWidthModelOwner::setPeakWidthModelByType(const string& tp)
 {
-    mpwmodel = createPeakWidthModel(tp);
+    mpwmodel = PeakWidthModel::createByType(tp);
 }
 
 
-PeakWidthModel& PeakWidthModelOwner::getPeakWidthModel()
+PeakWidthModelPtr PeakWidthModelOwner::getPeakWidthModel()
 {
     assert(mpwmodel.get());
-    return *mpwmodel;
+    return mpwmodel;
 }
 
 
-const PeakWidthModel& PeakWidthModelOwner::getPeakWidthModel() const
+const PeakWidthModelPtr PeakWidthModelOwner::getPeakWidthModel() const
 {
     assert(mpwmodel.get());
-    return *mpwmodel;
-}
-
-
-// Factory Functions ---------------------------------------------------------
-
-boost::shared_ptr<PeakWidthModel> createPeakWidthModel(const string& tp)
-{
-    return ClassRegistry<PeakWidthModel>::create(tp);
-}
-
-
-bool registerPeakWidthModel(const PeakWidthModel& ref)
-{
-    return ClassRegistry<PeakWidthModel>::add(ref);
-}
-
-
-bool aliasPeakWidthModel(const string& tp, const string& al)
-{
-    return ClassRegistry<PeakWidthModel>::alias(tp, al);
-}
-
-
-set<string> getPeakWidthModelTypes()
-{
-    return ClassRegistry<PeakWidthModel>::getTypes();
+    return mpwmodel;
 }
 
 }   // namespace srreal

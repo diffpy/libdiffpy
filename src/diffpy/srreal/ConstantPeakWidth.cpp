@@ -94,6 +94,6 @@ void ConstantPeakWidth::setWidth(double width)
 
 // Registration --------------------------------------------------------------
 
-bool reg_ConstantPeakWidth = registerPeakWidthModel(ConstantPeakWidth());
+bool reg_ConstantPeakWidth = ConstantPeakWidth().registerThisType();
 
 // End of file
