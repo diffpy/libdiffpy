@@ -30,8 +30,6 @@ template class HasClassRegistry<PeakWidthModel>;
 namespace diffpy {
 namespace srreal {
 
-
-
 // class PeakWidthModelOwner -------------------------------------------------
 
 void PeakWidthModelOwner::setPeakWidthModel(PeakWidthModelPtr pwm)

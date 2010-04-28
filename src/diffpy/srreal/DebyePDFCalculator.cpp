@@ -44,7 +44,7 @@ namespace srreal {
 DebyePDFCalculator::DebyePDFCalculator()
 {
     // default configuration
-    this->setScatteringFactorTable("SFTperiodictableXray");
+    this->setScatteringFactorTableByType("SFTperiodictableXray");
     this->setRstep(0.01);
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
     this->setMaxExtension(10.0);
@@ -246,9 +246,9 @@ void DebyePDFCalculator::configureBondGenerator(BaseBondGenerator& bnds)
 
 double DebyePDFCalculator::sfSiteAtQ(int siteidx, const double& Q) const
 {
-    const ScatteringFactorTable& sftable = this->getScatteringFactorTable();
+    const ScatteringFactorTablePtr sftable = this->getScatteringFactorTable();
     const string& smbl = mstructure->siteAtomType(siteidx);
-    double rv = sftable.lookup(smbl) * mstructure->siteOccupancy(siteidx);
+    double rv = sftable->lookup(smbl) * mstructure->siteOccupancy(siteidx);
     return rv;
 }
 

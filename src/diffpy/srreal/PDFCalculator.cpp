@@ -67,7 +67,7 @@ PDFCalculator::PDFCalculator()
     this->setPeakProfileByType("gaussian");
     this->getPeakProfile()->setPrecision(DEFAULT_PEAK_PRECISION);
     this->setBaselineByType("linear");
-    this->setScatteringFactorTable("SFTperiodictableXray");
+    this->setScatteringFactorTableByType("SFTperiodictableXray");
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
     this->setRstep(0.01);
     this->setQmin(0.0);
@@ -678,11 +678,11 @@ void PDFCalculator::cacheStructureData()
     int cntsites = mstructure->countSites();
     // sfsite
     mstructure_cache.sfsite.resize(cntsites);
-    const ScatteringFactorTable& sftable = this->getScatteringFactorTable();
+    const ScatteringFactorTablePtr sftable = this->getScatteringFactorTable();
     for (int i = 0; i < cntsites; ++i)
     {
         const string& smbl = mstructure->siteAtomType(i);
-        mstructure_cache.sfsite[i] = sftable.lookup(smbl) *
+        mstructure_cache.sfsite[i] = sftable->lookup(smbl) *
             mstructure->siteOccupancy(i);
     }
     // sfaverage

@@ -17,7 +17,7 @@
 *
 * Implementations of x-ray and neutron ScatteringFactorTable using Paul
 * Kienzle periodictable library for Python.  The instances can be created
-* using the createScatteringFactorTable factory, see the end of this file for
+* using the createByType factory method, see the end of this file for
 * available type strings.
 *
 * $Id$
@@ -67,27 +67,20 @@ class SFTperiodictableXray : public ScatteringFactorTable
 {
     public:
 
-        // constructors
+        // HasClassRegistry methods
 
-        SFTperiodictableXray()  { }
-
-
-        boost::shared_ptr<ScatteringFactorTable> create() const
+        ScatteringFactorTablePtr create() const
         {
-            boost::shared_ptr<ScatteringFactorTable> rv(
-                    new SFTperiodictableXray());
+            ScatteringFactorTablePtr rv(new SFTperiodictableXray());
             return rv;
         }
 
 
-        boost::shared_ptr<ScatteringFactorTable> clone() const
+        ScatteringFactorTablePtr clone() const
         {
-            boost::shared_ptr<ScatteringFactorTable> rv(
-                    new SFTperiodictableXray(*this));
+            ScatteringFactorTablePtr rv(new SFTperiodictableXray(*this));
             return rv;
         }
-
-        // methods
 
         const string& type() const
         {
@@ -95,6 +88,7 @@ class SFTperiodictableXray : public ScatteringFactorTable
             return rv;
         }
 
+        // own methods
 
         const string& radiationType() const
         {
@@ -132,27 +126,21 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
 {
     public:
 
-        // constructors
+        // HasClassRegistry methods
 
-        SFTperiodictableNeutron()  { }
-
-
-        boost::shared_ptr<ScatteringFactorTable> create() const
+        ScatteringFactorTablePtr create() const
         {
-            boost::shared_ptr<ScatteringFactorTable> rv(
-                    new SFTperiodictableNeutron());
+            ScatteringFactorTablePtr rv(new SFTperiodictableNeutron());
             return rv;
         }
 
 
-        boost::shared_ptr<ScatteringFactorTable> clone() const
+        ScatteringFactorTablePtr clone() const
         {
-            boost::shared_ptr<ScatteringFactorTable> rv(
-                    new SFTperiodictableNeutron(*this));
+            ScatteringFactorTablePtr rv(new SFTperiodictableNeutron(*this));
             return rv;
         }
 
-        // methods
 
         const string& type() const
         {
@@ -160,6 +148,7 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
             return rv;
         }
 
+        // own methods
 
         const string& radiationType() const
         {
@@ -193,13 +182,13 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
 // Registration --------------------------------------------------------------
 
 bool reg_SFTperiodictableXray = (
-        registerScatteringFactorTable(SFTperiodictableXray()) &&
-        aliasScatteringFactorTable("SFTperiodictableXray", "X")
+        SFTperiodictableXray().registerThisType() &&
+        ScatteringFactorTable::aliasType("SFTperiodictableXray", "X")
         );
 
 bool reg_SFTperiodictableNeutron = (
-        registerScatteringFactorTable(SFTperiodictableNeutron()) &&
-        aliasScatteringFactorTable("SFTperiodictableNeutron", "N")
+        SFTperiodictableNeutron().registerThisType() &&
+        ScatteringFactorTable::aliasType("SFTperiodictableNeutron", "N")
         );
 
 }   // namespace srreal

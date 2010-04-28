@@ -24,25 +24,17 @@
 #ifndef SCATTERINGFACTORTABLE_HPP_INCLUDED
 #define SCATTERINGFACTORTABLE_HPP_INCLUDED
 
-#include <string>
-#include <map>
-#include <set>
-#include <boost/shared_ptr.hpp>
+#include <diffpy/HasClassRegistry.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class ScatteringFactorTable
+class ScatteringFactorTable :
+    public diffpy::HasClassRegistry<ScatteringFactorTable>
 {
     public:
 
-        // constructors
-        virtual boost::shared_ptr<ScatteringFactorTable> create() const = 0;
-        virtual boost::shared_ptr<ScatteringFactorTable> clone() const = 0;
-        ~ScatteringFactorTable()  { }
-
         // methods
-        virtual const std::string& type() const = 0;
         virtual const std::string& radiationType() const = 0;
         const double& lookup(const std::string& smbl) const;
         void setCustom(const std::string& smbl, double value);
@@ -55,33 +47,25 @@ class ScatteringFactorTable
         mutable std::map<std::string,double> mtable;
 };
 
+typedef ScatteringFactorTable::SharedPtr ScatteringFactorTablePtr;
 
 class ScatteringFactorTableOwner
 {
     public:
 
         // access and configuration of scattering factors
-        void setScatteringFactorTable(const ScatteringFactorTable&);
-        void setScatteringFactorTable(const std::string& tp);
-        ScatteringFactorTable& getScatteringFactorTable();
-        const ScatteringFactorTable& getScatteringFactorTable() const;
+        void setScatteringFactorTable(ScatteringFactorTablePtr);
+        void setScatteringFactorTableByType(const std::string& tp);
+        ScatteringFactorTablePtr getScatteringFactorTable();
+        const ScatteringFactorTablePtr getScatteringFactorTable() const;
         const std::string& getRadiationType() const;
 
 
     private:
 
         // data
-        boost::shared_ptr<ScatteringFactorTable> msftable;
+        ScatteringFactorTablePtr msftable;
 };
-
-
-// Factory functions for Scattering Factor Tables ----------------------------
-
-boost::shared_ptr<ScatteringFactorTable>
-createScatteringFactorTable(const std::string& tp);
-bool registerScatteringFactorTable(const ScatteringFactorTable&);
-bool aliasScatteringFactorTable(const std::string& tp, const std::string& al);
-std::set<std::string> getScatteringFactorTableTypes();
 
 }   // namespace srreal
 }   // namespace diffpy

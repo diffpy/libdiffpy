@@ -19,10 +19,13 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
-#include <diffpy/ClassRegistry.hpp>
+#include <diffpy/HasClassRegistry.ipp>
 
 using namespace std;
-using diffpy::ClassRegistry;
+using diffpy::srreal::ScatteringFactorTable;
+
+// Unique instantiation of the template registry base class.
+template class HasClassRegistry<ScatteringFactorTable>;
 
 namespace diffpy {
 namespace srreal {
@@ -66,65 +69,39 @@ void ScatteringFactorTable::resetAll()
 // class ScatteringFactorTableOwner ------------------------------------------
 
 void ScatteringFactorTableOwner::setScatteringFactorTable(
-        const ScatteringFactorTable& sft)
+        ScatteringFactorTablePtr sft)
 {
-    if (msftable.get() == &sft)   return;
-    msftable = sft.clone();
+    msftable = sft;
 }
 
 
-void ScatteringFactorTableOwner::setScatteringFactorTable(const string& tp)
+void ScatteringFactorTableOwner::setScatteringFactorTableByType(
+        const string& tp)
 {
-    msftable = createScatteringFactorTable(tp);
+    msftable = ScatteringFactorTable::createByType(tp);
 }
 
 
-ScatteringFactorTable&
+ScatteringFactorTablePtr
 ScatteringFactorTableOwner::getScatteringFactorTable()
 {
     assert(msftable.get());
-    return *msftable;
+    return msftable;
 }
 
 
-const ScatteringFactorTable&
+const ScatteringFactorTablePtr
 ScatteringFactorTableOwner::getScatteringFactorTable() const
 {
     assert(msftable.get());
-    return *msftable;
+    return msftable;
 }
 
 
 const string& ScatteringFactorTableOwner::getRadiationType() const
 {
-    const string& tp = this->getScatteringFactorTable().radiationType();
+    const string& tp = this->getScatteringFactorTable()->radiationType();
     return tp;
-}
-
-// Factory Functions ---------------------------------------------------------
-
-boost::shared_ptr<ScatteringFactorTable>
-createScatteringFactorTable(const string& tp)
-{
-    return ClassRegistry<ScatteringFactorTable>::create(tp);
-}
-
-
-bool registerScatteringFactorTable(const ScatteringFactorTable& ref)
-{
-    return ClassRegistry<ScatteringFactorTable>::add(ref);
-}
-
-
-bool aliasScatteringFactorTable(const string& tp, const string& al)
-{
-    return ClassRegistry<ScatteringFactorTable>::alias(tp, al);
-}
-
-
-set<string> getScatteringFactorTableTypes()
-{
-    return ClassRegistry<ScatteringFactorTable>::getTypes();
 }
 
 }   // namespace srreal

@@ -19,6 +19,7 @@
 *
 *****************************************************************************/
 
+#include <typeinfo>
 #include <stdexcept>
 #include <memory>
 #include <cxxtest/TestSuite.h>
@@ -35,29 +36,34 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
     private:
 
         static const double mtol = 1.0e-4;
-        boost::shared_ptr<ScatteringFactorTable> sftb;
+        ScatteringFactorTablePtr sftb;
 
     public:
 
         void test_factory()
         {
-            typedef boost::shared_ptr<ScatteringFactorTable> PSFT;
-            TS_ASSERT_THROWS(createScatteringFactorTable("invalid"),
+            ScatteringFactorTablePtr sfx0, sfx1, sfn0, sfn1;
+            TS_ASSERT_THROWS(ScatteringFactorTable::createByType("invalid"),
                     invalid_argument);
-            PSFT sfx0 = createScatteringFactorTable("SFTperiodictableXray");
-            PSFT sfx1 = createScatteringFactorTable("X");
+            sfx0 = ScatteringFactorTable::createByType("SFTperiodictableXray");
+            sfx1 = ScatteringFactorTable::createByType("X");
             TS_ASSERT(sfx0.get());
+            TS_ASSERT(sfx1.get());
             TS_ASSERT_EQUALS(sfx0->type(), sfx1->type());
-            PSFT sfn0 = createScatteringFactorTable("SFTperiodictableNeutron");
-            PSFT sfn1 = createScatteringFactorTable("N");
+            TS_ASSERT(typeid(*sfx0) == typeid(*sfx1));
+            sfn0 = ScatteringFactorTable::createByType(
+                    "SFTperiodictableNeutron");
+            sfn1 = ScatteringFactorTable::createByType("N");
             TS_ASSERT(sfn0.get());
+            TS_ASSERT(sfn1.get());
             TS_ASSERT_EQUALS(sfn0->type(), sfn1->type());
+            TS_ASSERT(typeid(*sfn0) == typeid(*sfn1));
         }
 
 
         void test_setCustom()
         {
-            sftb = createScatteringFactorTable("X");
+            sftb = ScatteringFactorTable::createByType("X");
             TS_ASSERT_EQUALS(6.0, sftb->lookup("C"));
             sftb->setCustom("C", 6.3);
             TS_ASSERT_THROWS(sftb->lookup("Ccustom"), invalid_argument);
@@ -74,7 +80,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
 
         void test_periodictableXray()
         {
-            sftb = createScatteringFactorTable("X");
+            sftb = ScatteringFactorTable::createByType("X");
             TS_ASSERT_EQUALS(1.0, sftb->lookup("H"));
             TS_ASSERT_EQUALS(8.0, sftb->lookup("O"));
             TS_ASSERT_EQUALS(74.0, sftb->lookup("W"));
@@ -84,7 +90,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
 
         void test_periodictableNeutron()
         {
-            sftb = createScatteringFactorTable("N");
+            sftb = ScatteringFactorTable::createByType("N");
             TS_ASSERT_DELTA(3.63, sftb->lookup("Na"), mtol);
             TS_ASSERT_DELTA(-3.37, sftb->lookup("Ti"), mtol);
             TS_ASSERT_DELTA(5.805, sftb->lookup("O"), mtol);
