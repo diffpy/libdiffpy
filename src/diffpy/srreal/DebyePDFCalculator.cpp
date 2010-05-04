@@ -39,17 +39,19 @@ using diffpy::mathutils::eps_gt;
 namespace diffpy {
 namespace srreal {
 
+const double DEFAULT_DEBYEPDFCALCULATOR_QMAX = 25.0;
+
 // Constructor ---------------------------------------------------------------
 
 DebyePDFCalculator::DebyePDFCalculator()
 {
     // default configuration
     this->setScatteringFactorTableByType("SFTperiodictableXray");
-    this->setRstep(0.01);
+    this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
-    this->setMaxExtension(10.0);
+    this->setMaxExtension(DEFAULT_PDFCALCULATOR_MAXEXTENSION);
     this->setOptimumQstep();
-    this->setQmax(25.0);
+    this->setQmax(DEFAULT_DEBYEPDFCALCULATOR_QMAX);
     // attributes
     this->registerDoubleAttribute("qmin", this,
             &DebyePDFCalculator::getQmin, &DebyePDFCalculator::setQmin);

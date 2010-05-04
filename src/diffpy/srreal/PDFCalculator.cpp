@@ -69,10 +69,10 @@ PDFCalculator::PDFCalculator()
     this->setBaselineByType("linear");
     this->setScatteringFactorTableByType("SFTperiodictableXray");
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
-    this->setRstep(0.01);
+    this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
     this->setQmin(0.0);
     this->setQmax(0.0);
-    this->setMaxExtension(10.0);
+    this->setMaxExtension(DEFAULT_PDFCALCULATOR_MAXEXTENSION);
     // envelopes
     this->addEnvelopeByType("scale");
     this->addEnvelopeByType("qresolution");
@@ -274,9 +274,10 @@ const double& PDFCalculator::getRstep() const
 }
 
 
-void PDFCalculator::setMaxExtension(double maxext)
+void PDFCalculator::setMaxExtension(double maxextension)
 {
-    mmaxextension = max(0.0, maxext);
+    ensureNonNegative("maxextension", maxextension);
+    mmaxextension = maxextension;
 }
 
 
