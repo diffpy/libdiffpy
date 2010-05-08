@@ -29,6 +29,7 @@
 
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
+#include <diffpy/srreal/PairQuantity.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -47,6 +48,38 @@ class PDFEnvelope :
 
 
 typedef PDFEnvelope::SharedPtr PDFEnvelopePtr;
+
+
+/// @class PDFEnvelopeOwner
+/// @brief storage of one or more PDFEnvelope functions and their
+/// application to unscaled x, y arrays
+
+class PDFEnvelopeOwner
+{
+    public:
+
+        // application on (x, y) data
+        QuantityType applyEnvelopes(const QuantityType& x, const QuantityType& y) const;
+
+        // access and configuration of PDF envelope functions
+        // configuration of envelopes
+        void addEnvelope(PDFEnvelopePtr);
+        void addEnvelopeByType(const std::string& tp);
+        void popEnvelope(PDFEnvelopePtr);
+        void popEnvelopeByType(const std::string& tp);
+        const PDFEnvelopePtr getEnvelopeByType(const std::string& tp) const;
+        PDFEnvelopePtr getEnvelopeByType(const std::string& tp);
+        std::set<std::string> usedEnvelopeTypes() const;
+        void clearEnvelopes();
+
+    private:
+
+        // types
+        typedef std::map<std::string, PDFEnvelopePtr> EnvelopeStorage;
+
+        // data
+        EnvelopeStorage menvelope;
+};
 
 }   // namespace srreal
 }   // namespace diffpy
