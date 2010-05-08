@@ -12,7 +12,7 @@
 *
 ******************************************************************************
 *
-* class PDFCalculator -- brute force PDF calculator
+* class PDFCalculator -- real space PDF calculator
 *
 * $Id$
 *
@@ -34,9 +34,11 @@
 namespace diffpy {
 namespace srreal {
 
-class PDFCalculator : public PairQuantity,
+class PDFCalculator :
+    public PairQuantity,
     public PeakWidthModelOwner,
-    public ScatteringFactorTableOwner
+    public ScatteringFactorTableOwner,
+    public PDFEnvelopeOwner
 {
     public:
 
@@ -95,23 +97,7 @@ class PDFCalculator : public PairQuantity,
         PDFBaselinePtr getBaseline();
         const PDFBaselinePtr getBaseline() const;
 
-        // PDF envelope functions
-        // application on an array
-        QuantityType applyEnvelopes(const QuantityType& x, const QuantityType& y) const;
-        // configuration of envelopes
-        void addEnvelope(PDFEnvelopePtr);
-        void addEnvelopeByType(const std::string& tp);
-        void popEnvelope(PDFEnvelopePtr);
-        void popEnvelopeByType(const std::string& tp);
-        const PDFEnvelopePtr getEnvelopeByType(const std::string& tp) const;
-        PDFEnvelopePtr getEnvelopeByType(const std::string& tp);
-        std::set<std::string> usedEnvelopeTypes() const;
-        void clearEnvelopes();
-
     protected:
-
-        // types
-        typedef std::map<std::string, PDFEnvelopePtr> EnvelopeStorage;
 
         // Attributes overload to direct visitors around data structures
         virtual void accept(diffpy::BaseAttributesVisitor& v);
@@ -170,7 +156,6 @@ class PDFCalculator : public PairQuantity,
         double mmaxextension;
         PeakProfilePtr mpeakprofile;
         PDFBaselinePtr mbaseline;
-        EnvelopeStorage menvelope;
         struct {
             std::vector<double> sfsite;
             double sfaverage;
