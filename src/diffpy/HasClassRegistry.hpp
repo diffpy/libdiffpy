@@ -26,8 +26,8 @@
 *
 *****************************************************************************/
 
-#ifndef CLASSREGISTRY1_HPP_INCLUDED
-#define CLASSREGISTRY1_HPP_INCLUDED
+#ifndef HASCLASSREGISTRY_HPP_INCLUDED
+#define HASCLASSREGISTRY_HPP_INCLUDED
 
 #include <string>
 #include <sstream>
@@ -80,4 +80,4 @@ class HasClassRegistry
 
 }   // namespace diffpy
 
-#endif  // CLASSREGISTRY1_HPP_INCLUDED
+#endif  // HASCLASSREGISTRY_HPP_INCLUDED
