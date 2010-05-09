@@ -21,21 +21,18 @@
 #ifndef PAIRQUANTITY_HPP_INCLUDED
 #define PAIRQUANTITY_HPP_INCLUDED
 
-#include <vector>
-
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
+#include <diffpy/srreal/PairQuantityUtils.hpp>
 #include <diffpy/Attributes.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 class BaseBondGenerator;
-
-typedef std::vector<double> QuantityType;
 
 class PairQuantity : public diffpy::Attributes
 {
