@@ -80,7 +80,7 @@ QuantityType DebyePDFCalculator::getPDF() const
 {
     // FIXME - check this especially the coefficient 2
     int nfromdr = 2 * M_PI / this->getRstep() / this->getQstep();
-    int nrequired = max(this->totalQPoints(), nfromdr);
+    int nrequired = max(this->countQgridPoints(), nfromdr);
     int nlog2 = int(floor(log2(nrequired))) + 1;
     int padlen = int(pow(2, nlog2));
     // complex valarray needs to have twice as many elements

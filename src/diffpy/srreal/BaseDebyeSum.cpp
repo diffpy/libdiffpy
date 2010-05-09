@@ -53,9 +53,6 @@ BaseDebyeSum::BaseDebyeSum()
 {
     // default configuration
     this->setPeakWidthModelByType("jeong");
-    this->setQmin(0.0);
-    this->setQmax(10.0);
-    this->setQstep(0.05);
     this->setDebyePrecision(DEFAULT_DEBYE_PRECISION);
     // attributes
     this->registerDoubleAttribute("debyeprecision", this,
@@ -71,8 +68,8 @@ QuantityType BaseDebyeSum::getF() const
 {
     QuantityType rv = mvalue;
     const double& totocc = mstructure_cache.totaloccupancy;
-    const int npts = this->totalQPoints();
-    for (int kq = this->qminPoints(); kq < npts; ++kq)
+    const int npts = this->countQgridPoints();
+    for (int kq = this->countQminPoints(); kq < npts; ++kq)
     {
         double sfavg = this->sfAverageAtkQ(kq);
         double fscale = (sfavg * totocc) == 0 ? 0.0 :
@@ -80,59 +77,6 @@ QuantityType BaseDebyeSum::getF() const
         rv[kq] *= fscale;
     }
     return rv;
-}
-
-
-QuantityType BaseDebyeSum::getQgrid() const
-{
-    const int npts = this->totalQPoints();
-    QuantityType rv;
-    rv.reserve(npts);
-    for (int kq = 0; kq < npts; ++kq)  rv.push_back(kq * this->getQstep());
-    return rv;
-}
-
-// Q-range configuration
-
-void BaseDebyeSum::setQmin(double qmin)
-{
-    ensureNonNegative("Qmin", qmin);
-    mqmin = qmin;
-    this->cacheQpointsData();
-}
-
-
-const double& BaseDebyeSum::getQmin() const
-{
-    return mqmin;
-}
-
-
-void BaseDebyeSum::setQmax(double qmax)
-{
-    ensureNonNegative("Qmax", qmax);
-    mqmax = qmax;
-    this->cacheQpointsData();
-}
-
-
-const double& BaseDebyeSum::getQmax() const
-{
-    return mqmax;
-}
-
-
-void BaseDebyeSum::setQstep(double qstep)
-{
-    ensureEpsilonPositive("Qstep", qstep);
-    mqstep = qstep;
-    this->cacheQpointsData();
-}
-
-
-const double& BaseDebyeSum::getQstep() const
-{
-    return mqstep;
 }
 
 
@@ -153,9 +97,8 @@ const double& BaseDebyeSum::getDebyePrecision() const
 
 void BaseDebyeSum::resetValue()
 {
-    this->cacheQpointsData();
     this->cacheStructureData();
-    this->resizeValue(this->totalQPoints());
+    this->resizeValue(this->countQgridPoints());
     this->PairQuantity::resetValue();
 }
 
@@ -169,7 +112,8 @@ void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds,
     const double fwhm = this->getPeakWidthModel()->calculate(bnds);
     const double fwhmtosigma = 1.0 / (2 * sqrt(2 * M_LN2));
     const double dwsigma = fwhmtosigma * fwhm;
-    for (int kq = this->qminPoints(); kq < this->totalQPoints(); ++kq)
+    const int nqpts = this->countQgridPoints();
+    for (int kq = this->countQminPoints(); kq < nqpts; ++kq)
     {
         const double q = kq * this->getQstep();
         const double dwscale = exp(-0.5 * pow(dwsigma * q, 2));
@@ -187,32 +131,7 @@ double BaseDebyeSum::sfSiteAtQ(int siteidx, const double& q) const
     return 1.0;
 }
 
-
-int BaseDebyeSum::qminPoints() const
-{
-    return mqpoints_cache.qminpoints;
-}
-
-
-int BaseDebyeSum::totalQPoints() const
-{
-    return mqpoints_cache.totalpoints;
-}
-
 // Private Methods -----------------------------------------------------------
-
-void BaseDebyeSum::cacheQpointsData()
-{
-    const double& dq = this->getQstep();
-    mqpoints_cache.qminpoints = int(this->getQmin() / dq);
-    mqpoints_cache.totalpoints = int(ceil(this->getQmax() / dq));
-    // include point for qmax when it is a close multiple of dq
-    if (eps_eq(this->getQmax(), mqpoints_cache.totalpoints * dq))
-    {
-        mqpoints_cache.totalpoints += 1;
-    }
-}
-
 
 double BaseDebyeSum::sfSiteAtkQ(int siteidx, int kq) const
 {
@@ -234,7 +153,8 @@ double BaseDebyeSum::sfAverageAtkQ(int kq) const
 void BaseDebyeSum::cacheStructureData()
 {
     int cntsites = mstructure->countSites();
-    QuantityType zeros(this->totalQPoints(), 0.0);
+    const int nqpts = this->countQgridPoints();
+    QuantityType zeros(nqpts, 0.0);
     map<string,int> atomtypeidx;
     // sfsiteatkq
     mstructure_cache.sfsiteatkq.clear();
@@ -258,7 +178,7 @@ void BaseDebyeSum::cacheStructureData()
         boost::shared_ptr<QuantityType> pa(new QuantityType(zeros));
         mstructure_cache.sfsiteatkq.push_back(pa);
         QuantityType& sfarray = *(mstructure_cache.sfsiteatkq.back());
-        for (int kq = this->qminPoints(); kq < this->totalQPoints(); ++kq)
+        for (int kq = this->countQminPoints(); kq < nqpts; ++kq)
         {
             double q = this->getQstep() * kq;
             sfarray[kq] = this->sfSiteAtQ(siteidx, q);
@@ -272,7 +192,7 @@ void BaseDebyeSum::cacheStructureData()
     {
         QuantityType& sfarray = *(mstructure_cache.sfsiteatkq[siteidx]);
         const int multipl = mstructure->siteMultiplicity(siteidx);
-        for (int kq = this->qminPoints(); kq < this->totalQPoints(); ++kq)
+        for (int kq = this->countQminPoints(); kq < nqpts; ++kq)
         {
             sfak[kq] += sfarray[kq] * multipl;
         }

@@ -52,12 +52,15 @@
 
 #include <diffpy/srreal/BaseDebyeSum.hpp>
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
+#include <diffpy/srreal/PDFEnvelope.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class DebyePDFCalculator : public BaseDebyeSum,
-    public ScatteringFactorTableOwner
+class DebyePDFCalculator :
+    public BaseDebyeSum,
+    public ScatteringFactorTableOwner,
+    public PDFEnvelopeOwner
 {
     public:
 
@@ -67,7 +70,8 @@ class DebyePDFCalculator : public BaseDebyeSum,
         // results
         /// PDF on the specified r-grid
         QuantityType getPDF() const;
-        QuantityType getRgrid() const;
+        QuantityType getRDF() const;
+        QuantityType getRDFperR() const;
 
         // Q-range configuration
         virtual void setQstep(double);
@@ -75,6 +79,7 @@ class DebyePDFCalculator : public BaseDebyeSum,
         bool isOptimumQstep() const;
 
         // R-range configuration
+        QuantityType getRgrid() const;
         virtual void setRmin(double);
         virtual void setRmax(double);
         void setRstep(double);

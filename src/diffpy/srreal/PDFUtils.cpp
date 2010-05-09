@@ -27,8 +27,10 @@
 
 #include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/validators.hpp>
 
 using namespace std;
+using namespace diffpy::validators;
 using diffpy::mathutils::eps_eq;
 
 namespace diffpy {
@@ -129,6 +131,88 @@ void bandPassFilterCValarray(valarray<double>& ycpa, double dr,
         throw invalid_argument(emsgft);
     }
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// class HasQgrid
+//////////////////////////////////////////////////////////////////////////////
+
+// Constructor ---------------------------------------------------------------
+
+HasQgrid::HasQgrid()
+{
+    this->setQmin(0.0);
+    this->setQmax(DEFAULT_QGRID_QMAX);
+    this->setQstep(DEFAULT_QGRID_QSTEP);
+}
+
+// Public Methods ------------------------------------------------------------
+
+QuantityType HasQgrid::getQgrid() const
+{
+    const int npts = this->countQgridPoints();
+    QuantityType rv;
+    rv.reserve(npts);
+    for (int kq = 0; kq < npts; ++kq)  rv.push_back(kq * this->getQstep());
+    return rv;
+}
+
+
+int HasQgrid::countQminPoints() const
+{
+    int rv = int(this->getQmin() / this->getQstep());
+    return rv;
+}
+
+
+int HasQgrid::countQgridPoints() const
+{
+    const double dq = this->getQstep();
+    int rv = int(ceil(this->getQmax() / dq));
+    // include point for qmax when it is a close multiple of dq
+    if (eps_eq(this->getQmax(), rv * dq))  rv += 1;
+    return rv;
+}
+
+
+void HasQgrid::setQmin(double qmin)
+{
+    ensureNonNegative("Qmin", qmin);
+    mqmin = qmin;
+}
+
+
+const double& HasQgrid::getQmin() const
+{
+    return mqmin;
+}
+
+
+void HasQgrid::setQmax(double qmax)
+{
+    ensureNonNegative("Qmax", qmax);
+    mqmax = qmax;
+}
+
+
+const double& HasQgrid::getQmax() const
+{
+    return mqmax;
+}
+
+
+void HasQgrid::setQstep(double qstep)
+{
+    ensureEpsilonPositive("Qstep", qstep);
+    mqstep = qstep;
+}
+
+
+const double& HasQgrid::getQstep() const
+{
+    return mqstep;
+}
+
+
 
 }   // namespace srreal
 }   // namespace diffpy
