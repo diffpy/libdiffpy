@@ -78,7 +78,7 @@ class StructureAdapter
 
         /// this method allows custom special configuration for a concrete 
         /// pair of StructureAdapter and PairQuantity objects.
-        virtual void customPQConfig(PairQuantity& pq) const  { }
+        virtual void customPQConfig(PairQuantity* pq) const  { }
 };
 
 // Routines ------------------------------------------------------------------

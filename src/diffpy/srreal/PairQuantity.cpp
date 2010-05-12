@@ -49,7 +49,7 @@ const QuantityType& PairQuantity::eval(const StructureAdapter& stru)
 {
     mstructure = &stru;
     mcountsites = mstructure->countSites();
-    mstructure->customPQConfig(*this);
+    mstructure->customPQConfig(this);
     mevaluator->updateValue(*this);
     mstructure = NULL;
     return this->value();

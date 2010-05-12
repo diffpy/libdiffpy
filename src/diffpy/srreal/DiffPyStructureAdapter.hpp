@@ -55,7 +55,7 @@ class DiffPyStructureAdapter : public StructureAdapter
         virtual bool siteAnisotropy(int idx) const;
         virtual const R3::Matrix& siteCartesianUij(int idx) const;
         virtual const std::string& siteAtomType(int idx) const;
-        virtual void customPQConfig(PairQuantity& pq) const;
+        virtual void customPQConfig(PairQuantity* pq) const;
 
         // methods - own
         const Lattice& getLattice() const;
@@ -64,7 +64,7 @@ class DiffPyStructureAdapter : public StructureAdapter
 
         // methods
         void fetchPythonData();
-        void configurePDFCalculator(PDFCalculator& pdfc) const;
+        void configurePDFCalculator(PDFCalculator* pdfc) const;
         bool isPeriodic() const;
 
     private:

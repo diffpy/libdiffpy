@@ -56,12 +56,10 @@ PDFCalculator::PDFCalculator()
     mstructure_cache.sfaverage = 0.0;
     mstructure_cache.totaloccupancy = 0.0;
     // initialize mrlimits_cache
-    mrlimits_cache.extendedrmin = 0.0;
-    mrlimits_cache.extendedrmax = 0.0;
-    mrlimits_cache.rippleslopoints = 0;
-    mrlimits_cache.rcalclow = 0.0;
-    mrlimits_cache.rcalchigh = 0.0;
-    mrlimits_cache.calclopoints = 0;
+    mrlimits_cache.extendedrminsteps = 0;
+    mrlimits_cache.extendedrmaxsteps = 0;
+    mrlimits_cache.rcalclosteps = 0;
+    mrlimits_cache.rcalchisteps = 0;
     // default configuration
     this->setPeakWidthModelByType("jeong");
     this->setPeakProfileByType("gaussian");
@@ -81,6 +79,8 @@ PDFCalculator::PDFCalculator()
             &PDFCalculator::getQmin, &PDFCalculator::setQmin);
     this->registerDoubleAttribute("qmax", this,
             &PDFCalculator::getQmax, &PDFCalculator::setQmax);
+    this->registerDoubleAttribute("qstep", this,
+            &PDFCalculator::getQstep);
     this->registerDoubleAttribute("rmin", this,
             &PDFCalculator::getRmin, &PDFCalculator::setRmin);
     this->registerDoubleAttribute("rmax", this,
@@ -123,14 +123,10 @@ QuantityType PDFCalculator::getRDFperR() const
 }
 
 
-QuantityType PDFCalculator::getRgrid() const
+QuantityType PDFCalculator::getF() const
 {
-    QuantityType rv(this->rgridPoints());
-    QuantityType::iterator ri = rv.begin();
-    for (int i = 0; ri != rv.end(); ++i, ++ri)
-    {
-        *ri = this->getRmin() + i * this->getRstep();
-    }
+    // FIXME
+    QuantityType rv;
     return rv;
 }
 
@@ -149,17 +145,15 @@ QuantityType PDFCalculator::getExtendedPDF() const
 
 QuantityType PDFCalculator::getExtendedRDF() const
 {
-    QuantityType rdf(this->extendedPoints());
+    QuantityType rdf(this->countExtendedPoints());
     const double& totocc = mstructure_cache.totaloccupancy;
     double sfavg = this->sfAverage();
     double rdf_scale = (totocc * sfavg == 0.0) ? 0.0 :
         1.0 / (totocc * sfavg * sfavg);
     QuantityType::iterator iirdf = rdf.begin();
     QuantityType::const_iterator iival, iival_last;
-    iival = this->value().begin() +
-        this->calcloPoints() - this->ripplesloPoints();
-    iival_last = this->value().end() - this->calchiPoints()
-        + this->rippleshiPoints();
+    iival = this->value().begin() + this->extendedRminSteps();
+    iival_last = this->value().begin() + this->extendedRmaxSteps();
     assert(iival >= this->value().begin());
     assert(iival_last <= this->value().end());
     assert(rdf.size() == size_t(iival_last - iival));
@@ -188,16 +182,23 @@ QuantityType PDFCalculator::getExtendedRDFperR() const
 
 QuantityType PDFCalculator::getExtendedRgrid() const
 {
-    QuantityType rv(this->extendedPoints());
-    QuantityType::iterator ri = rv.begin();
+    QuantityType rv;
+    rv.reserve(this->countExtendedPoints());
     // make sure exact value of rmin will be in the extended grid
-    for (int i = -1 * this->ripplesloPoints(); ri != rv.end(); ++i, ++ri)
+    for (int i = this->extendedRminSteps(); i < this->extendedRmaxSteps(); ++i)
     {
-        *ri = this->getRmin() + i * this->getRstep();
+        rv.push_back(i * this->getRstep());
     }
     assert(rv.empty() || !eps_lt(rv.front(), this->getExtendedRmin()));
     assert(rv.empty() || !eps_gt(rv.back(), this->getExtendedRmax()));
     return rv;
+}
+
+// Q-range methods
+
+QuantityType PDFCalculator::getQgrid() const
+{
+    return pdfutils_getQgrid(this);
 }
 
 // Q-range configuration
@@ -228,6 +229,15 @@ const double& PDFCalculator::getQmax() const
 }
 
 
+const double& PDFCalculator::getQstep() const
+{
+    // FIXME
+    static double rv;
+    rv = 0.05;
+    return rv;
+}
+
+
 QuantityType PDFCalculator::applyBandPassFilter(const QuantityType& a) const
 {
     // constants and abbreviations
@@ -244,6 +254,12 @@ QuantityType PDFCalculator::applyBandPassFilter(const QuantityType& a) const
     return rv;
 }
 
+// R-range methods
+
+QuantityType PDFCalculator::getRgrid() const
+{
+    return pdfutils_getRgrid(this);
+}
 
 // R-range configuration
 
@@ -287,15 +303,17 @@ const double& PDFCalculator::getMaxExtension() const
 }
 
 
-const double& PDFCalculator::getExtendedRmin() const
+double PDFCalculator::getExtendedRmin() const
 {
-    return mrlimits_cache.extendedrmin;
+    double rv = this->extendedRminSteps() * this->getRstep();
+    return rv;
 }
 
 
-const double& PDFCalculator::getExtendedRmax() const
+double PDFCalculator::getExtendedRmax() const
 {
-    return mrlimits_cache.extendedrmax;
+    double rv = this->extendedRmaxSteps() * this->getRstep();
+    return rv;
 }
 
 // PDF peak profile configuration
@@ -424,7 +442,7 @@ void PDFCalculator::resetValue()
         PDFBaseline& bl = *(this->getBaseline());
         bl.setDoubleAttr("slope", -4 * M_PI * numdensity);
     }
-    this->resizeValue(this->calcPoints());
+    this->resizeValue(this->countCalcPoints());
     this->PairQuantity::resetValue();
 }
 
@@ -447,12 +465,11 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
     double xlo = dist + pkf.xboundlo(fwhm);
     double xhi = dist + pkf.xboundhi(fwhm);
     int i = max(0, this->calcIndex(xlo));
-    int ilast = min(this->calcPoints(), this->calcIndex(xhi) + 1);
-    double x0 = this->rcalclo();
+    int ilast = min(this->countCalcPoints(), this->calcIndex(xhi) + 1);
     assert(ilast <= int(mvalue.size()));
     for (; i < ilast; ++i)
     {
-        double x = x0 + i * this->getRstep() - dist;
+        double x = (this->rcalcloSteps() + i) * this->getRstep() - dist;
         double y = pkf.yvalue(x, fwhm);
         mvalue[i] += peakscale * y;
     }
@@ -460,15 +477,17 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
 
 // calculation specific
 
-const double& PDFCalculator::rcalclo() const
+const double PDFCalculator::rcalclo() const
 {
-    return mrlimits_cache.rcalclow;
+    double rv = this->rcalcloSteps() * this->getRstep();
+    return rv;
 }
 
 
-const double& PDFCalculator::rcalchi() const
+const double PDFCalculator::rcalchi() const
 {
-    return mrlimits_cache.rcalchigh;
+    double rv = this->rcalchiSteps() * this->getRstep();
+    return rv;
 }
 
 
@@ -496,75 +515,60 @@ double PDFCalculator::extFromPeakTails() const
 }
 
 
-int PDFCalculator::calcloPoints() const
+int PDFCalculator::rcalcloSteps() const
 {
-    return mrlimits_cache.calclopoints;
+    return mrlimits_cache.rcalclosteps;
 }
 
 
-int PDFCalculator::calchiPoints() const
+int PDFCalculator::rcalchiSteps() const
 {
-    // evaluate all with respect to rmin
-    int npts;
-    npts = int(ceil((this->rcalchi() - this->getRmin()) / this->getRstep()));
-    npts -= this->rgridPoints();
-    return npts;
+    return mrlimits_cache.rcalchisteps;
 }
 
 
-int PDFCalculator::ripplesloPoints() const
+int PDFCalculator::extendedRminSteps() const
 {
-    return mrlimits_cache.rippleslopoints;
+    return mrlimits_cache.extendedrminsteps;
 }
 
 
-int PDFCalculator::rippleshiPoints() const
+int PDFCalculator::extendedRmaxSteps() const
 {
-    // evaluate all with respect to rmin
-    int npts = int(ceil((this->getExtendedRmax() - this->getRmin()) /
-                this->getRstep()));
-    npts -= this->rgridPoints();
-    return npts;
+    return mrlimits_cache.extendedrmaxsteps;
 }
 
 
-int PDFCalculator::rgridPoints() const
+int PDFCalculator::countExtendedPoints() const
 {
-    int npts;
-    npts = int(ceil((this->getRmax() - this->getRmin()) / this->getRstep()));
-    return npts;
+    int rv = this->extendedRmaxSteps() - this->extendedRminSteps();
+    return rv;
 }
 
 
-int PDFCalculator::extendedPoints() const
+int PDFCalculator::countCalcPoints() const
 {
-    int npts = this->ripplesloPoints() + this->rgridPoints() +
-        this->rippleshiPoints();
-    return npts;
-}
-
-
-int PDFCalculator::calcPoints() const
-{
-    int npts;
-    npts = this->calcloPoints() + this->rgridPoints() + this->calchiPoints();
-    return npts;
+    int rv = this->rcalchiSteps() - this->rcalcloSteps();
+    return rv;
 }
 
 
 int PDFCalculator::calcIndex(double r) const
 {
-    int npts;
-    npts = int(ceil((r - this->rcalclo()) / this->getRstep()));
-    return npts;
+    int rv = int(floor(r / this->getRstep())) - this->rcalcloSteps();
+    return rv;
 }
 
 
 void PDFCalculator::cutRipplePoints(QuantityType& y) const
 {
-    assert(this->rippleshiPoints() + this->ripplesloPoints() <= int(y.size()));
-    y.erase(y.end() - this->rippleshiPoints(), y.end());
-    y.erase(y.begin(), y.begin() + this->ripplesloPoints());
+    assert(int(y.size()) ==
+            this->extendedRmaxSteps() - this->extendedRminSteps());
+    int ncutlo = pdfutils_rminSteps(this) - this->extendedRminSteps();
+    int ncuthi = this->extendedRmaxSteps() - pdfutils_rmaxSteps(this);
+    assert(ncutlo + ncuthi <= int(y.size()));
+    y.erase(y.end() - ncuthi, y.end());
+    y.erase(y.begin(), y.begin() + ncutlo);
 }
 
 
@@ -621,19 +625,12 @@ void PDFCalculator::cacheRlimitsData()
     }
     // abbreviations
     const double& rmin = this->getRmin();
-    const double& rstep = this->getRstep();
-    const double nstepmax = floor(rmin / rstep);
-    // r-range extended by termination ripples:
-    int nstep;
-    nstep = int(min(ceil(ext_ripples / rstep), nstepmax));
-    mrlimits_cache.rippleslopoints = nstep;
-    mrlimits_cache.extendedrmin = rmin - nstep * rstep;
-    mrlimits_cache.extendedrmax = this->getRmax() + ext_ripples;
-    // complete calculation range, extended for both ripples and peak tails
-    nstep = int(min(ceil(ext_total / rstep), nstepmax));
-    mrlimits_cache.calclopoints = nstep;
-    mrlimits_cache.rcalclow = rmin - nstep * rstep;
-    mrlimits_cache.rcalchigh = this->getRmax() + ext_total;
+    const double& rmax = this->getRmax();
+    const double& dr = this->getRstep();
+    mrlimits_cache.extendedrminsteps = max(int((rmin - ext_ripples) / dr), 0);
+    mrlimits_cache.extendedrmaxsteps = int(ceil((rmax + ext_ripples) / dr));
+    mrlimits_cache.rcalclosteps = max(int((rmin - ext_total) / dr), 0);
+    mrlimits_cache.rcalchisteps = int(ceil((rmax + ext_total) / dr));
 }
 
 

@@ -53,6 +53,9 @@ BaseDebyeSum::BaseDebyeSum()
 {
     // default configuration
     this->setPeakWidthModelByType("jeong");
+    this->setQmin(0.0);
+    this->setQmax(DEFAULT_QGRID_QMAX);
+    this->setQstep(DEFAULT_QGRID_QSTEP);
     this->setDebyePrecision(DEFAULT_DEBYE_PRECISION);
     // attributes
     this->registerDoubleAttribute("debyeprecision", this,
@@ -68,8 +71,8 @@ QuantityType BaseDebyeSum::getF() const
 {
     QuantityType rv = mvalue;
     const double& totocc = mstructure_cache.totaloccupancy;
-    const int npts = this->countQgridPoints();
-    for (int kq = this->countQminPoints(); kq < npts; ++kq)
+    const int npts = pdfutils_qmaxSteps(this);
+    for (int kq = pdfutils_qminSteps(this); kq < npts; ++kq)
     {
         double sfavg = this->sfAverageAtkQ(kq);
         double fscale = (sfavg * totocc) == 0 ? 0.0 :
@@ -77,6 +80,53 @@ QuantityType BaseDebyeSum::getF() const
         rv[kq] *= fscale;
     }
     return rv;
+}
+
+// Q-range methods
+
+QuantityType BaseDebyeSum::getQgrid() const
+{
+    return pdfutils_getQgrid(this);
+}
+
+// Q-range configuration
+
+void BaseDebyeSum::setQmin(double qmin)
+{
+    ensureNonNegative("Qmin", qmin);
+    mqmin = qmin;
+}
+
+
+const double& BaseDebyeSum::getQmin() const
+{
+    return mqmin;
+}
+
+
+void BaseDebyeSum::setQmax(double qmax)
+{
+    ensureNonNegative("Qmax", qmax);
+    mqmax = qmax;
+}
+
+
+const double& BaseDebyeSum::getQmax() const
+{
+    return mqmax;
+}
+
+
+void BaseDebyeSum::setQstep(double qstep)
+{
+    ensureEpsilonPositive("Qstep", qstep);
+    mqstep = qstep;
+}
+
+
+const double& BaseDebyeSum::getQstep() const
+{
+    return mqstep;
 }
 
 
@@ -98,7 +148,7 @@ const double& BaseDebyeSum::getDebyePrecision() const
 void BaseDebyeSum::resetValue()
 {
     this->cacheStructureData();
-    this->resizeValue(this->countQgridPoints());
+    this->resizeValue(pdfutils_qmaxSteps(this));
     this->PairQuantity::resetValue();
 }
 
@@ -112,8 +162,8 @@ void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds,
     const double fwhm = this->getPeakWidthModel()->calculate(bnds);
     const double fwhmtosigma = 1.0 / (2 * sqrt(2 * M_LN2));
     const double dwsigma = fwhmtosigma * fwhm;
-    const int nqpts = this->countQgridPoints();
-    for (int kq = this->countQminPoints(); kq < nqpts; ++kq)
+    const int nqpts = pdfutils_qmaxSteps(this);
+    for (int kq = pdfutils_qminSteps(this); kq < nqpts; ++kq)
     {
         const double q = kq * this->getQstep();
         const double dwscale = exp(-0.5 * pow(dwsigma * q, 2));
@@ -153,7 +203,7 @@ double BaseDebyeSum::sfAverageAtkQ(int kq) const
 void BaseDebyeSum::cacheStructureData()
 {
     int cntsites = mstructure->countSites();
-    const int nqpts = this->countQgridPoints();
+    const int nqpts = pdfutils_qmaxSteps(this);
     QuantityType zeros(nqpts, 0.0);
     map<string,int> atomtypeidx;
     // sfsiteatkq
@@ -178,7 +228,7 @@ void BaseDebyeSum::cacheStructureData()
         boost::shared_ptr<QuantityType> pa(new QuantityType(zeros));
         mstructure_cache.sfsiteatkq.push_back(pa);
         QuantityType& sfarray = *(mstructure_cache.sfsiteatkq.back());
-        for (int kq = this->countQminPoints(); kq < nqpts; ++kq)
+        for (int kq = pdfutils_qminSteps(this); kq < nqpts; ++kq)
         {
             double q = this->getQstep() * kq;
             sfarray[kq] = this->sfSiteAtQ(siteidx, q);
@@ -192,7 +242,7 @@ void BaseDebyeSum::cacheStructureData()
     {
         QuantityType& sfarray = *(mstructure_cache.sfsiteatkq[siteidx]);
         const int multipl = mstructure->siteMultiplicity(siteidx);
-        for (int kq = this->countQminPoints(); kq < nqpts; ++kq)
+        for (int kq = pdfutils_qminSteps(this); kq < nqpts; ++kq)
         {
             sfak[kq] += sfarray[kq] * multipl;
         }

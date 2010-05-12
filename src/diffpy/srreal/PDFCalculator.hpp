@@ -49,7 +49,7 @@ class PDFCalculator :
         QuantityType getPDF() const;
         QuantityType getRDF() const;
         QuantityType getRDFperR() const;
-        QuantityType getRgrid() const;
+        QuantityType getF() const;
 
         /// PDF on an r-range extended for termination ripples
         QuantityType getExtendedPDF() const;
@@ -60,13 +60,19 @@ class PDFCalculator :
         /// r-grid extended for termination ripples
         QuantityType getExtendedRgrid() const;
 
+        // Q-range methods
+        QuantityType getQgrid() const;
         // Q-range configuration
         void setQmin(double);
         const double& getQmin() const;
         void setQmax(double);
         const double& getQmax() const;
+        const double& getQstep() const;
+
         QuantityType applyBandPassFilter(const QuantityType& a) const;
 
+        // R-range methods
+        QuantityType getRgrid() const;
         // R-range configuration
         virtual void setRmin(double);
         virtual void setRmax(double);
@@ -79,9 +85,9 @@ class PDFCalculator :
         /// termination ripples and peak tails
         const double& getMaxExtension() const;
         /// lower bound for the r-range extended for termination ripples
-        const double& getExtendedRmin() const;
+        double getExtendedRmin() const;
         /// upper bound of the r-range extended for termination ripples
-        const double& getExtendedRmax() const;
+        double getExtendedRmax() const;
 
         // PDF profile configuration
         void setPeakProfile(PeakProfilePtr);
@@ -112,32 +118,29 @@ class PDFCalculator :
 
         // methods - calculation specific
         /// complete lower bound extension of the calculated grid
-        const double& rcalclo() const;
+        const double rcalclo() const;
         /// complete upper bound extension of the calculated grid
-        const double& rcalchi() const;
+        const double rcalchi() const;
         /// r-range extension to allow propagation of termination ripples
         double extFromTerminationRipples() const;
         /// r-range extension to account for tails from out-of-range peaks
         double extFromPeakTails() const;
-        /// number of data points in the complete extension of the lower bound
-        int calcloPoints() const;
-        /// number of data points in the complete extension of the upper bound
-        int calchiPoints() const;
-        /// number of points in the lower extension due to termination ripples
-        int ripplesloPoints() const;
-        /// number of points in the upper extension due to termination ripples
-        int rippleshiPoints() const;
-        /// number of points within the user requested r-grid
-        int rgridPoints() const;
+        /// number of dr steps at rcalclo from 0
+        int rcalcloSteps() const;
+        /// number of dr steps at rhalchi from 0
+        int rcalchiSteps() const;
+        /// number of dr steps at lower extension due to termination ripples
+        int extendedRminSteps() const;
+        /// number of dr steps at upper extension due to termination ripples
+        int extendedRmaxSteps() const;
         /// number of points in the r-grid extended with termination ripples
-        int extendedPoints() const;
+        int countExtendedPoints() const;
         /// number of points in the complete calculated r-grid
-        int calcPoints() const;
+        int countCalcPoints() const;
         /// index of a nearby point in the complete calculated r-grid
         int calcIndex(double r) const;
-        /// remove ripplesloPoints from head and rippleshiPoints from tail
-        /// of a QuantityType array.  Used for reducing extended to result
-        /// arrays.
+        /// reduce extended grid to user-requested results grid
+        /// by cutting away the points for termination ripples
         void cutRipplePoints(QuantityType& y) const;
 
         // structure factors - fast lookup by site index
@@ -162,12 +165,10 @@ class PDFCalculator :
             double totaloccupancy;
         } mstructure_cache;
         struct {
-            double extendedrmin;
-            double extendedrmax;
-            int rippleslopoints;
-            double rcalclow;
-            double rcalchigh;
-            int calclopoints;
+            int extendedrminsteps;
+            int extendedrmaxsteps;
+            int rcalclosteps;
+            int rcalchisteps;
         } mrlimits_cache;
 
 };  // class PDFCalculator

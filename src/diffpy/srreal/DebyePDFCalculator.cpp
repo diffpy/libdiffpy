@@ -45,6 +45,8 @@ const double DEFAULT_DEBYEPDFCALCULATOR_QMAX = 25.0;
 
 DebyePDFCalculator::DebyePDFCalculator()
 {
+    // initializations
+    mtotalextension = 0.0;
     // default configuration
     this->setScatteringFactorTableByType("SFTperiodictableXray");
     this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
@@ -52,6 +54,9 @@ DebyePDFCalculator::DebyePDFCalculator()
     this->setMaxExtension(DEFAULT_PDFCALCULATOR_MAXEXTENSION);
     this->setOptimumQstep();
     this->setQmax(DEFAULT_DEBYEPDFCALCULATOR_QMAX);
+    // envelopes
+    this->addEnvelopeByType("scale");
+    this->addEnvelopeByType("qresolution");
     // attributes
     this->registerDoubleAttribute("qmin", this,
             &DebyePDFCalculator::getQmin, &DebyePDFCalculator::setQmin);
@@ -80,7 +85,7 @@ QuantityType DebyePDFCalculator::getPDF() const
 {
     // FIXME - check this especially the coefficient 2
     int nfromdr = 2 * M_PI / this->getRstep() / this->getQstep();
-    int nrequired = max(this->countQgridPoints(), nfromdr);
+    int nrequired = max(pdfutils_qmaxSteps(this), nfromdr);
     int nlog2 = int(floor(log2(nrequired))) + 1;
     int padlen = int(pow(2, nlog2));
     // complex valarray needs to have twice as many elements
@@ -125,19 +130,20 @@ QuantityType DebyePDFCalculator::getPDF() const
 }
 
 
-QuantityType DebyePDFCalculator::getRgrid() const
+QuantityType DebyePDFCalculator::getRDF() const
 {
-    double ndrmin = int(this->getRmin() / this->getRstep());
-    double ndrmax = int(ceil(this->getRmax() / this->getRstep()));
-    QuantityType rv;
-    rv.reserve(ndrmax - ndrmin);
-    for (int ndr = ndrmin; ndr < ndrmax; ++ndr)
-    {
-        rv.push_back(ndr * this->getRstep());
-    }
-    return rv;
+    // FIXME
+    return QuantityType();
 }
 
+
+QuantityType DebyePDFCalculator::getRDFperR() const
+{
+    // FIXME
+    return QuantityType();
+}
+
+// Q-range configuration
 
 void DebyePDFCalculator::setQstep(double qstep)
 {
@@ -156,6 +162,13 @@ void DebyePDFCalculator::setOptimumQstep()
 bool DebyePDFCalculator::isOptimumQstep() const
 {
     return moptimumqstep;
+}
+
+// R-range methods
+
+QuantityType DebyePDFCalculator::getRgrid() const
+{
+    return pdfutils_getRgrid(this);
 }
 
 // R-range configuration
@@ -270,7 +283,7 @@ void DebyePDFCalculator::updateQstep()
 
 double DebyePDFCalculator::rcalclo() const
 {
-    double rv = this->getRmin() - mrlimits_cache.totalextension;
+    double rv = this->getRmin() - mtotalextension;
     rv = max(rv, 0.0);
     return rv;
 }
@@ -278,7 +291,7 @@ double DebyePDFCalculator::rcalclo() const
 
 double DebyePDFCalculator::rcalchi() const
 {
-    double rv = this->getRmax() + mrlimits_cache.totalextension;
+    double rv = this->getRmax() + mtotalextension;
     return rv;
 }
 
@@ -311,7 +324,7 @@ void DebyePDFCalculator::cacheRlimitsData()
 {
     double totext =
         this->extFromTerminationRipples() + this->extFromPeakTails();
-    mrlimits_cache.totalextension = min(totext, this->getMaxExtension());
+    mtotalextension = min(totext, this->getMaxExtension());
 }
 
 }   // namespace srreal

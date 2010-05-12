@@ -23,6 +23,7 @@
 #ifndef PDFUTILS_HPP_INCLUDED
 #define PDFUTILS_HPP_INCLUDED
 
+#include <cmath>
 #include <valarray>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -51,40 +52,6 @@ void bandPassFilter(Ti first, Ti last, double dr, double qmin, double qmax);
 /// Implementation of bandPassFilter using padded complex valarray
 void bandPassFilterCValarray(std::valarray<double>& ycpa,
         double dr, double qmin, double qmax);
-
-
-/// @class HasQgrid
-/// @brief shared implementation of Q-grid, related methods
-
-class HasQgrid {
-
-    public:
-
-        // constructor
-        HasQgrid();
-        virtual ~HasQgrid()  { }
-       
-        QuantityType getQgrid() const;
-        int countQminPoints() const;
-        int countQgridPoints() const;
-
-        // Q-range configuration
-        void setQmin(double);
-        const double& getQmin() const;
-        void setQmax(double);
-        const double& getQmax() const;
-        virtual void setQstep(double);
-        const double& getQstep() const;
-
-    private:
-
-        // data
-        double mqmin;
-        double mqmax;
-        double mqstep;
-};
-
-
 
 }   // namespace srreal
 }   // namespace diffpy

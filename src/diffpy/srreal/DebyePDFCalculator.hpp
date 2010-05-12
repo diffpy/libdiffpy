@@ -20,7 +20,7 @@
 
 // Comments from Chris Farrow's sources for PDFNanoProfile:
 //
-// This calculates PDF from the Deybe scattering equation.  
+// This calculates PDF from the Deybe scattering equation.
 // See chapter 10 of "x-ray diffraction" by B. E. Warren.
 //
 // I(Q) = 1/N sum_i sum_j f_i f_j sin(Q r_ij)/(Q r_ij)
@@ -40,7 +40,7 @@
 // factor: exp( -0.5 rij^2 MSDij )
 //
 // According to Warren, this gives us g(r) = 4 pi r rho(r).  When we
-// calculate G(r) from reciprocal space data into real space, we see:  
+// calculate G(r) from reciprocal space data into real space, we see:
 // G(r) = 4 pi r (rho(r) - rho0).
 // In the theory (Warren), the rho0 is added ad hoc. We account for this by
 // cutting off the scattering at a low-Q value. The exact value is not
@@ -78,8 +78,9 @@ class DebyePDFCalculator :
         void setOptimumQstep();
         bool isOptimumQstep() const;
 
-        // R-range configuration
+        // R-range methods
         QuantityType getRgrid() const;
+        // R-range configuration
         virtual void setRmin(double);
         virtual void setRmax(double);
         void setRstep(double);
@@ -120,13 +121,7 @@ class DebyePDFCalculator :
         bool moptimumqstep;
         double mrstep;
         double mmaxextension;
-        struct RLimitsCache {
-            double totalextension;
-            RLimitsCache() :
-                totalextension(0.0)
-            { }
-        };
-        RLimitsCache mrlimits_cache;
+        double mtotalextension;
 
 };  // class DebyePDFCalculator
 

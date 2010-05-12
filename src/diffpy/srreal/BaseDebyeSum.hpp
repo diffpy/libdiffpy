@@ -29,9 +29,8 @@ namespace diffpy {
 namespace srreal {
 
 class BaseDebyeSum :
-    public PairQuantity,
-    public PeakWidthModelOwner,
-    public HasQgrid
+    public virtual PairQuantity,
+    public virtual PeakWidthModelOwner
 {
     public:
 
@@ -41,6 +40,17 @@ class BaseDebyeSum :
         // results
         /// F values on a full Q-grid starting at 0
         QuantityType getF() const;
+
+        // Q-range methods
+        /// Full Q-grid starting at 0
+        QuantityType getQgrid() const;
+        // Q-range configuration
+        void setQmin(double);
+        const double& getQmin() const;
+        void setQmax(double);
+        const double& getQmax() const;
+        virtual void setQstep(double);
+        const double& getQstep() const;
 
         // Summation cutoff due to Q-dependent pair scaling or large distance
         /// set relative cutoff value for Debye sum contribution
@@ -67,6 +77,9 @@ class BaseDebyeSum :
 
         // data
         // configuration
+        double mqmin;
+        double mqmax;
+        double mqstep;
         double mdebyeprecision;
         struct {
             std::vector< boost::shared_ptr<QuantityType> > sfsiteatkq;
