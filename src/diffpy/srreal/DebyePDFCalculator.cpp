@@ -83,35 +83,12 @@ DebyePDFCalculator::DebyePDFCalculator()
 
 QuantityType DebyePDFCalculator::getPDF() const
 {
-    // FIXME - check this especially the coefficient 2
-    int nfromdr = 2 * M_PI / this->getRstep() / this->getQstep();
-    int nrequired = max(pdfutils_qmaxSteps(this), nfromdr);
-    int nlog2 = int(floor(log2(nrequired))) + 1;
-    int padlen = int(pow(2, nlog2));
-    // complex valarray needs to have twice as many elements
-    valarray<double> ftog(0.0, 2 * padlen);
-    QuantityType F = this->getF();
-    assert(F.size() * 2 <= ftog.size());
-    QuantityType::const_iterator fe = F.begin();
-    double* pfc = &(ftog[0]);
-    for (; fe != F.end(); ++fe, pfc += 2)  { *pfc = *fe; }
-    // apply inverse fft
-    int status;
-    status = gsl_fft_complex_radix2_inverse(&(ftog[0]), 1, padlen);
-    if (status != GSL_SUCCESS)
-    {
-        const char* emsgft = "Fourier Transformation failed.";
-        throw invalid_argument(emsgft);
-    }
-    // normalize the complex part
-    double qmaxpad = padlen * this->getQstep();
-    valarray<double> gpad(0.0, padlen / 2);
-    for (int i = 0; i < padlen / 2; ++i)
-    {
-        gpad[i] = ftog[2 * i + 1] * 2 / M_PI * qmaxpad;
-    }
-    // interpolate to the output r-grid
-    const double drpad = 2 * M_PI / qmaxpad;
+    // build a zero padded F vector that gives dr <= rstep
+    QuantityType fpad = this->getF();
+    int nfromdr = int(ceil(M_PI / this->getRstep() / this->getQstep()));
+    if (nfromdr > int(fpad.size()))  fpad.resize(nfromdr, 0.0);
+    QuantityType gpad = fftftog(fpad, this->getQstep());
+    const double drpad = M_PI / (gpad.size() * this->getQstep());
     QuantityType rgrid = this->getRgrid();
     QuantityType pdf(rgrid.size());
     QuantityType::const_iterator ri = rgrid.begin();
