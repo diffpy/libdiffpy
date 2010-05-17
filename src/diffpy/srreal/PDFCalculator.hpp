@@ -57,6 +57,8 @@ class PDFCalculator :
         QuantityType getExtendedRDF() const;
         /// RDF divided by r on an r-range extended for termination ripples
         QuantityType getExtendedRDFperR() const;
+        /// F(Q) on a zero-padded grid that reaches r-sampling Qmax = PI/dr
+        QuantityType getExtendedF() const;
         /// r-grid extended for termination ripples
         QuantityType getExtendedRgrid() const;
 
@@ -68,8 +70,6 @@ class PDFCalculator :
         void setQmax(double);
         const double& getQmax() const;
         const double& getQstep() const;
-
-        QuantityType applyBandPassFilter(const QuantityType& a) const;
 
         // R-range methods
         QuantityType getRgrid() const;

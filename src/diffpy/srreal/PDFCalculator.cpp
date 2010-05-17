@@ -34,8 +34,7 @@
 using namespace std;
 using namespace diffpy::srreal;
 using namespace diffpy::validators;
-using diffpy::mathutils::eps_lt;
-using diffpy::mathutils::eps_gt;
+using namespace diffpy::mathutils;
 
 // Declaration of Local Helpers ----------------------------------------------
 
@@ -69,7 +68,7 @@ PDFCalculator::PDFCalculator()
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
     this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
     this->setQmin(0.0);
-    this->setQmax(0.0);
+    this->setQmax(DOUBLE_MAX);
     this->setMaxExtension(DEFAULT_PDFCALCULATOR_MAXEXTENSION);
     // envelopes
     this->addEnvelopeByType("scale");
@@ -125,8 +124,9 @@ QuantityType PDFCalculator::getRDFperR() const
 
 QuantityType PDFCalculator::getF() const
 {
-    // FIXME
-    QuantityType rv;
+    QuantityType f_ext = this->getExtendedF();
+    assert(pdfutils_qmaxSteps(this) <= int(f_ext.size()));
+    QuantityType rv(f_ext.begin(), f_ext.begin() + pdfutils_qmaxSteps(this));
     return rv;
 }
 
@@ -136,10 +136,15 @@ QuantityType PDFCalculator::getExtendedPDF() const
     // we need a full range PDF to apply termination ripples correctly
     QuantityType rdfperr_ext = this->getExtendedRDFperR();
     QuantityType rgrid_ext = this->getExtendedRgrid();
-    QuantityType pdf0 = this->applyBandPassFilter(rdfperr_ext);
-    QuantityType pdf1 = this->applyBaseline(rgrid_ext, pdf0);
-    QuantityType pdf2 = this->applyEnvelopes(rgrid_ext, pdf1);
-    return pdf2;
+    QuantityType f_ext = this->getExtendedF();
+    QuantityType pdf0 = fftftog(f_ext, this->getQstep());
+    // cut away the FFT padded points
+    assert(this->extendedRmaxSteps() <= int(pdf0.size()));
+    QuantityType pdf1(pdf0.begin() + this->extendedRminSteps(),
+            pdf0.begin() + this->extendedRmaxSteps());
+    QuantityType pdf2 = this->applyBaseline(rgrid_ext, pdf1);
+    QuantityType pdf3 = this->applyEnvelopes(rgrid_ext, pdf2);
+    return pdf3;
 }
 
 
@@ -177,6 +182,24 @@ QuantityType PDFCalculator::getExtendedRDFperR() const
         *rdfi = eps_gt(*ri, 0) ? (*rdfi / *ri) : 0.0;
     }
     return rdf_ext;
+}
+
+
+QuantityType PDFCalculator::getExtendedF() const
+{
+    QuantityType rdfperr_ext = this->getExtendedRDFperR();
+    const double rmin_ext = this->getRstep() * this->extendedRminSteps();
+    QuantityType rv = fftgtof(rdfperr_ext, this->getRstep(), rmin_ext);
+    assert(eps_eq(this->getQstep(), M_PI / (rv.size() * this->getRstep())));
+    // zero all F points at Q < Qmin
+    QuantityType::iterator rvqmin =
+        rv.begin() + min(pdfutils_qminSteps(this), int(rv.size()));
+    fill(rv.begin(), rvqmin, 0.0);
+    // zero all F points at Q >= Qmax
+    assert(pdfutils_qmaxSteps(this) <= int(rv.size()));
+    QuantityType::iterator rvqmax = rv.begin() + pdfutils_qmaxSteps(this);
+    fill(rvqmax, rv.end(), 0.0);
+    return rv;
 }
 
 
@@ -219,38 +242,25 @@ const double& PDFCalculator::getQmin() const
 void PDFCalculator::setQmax(double qmax)
 {
     ensureNonNegative("Qmax", qmax);
-    mqmax = qmax;
+    mqmax = (qmax > 0.0) ? qmax : DOUBLE_MAX;
 }
 
 
 const double& PDFCalculator::getQmax() const
 {
-    return mqmax;
+    static double rv;
+    rv = min(mqmax, M_PI / this->getRstep());
+    return rv;
 }
 
 
 const double& PDFCalculator::getQstep() const
 {
-    // FIXME
     static double rv;
-    rv = 0.05;
-    return rv;
-}
-
-
-QuantityType PDFCalculator::applyBandPassFilter(const QuantityType& a) const
-{
-    // constants and abbreviations
-    const double infinite_Qmax = 1e6;
-    const double& qmin = this->getQmin();
-    // zero or negative Qmax is in effect the same as infinite
-    double qmax = (this->getQmax() <= 0.0) ? infinite_Qmax : this->getQmax();
-    QuantityType rv(a);
-    bool skipfilter = (qmin <= 0.0) && (qmax >= infinite_Qmax);
-    if (!skipfilter)
-    {
-        bandPassFilter(rv.begin(), rv.end(), this->getRstep(), qmin, qmax);
-    }
+    // replicate the zero padding as done in fftgtof
+    int Npad1 = this->extendedRmaxSteps();
+    int Npad2 = pow(2, int(ceil(log2(Npad1))));
+    rv = M_PI / (Npad2 * this->getRstep());
     return rv;
 }
 
