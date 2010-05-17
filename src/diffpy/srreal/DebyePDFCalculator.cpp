@@ -90,9 +90,9 @@ QuantityType DebyePDFCalculator::getPDF() const
     QuantityType gpad = fftftog(fpad, this->getQstep());
     const double drpad = M_PI / (gpad.size() * this->getQstep());
     QuantityType rgrid = this->getRgrid();
-    QuantityType pdf(rgrid.size());
+    QuantityType pdf0(rgrid.size());
     QuantityType::const_iterator ri = rgrid.begin();
-    QuantityType::iterator pdfi = pdf.begin();
+    QuantityType::iterator pdfi = pdf0.begin();
     for (; ri != rgrid.end(); ++ri, ++pdfi)
     {
         double xdrp = *ri / drpad;
@@ -103,7 +103,8 @@ QuantityType DebyePDFCalculator::getPDF() const
         assert(iphi < int(gpad.size()));
         *pdfi = wplo * gpad[iplo] + wphi * gpad[iphi];
     }
-    return pdf;
+    QuantityType pdf1 = this->applyEnvelopes(rgrid, pdf0);
+    return pdf1;
 }
 
 
@@ -201,6 +202,13 @@ template <class T>
 void debyepdfcalc_accept(T* obj, diffpy::BaseAttributesVisitor& v)
 {
     obj->getPeakWidthModel()->accept(v);
+    // PDF envelopes
+    set<string> evnames = obj->usedEnvelopeTypes();
+    set<string>::const_iterator nm = evnames.begin();
+    for (; nm != evnames.end(); ++nm)
+    {
+        obj->getEnvelopeByType(*nm)->accept(v);
+    }
     // finally call standard accept
     obj->diffpy::Attributes::accept(v);
 }
