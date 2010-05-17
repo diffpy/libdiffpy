@@ -36,6 +36,7 @@
 #include <diffpy/srreal/Lattice.hpp>
 
 #include <ObjCryst/ObjCryst/Crystal.h>
+#include <ObjCryst/ObjCryst/Molecule.h>
 #include <ObjCryst/ObjCryst/ScatteringPower.h>
 #include <ObjCryst/ObjCryst/SpaceGroup.h>
 
@@ -77,7 +78,6 @@ class ObjCrystStructureAdapter : public StructureAdapter
         // methods - own
         void getPeriodicUnitCell();
         void getAperiodicUnitCell();
-        R3::Matrix getUij(const ObjCryst::ScatteringPower* sp) const;
 
         // Tolerance on distance measurements.  Two sites are the same if
         // their fractional coordinates are within this tolerance
@@ -159,6 +159,78 @@ class ObjCrystPeriodicBondGenerator : public ObjCrystAperiodicBondGenerator
         std::auto_ptr<PointsInSphere> msphere;
 };
 
+// Adapter for ObjCryst::Molecule
+//
+// Molecules are always considered aperiodic. The anisotropic ADPs are treated
+// as if in a cartesian cell. If this is not what is intended, pass the
+// molecule as a scattering component within an ObjCryst::Crystal.
+
+class ObjCrystMoleculeAdapter : public StructureAdapter
+{
+
+    friend class ObjCrystMoleculeBondGenerator;
+
+    public:
+
+        // constructors
+        ObjCrystMoleculeAdapter(const ObjCryst::Molecule&);
+
+        // methods - overloaded
+        virtual BaseBondGenerator* createBondGenerator() const;
+        virtual int countSites() const;
+        virtual double numberDensity() const;
+        virtual const R3::Vector& siteCartesianPosition(int idx) const;
+        virtual double siteOccupancy(int idx) const;
+        virtual bool siteAnisotropy(int idx) const;
+        virtual const R3::Matrix& siteCartesianUij(int idx) const;
+        virtual const std::string& siteAtomType(int idx) const;
+        const Lattice& getLattice() const;
+
+
+    private:
+
+        // The ObjCryst::Molecule
+        const ObjCryst::Molecule* mpmolecule;
+        // The MolAtom instances
+        std::vector< ObjCryst::MolAtom > mvatoms;
+        // The positions of the scatterers. Same order as mvatoms.
+        std::vector<R3::Vector> mvpos;
+        // The Uij for scatterers. Same order as mvatoms.
+        std::vector<R3::Matrix> mvuij;
+        // The Lattice instance needed by the bond generator
+        Lattice mlattice;
+
+};
+
+
+class ObjCrystMoleculeBondGenerator : public BaseBondGenerator
+{
+    public:
+
+        // constructors
+        ObjCrystMoleculeBondGenerator(const ObjCrystMoleculeAdapter*);
+
+        // data access
+        virtual double msd0() const;
+        virtual double msd1() const;
+
+    protected:
+
+        // The adapted structure
+        const ObjCrystMoleculeAdapter* mpstructure;
+
+    private:
+
+    double msd(int siteidx) const;
+
+};
+
+
+namespace objcrystutil
+{
+    R3::Matrix getUij(const ObjCryst::ScatteringPower* sp);
+} // namespace objcrystutil
+
 
 inline
 StructureAdapter* 
@@ -167,6 +239,16 @@ createPQAdapter(const ObjCryst::Crystal& cryst)
     StructureAdapter* adapter = new ObjCrystStructureAdapter(cryst);
     return adapter;
 }
+
+
+inline
+StructureAdapter* 
+createPQAdapter(const ObjCryst::Molecule& molecule)
+{
+    StructureAdapter* adapter = new ObjCrystMoleculeAdapter(molecule);
+    return adapter;
+}
+
 
 }   // namespace srreal
 }   // namespace diffpy

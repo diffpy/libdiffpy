@@ -89,6 +89,7 @@ ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst) : mpcryst(&cryst)
     const_cast<Crystal*>(mpcryst)->SetUseDynPopCorr(usepopcorr);
 }
 
+
 // Public Methods ------------------------------------------------------------
 
 BaseBondGenerator* 
@@ -155,6 +156,7 @@ siteAnisotropy(int idx) const
     return !(mvsc[idx].mpScattPow->IsIsotropic());
 }
 
+
 double
 ObjCrystStructureAdapter::
 siteMultiplicity(int idx) const
@@ -163,6 +165,7 @@ siteMultiplicity(int idx) const
     assert(0 <= idx && idx < this->countSites());
     return mvsym[idx].size();
 }
+
 
 const R3::Matrix&
 ObjCrystStructureAdapter::
@@ -246,7 +249,7 @@ getPeriodicUnitCell()
         size_t numsym = 0;
 
         // Store Uij.
-        R3::Matrix Uij = getUij(sp);
+        R3::Matrix Uij = objcrystutil::getUij(sp);
 
         // Get all the symmetric coordinates. Symmetric coordinates are created
         // by translation vector in the outer loop, and rotation matrix in the
@@ -365,7 +368,7 @@ getAperiodicUnitCell()
         symvec.push_back(xyz);
 
         // Record UCart
-        R3::Matrix Uij = getUij(sp);
+        R3::Matrix Uij = objcrystutil::getUij(sp);
         R3::Matrix UCart;
         if (!sp->IsIsotropic())
         {
@@ -384,31 +387,134 @@ getAperiodicUnitCell()
 }
 
 
-R3::Matrix 
-ObjCrystStructureAdapter::
-getUij(const ObjCryst::ScatteringPower* sp) const
-{
-    R3::Matrix Uij;
-    if (sp->IsIsotropic())
-    {
-        Uij(0,0) = Uij(1,1) = Uij(2,2) = sp->GetBiso() * BtoU;
-        Uij(0,1) = Uij(1,0) = 0;
-        Uij(0,2) = Uij(2,0) = 0;
-        Uij(2,1) = Uij(1,2) = 0;
-    }
-    else
-    {
-        Uij(0,0) = sp->GetBij(1,1) * BtoU;
-        Uij(1,1) = sp->GetBij(2,2) * BtoU;
-        Uij(2,2) = sp->GetBij(3,3) * BtoU;
-        Uij(0,1) = Uij(1,0) = sp->GetBij(1,2) * BtoU;
-        Uij(0,2) = Uij(2,0) = sp->GetBij(1,3) * BtoU;
-        Uij(1,2) = Uij(2,1) = sp->GetBij(2,3) * BtoU;
-    }
+//////////////////////////////////////////////////////////////////////////////
+// class ObjCrystMoleculeAdapter
+//////////////////////////////////////////////////////////////////////////////
 
-    return Uij;
+// static data
+
+// Constructor ---------------------------------------------------------------
+
+ObjCrystMoleculeAdapter::
+ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule) 
+: mpmolecule(&molecule)
+{
+    using ObjCryst::Molecule;
+    using ObjCryst::MolAtom;
+    mlattice.setLatPar(1, 1, 1, 90, 90, 90);
+    const ObjCryst::ScatteringComponentList& scl = 
+        molecule.GetScatteringComponentList();
+
+    size_t nbComponent = scl.GetNbComponent();
+    // Initialize positions and uij
+    mvatoms.clear();
+    mvpos.clear();
+    mvuij.clear();
+    mvatoms.reserve(nbComponent);
+    mvpos.reserve(nbComponent);
+    mvuij.reserve(nbComponent);
+
+    for (size_t i = 0; i < nbComponent; ++i)
+    {
+
+        const MolAtom& atom = mpmolecule->GetAtom(i);
+        if (atom.IsDummy()) continue;
+
+        // Store the atom
+        mvatoms.push_back(atom);
+
+        // Store position
+        R3::Vector xyz; 
+        xyz = atom.X(), atom.Y(), atom.Z();
+        mvpos.push_back(xyz);
+
+        // Store Uij
+        R3::Matrix Uij = objcrystutil::getUij(&atom.GetScatteringPower());
+        mvuij.push_back(Uij);
+    }
 
 }
+
+// Public Methods ------------------------------------------------------------
+
+BaseBondGenerator* 
+ObjCrystMoleculeAdapter::
+createBondGenerator() const
+{
+
+    BaseBondGenerator* bnds = new ObjCrystMoleculeBondGenerator(this);
+    return bnds;
+}
+
+
+int 
+ObjCrystMoleculeAdapter::
+countSites() const
+{
+    return mvatoms.size();
+}
+
+
+double 
+ObjCrystMoleculeAdapter::
+numberDensity() const
+{
+    return 0.0;
+}
+
+
+const Lattice& 
+ObjCrystMoleculeAdapter::
+getLattice() const
+{
+    return mlattice;
+}
+
+
+const R3::Vector& 
+ObjCrystMoleculeAdapter::
+siteCartesianPosition(int idx) const
+{
+    assert(0 <= idx && idx < this->countSites());
+    return mvpos[idx];
+}
+
+
+double 
+ObjCrystMoleculeAdapter::
+siteOccupancy(int idx) const
+{
+    assert(0 <= idx && idx < this->countSites());
+    return mvatoms[idx].GetOccupancy();
+}
+
+
+bool 
+ObjCrystMoleculeAdapter::
+siteAnisotropy(int idx) const
+{
+    assert(0 <= idx && idx < this->countSites());
+    return !(mvatoms[idx].GetScatteringPower().IsIsotropic());
+}
+
+
+const R3::Matrix&
+ObjCrystMoleculeAdapter::
+siteCartesianUij(int idx) const
+{
+    assert(0 <= idx && idx < this->countSites());
+    return mvuij[idx];
+}
+
+
+const string& 
+ObjCrystMoleculeAdapter::
+siteAtomType(int idx) const
+{
+    assert(0 <= idx && idx < this->countSites());
+    return mvatoms[idx].GetScatteringPower().GetSymbol();
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 // class ObjCrystAperiodicBondGenerator
@@ -452,6 +558,7 @@ msd1() const
     double rv = msd(this->site1(), msymidx);
     return rv;
 }
+
 
 bool 
 ObjCrystAperiodicBondGenerator::
@@ -500,6 +607,7 @@ ObjCrystPeriodicBondGenerator(const ObjCrystStructureAdapter* adpt)
     : ObjCrystAperiodicBondGenerator(adpt)
 {
 }
+
 
 // Public Methods ------------------------------------------------------------
 
@@ -584,6 +692,80 @@ rewindSymmetry()
 }
 
 
+//////////////////////////////////////////////////////////////////////////////
+// class ObjCrystMoleculeBondGenerator
+//////////////////////////////////////////////////////////////////////////////
+
+// Constructor ---------------------------------------------------------------
+
+ObjCrystMoleculeBondGenerator::
+ObjCrystMoleculeBondGenerator(const ObjCrystMoleculeAdapter* adpt) 
+    : BaseBondGenerator(adpt), mpstructure(adpt)
+{
+}
+
+
+// Public Methods ------------------------------------------------------------
+
+double 
+ObjCrystMoleculeBondGenerator::
+msd0() const
+{
+    double rv = msd(this->site0());
+    return rv;
+}
+
+
+double 
+ObjCrystMoleculeBondGenerator::
+msd1() const
+{
+    double rv = msd(this->site1());
+    return rv;
+}
+
+
+double 
+ObjCrystMoleculeBondGenerator::
+msd(int siteidx) const
+{
+    // Get the proper Uij tensor for the given site, and symmetry indices
+    const R3::Matrix& UCart = mpstructure->mvuij[siteidx];
+    const R3::Vector& s = this->r01();
+    bool anisotropy = mpstructure->siteAnisotropy(siteidx);
+    double rv = meanSquareDisplacement(UCart, s, anisotropy);
+    return rv;
+}
+
+
+// Utility functions --------------------------------------------------------
+
+R3::Matrix 
+objcrystutil::
+getUij(const ObjCryst::ScatteringPower* sp)
+{
+    R3::Matrix Uij;
+    if (sp->IsIsotropic())
+    {
+        Uij(0,0) = Uij(1,1) = Uij(2,2) = sp->GetBiso() * BtoU;
+        Uij(0,1) = Uij(1,0) = 0;
+        Uij(0,2) = Uij(2,0) = 0;
+        Uij(2,1) = Uij(1,2) = 0;
+    }
+    else
+    {
+        Uij(0,0) = sp->GetBij(1,1) * BtoU;
+        Uij(1,1) = sp->GetBij(2,2) * BtoU;
+        Uij(2,2) = sp->GetBij(3,3) * BtoU;
+        Uij(0,1) = Uij(1,0) = sp->GetBij(1,2) * BtoU;
+        Uij(0,2) = Uij(2,0) = sp->GetBij(1,3) * BtoU;
+        Uij(1,2) = Uij(2,1) = sp->GetBij(2,3) * BtoU;
+    }
+
+    return Uij;
+
+}
+
 // Factory Function and its Registration -------------------------------------
 
 StructureAdapter*
@@ -603,8 +785,29 @@ createPyObjCrystStructureAdapter(const boost::python::object& stru)
     return rv;
 }
 
+StructureAdapter*
+createPyObjCrystMoleculeAdapter(const boost::python::object& stru)
+{
+    using diffpy::importFromPyModule;
+    boost::python::object cls_Molecule, None;
+    cls_Molecule = importFromPyModule("pyobjcryst.molecule", "Molecule", None);
+    StructureAdapter* rv = NULL;
+    if (cls_Molecule.ptr() != Py_None &&
+        PyObject_IsInstance(stru.ptr(), cls_Molecule.ptr()) == 1)
+    {
+        ObjCryst::Molecule* pmolecule =
+            boost::python::extract<ObjCryst::Molecule*>(stru);
+        rv = createPQAdapter(*pmolecule);
+    }
+    return rv;
+}
+
+
 
 bool reg_PyObjCrystStructureAdapter =
 registerPythonStructureAdapterFactory(createPyObjCrystStructureAdapter);
+
+bool reg_PyObjCrystMoleculeAdapter =
+registerPythonStructureAdapterFactory(createPyObjCrystMoleculeAdapter);
 
 // End of file

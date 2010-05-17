@@ -26,10 +26,15 @@
 
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
 #include "objcryst_helpers.hpp"
+#include <ObjCryst/ObjCryst/Crystal.h>
+#include <ObjCryst/ObjCryst/Molecule.h>
+#include <ObjCryst/ObjCryst/ScatteringPower.h>
 
 using namespace std;
 using namespace diffpy::srreal;
 using ObjCryst::Crystal;
+using ObjCryst::Molecule;
+using ObjCryst::ScatteringPowerAtom;
 
 // Local Helpers -------------------------------------------------------------
 
@@ -41,6 +46,9 @@ int countBonds(BaseBondGenerator& bnds)
     for (bnds.rewind(); !bnds.finished(); bnds.next())  ++rv;
     return rv;
 }
+
+// Defined below
+Molecule* makeC60Molecule();
 
 }   // namespace
 
@@ -334,5 +342,258 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
 
 
 };  // class TestObjCrystStructureBondGenerator
+
+
+//////////////////////////////////////////////////////////////////////////////
+// class TestObjCrystMoleculeAdapter
+//////////////////////////////////////////////////////////////////////////////
+
+
+class TestObjCrystMoleculeAdapter : public CxxTest::TestSuite
+{
+    private:
+
+        auto_ptr<Molecule> mmol_c60;
+        auto_ptr<StructureAdapter> m_c60;
+
+    public:
+
+        void setUp()
+        {
+            if (!mmol_c60.get())
+            {
+                mmol_c60.reset(makeC60Molecule());
+                m_c60.reset(createPQAdapter(*mmol_c60));
+            }
+        }
+
+        virtual ~TestObjCrystMoleculeAdapter()
+        {
+            // Delete the crystal in the molecule
+            Crystal* cryst = &mmol_c60->GetCrystal();
+            delete cryst;
+        }
+
+        void test_typeid()
+        {
+            TS_ASSERT(typeid(ObjCrystMoleculeAdapter) == typeid(*m_c60));
+        }
+
+
+        void test_countSites()
+        {
+            TS_ASSERT_EQUALS(60, m_c60->countSites());
+        }
+
+
+        void test_totalOccupancy()
+        {
+            TS_ASSERT_EQUALS(60, m_c60->totalOccupancy());
+        }
+
+
+        void test_numberDensity()
+        {
+            const double eps = 1.0e-7;
+            TS_ASSERT_DELTA(0.0, m_c60->numberDensity(), eps);
+        }
+
+
+        void test_siteCartesianPosition()
+        {
+            const double eps = 1.0e-5;
+            R3::Vector rC0 = m_c60->siteCartesianPosition(0);
+            TS_ASSERT_DELTA(3.45127, rC0[0], eps);
+            TS_ASSERT_DELTA(0.68500, rC0[1], eps);
+            TS_ASSERT_DELTA(0.00000, rC0[2], eps);
+        }
+
+
+        void test_siteAnisotropy()
+        {
+            for (int i = 0; i < m_c60->countSites(); ++i)
+            {
+                TS_ASSERT_EQUALS(false, m_c60->siteAnisotropy(i));
+            }
+        }
+
+
+        void test_siteCartesianUij()
+        {
+            double BtoU = 1.0 / (8 * M_PI * M_PI);
+            const R3::Matrix Uij = m_c60->siteCartesianUij(0);
+            TS_ASSERT_EQUALS(0.0, Uij(0,1));
+            TS_ASSERT_EQUALS(0.0, Uij(0,2));
+            TS_ASSERT_EQUALS(0.0, Uij(1,0));
+            TS_ASSERT_EQUALS(0.0, Uij(1,2));
+            TS_ASSERT_EQUALS(0.0, Uij(2,0));
+            TS_ASSERT_EQUALS(0.0, Uij(2,1));
+            TS_ASSERT_EQUALS(BtoU, Uij(0,0));
+            TS_ASSERT_EQUALS(BtoU, Uij(1,1));
+            TS_ASSERT_EQUALS(BtoU, Uij(2,2));
+        }
+
+
+        void test_siteAtomType()
+        {
+            for (int i = 0; i < m_c60->countSites(); ++i)
+            {
+                TS_ASSERT_EQUALS(string("C"), m_c60->siteAtomType(i));
+            }
+        }
+
+
+        void test_getLattice()
+        {
+            ObjCrystMoleculeAdapter* padpt =
+                dynamic_cast<ObjCrystMoleculeAdapter*>(m_c60.get());
+            TS_ASSERT(padpt);
+            const Lattice& L = padpt->getLattice();
+            const double eps = 1.0e-12;
+            TS_ASSERT_DELTA(1, L.a(), eps);
+            TS_ASSERT_DELTA(1, L.b(), eps);
+            TS_ASSERT_DELTA(1, L.c(), eps);
+            TS_ASSERT_DELTA(90, L.alpha(), eps);
+            TS_ASSERT_DELTA(90, L.beta(), eps);
+            TS_ASSERT_DELTA(90, L.gamma(), eps);
+        }
+
+};  // class TestObjCrystMoleculeAdapter
+
+
+//////////////////////////////////////////////////////////////////////////////
+// class TestObjCrystMoleculeBondGenerator
+//////////////////////////////////////////////////////////////////////////////
+
+class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
+{
+    private:
+
+        auto_ptr<Molecule> mmol_c60;
+        auto_ptr<StructureAdapter> m_c60;
+        auto_ptr<BaseBondGenerator> m_c60bnds;
+
+    public:
+
+        void setUp()
+        {
+            if (!m_c60.get())
+            {
+                mmol_c60.reset(makeC60Molecule());
+                m_c60.reset(createPQAdapter(*mmol_c60));
+            }
+            m_c60bnds.reset(m_c60->createBondGenerator());
+        }
+
+        virtual ~TestObjCrystMoleculeBondGenerator()
+        {
+            // Delete the crystal in the molecule
+            Crystal* cryst = &mmol_c60->GetCrystal();
+            delete cryst;
+        }
+
+        void test_typeid()
+        {
+            TS_ASSERT(typeid(ObjCrystMoleculeBondGenerator) ==
+                    typeid(*m_c60bnds));
+        }
+
+
+        void test_bondCountC60()
+        {
+            m_c60bnds->selectAnchorSite(0);
+            m_c60bnds->setRmin(0);
+            m_c60bnds->setRmax(1.0);
+            TS_ASSERT_EQUALS(0, countBonds(*m_c60bnds));
+            m_c60bnds->setRmin(-10);
+            TS_ASSERT_EQUALS(0, countBonds(*m_c60bnds));
+            // there are 3 nearest neighbors at 1.44
+            m_c60bnds->setRmax(1.5);
+            TS_ASSERT_EQUALS(3, countBonds(*m_c60bnds));
+            // There are 59 neighbors total
+            m_c60bnds->setRmax(8);
+            TS_ASSERT_EQUALS(59, countBonds(*m_c60bnds));
+        }
+
+
+};  // class TestObjCrystMoleculeBondGenerator
+
+
+namespace {
+
+Molecule* makeC60Molecule()
+{
+
+    Crystal* cryst = new Crystal(1, 1, 1, "P1");
+    Molecule* mol = new Molecule(*cryst, "c60");
+
+    // Populate the molecule
+    ScatteringPowerAtom* sp = new ScatteringPowerAtom("C", "C");
+    mol->AddAtom(3.451266498, 0.685000000, 0.000000000, sp, "C0");
+    mol->AddAtom(3.451266498, -0.685000000, 0.000000000, sp, "C1");
+    mol->AddAtom(-3.451266498, 0.685000000, 0.000000000, sp, "C2");
+    mol->AddAtom(-3.451266498, -0.685000000, 0.000000000, sp, "C3");
+    mol->AddAtom(0.685000000, 0.000000000, 3.451266498, sp, "C4");
+    mol->AddAtom(-0.685000000, 0.000000000, 3.451266498, sp, "C5");
+    mol->AddAtom(0.685000000, 0.000000000, -3.451266498, sp, "C6");
+    mol->AddAtom(-0.685000000, 0.000000000, -3.451266498, sp, "C7");
+    mol->AddAtom(0.000000000, 3.451266498, 0.685000000, sp, "C8");
+    mol->AddAtom(0.000000000, 3.451266498, -0.685000000, sp, "C9");
+    mol->AddAtom(0.000000000, -3.451266498, 0.685000000, sp, "C10");
+    mol->AddAtom(0.000000000, -3.451266498, -0.685000000, sp, "C11");
+    mol->AddAtom(3.003809890, 1.409000000, 1.171456608, sp, "C12");
+    mol->AddAtom(3.003809890, 1.409000000, -1.171456608, sp, "C13");
+    mol->AddAtom(3.003809890, -1.409000000, 1.171456608, sp, "C14");
+    mol->AddAtom(3.003809890, -1.409000000, -1.171456608, sp, "C15");
+    mol->AddAtom(-3.003809890, 1.409000000, 1.171456608, sp, "C16");
+    mol->AddAtom(-3.003809890, 1.409000000, -1.171456608, sp, "C17");
+    mol->AddAtom(-3.003809890, -1.409000000, 1.171456608, sp, "C18");
+    mol->AddAtom(-3.003809890, -1.409000000, -1.171456608, sp, "C19");
+    mol->AddAtom(1.409000000, 1.171456608, 3.003809890, sp, "C20");
+    mol->AddAtom(1.409000000, -1.171456608, 3.003809890, sp, "C21");
+    mol->AddAtom(-1.409000000, 1.171456608, 3.003809890, sp, "C22");
+    mol->AddAtom(-1.409000000, -1.171456608, 3.003809890, sp, "C23");
+    mol->AddAtom(1.409000000, 1.171456608, -3.003809890, sp, "C24");
+    mol->AddAtom(1.409000000, -1.171456608, -3.003809890, sp, "C25");
+    mol->AddAtom(-1.409000000, 1.171456608, -3.003809890, sp, "C26");
+    mol->AddAtom(-1.409000000, -1.171456608, -3.003809890, sp, "C27");
+    mol->AddAtom(1.171456608, 3.003809890, 1.409000000, sp, "C28");
+    mol->AddAtom(-1.171456608, 3.003809890, 1.409000000, sp, "C29");
+    mol->AddAtom(1.171456608, 3.003809890, -1.409000000, sp, "C30");
+    mol->AddAtom(-1.171456608, 3.003809890, -1.409000000, sp, "C31");
+    mol->AddAtom(1.171456608, -3.003809890, 1.409000000, sp, "C32");
+    mol->AddAtom(-1.171456608, -3.003809890, 1.409000000, sp, "C33");
+    mol->AddAtom(1.171456608, -3.003809890, -1.409000000, sp, "C34");
+    mol->AddAtom(-1.171456608, -3.003809890, -1.409000000, sp, "C35");
+    mol->AddAtom(2.580456608, 0.724000000, 2.279809890, sp, "C36");
+    mol->AddAtom(2.580456608, 0.724000000, -2.279809890, sp, "C37");
+    mol->AddAtom(2.580456608, -0.724000000, 2.279809890, sp, "C38");
+    mol->AddAtom(2.580456608, -0.724000000, -2.279809890, sp, "C39");
+    mol->AddAtom(-2.580456608, 0.724000000, 2.279809890, sp, "C40");
+    mol->AddAtom(-2.580456608, 0.724000000, -2.279809890, sp, "C41");
+    mol->AddAtom(-2.580456608, -0.724000000, 2.279809890, sp, "C42");
+    mol->AddAtom(-2.580456608, -0.724000000, -2.279809890, sp, "C43");
+    mol->AddAtom(0.724000000, 2.279809890, 2.580456608, sp, "C44");
+    mol->AddAtom(0.724000000, -2.279809890, 2.580456608, sp, "C45");
+    mol->AddAtom(-0.724000000, 2.279809890, 2.580456608, sp, "C46");
+    mol->AddAtom(-0.724000000, -2.279809890, 2.580456608, sp, "C47");
+    mol->AddAtom(0.724000000, 2.279809890, -2.580456608, sp, "C48");
+    mol->AddAtom(0.724000000, -2.279809890, -2.580456608, sp, "C49");
+    mol->AddAtom(-0.724000000, 2.279809890, -2.580456608, sp, "C50");
+    mol->AddAtom(-0.724000000, -2.279809890, -2.580456608, sp, "C51");
+    mol->AddAtom(2.279809890, 2.580456608, 0.724000000, sp, "C52");
+    mol->AddAtom(-2.279809890, 2.580456608, 0.724000000, sp, "C53");
+    mol->AddAtom(2.279809890, 2.580456608, -0.724000000, sp, "C54");
+    mol->AddAtom(-2.279809890, 2.580456608, -0.724000000, sp, "C55");
+    mol->AddAtom(2.279809890, -2.580456608, 0.724000000, sp, "C56");
+    mol->AddAtom(-2.279809890, -2.580456608, 0.724000000, sp, "C57");
+    mol->AddAtom(2.279809890, -2.580456608, -0.724000000, sp, "C58");
+    mol->AddAtom(-2.279809890, -2.580456608, -0.724000000, sp, "C59");
+
+    return mol;
+}
+
+}   // namespace
+
 
 // End of file
