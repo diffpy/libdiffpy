@@ -53,6 +53,11 @@ void bandPassFilter(Ti first, Ti last, double dr, double qmin, double qmax);
 void bandPassFilterCValarray(std::valarray<double>& ycpa,
         double dr, double qmin, double qmax);
 
+/// fast Fourier transformation converting G(r) to F(Q)
+QuantityType fftgtof(const QuantityType& g, double rstep, double rmin=0.0);
+/// fast Fourier transformation converting F(Q) to G(r)
+QuantityType fftftog(const QuantityType& f, double qstep, double qmin=0.0);
+
 }   // namespace srreal
 }   // namespace diffpy
 
