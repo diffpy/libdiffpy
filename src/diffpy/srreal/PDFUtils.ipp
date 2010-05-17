@@ -12,8 +12,8 @@
 *
 ******************************************************************************
 *
-* Implementation of shared template functions for PDF calculator.
-*     bandPassFilter
+* Various common routines useful for PDF calculation.
+* Implementation of template functions.
 *
 * $Id$
 *
@@ -24,25 +24,6 @@
 
 namespace diffpy {
 namespace srreal {
-
-template <class Ti>
-void bandPassFilter(Ti first, Ti last, double dr, double qmin, double qmax)
-{
-    if (!(first < last))    return;
-    int datalen = last - first;
-    // pad data with the same number of zeros up to the next power of 2
-    int padlen = (int) pow(2, int(ceil(log2(datalen) + 1)));
-    // ycpad is complex, so it needs to be twice as long
-    std::valarray<double> ycpa(0.0, 2 * padlen);
-    double* ycfirst = &(ycpa[0]);
-    double* yci = ycfirst;
-    for (Ti p = first; p != last; ++p, yci += 2)  { *yci = *p; }
-    // perform the filtering
-    bandPassFilterCValarray(ycpa, dr, qmin, qmax);
-    // copy real components back to the input sequence
-    yci = &(ycpa[0]);
-    for (Ti p = first; p != last; ++p, yci += 2)  { *p = *yci; }
-}
 
 // Shared implementations of DebyePDFCalculator and PDFCalculator methods
 

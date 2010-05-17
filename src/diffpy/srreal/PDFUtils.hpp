@@ -14,7 +14,8 @@
 *
 * Various common routines useful for PDF calculation:
 *     meanSquareDisplacement
-*     bandPassFilter
+*     maxUii
+*     fftftog  and  fftgtof
 *
 * $Id$
 *
@@ -45,18 +46,19 @@ double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
 /// Maximum diagonal Uii element from all atoms in the structure.
 double maxUii(const StructureAdapter* stru);
 
-/// Apply band pass filter to a sequence of doubles
-template <class Ti>
-void bandPassFilter(Ti first, Ti last, double dr, double qmin, double qmax);
-
-/// Implementation of bandPassFilter using padded complex valarray
-void bandPassFilterCValarray(std::valarray<double>& ycpa,
-        double dr, double qmin, double qmax);
-
 /// fast Fourier transformation converting G(r) to F(Q)
 QuantityType fftgtof(const QuantityType& g, double rstep, double rmin=0.0);
+
 /// fast Fourier transformation converting F(Q) to G(r)
 QuantityType fftftog(const QuantityType& f, double qstep, double qmin=0.0);
+
+/// shared methods for PDFCalculator and DebyePDFCalculator
+template <class T> QuantityType pdfutils_getQgrid(const T* pdfc);
+template <class T> int pdfutils_qminSteps(const T* pdfc);
+template <class T> int pdfutils_qmaxSteps(const T* pdfc);
+template <class T> QuantityType pdfutils_getRgrid(const T* pdfc);
+template <class T> int pdfutils_rminSteps(const T* pdfc);
+template <class T> int pdfutils_rmaxSteps(const T* pdfc);
 
 }   // namespace srreal
 }   // namespace diffpy
