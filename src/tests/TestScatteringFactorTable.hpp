@@ -64,27 +64,27 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
         void test_setCustom()
         {
             sftb = ScatteringFactorTable::createByType("X");
-            TS_ASSERT_EQUALS(6.0, sftb->lookup("C"));
+            TS_ASSERT_DELTA(6.0, sftb->lookup("C"), 0.01);
             sftb->setCustom("C", 6.3);
             TS_ASSERT_THROWS(sftb->lookup("Ccustom"), invalid_argument);
             sftb->setCustom("Ccustom", 6.5);
             TS_ASSERT_EQUALS(6.5, sftb->lookup("Ccustom"));
             sftb->resetCustom("C");
             TS_ASSERT_EQUALS(6.5, sftb->lookup("Ccustom"));
-            TS_ASSERT_EQUALS(6.0, sftb->lookup("C"));
+            TS_ASSERT_DELTA(6.0, sftb->lookup("C"), 0.01);
             sftb->resetAll();
             TS_ASSERT_THROWS(sftb->lookup("Ccustom"), invalid_argument);
-            TS_ASSERT_EQUALS(6.0, sftb->lookup("C"));
+            TS_ASSERT_DELTA(6.0, sftb->lookup("C"), 0.01);
         }
 
 
         void test_periodictableXray()
         {
             sftb = ScatteringFactorTable::createByType("X");
-            TS_ASSERT_EQUALS(1.0, sftb->lookup("H"));
-            TS_ASSERT_EQUALS(8.0, sftb->lookup("O"));
-            TS_ASSERT_EQUALS(74.0, sftb->lookup("W"));
-            TS_ASSERT_EQUALS(88.0, sftb->lookup("Ra"));
+            TS_ASSERT_DELTA(1.0, sftb->lookup("H"), 0.01);
+            TS_ASSERT_DELTA(8.0, sftb->lookup("O"), 0.01);
+            TS_ASSERT_DELTA(74.0, sftb->lookup("W"), 0.04);
+            TS_ASSERT_DELTA(88.0, sftb->lookup("Ra"), 0.04);
         }
 
 
