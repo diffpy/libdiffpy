@@ -123,9 +123,9 @@ QuantityType fftgtof(const QuantityType& g, double rstep, double rmin)
         f[i] = gpadc[2 * i + 1] * Npad2 * rstep;
     }
     // real components should be all close to zero
-    assert(fabs(valarray<double>(gpadc[slice(0, 2 * Npad2, 2)]).min()) <
+    assert(fabs(valarray<double>(gpadc[slice(0, 2 * Npad2, 2)]).min()) <=
             SQRT_DOUBLE_EPS * gpadc.max());
-    assert(fabs(valarray<double>(gpadc[slice(0, 2 * Npad2, 2)]).max()) <
+    assert(fabs(valarray<double>(gpadc[slice(0, 2 * Npad2, 2)]).max()) <=
             SQRT_DOUBLE_EPS * gpadc.max());
     return f;
 }
