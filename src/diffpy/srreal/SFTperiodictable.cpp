@@ -34,28 +34,6 @@
 using namespace std;
 namespace python = boost::python;
 
-// Local helpers -------------------------------------------------------------
-
-namespace {
-
-// reference to the symbol method of periodictable.elements
-python::object periodictable_elements_symbol()
-{
-    static bool did_import = false;
-    static python::object symbol;
-    // short-circuit return
-    if (did_import)  return symbol;
-    // first pass requires actual import
-    diffpy::initializePython();
-    python::object elements;
-    elements = diffpy::importFromPyModule("periodictable", "elements");
-    symbol = elements.attr("symbol");
-    did_import = true;
-    return symbol;
-}
-
-}   // namespace
-
 namespace diffpy {
 namespace srreal {
 
@@ -102,11 +80,12 @@ class SFTperiodictableXray : public ScatteringFactorTable
 
         double fetch(const string& smbl) const
         {
+            diffpy::initializePython();
+            static python::object fxrayatq = diffpy::importFromPyModule(
+                    "periodictable.cromermann", "fxrayatq");
             double rv;
-            python::object symbol = periodictable_elements_symbol();
             try {
-                python::object el = symbol(smbl);
-                rv = python::extract<int>(el.attr("number"));
+                rv = python::extract<double>(fxrayatq(smbl, 0.0) + 0.0);
             }
             catch (python::error_already_set e) {
                 string emsg = diffpy::getPythonErrorString();
@@ -162,8 +141,10 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
 
         double fetch(const string& smbl) const
         {
+            diffpy::initializePython();
+            static python::object symbol = diffpy::importFromPyModule(
+                    "periodictable", "elements").attr("symbol");
             double rv;
-            python::object symbol = periodictable_elements_symbol();
             try {
                 python::object el = symbol(smbl);
                 python::object b_c = el.attr("neutron").attr("b_c");
