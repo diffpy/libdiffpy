@@ -46,7 +46,8 @@ const double DEFAULT_DEBYEPDFCALCULATOR_QMAX = 25.0;
 DebyePDFCalculator::DebyePDFCalculator()
 {
     // initializations
-    mtotalextension = 0.0;
+    mrcalclosteps = 0;
+    mrcalchisteps = 0;
     // default configuration
     this->setScatteringFactorTableByType("SFTperiodictableXray");
     this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
@@ -268,15 +269,14 @@ void DebyePDFCalculator::updateQstep()
 
 double DebyePDFCalculator::rcalclo() const
 {
-    double rv = this->getRmin() - mtotalextension;
-    rv = max(rv, 0.0);
+    double rv = mrcalclosteps * this->getRstep();
     return rv;
 }
 
 
 double DebyePDFCalculator::rcalchi() const
 {
-    double rv = this->getRmax() + mtotalextension;
+    double rv = mrcalchisteps * this->getRstep();
     return rv;
 }
 
@@ -298,7 +298,7 @@ double DebyePDFCalculator::extFromPeakTails() const
     double maxfwhm = this->getPeakWidthModel()->calculateFromMSD(maxmsd);
     // assume Gaussian peak profile
     GaussianProfile pkf;
-    pkf.setPrecision(this->getDebyePrecision());
+    pkf.setPrecision(DEFAULT_PEAKPRECISION);
     // Gaussian function is symmetric, no need to use xboundlo
     double rv = pkf.xboundhi(maxfwhm);
     return rv;
@@ -307,9 +307,14 @@ double DebyePDFCalculator::extFromPeakTails() const
 
 void DebyePDFCalculator::cacheRlimitsData()
 {
-    double totext =
-        this->extFromTerminationRipples() + this->extFromPeakTails();
-    mtotalextension = min(totext, this->getMaxExtension());
+    double ext_total = min(this->getMaxExtension(),
+        this->extFromTerminationRipples() + this->extFromPeakTails());
+    // abbreviations
+    const double& rmin = this->getRmin();
+    const double& rmax = this->getRmax();
+    const double& dr = this->getRstep();
+    mrcalclosteps = max(int((rmin - ext_total) / dr), 0);
+    mrcalchisteps = int(ceil((rmax + ext_total) / dr));
 }
 
 }   // namespace srreal

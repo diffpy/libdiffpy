@@ -36,6 +36,11 @@ namespace srreal {
 const double DEFAULT_PDFCALCULATOR_RMAX = 10.0;
 const double DEFAULT_PDFCALCULATOR_RSTEP = 0.01;
 const double DEFAULT_PDFCALCULATOR_MAXEXTENSION = 10.0;
+/// Default peak precision was obtained from the tunePeakPrecision.py script
+/// and it was tuned to give average zero slope in the difference curve
+/// between pdffit2 and PDFCalculator results.
+const double DEFAULT_PEAKPRECISION = 3.33e-6;
+
 const double DEFAULT_QGRID_QMAX = 10.0;
 const double DEFAULT_QGRID_QSTEP = 0.05;
 

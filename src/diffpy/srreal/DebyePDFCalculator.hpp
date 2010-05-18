@@ -121,7 +121,8 @@ class DebyePDFCalculator :
         bool moptimumqstep;
         double mrstep;
         double mmaxextension;
-        double mtotalextension;
+        int mrcalclosteps;
+        int mrcalchisteps;
 
 };  // class DebyePDFCalculator
 

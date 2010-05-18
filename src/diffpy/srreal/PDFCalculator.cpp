@@ -36,16 +36,6 @@ using namespace diffpy::srreal;
 using namespace diffpy::validators;
 using namespace diffpy::mathutils;
 
-// Declaration of Local Helpers ----------------------------------------------
-
-namespace {
-
-/// Default peak precision was obtained from the tunePeakPrecision.py script
-/// and it was tuned to give average zero slope in the difference curve
-/// between pdffit2 and PDFCalculator results.
-const double DEFAULT_PEAK_PRECISION = 3.33e-6;
-
-}   // namespace
 
 // Constructor ---------------------------------------------------------------
 
@@ -62,7 +52,7 @@ PDFCalculator::PDFCalculator()
     // default configuration
     this->setPeakWidthModelByType("jeong");
     this->setPeakProfileByType("gaussian");
-    this->getPeakProfile()->setPrecision(DEFAULT_PEAK_PRECISION);
+    this->getPeakProfile()->setPrecision(DEFAULT_PEAKPRECISION);
     this->setBaselineByType("linear");
     this->setScatteringFactorTableByType("SFTperiodictableXray");
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
