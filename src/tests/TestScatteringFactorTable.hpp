@@ -83,6 +83,10 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             sftb = ScatteringFactorTable::createByType("X");
             TS_ASSERT_DELTA(1.0, sftb->lookup("H"), 0.01);
             TS_ASSERT_DELTA(8.0, sftb->lookup("O"), 0.01);
+            TS_ASSERT_DELTA(10.0, sftb->lookup("O2-"), 0.01);
+            TS_ASSERT_DELTA(11.0, sftb->lookup("Na"), 0.01);
+            TS_ASSERT_DELTA(10.0, sftb->lookup("Na+"), 0.01);
+            TS_ASSERT_EQUALS(sftb->lookup("Na+"), sftb->lookup("Na1+"));
             TS_ASSERT_DELTA(74.0, sftb->lookup("W"), 0.04);
             TS_ASSERT_DELTA(88.0, sftb->lookup("Ra"), 0.04);
         }
