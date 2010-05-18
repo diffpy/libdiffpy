@@ -74,15 +74,15 @@ class SFTperiodictableXray : public ScatteringFactorTable
             return rv;
         }
 
-    protected:
-
-        // methods
 
         double fetch(const string& smbl) const
         {
             return this->fetchatq(smbl, 0.0);
         }
 
+    protected:
+
+        // methods
 
         double fetchatq(const string& smbl, double q) const
         {
@@ -141,9 +141,6 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
             return rv;
         }
 
-    protected:
-
-        // methods
 
         double fetch(const string& smbl) const
         {

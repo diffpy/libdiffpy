@@ -41,10 +41,10 @@ class ScatteringFactorTable :
         void setCustom(const std::string& smbl, double value);
         void resetCustom(const std::string& smbl);
         void resetAll();
+        virtual double fetch(const std::string& smbl) const = 0;
 
     protected:
 
-        virtual double fetch(const std::string& smbl) const = 0;
         mutable std::map<std::string,double> mtable;
 };
 
