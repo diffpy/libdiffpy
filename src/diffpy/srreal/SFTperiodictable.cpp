@@ -80,12 +80,18 @@ class SFTperiodictableXray : public ScatteringFactorTable
 
         double fetch(const string& smbl) const
         {
+            return this->fetchatq(smbl, 0.0);
+        }
+
+
+        double fetchatq(const string& smbl, double q) const
+        {
             diffpy::initializePython();
             static python::object fxrayatq = diffpy::importFromPyModule(
                     "periodictable.cromermann", "fxrayatq");
             double rv;
             try {
-                rv = python::extract<double>(fxrayatq(smbl, 0.0) + 0.0);
+                rv = python::extract<double>(fxrayatq(smbl, q) + 0.0);
             }
             catch (python::error_already_set e) {
                 string emsg = diffpy::getPythonErrorString();

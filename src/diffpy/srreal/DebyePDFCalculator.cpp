@@ -249,7 +249,8 @@ double DebyePDFCalculator::sfSiteAtQ(int siteidx, const double& Q) const
 {
     const ScatteringFactorTablePtr sftable = this->getScatteringFactorTable();
     const string& smbl = mstructure->siteAtomType(siteidx);
-    double rv = sftable->lookup(smbl) * mstructure->siteOccupancy(siteidx);
+    const double occupancy = mstructure->siteOccupancy(siteidx);
+    double rv = sftable->lookupatq(smbl, Q) * occupancy;
     return rv;
 }
 
