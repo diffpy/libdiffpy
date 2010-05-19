@@ -34,14 +34,14 @@ namespace srreal {
 
 // public methods
 
-const double& ScatteringFactorTable::lookup(const string& smbl) const
+double ScatteringFactorTable::lookup(const string& smbl) const
 {
     using namespace std;
     map<string, double>::const_iterator isft;
     isft = mtable.find(smbl);
     if (isft == mtable.end())
     {
-        double value = this->fetch(smbl);
+        double value = this->lookupatq(smbl, 0.0);
         mtable[smbl] = value;
         isft = mtable.find(smbl);
     }
@@ -49,7 +49,7 @@ const double& ScatteringFactorTable::lookup(const string& smbl) const
 }
 
 
-const double& ScatteringFactorTable::lookupatq(const std::string& smbl,
+double ScatteringFactorTable::lookupatq(const std::string& smbl,
         double q) const
 {
     return this->lookup(smbl);

@@ -75,7 +75,7 @@ class SFTperiodictableXray : public ScatteringFactorTable
         }
 
 
-        double fetch(const string& smbl) const
+        double lookupatq(const string& smbl, double q) const
         {
             return this->fetchatq(smbl, 0.0);
         }
@@ -142,7 +142,7 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
         }
 
 
-        double fetch(const string& smbl) const
+        double lookupatq(const string& smbl, double q) const
         {
             diffpy::initializePython();
             static python::object symbol = diffpy::importFromPyModule(
