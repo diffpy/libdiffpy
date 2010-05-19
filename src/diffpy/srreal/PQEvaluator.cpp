@@ -59,6 +59,7 @@ void PQEvaluatorBasic::updateValue(PairQuantity& pq)
         bnds->selectSiteRange(0, i0 + 1);
         for (bnds->rewind(); !bnds->finished(); bnds->next())
         {
+            if (!pq.getPairMask(bnds->site0(), bnds->site1()))  continue;
             int summationscale = (bnds->site0() == bnds->site1()) ? 1 : 2;
             pq.addPairContribution(*bnds, summationscale);
         }

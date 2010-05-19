@@ -36,6 +36,7 @@ PairQuantity::PairQuantity()
     this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
     this->setEvaluator(BASIC);
     mcountsites = 0;
+    this->maskAllPairs(true);
     // attributes
     this->registerDoubleAttribute("rmin", this,
             &PairQuantity::getRmin, &PairQuantity::setRmin);
@@ -97,6 +98,30 @@ void PairQuantity::setEvaluator(PQEvaluatorType evtp)
 int PairQuantity::countSites() const
 {
     return mcountsites;
+}
+
+
+void PairQuantity::maskAllPairs(bool mask)
+{
+    minvertpairmask.clear();
+    mdefaultpairmask = mask;
+}
+
+
+void PairQuantity::maskSitePair(int i, int j, bool mask)
+{
+    pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
+    if (mask == mdefaultpairmask)  minvertpairmask.erase(ij);
+    else    minvertpairmask.insert(ij);
+}
+
+
+bool PairQuantity::getPairMask(int i, int j)
+{
+    pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
+    bool rv = minvertpairmask.count(ij) ?
+        !mdefaultpairmask : mdefaultpairmask;
+    return rv;
 }
 
 // Protected Methods ---------------------------------------------------------

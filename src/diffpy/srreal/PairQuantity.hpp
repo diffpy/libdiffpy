@@ -54,6 +54,9 @@ class PairQuantity : public diffpy::Attributes
         const double& getRmax() const;
         void setEvaluator(PQEvaluatorType evtp);
         int countSites() const;
+        void maskAllPairs(bool mask);
+        void maskSitePair(int i, int j, bool mask);
+        bool getPairMask(int i, int j);
 
     protected:
 
@@ -73,6 +76,8 @@ class PairQuantity : public diffpy::Attributes
         double mrmax;
         boost::shared_ptr<PQEvaluatorBasic> mevaluator;
         int mcountsites;
+        std::set< std::pair<int,int> > minvertpairmask;
+        bool mdefaultpairmask;
 
 };
 
