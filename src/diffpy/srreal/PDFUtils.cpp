@@ -106,13 +106,12 @@ QuantityType fftgtof(const QuantityType& g, double rstep, double rmin)
     {
         gpadc[2 * ilo] = *gi;
     }
-    // copy the odd part of g skipping the first point in rmin-padded,
+    // copy the odd part of g skipping the first point,
     // because it is periodic image of gpadc[0]
-    gi = (padrmin > 0) ? g.begin() : g.empty() ? g.begin() : (g.begin() + 1);
-    int ihi = 2 * Npad2 - padrmin - 1;
-    for (; gi != g.end(); ++gi, --ihi)
+    int ihi = 2 * Npad2 - 1;
+    for (ilo = 1; ilo < Npad2; ++ilo, --ihi)
     {
-        gpadc[2 * ihi] = -1 * (*gi);
+        gpadc[2 * ihi] = -1 * gpadc[2 * ilo];
     }
     int status;
     status = gsl_fft_complex_radix2_inverse(&(gpadc[0]), 1, 2 * Npad2);
