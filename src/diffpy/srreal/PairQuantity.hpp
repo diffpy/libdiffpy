@@ -23,6 +23,7 @@
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/unordered_set.hpp>
 
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -76,7 +77,7 @@ class PairQuantity : public diffpy::Attributes
         double mrmax;
         boost::shared_ptr<PQEvaluatorBasic> mevaluator;
         int mcountsites;
-        std::set< std::pair<int,int> > minvertpairmask;
+        boost::unordered_set< std::pair<int,int> > minvertpairmask;
         bool mdefaultpairmask;
 
 };
