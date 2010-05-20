@@ -61,11 +61,11 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
     private:
 
         auto_ptr<Crystal> mcryst_ni;
-        auto_ptr<StructureAdapter> m_ni;
+        StructureAdapterPtr m_ni;
         auto_ptr<Crystal> mcryst_kbise;
-        auto_ptr<StructureAdapter> m_kbise;
+        StructureAdapterPtr m_kbise;
         auto_ptr<Crystal> mcryst_catio3;
-        auto_ptr<StructureAdapter> m_catio3;
+        StructureAdapterPtr m_catio3;
 
     public:
 
@@ -74,17 +74,17 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
             if (!m_ni.get())
             {
                 mcryst_ni.reset(loadTestCrystal("Ni.cif"));
-                m_ni.reset(createPQAdapter(*mcryst_ni));
+                m_ni = createStructureAdapter(*mcryst_ni);
             }
             if (!m_kbise.get())
             {
                 mcryst_kbise.reset(loadTestCrystal("alpha_K2Bi8Se13.cif"));
-                m_kbise.reset(createPQAdapter(*mcryst_kbise));
+                m_kbise = createStructureAdapter(*mcryst_kbise);
             }
             if (!m_catio3.get())
             {
                 mcryst_catio3.reset(loadTestCrystal("icsd_62149.cif"));
-                m_catio3.reset(createPQAdapter(*mcryst_catio3));
+                m_catio3 = createStructureAdapter(*mcryst_catio3);
             }
         }
 
@@ -202,7 +202,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
     private:
 
         auto_ptr<Crystal> mcryst_ni;
-        auto_ptr<StructureAdapter> m_ni;
+        StructureAdapterPtr m_ni;
         auto_ptr<BaseBondGenerator> m_nibnds;
 
     public:
@@ -212,7 +212,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
             if (!m_ni.get())
             {
                 mcryst_ni.reset(loadTestCrystal("Ni.cif"));
-                m_ni.reset(createPQAdapter(*mcryst_ni));
+                m_ni = createStructureAdapter(*mcryst_ni);
             }
             m_nibnds.reset(m_ni->createBondGenerator());
         }
@@ -252,7 +252,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
         void test_bondCountWurtzite()
         {
             auto_ptr<Crystal> wurtzite(loadTestCrystal("ZnS_wurtzite.cif"));
-            auto_ptr<StructureAdapter> stru(createPQAdapter(*wurtzite));
+            StructureAdapterPtr stru = createStructureAdapter(*wurtzite);
             auto_ptr<BaseBondGenerator> bnds(stru->createBondGenerator());
             TS_ASSERT_EQUALS(2, stru->countSites());
             bnds->selectAnchorSite(0);
@@ -289,7 +289,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
             const string oxygen = "O2-";
             const double epsu = 1e-5;
             auto_ptr<Crystal> litao3(loadTestCrystal("LiTaO3.cif"));
-            auto_ptr<StructureAdapter> stru(createPQAdapter(*litao3));
+            StructureAdapterPtr stru = createStructureAdapter(*litao3);
             TS_ASSERT_EQUALS(3, stru->countSites());
             auto_ptr<BaseBondGenerator> bnds(stru->createBondGenerator());
             bnds->selectAnchorSite(0);
@@ -354,7 +354,7 @@ class TestObjCrystMoleculeAdapter : public CxxTest::TestSuite
     private:
 
         auto_ptr<Molecule> mmol_c60;
-        auto_ptr<StructureAdapter> m_c60;
+        StructureAdapterPtr m_c60;
 
     public:
 
@@ -363,7 +363,7 @@ class TestObjCrystMoleculeAdapter : public CxxTest::TestSuite
             if (!mmol_c60.get())
             {
                 mmol_c60.reset(makeC60Molecule());
-                m_c60.reset(createPQAdapter(*mmol_c60));
+                m_c60 = createStructureAdapter(*mmol_c60);
             }
         }
 
@@ -470,7 +470,7 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
     private:
 
         auto_ptr<Molecule> mmol_c60;
-        auto_ptr<StructureAdapter> m_c60;
+        StructureAdapterPtr m_c60;
         auto_ptr<BaseBondGenerator> m_c60bnds;
 
     public:
@@ -480,7 +480,7 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
             if (!m_c60.get())
             {
                 mmol_c60.reset(makeC60Molecule());
-                m_c60.reset(createPQAdapter(*mmol_c60));
+                m_c60 = createStructureAdapter(*mmol_c60);
             }
             m_c60bnds.reset(m_c60->createBondGenerator());
         }

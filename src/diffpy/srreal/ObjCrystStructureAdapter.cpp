@@ -768,36 +768,36 @@ getUij(const ObjCryst::ScatteringPower* sp)
 
 // Factory Function and its Registration -------------------------------------
 
-StructureAdapter*
+StructureAdapterPtr
 createPyObjCrystStructureAdapter(const boost::python::object& stru)
 {
     using diffpy::importFromPyModule;
     boost::python::object cls_Crystal, None;
     cls_Crystal = importFromPyModule("pyobjcryst.crystal", "Crystal", None);
-    StructureAdapter* rv = NULL;
+    StructureAdapterPtr rv;
     if (cls_Crystal.ptr() != Py_None &&
         PyObject_IsInstance(stru.ptr(), cls_Crystal.ptr()) == 1)
     {
         ObjCryst::Crystal* pcryst =
             boost::python::extract<ObjCryst::Crystal*>(stru);
-        rv = createPQAdapter(*pcryst);
+        rv = createStructureAdapter(*pcryst);
     }
     return rv;
 }
 
-StructureAdapter*
+StructureAdapterPtr
 createPyObjCrystMoleculeAdapter(const boost::python::object& stru)
 {
     using diffpy::importFromPyModule;
     boost::python::object cls_Molecule, None;
     cls_Molecule = importFromPyModule("pyobjcryst.molecule", "Molecule", None);
-    StructureAdapter* rv = NULL;
+    StructureAdapterPtr rv;
     if (cls_Molecule.ptr() != Py_None &&
         PyObject_IsInstance(stru.ptr(), cls_Molecule.ptr()) == 1)
     {
         ObjCryst::Molecule* pmolecule =
             boost::python::extract<ObjCryst::Molecule*>(stru);
-        rv = createPQAdapter(*pmolecule);
+        rv = createStructureAdapter(*pmolecule);
     }
     return rv;
 }

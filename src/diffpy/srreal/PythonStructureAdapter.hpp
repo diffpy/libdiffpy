@@ -12,8 +12,8 @@
 *
 ******************************************************************************
 *
-* createPQAdapter - a factory for creating StructureAdapter for recognized
-*     Python objects
+* createStructureAdapter - a factory for creating StructureAdapter
+*     for recognized Python objects
 *
 * $Id$
 *
@@ -29,11 +29,11 @@ namespace diffpy {
 namespace srreal {
 
 /// Factory for constructing appropriate StructureAdapter for a Python object.
-StructureAdapter* createPQAdapter(const boost::python::object& stru);
+StructureAdapterPtr createStructureAdapter(const boost::python::object& stru);
 
 /// PythonStructureAdapterFactory type is a function that can
 /// create StructureAdapter from boost::python object
-typedef StructureAdapter*
+typedef StructureAdapterPtr
     (*PythonStructureAdapterFactory)(const boost::python::object&);
 
 /// This function registers a concrete structure adapter factory

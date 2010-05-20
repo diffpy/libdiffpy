@@ -154,9 +154,9 @@ const R3::Vector& VR3BondGenerator::r1() const
 // Inline Routines -----------------------------------------------------------
 
 inline
-StructureAdapter* createPQAdapter(const VR3Structure& vr3stru)
+StructureAdapterPtr createStructureAdapter(const VR3Structure& vr3stru)
 {
-    StructureAdapter* adapter = new VR3Adapter(vr3stru);
+    StructureAdapterPtr adapter(new VR3Adapter(vr3stru));
     return adapter;
 }
 

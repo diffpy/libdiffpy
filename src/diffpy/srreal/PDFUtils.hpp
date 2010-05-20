@@ -49,7 +49,7 @@ double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
         bool anisotropy=true);
 
 /// Maximum diagonal Uii element from all atoms in the structure.
-double maxUii(const StructureAdapter* stru);
+double maxUii(ConstStructureAdapterPtr stru);
 
 /// fast Fourier transformation converting G(r) to F(Q)
 QuantityType fftgtof(const QuantityType& g, double rstep, double rmin=0.0);

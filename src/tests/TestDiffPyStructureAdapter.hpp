@@ -53,10 +53,10 @@ class TestDiffPyStructureAdapter : public CxxTest::TestSuite
 {
     private:
 
-        auto_ptr<StructureAdapter> m_ni;
-        auto_ptr<StructureAdapter> m_kbise;
-        auto_ptr<StructureAdapter> m_catio3;
-        auto_ptr<StructureAdapter> m_pswt;
+        StructureAdapterPtr m_ni;
+        StructureAdapterPtr m_kbise;
+        StructureAdapterPtr m_catio3;
+        StructureAdapterPtr m_pswt;
 
     public:
 
@@ -66,22 +66,22 @@ class TestDiffPyStructureAdapter : public CxxTest::TestSuite
             if (!m_ni.get())
             {
                 stru = loadTestStructure("Ni.cif");
-                m_ni.reset(createPQAdapter(stru));
+                m_ni = createStructureAdapter(stru);
             }
             if (!m_kbise.get())
             {
                 stru = loadTestStructure("alpha_K2Bi8Se13.cif");
-                m_kbise.reset(createPQAdapter(stru));
+                m_kbise = createStructureAdapter(stru);
             }
             if (!m_catio3.get())
             {
                 stru = loadTestStructure("icsd_62149.cif");
-                m_catio3.reset(createPQAdapter(stru));
+                m_catio3 = createStructureAdapter(stru);
             }
             if (!m_pswt.get())
             {
                 stru = loadTestStructure("PbScW25TiO3.stru");
-                m_pswt.reset(createPQAdapter(stru));
+                m_pswt = createStructureAdapter(stru);
             }
         }
 
@@ -266,7 +266,7 @@ class TestDiffPyStructureBondGenerator : public CxxTest::TestSuite
         void test_bondCountWurtzite()
         {
             python::object wurtzite = loadTestStructure("ZnS_wurtzite.cif");
-            auto_ptr<StructureAdapter> stru(createPQAdapter(wurtzite));
+            StructureAdapterPtr stru = createStructureAdapter(wurtzite);
             auto_ptr<BaseBondGenerator> bnds(stru->createBondGenerator());
             TS_ASSERT_EQUALS(4, stru->countSites());
             bnds->selectAnchorSite(0);
@@ -307,7 +307,7 @@ class TestDiffPyStructureBondGenerator : public CxxTest::TestSuite
             const string oxygen = "O2-";
             const double epsu = 1e-5;
             python::object litao3 = loadTestStructure("LiTaO3.cif");
-            auto_ptr<StructureAdapter> stru(createPQAdapter(litao3));
+            StructureAdapterPtr stru = createStructureAdapter(litao3);
             TS_ASSERT_EQUALS(30, stru->countSites());
             auto_ptr<BaseBondGenerator> bnds(stru->createBondGenerator());
             bnds->selectAnchorSite(0);

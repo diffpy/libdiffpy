@@ -347,16 +347,16 @@ void DiffPyStructurePeriodicBondGenerator::rewindSymmetry()
 
 // Factory Function and its Registration -------------------------------------
 
-StructureAdapter* createDiffPyStructureAdapter(const python::object& stru)
+StructureAdapterPtr createDiffPyStructureAdapter(const python::object& stru)
 {
     using diffpy::importFromPyModule;
     python::object cls_Structure, None;
     cls_Structure = importFromPyModule("diffpy.Structure", "Structure", None);
-    StructureAdapter* rv = NULL;
+    StructureAdapterPtr rv;
     if (cls_Structure.ptr() != Py_None &&
         PyObject_IsInstance(stru.ptr(), cls_Structure.ptr()) == 1)
     {
-        rv = new DiffPyStructureAdapter(stru);
+        rv.reset(new DiffPyStructureAdapter(stru));
     }
     return rv;
 }

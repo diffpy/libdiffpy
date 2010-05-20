@@ -46,13 +46,12 @@ PairQuantity::PairQuantity()
 
 // Public Methods ------------------------------------------------------------
 
-const QuantityType& PairQuantity::eval(const StructureAdapter& stru)
+const QuantityType& PairQuantity::eval(ConstStructureAdapterPtr stru)
 {
-    mstructure = &stru;
+    mstructure = stru;
     mcountsites = mstructure->countSites();
     mstructure->customPQConfig(this);
     mevaluator->updateValue(*this);
-    mstructure = NULL;
     return this->value();
 }
 

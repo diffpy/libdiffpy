@@ -12,8 +12,8 @@
 *
 ******************************************************************************
 *
-* createPQAdapter - a factory for creating StructureAdapter for recognized
-*     Python objects
+* createStructureAdapter - a factory for creating StructureAdapter
+*     for recognized Python objects
 *
 * $Id$
 *
@@ -48,9 +48,9 @@ PSAFactorySet& getPSAFactorySet()
 
 // Routines ------------------------------------------------------------------
 
-StructureAdapter* createPQAdapter(const boost::python::object& stru)
+StructureAdapterPtr createStructureAdapter(const boost::python::object& stru)
 {
-    StructureAdapter* rv = NULL;
+    StructureAdapterPtr rv;
     // Loop over all registered factories.  They should return
     // a new StructureAdapter instance or NULL on failure.
     PSAFactorySet::iterator factory = getPSAFactorySet().begin();
@@ -58,7 +58,7 @@ StructureAdapter* createPQAdapter(const boost::python::object& stru)
     for (; factory != last; ++factory)
     {
         rv = (*factory)(stru);
-        if (rv)  return rv;
+        if (rv.get())  return rv;
     }
     // We get here only if nothing worked.
     python::object pytype = python::import("__builtin__").attr("type");

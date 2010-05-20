@@ -22,6 +22,7 @@
 #ifndef STRUCTUREADAPTER_HPP_INCLUDED
 #define STRUCTUREADAPTER_HPP_INCLUDED
 
+#include <boost/shared_ptr.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
 
 namespace diffpy {
@@ -29,6 +30,11 @@ namespace srreal {
 
 class BaseBondGenerator;
 class PairQuantity;
+
+/// shared pointer to StructureAdapter
+
+typedef boost::shared_ptr<const class StructureAdapter> ConstStructureAdapterPtr;
+typedef boost::shared_ptr<class StructureAdapter> StructureAdapterPtr;
 
 /// @class StructureAdapter
 /// @brief abstract adaptor to structure data needed by
@@ -39,6 +45,8 @@ class StructureAdapter
     public:
 
         virtual ~StructureAdapter()  { }
+        // FIXME: to be implemented
+        // virtual StructureAdapterPtr clone() const = 0;
 
         // methods
 

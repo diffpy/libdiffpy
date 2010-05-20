@@ -73,7 +73,7 @@ double meanSquareDisplacement(const R3::Matrix& Uijcartn,
 }
 
 
-double maxUii(const StructureAdapter* stru)
+double maxUii(ConstStructureAdapterPtr stru)
 {
     if (!stru)  return 0.0;
     double rv = 0.0;

@@ -233,19 +233,19 @@ namespace objcrystutil
 
 
 inline
-StructureAdapter* 
-createPQAdapter(const ObjCryst::Crystal& cryst)
+StructureAdapterPtr 
+createStructureAdapter(const ObjCryst::Crystal& cryst)
 {
-    StructureAdapter* adapter = new ObjCrystStructureAdapter(cryst);
+    StructureAdapterPtr adapter(new ObjCrystStructureAdapter(cryst));
     return adapter;
 }
 
 
 inline
-StructureAdapter* 
-createPQAdapter(const ObjCryst::Molecule& molecule)
+StructureAdapterPtr 
+createStructureAdapter(const ObjCryst::Molecule& molecule)
 {
-    StructureAdapter* adapter = new ObjCrystMoleculeAdapter(molecule);
+    StructureAdapterPtr adapter(new ObjCrystMoleculeAdapter(molecule));
     return adapter;
 }
 
