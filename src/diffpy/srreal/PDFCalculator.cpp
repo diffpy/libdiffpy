@@ -437,7 +437,7 @@ void PDFCalculator::resetValue()
     this->cacheRlimitsData();
     // when applicable, configure linear baseline
     double numdensity = mstructure->numberDensity();
-    if (numdensity > 0 && this->getBaseline()->type() == "linear")
+    if (this->getBaseline()->type() == "linear")
     {
         PDFBaseline& bl = *(this->getBaseline());
         bl.setDoubleAttr("slope", -4 * M_PI * numdensity);
