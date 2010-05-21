@@ -44,7 +44,7 @@ class DiffPyStructureAdapter : public StructureAdapter
     public:
 
         // constructors
-        DiffPyStructureAdapter(const boost::python::object&);
+        DiffPyStructureAdapter(boost::python::object);
 
         // methods - overloaded
         virtual BaseBondGenerator* createBondGenerator() const;
@@ -70,7 +70,7 @@ class DiffPyStructureAdapter : public StructureAdapter
     private:
 
         // data
-        const boost::python::object* mdpstructure;
+        boost::python::object mpystructure;
         // copied properties
         Lattice mlattice;
         std::vector<R3::Vector> mcartesian_positions;

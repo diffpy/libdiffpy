@@ -48,9 +48,16 @@ PSAFactorySet& getPSAFactorySet()
 
 // Routines ------------------------------------------------------------------
 
-StructureAdapterPtr createStructureAdapter(const boost::python::object& stru)
+StructureAdapterPtr createStructureAdapter(const boost::python::object stru)
 {
     StructureAdapterPtr rv;
+    // First check if stru is already a wrapped StructureAdapterPtr
+    python::extract<StructureAdapterPtr> getadapter(stru);
+    if (getadapter.check())
+    {
+        rv = getadapter();
+        return rv;
+    }
     // Loop over all registered factories.  They should return
     // a new StructureAdapter instance or NULL on failure.
     PSAFactorySet::iterator factory = getPSAFactorySet().begin();

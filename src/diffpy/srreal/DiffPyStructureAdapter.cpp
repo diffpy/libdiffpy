@@ -46,9 +46,9 @@ using namespace diffpy::srreal;
 
 // Constructor ---------------------------------------------------------------
 
-DiffPyStructureAdapter::DiffPyStructureAdapter(const python::object& dpstru)
+DiffPyStructureAdapter::DiffPyStructureAdapter(python::object dpstru)
 {
-    mdpstructure = &dpstru;
+    mpystructure = dpstru;
     this->fetchPythonData();
 }
 
@@ -132,7 +132,7 @@ void DiffPyStructureAdapter::fetchPythonData()
 {
     // mlattice
     python::object lattice;
-    lattice = mdpstructure->attr("lattice");
+    lattice = mpystructure.attr("lattice");
     double a, b, c, alpha, beta, gamma;
     a = python::extract<double>(lattice.attr("a"));
     b = python::extract<double>(lattice.attr("b"));
@@ -147,11 +147,11 @@ void DiffPyStructureAdapter::fetchPythonData()
     manisotropies.clear();
     mcartesian_uijs.clear();
     matomtypes.clear();
-    int num_atoms = python::len(*mdpstructure);
+    int num_atoms = python::len(mpystructure);
     for (int i = 0; i < num_atoms; ++i)
     {
         python::object ai;
-        ai = (*mdpstructure)[i];
+        ai = mpystructure[i];
         // mcartesian_positions
         python::object xyz = ai.attr("xyz");
         double x, y, z;
@@ -191,8 +191,8 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator* pdfc) const
 {
     // this is only needed if diffpy.Structure instance has pdffit attribute
     // with PDF-related structure properties
-    if (!PyObject_HasAttrString(mdpstructure->ptr(), "pdffit"))  return;
-    python::object stru_pdffit = mdpstructure->attr("pdffit");
+    if (!PyObject_HasAttrString(mpystructure.ptr(), "pdffit"))  return;
+    python::object stru_pdffit = mpystructure.attr("pdffit");
     PDFEnvelopePtr envelope;
     // get method of the stru.pdffit dictionary
     python::object pfget = stru_pdffit.attr("get");
@@ -320,7 +320,7 @@ void DiffPyStructurePeriodicBondGenerator::rewindSymmetry()
 
 // Factory Function and its Registration -------------------------------------
 
-StructureAdapterPtr createDiffPyStructureAdapter(const python::object& stru)
+StructureAdapterPtr createDiffPyStructureAdapter(python::object stru)
 {
     using diffpy::importFromPyModule;
     python::object cls_Structure, None;

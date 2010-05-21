@@ -29,12 +29,12 @@ namespace diffpy {
 namespace srreal {
 
 /// Factory for constructing appropriate StructureAdapter for a Python object.
-StructureAdapterPtr createStructureAdapter(const boost::python::object& stru);
+StructureAdapterPtr createStructureAdapter(boost::python::object stru);
 
 /// PythonStructureAdapterFactory type is a function that can
 /// create StructureAdapter from boost::python object
 typedef StructureAdapterPtr
-    (*PythonStructureAdapterFactory)(const boost::python::object&);
+    (*PythonStructureAdapterFactory)(boost::python::object);
 
 /// This function registers a concrete structure adapter factory
 bool registerPythonStructureAdapterFactory(PythonStructureAdapterFactory);

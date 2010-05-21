@@ -712,7 +712,7 @@ getUij(const ObjCryst::ScatteringPower* sp)
 // Factory Function and its Registration -------------------------------------
 
 StructureAdapterPtr
-createPyObjCrystStructureAdapter(const boost::python::object& stru)
+createPyObjCrystStructureAdapter(boost::python::object stru)
 {
     using diffpy::importFromPyModule;
     boost::python::object cls_Crystal, None;
@@ -729,7 +729,7 @@ createPyObjCrystStructureAdapter(const boost::python::object& stru)
 }
 
 StructureAdapterPtr
-createPyObjCrystMoleculeAdapter(const boost::python::object& stru)
+createPyObjCrystMoleculeAdapter(boost::python::object stru)
 {
     using diffpy::importFromPyModule;
     boost::python::object cls_Molecule, None;
