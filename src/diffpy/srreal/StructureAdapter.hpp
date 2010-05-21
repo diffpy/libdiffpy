@@ -33,7 +33,6 @@ class PairQuantity;
 
 /// shared pointer to StructureAdapter
 
-typedef boost::shared_ptr<const class StructureAdapter> ConstStructureAdapterPtr;
 typedef boost::shared_ptr<class StructureAdapter> StructureAdapterPtr;
 
 /// @class StructureAdapter
@@ -96,7 +95,7 @@ double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
         bool anisotropy=true);
 
 /// Maximum diagonal Uii element from all atoms in the structure.
-double maxUii(ConstStructureAdapterPtr stru);
+double maxUii(StructureAdapterPtr stru);
 
 /// Return bare element symbol from atom symbol that may be isotope or ion,
 /// for example "Ca2+" or "12-C".

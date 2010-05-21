@@ -46,7 +46,7 @@ PairQuantity::PairQuantity()
 
 // Public Methods ------------------------------------------------------------
 
-const QuantityType& PairQuantity::eval(ConstStructureAdapterPtr stru)
+const QuantityType& PairQuantity::eval(StructureAdapterPtr stru)
 {
     mstructure = stru;
     mcountsites = mstructure->countSites();

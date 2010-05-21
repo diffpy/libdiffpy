@@ -44,7 +44,7 @@ class PairQuantity : public diffpy::Attributes
         virtual ~PairQuantity()  { }
 
         // methods
-        const QuantityType& eval(ConstStructureAdapterPtr);
+        const QuantityType& eval(StructureAdapterPtr);
         template <class T> const QuantityType& eval(const T&);
         const QuantityType& value() const;
 
@@ -72,7 +72,7 @@ class PairQuantity : public diffpy::Attributes
 
         // data
         QuantityType mvalue;
-        ConstStructureAdapterPtr mstructure;
+        StructureAdapterPtr mstructure;
         double mrmin;
         double mrmax;
         boost::shared_ptr<PQEvaluatorBasic> mevaluator;
@@ -87,7 +87,7 @@ class PairQuantity : public diffpy::Attributes
 template <class T>
 const QuantityType& PairQuantity::eval(const T& stru)
 {
-    ConstStructureAdapterPtr bstru = createStructureAdapter(stru);
+    StructureAdapterPtr bstru = createStructureAdapter(stru);
     return this->eval(bstru);
 }
 
