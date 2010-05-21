@@ -107,8 +107,7 @@ class ObjCrystAperiodicBondGenerator : public BaseBondGenerator
 
         // data access
         virtual const R3::Vector& r1() const;
-        virtual double msd0() const;
-        virtual double msd1() const;
+        virtual const R3::Matrix& Ucartesian1() const;
 
     protected:
 
@@ -122,10 +121,6 @@ class ObjCrystAperiodicBondGenerator : public BaseBondGenerator
         const ObjCrystStructureAdapter* mpstructure;
         // Index over symmetry
         size_t msymidx;
-
-    private:
-
-        double msd(int siteidx, int symidx) const;
 
 };
 
@@ -210,18 +205,10 @@ class ObjCrystMoleculeBondGenerator : public BaseBondGenerator
         // constructors
         ObjCrystMoleculeBondGenerator(const ObjCrystMoleculeAdapter*);
 
-        // data access
-        virtual double msd0() const;
-        virtual double msd1() const;
-
     protected:
 
         // The adapted structure
         const ObjCrystMoleculeAdapter* mpstructure;
-
-    private:
-
-    double msd(int siteidx) const;
 
 };
 

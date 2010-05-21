@@ -63,8 +63,8 @@ class BaseBondGenerator
         virtual const R3::Vector& r1() const;
         double distance() const;
         const R3::Vector& r01() const;
-        virtual double msd0() const;
-        virtual double msd1() const;
+        virtual const R3::Matrix& Ucartesian0() const;
+        virtual const R3::Matrix& Ucartesian1() const;
         double msd() const;
 
     protected:

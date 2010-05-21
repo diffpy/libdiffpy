@@ -47,6 +47,26 @@ int countBonds(BaseBondGenerator& bnds)
     return rv;
 }
 
+
+template <class Tstru, class Tbnds>
+double testmsd0(const Tstru& stru, const Tbnds& bnds)
+{
+    bool anisotropy0 = stru->siteAnisotropy(bnds->site0());
+    double rv = meanSquareDisplacement(
+            bnds->Ucartesian0(), bnds->r01(), anisotropy0);
+    return rv;
+}
+
+
+template <class Tstru, class Tbnds>
+double testmsd1(const Tstru& stru, const Tbnds& bnds)
+{
+    bool anisotropy1 = stru->siteAnisotropy(bnds->site1());
+    double rv = meanSquareDisplacement(
+            bnds->Ucartesian1(), bnds->r01(), anisotropy1);
+    return rv;
+}
+
 // Defined below
 Molecule* makeC60Molecule();
 
@@ -302,8 +322,8 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
             {
                 TS_ASSERT_EQUALS(lithium, stru->siteAtomType(bnds->site0()));
                 TS_ASSERT_EQUALS(oxygen, stru->siteAtomType(bnds->site1()));
-                TS_ASSERT_DELTA(0.00265968, bnds->msd0(), epsu);
-                TS_ASSERT_DELTA(0.00710945, bnds->msd1(), epsu);
+                TS_ASSERT_DELTA(0.00265968, testmsd0(stru, bnds), epsu);
+                TS_ASSERT_DELTA(0.00710945, testmsd1(stru, bnds), epsu);
             }
             // there are 3 oxygen neighbors at 2.26
             bnds->setRmin(2.2);
@@ -312,8 +332,8 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
             for (bnds->rewind(); !bnds->finished(); bnds->next())
             {
                 TS_ASSERT_EQUALS(oxygen, stru->siteAtomType(bnds->site1()));
-                TS_ASSERT_DELTA(0.00265968, bnds->msd0(), epsu);
-                TS_ASSERT_DELTA(0.00824319, bnds->msd1(), epsu);
+                TS_ASSERT_DELTA(0.00265968, testmsd0(stru, bnds), epsu);
+                TS_ASSERT_DELTA(0.00824319, testmsd1(stru, bnds), epsu);
             }
             // finally there are 4 Ta neighbors between 2.8 and 3.1
             bnds->setRmin(2.8);
@@ -321,20 +341,20 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(4, countBonds(*bnds));
             for (bnds->rewind(); !bnds->finished(); bnds->next())
             {
-                TS_ASSERT_DELTA(0.00265968, bnds->msd0(), epsu);
+                TS_ASSERT_DELTA(0.00265968, testmsd0(stru, bnds), epsu);
                 TS_ASSERT_EQUALS(tantalum, stru->siteAtomType(bnds->site1()));
                 R3::Vector r01xy = bnds->r01();
                 r01xy[2] = 0.0;
                 // for the tantalum above Li the msd equals U33
                 if (R3::norm(r01xy) < 0.1)
                 {
-                    TS_ASSERT_DELTA(0.00356, bnds->msd1(), epsu);
+                    TS_ASSERT_DELTA(0.00356, testmsd1(stru, bnds), epsu);
                 }
                 // other 3 tantalums are related by tripple axis and
                 // have the same msd towards the central Li
                 else
                 {
-                    TS_ASSERT_DELTA(0.00486942, bnds->msd1(), epsu);
+                    TS_ASSERT_DELTA(0.00486942, testmsd1(stru, bnds), epsu);
                 }
             }
         }

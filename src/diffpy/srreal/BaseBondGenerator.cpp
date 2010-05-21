@@ -177,21 +177,28 @@ const R3::Vector& BaseBondGenerator::r01() const
 }
 
 
-double BaseBondGenerator::msd0() const
+const R3::Matrix& BaseBondGenerator::Ucartesian0() const
 {
-    return 0.0;
+    return mstructure->siteCartesianUij(this->site0());
 }
 
 
-double BaseBondGenerator::msd1() const
+const R3::Matrix& BaseBondGenerator::Ucartesian1() const
 {
-    return 0.0;
+    return mstructure->siteCartesianUij(this->site1());
 }
 
 
 double BaseBondGenerator::msd() const
 {
-    return (this->msd0() + this->msd1());
+    static R3::Vector s;
+    s = this->r01();
+    double msd0 = meanSquareDisplacement(this->Ucartesian0(), s,
+            mstructure->siteAnisotropy(this->site0()));
+    double msd1 = meanSquareDisplacement(this->Ucartesian1(), s,
+            mstructure->siteAnisotropy(this->site1()));
+    double rv = msd0 + msd1;
+    return rv;
 }
 
 // Protected Methods ---------------------------------------------------------

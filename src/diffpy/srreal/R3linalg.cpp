@@ -31,6 +31,15 @@ const R3::Matrix& R3::identity()
 }
 
 
+const R3::Matrix& R3::zeros()
+{
+    static R3::Matrix mx;
+    static bool mx_ready = false;
+    if (!mx_ready)  mx = 0.0;
+    return mx;
+}
+
+
 double R3::determinant(const R3::Matrix& A)
 {
     gsl_matrix* gA = gsl_matrix_alloc(R3::Ndim, R3::Ndim);

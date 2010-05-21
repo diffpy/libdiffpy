@@ -91,6 +91,13 @@ class StructureAdapter
 
 // Routines ------------------------------------------------------------------
 
+/// Calculate MSD along specified direction in Cartesian space.
+double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
+        bool anisotropy=true);
+
+/// Maximum diagonal Uii element from all atoms in the structure.
+double maxUii(ConstStructureAdapterPtr stru);
+
 /// Return bare element symbol from atom symbol that may be isotope or ion,
 /// for example "Ca2+" or "12-C".
 std::string atomBareSymbol(const std::string& atomtype);

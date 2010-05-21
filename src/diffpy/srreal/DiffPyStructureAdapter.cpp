@@ -32,7 +32,6 @@
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
-#include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/srreal/ScaleEnvelope.hpp>
@@ -246,32 +245,6 @@ DiffPyStructureBaseBondGenerator::DiffPyStructureBaseBondGenerator(
         const DiffPyStructureAdapter* adpt) : BaseBondGenerator(adpt)
 {
     mdpstructure = adpt;
-}
-
-// Public Methods ------------------------------------------------------------
-
-double DiffPyStructureBaseBondGenerator::msd0() const
-{
-    double rv = this->msdSiteDir(this->site0(), this->r01());
-    return rv;
-}
-
-
-double DiffPyStructureBaseBondGenerator::msd1() const
-{
-    double rv = this->msdSiteDir(this->site1(), this->r01());
-    return rv;
-}
-
-// Private Methods -----------------------------------------------------------
-
-double DiffPyStructureBaseBondGenerator::msdSiteDir(
-        int siteidx, const R3::Vector& s) const
-{
-    const R3::Matrix& Uijcartn = mdpstructure->siteCartesianUij(siteidx);
-    bool anisotropy = mdpstructure->siteAnisotropy(siteidx);
-    double rv = meanSquareDisplacement(Uijcartn, s, anisotropy);
-    return rv;
 }
 
 //////////////////////////////////////////////////////////////////////////////

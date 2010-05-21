@@ -22,10 +22,12 @@
 #include <cstdlib>
 #include <cctype>
 
+#include <diffpy/mathutils.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 
 using namespace std;
+using diffpy::mathutils::eps_eq;
 
 namespace diffpy {
 namespace srreal {
@@ -69,6 +71,51 @@ double StructureAdapter::siteOccupancy(int idx) const
 }
 
 // Routines ------------------------------------------------------------------
+
+double meanSquareDisplacement(const R3::Matrix& Uijcartn,
+        const R3::Vector& s, bool anisotropy)
+{
+    double rv;
+    if (anisotropy)
+    {
+        assert(R3::norm(s) > 0);
+        assert(eps_eq(Uijcartn(0,1), Uijcartn(1,0)));
+        assert(eps_eq(Uijcartn(0,2), Uijcartn(2,0)));
+        assert(eps_eq(Uijcartn(1,2), Uijcartn(2,1)));
+        static R3::Vector sn;
+        sn = s / R3::norm(s);
+        rv = Uijcartn(0,0) * sn(0) * sn(0) +
+             Uijcartn(1,1) * sn(1) * sn(1) +
+             Uijcartn(2,2) * sn(2) * sn(2) +
+             2 * Uijcartn(0,1) * sn(0) * sn(1) +
+             2 * Uijcartn(0,2) * sn(0) * sn(2) +
+             2 * Uijcartn(1,2) * sn(1) * sn(2);
+    }
+    else
+    {
+        assert(eps_eq(Uijcartn(0,0), Uijcartn(1,1)));
+        assert(eps_eq(Uijcartn(0,0), Uijcartn(2,2)));
+        rv = Uijcartn(0,0);
+    }
+    return rv;
+}
+
+
+double maxUii(ConstStructureAdapterPtr stru)
+{
+    if (!stru)  return 0.0;
+    double rv = 0.0;
+    for (int i = 0; i < stru->countSites(); ++i)
+    {
+        const R3::Matrix& U = stru->siteCartesianUij(i);
+        for (int k = 0; k < R3::Ndim; k++)
+        {
+            if (U(k,k) > rv)   rv = U(k,k);
+        }
+    }
+    return rv;
+}
+
 
 std::string atomBareSymbol(const std::string& atomtype)
 {

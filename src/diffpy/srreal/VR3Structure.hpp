@@ -113,9 +113,7 @@ bool VR3Adapter::siteAnisotropy(int idx) const
 inline
 const R3::Matrix& VR3Adapter::siteCartesianUij(int idx) const
 {
-    static R3::Matrix Uzero;
-    Uzero = 0.0;
-    return Uzero;
+    return R3::zeros();
 }
 
 

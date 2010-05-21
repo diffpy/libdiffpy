@@ -34,7 +34,6 @@
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/Lattice.hpp>
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
-#include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
 
 using namespace std;
@@ -542,20 +541,11 @@ r1() const
 }
 
 
-double 
+const R3::Matrix&
 ObjCrystAperiodicBondGenerator::
-msd0() const
+Ucartesian1() const
 {
-    double rv = msd(this->site0(), 0);
-    return rv;
-}
-
-
-double 
-ObjCrystAperiodicBondGenerator::
-msd1() const
-{
-    double rv = msd(this->site1(), msymidx);
+    const R3::Matrix& rv = mpstructure->mvuij[this->site1()][msymidx];
     return rv;
 }
 
@@ -581,19 +571,6 @@ rewindSymmetry()
 {
     this->uncache();
     this->msymidx = 0;
-}
-
-
-double 
-ObjCrystAperiodicBondGenerator::
-msd(int siteidx, int symidx) const
-{
-    // Get the proper Uij tensor for the given site, and symmetry indices
-    const R3::Matrix& UCart = mpstructure->mvuij[siteidx][symidx];
-    const R3::Vector& s = this->r01();
-    bool anisotropy = mpstructure->siteAnisotropy(siteidx);
-    double rv = meanSquareDisplacement(UCart, s, anisotropy);
-    return rv;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -703,40 +680,6 @@ ObjCrystMoleculeBondGenerator(const ObjCrystMoleculeAdapter* adpt)
     : BaseBondGenerator(adpt), mpstructure(adpt)
 {
 }
-
-
-// Public Methods ------------------------------------------------------------
-
-double 
-ObjCrystMoleculeBondGenerator::
-msd0() const
-{
-    double rv = msd(this->site0());
-    return rv;
-}
-
-
-double 
-ObjCrystMoleculeBondGenerator::
-msd1() const
-{
-    double rv = msd(this->site1());
-    return rv;
-}
-
-
-double 
-ObjCrystMoleculeBondGenerator::
-msd(int siteidx) const
-{
-    // Get the proper Uij tensor for the given site, and symmetry indices
-    const R3::Matrix& UCart = mpstructure->mvuij[siteidx];
-    const R3::Vector& s = this->r01();
-    bool anisotropy = mpstructure->siteAnisotropy(siteidx);
-    double rv = meanSquareDisplacement(UCart, s, anisotropy);
-    return rv;
-}
-
 
 // Utility functions --------------------------------------------------------
 

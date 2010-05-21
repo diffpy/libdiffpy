@@ -44,13 +44,6 @@ const double DEFAULT_PEAKPRECISION = 3.33e-6;
 const double DEFAULT_QGRID_QMAX = 10.0;
 const double DEFAULT_QGRID_QSTEP = 0.05;
 
-/// Calculate MSD along specified direction in Cartesian space.
-double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
-        bool anisotropy=true);
-
-/// Maximum diagonal Uii element from all atoms in the structure.
-double maxUii(ConstStructureAdapterPtr stru);
-
 /// fast Fourier transformation converting G(r) to F(Q)
 QuantityType fftgtof(const QuantityType& g, double rstep, double rmin=0.0);
 

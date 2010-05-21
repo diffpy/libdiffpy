@@ -89,20 +89,10 @@ class DiffPyStructureBaseBondGenerator : public BaseBondGenerator
         // constructors
         DiffPyStructureBaseBondGenerator(const DiffPyStructureAdapter*);
 
-        // methods
-        // data access
-        virtual double msd0() const;
-        virtual double msd1() const;
-
     protected:
 
         // data
         const DiffPyStructureAdapter* mdpstructure;
-
-    private:
-
-        // methods
-        double msdSiteDir(int siteidx, const R3::Vector& s) const;
 };
 
 

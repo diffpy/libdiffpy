@@ -47,6 +47,7 @@ typedef blitz::TinyVector<double,Ndim> Vector;
 // Functions
 
 const Matrix& identity();
+const Matrix& zeros();
 double determinant(const Matrix& A);
 Matrix inverse(const Matrix& A);
 Matrix transpose(const Matrix& A);
