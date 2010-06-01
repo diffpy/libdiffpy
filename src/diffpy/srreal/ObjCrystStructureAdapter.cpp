@@ -14,10 +14,12 @@
 *
 * class ObjCrystStructureAdapter   
 *   -- adapter to the Crystal class from ObjCryst++.
-* class ObjCrystAperiodicBondGenerator 
-*   -- Generate bonds from aperiodic ObjCrystStructureAdapter.
-* class ObjCrystPeriodicBondGenerator     
+* class ObjCrystBondGenerator     
 *   -- Generate bonds from periodic ObjCrystStructureAdapter.
+* class ObjCrystMoleculeAdapter
+*   -- adapter class for Molecule class from ObjCryst++.
+* class ObjCrystMoleculeBondGenerator
+*   -- Generate bonds from ObjCrystMoleculeAdapter
 *
 * $Id$
 *
@@ -76,14 +78,7 @@ ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst) : mpcryst(&cryst)
     // off momentarily.
     int usepopcorr = mpcryst->GetUseDynPopCorr();
     const_cast<Crystal*>(mpcryst)->SetUseDynPopCorr(0);
-    if (this->isPeriodic())
-    {
-        this->getPeriodicUnitCell();
-    }
-    else
-    {
-        this->getAperiodicUnitCell();
-    }
+    this->getUnitCell();
     // Undo change
     const_cast<Crystal*>(mpcryst)->SetUseDynPopCorr(usepopcorr);
 }
@@ -96,9 +91,7 @@ ObjCrystStructureAdapter::
 createBondGenerator() const
 {
 
-    BaseBondGenerator* bnds = this->isPeriodic() ?
-        new ObjCrystPeriodicBondGenerator(this) :
-        new ObjCrystAperiodicBondGenerator(this);
+    BaseBondGenerator* bnds = new ObjCrystBondGenerator(this);
     return bnds;
 }
 
@@ -115,8 +108,7 @@ double
 ObjCrystStructureAdapter::
 numberDensity() const
 {
-    double rv = this->isPeriodic() ?
-        (this->totalOccupancy() / mlattice.volume()) : 0.0;
+    double rv = this->totalOccupancy() / mlattice.volume();
     return rv;
 }
 
@@ -183,23 +175,12 @@ siteAtomType(int idx) const
     return mvsc[idx].mpScattPow->GetSymbol();
 }
 
-
-bool 
-ObjCrystStructureAdapter::
-isPeriodic() const
-{
-    const Lattice& L = this->getLattice();
-    bool rv = !(R3::EpsEqual(R3::identity(), L.base()));
-    return rv;
-}
-
-
 // Private Methods -----------------------------------------------------------
 
 /* Get the conventional unit cell from the crystal. */
 void
 ObjCrystStructureAdapter::
-getPeriodicUnitCell()
+getUnitCell()
 {
 
     // Expand each scattering component in the primitive cell and record the
@@ -323,66 +304,109 @@ getPeriodicUnitCell()
 
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// class ObjCrystBondGenerator
+//////////////////////////////////////////////////////////////////////////////
+
+// Constructor ---------------------------------------------------------------
+
+ObjCrystBondGenerator::
+ObjCrystBondGenerator(const ObjCrystStructureAdapter* adpt) 
+    : BaseBondGenerator(adpt), mpstructure(adpt), msymidx(0)
+{
+}
+
+
+// Public Methods ------------------------------------------------------------
+
+void 
+ObjCrystBondGenerator::
+rewind()
+{
+    // Delay msphere instantiation to here instead of in constructor,
+    // so it is possible to use setRmin, setRmax.
+    if (!msphere.get())
+    {
+        // Make a Lattice instance
+        const Lattice& L = mpstructure->getLattice();
+        double buffzone = L.ucMaxDiagonalLength();
+        double rsphmin = this->getRmin() - buffzone;
+        double rsphmax = this->getRmax() + buffzone;
+        msphere.reset(new PointsInSphere(rsphmin, rsphmax, L));
+    }
+    // BaseBondGenerator::rewind calls this->rewindSymmetry,
+    // which takes care of msphere and msymidx configuration
+    this->BaseBondGenerator::rewind();
+}
+
+
+const R3::Vector& 
+ObjCrystBondGenerator::
+r1() const
+{
+    size_t siteidx = this->site1();
+    assert(msymidx < mpstructure->mvsym[siteidx].size());
+    const Lattice& L = mpstructure->getLattice();
+    static R3::Vector rv; 
+    rv = L.cartesian(msphere->mno()) + mpstructure->mvsym[siteidx][msymidx];
+    return rv;
+}
+
+const R3::Matrix&
+ObjCrystBondGenerator::
+Ucartesian1() const
+{
+    const R3::Matrix& rv = mpstructure->mvuij[this->site1()][msymidx];
+    return rv;
+}
+
 
 void
-ObjCrystStructureAdapter::
-getAperiodicUnitCell()
+ObjCrystBondGenerator::
+setRmin(double rmin)
 {
+    // destroy msphere so it will be created on rewind with new rmin
+    if (this->getRmin() != rmin)    msphere.reset(NULL);
+    this->BaseBondGenerator::setRmin(rmin);
+}
 
-    // Aperiodic implies P1 symmetry. We speed things up a bit for this case.
 
-    const ObjCryst::ScatteringComponentList& scl =
-        mpcryst->GetScatteringComponentList();
-    size_t nbComponent = scl.GetNbComponent();
+void 
+ObjCrystBondGenerator::
+setRmax(double rmax)
+{
+    // destroy msphere so it will be created on rewind with new rmax
+    if (this->getRmax() != rmax)    msphere.reset(NULL);
+    this->BaseBondGenerator::setRmax(rmax);
+}
 
-    // Clear old vectors and make room for the new
-    mvsc.clear();
-    mvsym.clear();
-    mvuij.clear();
-    mvsc.reserve(nbComponent);
-    mvsym.reserve(nbComponent);
-    mvuij.reserve(nbComponent);
 
-    // For each scattering component, find and record its position.
-    for (size_t i = 0; i < nbComponent; ++i)
+bool 
+ObjCrystBondGenerator::
+iterateSymmetry()
+{
+    // Iterate the sphere. If it is finished, rewind and iterate the symmetry
+    // counter. If that is also finished, then we're done.
+    this->uncache();
+    msphere->next();
+    if (msphere->finished())
     {
-
-        const ObjCryst::ScatteringPower* sp = scl(i).mpScattPow;
-
-        // Skip over this if it is a dummy atom. A dummy atom has no
-        // mpScattPow, and therefore no type. It's just in a structure as a
-        // reference position.
-        if (sp == NULL) continue;
-
-        // Make the requisite storage vectors
-        SymPosVec symvec = SymPosVec();
-        SymUijVec uijvec = SymUijVec();
-
-        // Record the ScatteringPower
-        mvsc.push_back(scl(i));
-
-        // Record the position
-        R3::Vector xyz; 
-        xyz = scl(i).mX, scl(i).mY, scl(i).mZ;
-        symvec.push_back(xyz);
-
-        // Record UCart
-        R3::Matrix Uij = objcrystutil::getUij(sp);
-        R3::Matrix UCart;
-        if (!sp->IsIsotropic())
+        if (++msymidx == mpstructure->mvsym[this->site1()].size())
         {
-            UCart = mlattice.cartesianMatrix(Uij);
+            return false;
         }
-        else
-        {
-            UCart = Uij;
-        }
-        uijvec.push_back(UCart);
-
-        // Store teh requisite vectors
-        mvsym.push_back(symvec);
-        mvuij.push_back(uijvec);
+        msphere->rewind();
     }
+    return true;
+}
+
+
+void 
+ObjCrystBondGenerator::
+rewindSymmetry()
+{
+    this->msphere->rewind();
+    msymidx = 0;
 }
 
 
@@ -390,21 +414,17 @@ getAperiodicUnitCell()
 // class ObjCrystMoleculeAdapter
 //////////////////////////////////////////////////////////////////////////////
 
-// static data
-
 // Constructor ---------------------------------------------------------------
 
 ObjCrystMoleculeAdapter::
 ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule) 
 : mpmolecule(&molecule)
 {
-    using ObjCryst::Molecule;
     using ObjCryst::MolAtom;
-    mlattice.setLatPar(1, 1, 1, 90, 90, 90);
-    const ObjCryst::ScatteringComponentList& scl = 
-        molecule.GetScatteringComponentList();
 
-    size_t nbComponent = scl.GetNbComponent();
+    mlattice.setLatPar(1, 1, 1, 90, 90, 90);
+
+    size_t nbComponent = mpmolecule->GetNbComponent();
     // Initialize positions and uij
     mvatoms.clear();
     mvpos.clear();
@@ -512,160 +532,6 @@ siteAtomType(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
     return mvatoms[idx].GetScatteringPower().GetSymbol();
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// class ObjCrystAperiodicBondGenerator
-//////////////////////////////////////////////////////////////////////////////
-
-// Constructor ---------------------------------------------------------------
-
-ObjCrystAperiodicBondGenerator::
-ObjCrystAperiodicBondGenerator(const ObjCrystStructureAdapter* adpt) 
-    : BaseBondGenerator(adpt), mpstructure(adpt), msymidx(0)
-{
-}
-
-// Public Methods ------------------------------------------------------------
-
-const R3::Vector& 
-ObjCrystAperiodicBondGenerator::
-r1() const
-{
-    size_t siteidx = this->site1();
-    static R3::Vector rv;
-    assert(msymidx < mpstructure->mvsym[siteidx].size());
-    rv = mpstructure->mvsym[siteidx][msymidx];
-    return rv;
-}
-
-
-const R3::Matrix&
-ObjCrystAperiodicBondGenerator::
-Ucartesian1() const
-{
-    const R3::Matrix& rv = mpstructure->mvuij[this->site1()][msymidx];
-    return rv;
-}
-
-
-bool 
-ObjCrystAperiodicBondGenerator::
-iterateSymmetry()
-{
-    // Rewind and iterate the symmetry counter. 
-    // If that is finished, then we're done.
-    this->uncache();
-    if (++msymidx == mpstructure->mvsym[this->site1()].size())
-    {
-        return false;
-    }
-    return true;
-}
-
-
-void 
-ObjCrystAperiodicBondGenerator::
-rewindSymmetry()
-{
-    this->uncache();
-    this->msymidx = 0;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// class ObjCrystPeriodicBondGenerator
-//////////////////////////////////////////////////////////////////////////////
-
-// Constructor ---------------------------------------------------------------
-
-ObjCrystPeriodicBondGenerator::
-ObjCrystPeriodicBondGenerator(const ObjCrystStructureAdapter* adpt) 
-    : ObjCrystAperiodicBondGenerator(adpt)
-{
-}
-
-
-// Public Methods ------------------------------------------------------------
-
-void 
-ObjCrystPeriodicBondGenerator::
-rewind()
-{
-    // Delay msphere instantiation to here instead of in constructor,
-    // so it is possible to use setRmin, setRmax.
-    if (!msphere.get())
-    {
-        // Make a Lattice instance
-        const Lattice& L = mpstructure->getLattice();
-        double buffzone = L.ucMaxDiagonalLength();
-        double rsphmin = this->getRmin() - buffzone;
-        double rsphmax = this->getRmax() + buffzone;
-        msphere.reset(new PointsInSphere(rsphmin, rsphmax, L));
-    }
-    // BaseBondGenerator::rewind calls this->rewindSymmetry,
-    // which takes care of msphere and msymidx configuration
-    this->ObjCrystAperiodicBondGenerator::rewind();
-}
-
-
-const R3::Vector& 
-ObjCrystPeriodicBondGenerator::
-r1() const
-{
-    const Lattice& L = mpstructure->getLattice();
-    static R3::Vector rv; 
-    rv = L.cartesian(msphere->mno()) + ObjCrystAperiodicBondGenerator::r1();
-    return rv;
-}
-
-
-void
-ObjCrystPeriodicBondGenerator::
-setRmin(double rmin)
-{
-    // destroy msphere so it will be created on rewind with new rmin
-    if (this->getRmin() != rmin)    msphere.reset(NULL);
-    this->ObjCrystAperiodicBondGenerator::setRmin(rmin);
-}
-
-
-void 
-ObjCrystPeriodicBondGenerator::
-setRmax(double rmax)
-{
-    // destroy msphere so it will be created on rewind with new rmax
-    if (this->getRmax() != rmax)    msphere.reset(NULL);
-    this->ObjCrystAperiodicBondGenerator::setRmax(rmax);
-}
-
-
-bool 
-ObjCrystPeriodicBondGenerator::
-iterateSymmetry()
-{
-    // Iterate the sphere. If it is finished, rewind and iterate the symmetry
-    // counter. If that is also finished, then we're done.
-    this->uncache();
-    msphere->next();
-    if (msphere->finished())
-    {
-        if (++msymidx == mpstructure->mvsym[this->site1()].size())
-        {
-            return false;
-        }
-        msphere->rewind();
-    }
-    return true;
-}
-
-
-void 
-ObjCrystPeriodicBondGenerator::
-rewindSymmetry()
-{
-    this->msphere->rewind();
-    ObjCrystAperiodicBondGenerator::rewindSymmetry();
 }
 
 

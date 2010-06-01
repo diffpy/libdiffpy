@@ -240,7 +240,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
 
         void test_typeid()
         {
-            TS_ASSERT(typeid(ObjCrystPeriodicBondGenerator) ==
+            TS_ASSERT(typeid(ObjCrystBondGenerator) ==
                     typeid(*m_nibnds));
         }
 

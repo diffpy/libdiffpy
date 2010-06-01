@@ -14,10 +14,12 @@
 *
 * class ObjCrystStructureAdapter   
 *   -- adapter to the Crystal class from ObjCryst++.
-* class ObjCrystAperiodicBondGenerator 
-*   -- Generate bonds from aperiodic ObjCrystStructureAdapter.
-* class ObjCrystPeriodicBondGenerator     
+* class ObjCrystBondGenerator     
 *   -- Generate bonds from periodic ObjCrystStructureAdapter.
+* class ObjCrystMoleculeAdapter
+*   -- adapter class for Molecule class from ObjCryst++.
+* class ObjCrystMoleculeBondGenerator
+*   -- Generate bonds from ObjCrystMoleculeAdapter
 *
 * $Id$
 *
@@ -48,8 +50,7 @@ class PointsInSphere;
 
 class ObjCrystStructureAdapter : public StructureAdapter
 {
-    friend class ObjCrystAperiodicBondGenerator;
-    friend class ObjCrystPeriodicBondGenerator;
+    friend class ObjCrystBondGenerator;
 
     public:
 
@@ -67,7 +68,6 @@ class ObjCrystStructureAdapter : public StructureAdapter
         virtual const R3::Matrix& siteCartesianUij(int idx) const;
         virtual const std::string& siteAtomType(int idx) const;
         const Lattice& getLattice() const;
-        bool isPeriodic() const;
 
 
     private:
@@ -76,8 +76,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
         typedef std::vector<R3::Matrix> SymUijVec;
 
         // methods - own
-        void getPeriodicUnitCell();
-        void getAperiodicUnitCell();
+        void getUnitCell();
 
         // Tolerance on distance measurements.  Two sites are the same if
         // their fractional coordinates are within this tolerance
@@ -96,48 +95,20 @@ class ObjCrystStructureAdapter : public StructureAdapter
 };
 
 
-class ObjCrystAperiodicBondGenerator : public BaseBondGenerator
-{
-    public:
-
-        // constructors
-        ObjCrystAperiodicBondGenerator(const ObjCrystStructureAdapter*);
-
-        // methods
-
-        // data access
-        virtual const R3::Vector& r1() const;
-        virtual const R3::Matrix& Ucartesian1() const;
-
-    protected:
-
-        // methods
-        virtual bool iterateSymmetry();
-        virtual void rewindSymmetry();
-
-        // data
-
-        // The adapted structure
-        const ObjCrystStructureAdapter* mpstructure;
-        // Index over symmetry
-        size_t msymidx;
-
-};
-
-
-class ObjCrystPeriodicBondGenerator : public ObjCrystAperiodicBondGenerator
+class ObjCrystBondGenerator : public BaseBondGenerator
 {
 
     public:
 
         // constructors
-        ObjCrystPeriodicBondGenerator(const ObjCrystStructureAdapter*);
+        ObjCrystBondGenerator(const ObjCrystStructureAdapter*);
 
         // loop control
         virtual void rewind();
 
         // data access
         virtual const R3::Vector& r1() const;
+        virtual const R3::Matrix& Ucartesian1() const;
 
         // configuration
         virtual void setRmin(double);
@@ -149,6 +120,10 @@ class ObjCrystPeriodicBondGenerator : public ObjCrystAperiodicBondGenerator
         virtual bool iterateSymmetry();
         virtual void rewindSymmetry();
 
+        // data
+        const ObjCrystStructureAdapter* mpstructure;
+        size_t msymidx;
+
     private:
 
         std::auto_ptr<PointsInSphere> msphere;
@@ -158,7 +133,7 @@ class ObjCrystPeriodicBondGenerator : public ObjCrystAperiodicBondGenerator
 //
 // Molecules are always considered aperiodic. The anisotropic ADPs are treated
 // as if in a cartesian cell. If this is not what is intended, pass the
-// molecule as a scattering component within an ObjCryst::Crystal.
+// molecule as a scattering component within an ObjCryst::Crystal. 
 
 class ObjCrystMoleculeAdapter : public StructureAdapter
 {
