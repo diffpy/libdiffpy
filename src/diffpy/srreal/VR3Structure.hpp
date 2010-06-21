@@ -54,7 +54,7 @@ class VR3Adapter : public StructureAdapter
     private:
 
         // data
-        const VR3Structure* mvr3structure;
+        VR3Structure mvr3structure;
 };
 
 
@@ -71,7 +71,7 @@ class VR3BondGenerator : public BaseBondGenerator
 
     private:
         // data
-        const VR3Structure* mvr3structure;
+        const VR3Structure& mvr3structure;
 };
 
 
@@ -82,24 +82,22 @@ class VR3BondGenerator : public BaseBondGenerator
 // VR3Adapter - Constructor --------------------------------------------------
 
 inline
-VR3Adapter::VR3Adapter(const VR3Structure& vr3s)
-{
-    mvr3structure = &vr3s;
-}
+VR3Adapter::VR3Adapter(const VR3Structure& vr3s) : mvr3structure(vr3s)
+{ }
 
 // VR3Adapter - Public Methods -----------------------------------------------
 
 inline
 int VR3Adapter::countSites() const
 {
-    return mvr3structure->size();
+    return mvr3structure.size();
 }
 
 
 inline
 const R3::Vector& VR3Adapter::siteCartesianPosition(int idx) const
 {
-    return mvr3structure->at(idx);
+    return mvr3structure[idx];
 }
 
 
@@ -129,24 +127,22 @@ BaseBondGenerator* VR3Adapter::createBondGenerator() const
 
 inline
 VR3BondGenerator::VR3BondGenerator(const VR3Adapter* adpt) :
-    BaseBondGenerator(adpt)
-{
-    mvr3structure = adpt->mvr3structure;
-}
+    BaseBondGenerator(adpt), mvr3structure(adpt->mvr3structure)
+{ }
 
 // VR3BondGenerator - Public Methods -----------------------------------------
 
 inline
 const R3::Vector& VR3BondGenerator::r0() const
 {
-    return mvr3structure->at(this->site0());
+    return mvr3structure.at(this->site0());
 }
 
 
 inline
 const R3::Vector& VR3BondGenerator::r1() const
 {
-    return mvr3structure->at(this->site1());
+    return mvr3structure.at(this->site1());
 }
 
 // Inline Routines -----------------------------------------------------------

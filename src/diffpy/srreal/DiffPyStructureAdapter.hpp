@@ -27,6 +27,7 @@
 #include <memory>
 #include <vector>
 #include <boost/python.hpp>
+#include <boost/unordered_map.hpp>
 
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
@@ -78,6 +79,7 @@ class DiffPyStructureAdapter : public StructureAdapter
         std::vector<bool> manisotropies;
         std::vector<R3::Matrix> mcartesian_uijs;
         std::vector<std::string> matomtypes;
+        boost::unordered_map<std::string, double> mpdffit;
 
 };
 

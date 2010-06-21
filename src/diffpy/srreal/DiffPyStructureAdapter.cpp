@@ -184,6 +184,26 @@ void DiffPyStructureAdapter::fetchPythonData()
     assert(int(manisotropies.size()) == this->countSites());
     assert(int(mcartesian_uijs.size()) == this->countSites());
     assert(int(matomtypes.size()) == this->countSites());
+    // fetch the pdffit dictionary if present in mpystructure
+    mpdffit.clear();
+    if (PyObject_HasAttrString(mpystructure.ptr(), "pdffit"))
+    {
+        // get method of the stru.pdffit dictionary
+        python::object stru_pdffit = mpystructure.attr("pdffit");
+        python::object pfget = stru_pdffit.attr("get");
+        mpdffit["scale"] = python::extract<double>(pfget("scale", 1.0));
+        mpdffit["delta1"] = python::extract<double>(pfget("delta1", 0.0));
+        mpdffit["delta2"] = python::extract<double>(pfget("delta2", 0.0));
+        if (pfget("spdiameter").ptr() != Py_None)
+        {
+            mpdffit["spdiameter"] =
+                python::extract<double>(pfget("spdiameter"));
+        }
+        if (pfget("stepcut").ptr() != Py_None)
+        {
+            mpdffit["stepcut"] = python::extract<double>(pfget("stepcut"));
+        }
+    }
 }
 
 
@@ -191,38 +211,30 @@ void DiffPyStructureAdapter::configurePDFCalculator(PDFCalculator* pdfc) const
 {
     // this is only needed if diffpy.Structure instance has pdffit attribute
     // with PDF-related structure properties
-    if (!PyObject_HasAttrString(mpystructure.ptr(), "pdffit"))  return;
-    python::object stru_pdffit = mpystructure.attr("pdffit");
-    PDFEnvelopePtr envelope;
-    // get method of the stru.pdffit dictionary
-    python::object pfget = stru_pdffit.attr("get");
+    if (mpdffit.empty())  return;
     // scale
-    double scale = python::extract<double>(pfget("scale", 1.0));
+    PDFEnvelopePtr envelope;
     envelope = PDFEnvelope::createByType("scale");
-    envelope->setDoubleAttr("scale", scale);
+    envelope->setDoubleAttr("scale", mpdffit.at("scale"));
     pdfc->addEnvelope(envelope);
     // delta1, delta2 - set these only when using JeongPeakWidth model
     if (pdfc->getPeakWidthModel()->type() == "jeong")
     {
-        double delta1 = python::extract<double>(pfget("delta1", 0.0));
-        double delta2 = python::extract<double>(pfget("delta2", 0.0));
-        pdfc->setDoubleAttr("delta1", delta1);
-        pdfc->setDoubleAttr("delta2", delta2);
+        pdfc->setDoubleAttr("delta1", mpdffit.at("delta1"));
+        pdfc->setDoubleAttr("delta2", mpdffit.at("delta2"));
     }
     // spdiameter
-    if (pfget("spdiameter").ptr() != Py_None)
+    if (mpdffit.count("spdiameter"))
     {
-        double spdiameter = python::extract<double>(pfget("spdiameter"));
         envelope = PDFEnvelope::createByType("sphericalshape");
-        envelope->setDoubleAttr("spdiameter", spdiameter);
+        envelope->setDoubleAttr("spdiameter", mpdffit.at("spdiameter"));
         pdfc->addEnvelope(envelope);
     }
     // stepcut
-    if (pfget("stepcut").ptr() != Py_None)
+    if (mpdffit.count("stepcut"))
     {
-        double stepcut = python::extract<double>(pfget("stepcut"));
         envelope = PDFEnvelope::createByType("stepcut");
-        envelope->setDoubleAttr("stepcut", stepcut);
+        envelope->setDoubleAttr("stepcut", mpdffit.at("stepcut"));
         pdfc->addEnvelope(envelope);
     }
 }

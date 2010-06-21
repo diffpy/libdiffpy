@@ -16,7 +16,7 @@
 *     any symmetry expansions (rotations or periodic translations) from
 *     another StructureAdapter instance.  This can be used to use only
 *     the asymmetric unit from any adapter to crystal structure.
-
+*
 * class NoSymmetryBondGenerator -- bond generator
 *
 * nosymmetry -- factory function that creates a NoSymmetryStructureAdapter
