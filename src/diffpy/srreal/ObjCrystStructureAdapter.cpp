@@ -61,8 +61,7 @@ const double ObjCrystStructureAdapter::mtoler = 1e-5;
 // Constructor ---------------------------------------------------------------
 
 ObjCrystStructureAdapter::
-ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst)
-: mpcryst(new ObjCryst::Crystal(cryst))
+ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst) : mpcryst(&cryst)
 {
     using ObjCryst::Crystal;
     mlattice.setLatPar( mpcryst->GetLatticePar(0), 
@@ -78,10 +77,10 @@ ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst)
     // structures. Since we're not using any ObjCryst calculators, we turn it
     // off momentarily.
     int usepopcorr = mpcryst->GetUseDynPopCorr();
-    mpcryst->SetUseDynPopCorr(0);
+    const_cast<Crystal*>(mpcryst)->SetUseDynPopCorr(0);
     this->getUnitCell();
     // Undo change
-    mpcryst->SetUseDynPopCorr(usepopcorr);
+    const_cast<Crystal*>(mpcryst)->SetUseDynPopCorr(usepopcorr);
 }
 
 
@@ -419,7 +418,7 @@ rewindSymmetry()
 
 ObjCrystMoleculeAdapter::
 ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule) 
-: mpmolecule(new ObjCryst::Molecule(molecule))
+: mpmolecule(&molecule)
 {
     using ObjCryst::MolAtom;
 

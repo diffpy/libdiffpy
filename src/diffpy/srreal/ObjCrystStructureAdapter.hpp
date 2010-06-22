@@ -82,7 +82,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
         // their fractional coordinates are within this tolerance
         static const double mtoler;
         // The ObjCryst::Crystal
-        boost::shared_ptr<ObjCryst::Crystal> mpcryst;
+        const ObjCryst::Crystal* mpcryst;
         // The asymmetric unit cell of ScatteringComponent instances
         std::vector< ObjCryst::ScatteringComponent > mvsc;
         // The symmetry-related positions of the asymmetric unit cell
@@ -160,7 +160,7 @@ class ObjCrystMoleculeAdapter : public StructureAdapter
     private:
 
         // The ObjCryst::Molecule
-        boost::shared_ptr<ObjCryst::Molecule> mpmolecule;
+        const ObjCryst::Molecule* mpmolecule;
         // The MolAtom instances
         std::vector< ObjCryst::MolAtom > mvatoms;
         // The positions of the scatterers. Same order as mvatoms.
