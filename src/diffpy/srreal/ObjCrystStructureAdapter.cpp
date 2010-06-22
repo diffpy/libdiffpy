@@ -61,26 +61,26 @@ const double ObjCrystStructureAdapter::mtoler = 1e-5;
 // Constructor ---------------------------------------------------------------
 
 ObjCrystStructureAdapter::
-ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst) : mpcryst(&cryst)
+ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst)
 {
     using ObjCryst::Crystal;
-    mlattice.setLatPar( mpcryst->GetLatticePar(0), 
-                        mpcryst->GetLatticePar(1),
-                        mpcryst->GetLatticePar(2), 
-                        rtod * mpcryst->GetLatticePar(3),
-                        rtod * mpcryst->GetLatticePar(4), 
-                        rtod * mpcryst->GetLatticePar(5) );
+    mlattice.setLatPar( cryst.GetLatticePar(0), 
+                        cryst.GetLatticePar(1),
+                        cryst.GetLatticePar(2), 
+                        rtod * cryst.GetLatticePar(3),
+                        rtod * cryst.GetLatticePar(4), 
+                        rtod * cryst.GetLatticePar(5) );
 
     // The dynamic population correction in ObjCryst is used by its interal
     // calculators, but slows down the calculation of atom positions. This is
     // also required to get the proper ScatteringComponentList for aperiodic
     // structures. Since we're not using any ObjCryst calculators, we turn it
     // off momentarily.
-    int usepopcorr = mpcryst->GetUseDynPopCorr();
-    const_cast<Crystal*>(mpcryst)->SetUseDynPopCorr(0);
-    this->getUnitCell();
+    int usepopcorr = cryst.GetUseDynPopCorr();
+    const_cast<Crystal&>(cryst).SetUseDynPopCorr(0);
+    this->getUnitCell(cryst);
     // Undo change
-    const_cast<Crystal*>(mpcryst)->SetUseDynPopCorr(usepopcorr);
+    const_cast<Crystal&>(cryst).SetUseDynPopCorr(usepopcorr);
 }
 
 
@@ -180,17 +180,17 @@ siteAtomType(int idx) const
 /* Get the conventional unit cell from the crystal. */
 void
 ObjCrystStructureAdapter::
-getUnitCell()
+getUnitCell(const ObjCryst::Crystal& cryst)
 {
 
     // Expand each scattering component in the primitive cell and record the
     // new scatterers.
     const ObjCryst::ScatteringComponentList& scl =
-        mpcryst->GetScatteringComponentList();
+        cryst.GetScatteringComponentList();
     size_t nbComponent = scl.GetNbComponent();
 
     // Various things we need to know about the symmetry operations
-    const ObjCryst::SpaceGroup& spacegroup = mpcryst->GetSpaceGroup();
+    const ObjCryst::SpaceGroup& spacegroup = cryst.GetSpaceGroup();
     size_t nbSymmetrics = spacegroup.GetNbSymmetrics();
 
     double x, y, z, junk;
@@ -418,13 +418,12 @@ rewindSymmetry()
 
 ObjCrystMoleculeAdapter::
 ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule) 
-: mpmolecule(&molecule)
 {
     using ObjCryst::MolAtom;
 
     mlattice.setLatPar(1, 1, 1, 90, 90, 90);
 
-    size_t nbComponent = mpmolecule->GetNbComponent();
+    size_t nbComponent = molecule.GetNbComponent();
     // Initialize positions and uij
     mvatoms.clear();
     mvpos.clear();
@@ -436,7 +435,7 @@ ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule)
     for (size_t i = 0; i < nbComponent; ++i)
     {
 
-        const MolAtom& atom = mpmolecule->GetAtom(i);
+        const MolAtom& atom = molecule.GetAtom(i);
         if (atom.IsDummy()) continue;
 
         // Store the atom

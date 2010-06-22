@@ -41,7 +41,6 @@ class PDFCalculator;
 
 class DiffPyStructureAdapter : public StructureAdapter
 {
-    friend class DiffPyStructureBondGenerator;
     public:
 
         // constructors
@@ -61,18 +60,14 @@ class DiffPyStructureAdapter : public StructureAdapter
         // methods - own
         const Lattice& getLattice() const;
 
-    protected:
+    private:
 
         // methods
-        void fetchPythonData();
+        void fetchPythonData(boost::python::object dpstru);
         void configurePDFCalculator(PDFCalculator* pdfc) const;
         bool isPeriodic() const;
 
-    private:
-
         // data
-        boost::python::object mpystructure;
-        // copied properties
         Lattice mlattice;
         std::vector<R3::Vector> mcartesian_positions;
         std::vector<double> moccupancies;

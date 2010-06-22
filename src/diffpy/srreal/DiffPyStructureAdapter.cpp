@@ -48,8 +48,7 @@ using namespace diffpy::srreal;
 
 DiffPyStructureAdapter::DiffPyStructureAdapter(python::object dpstru)
 {
-    mpystructure = dpstru;
-    this->fetchPythonData();
+    this->fetchPythonData(dpstru);
 }
 
 // Public Methods ------------------------------------------------------------
@@ -126,13 +125,13 @@ void DiffPyStructureAdapter::customPQConfig(PairQuantity* pq) const
     if (pdfc)  this->configurePDFCalculator(pdfc);
 }
 
-// Protected Methods ---------------------------------------------------------
+// Private Methods -----------------------------------------------------------
 
-void DiffPyStructureAdapter::fetchPythonData()
+void DiffPyStructureAdapter::fetchPythonData(python::object dpstru)
 {
     // mlattice
     python::object lattice;
-    lattice = mpystructure.attr("lattice");
+    lattice = dpstru.attr("lattice");
     double a, b, c, alpha, beta, gamma;
     a = python::extract<double>(lattice.attr("a"));
     b = python::extract<double>(lattice.attr("b"));
@@ -147,11 +146,11 @@ void DiffPyStructureAdapter::fetchPythonData()
     manisotropies.clear();
     mcartesian_uijs.clear();
     matomtypes.clear();
-    int num_atoms = python::len(mpystructure);
+    int num_atoms = python::len(dpstru);
     for (int i = 0; i < num_atoms; ++i)
     {
         python::object ai;
-        ai = mpystructure[i];
+        ai = dpstru[i];
         // mcartesian_positions
         python::object xyz = ai.attr("xyz");
         double x, y, z;
@@ -184,12 +183,12 @@ void DiffPyStructureAdapter::fetchPythonData()
     assert(int(manisotropies.size()) == this->countSites());
     assert(int(mcartesian_uijs.size()) == this->countSites());
     assert(int(matomtypes.size()) == this->countSites());
-    // fetch the pdffit dictionary if present in mpystructure
+    // fetch the pdffit dictionary if present in dpstru
     mpdffit.clear();
-    if (PyObject_HasAttrString(mpystructure.ptr(), "pdffit"))
+    if (PyObject_HasAttrString(dpstru.ptr(), "pdffit"))
     {
         // get method of the stru.pdffit dictionary
-        python::object stru_pdffit = mpystructure.attr("pdffit");
+        python::object stru_pdffit = dpstru.attr("pdffit");
         python::object pfget = stru_pdffit.attr("get");
         mpdffit["scale"] = python::extract<double>(pfget("scale", 1.0));
         mpdffit["delta1"] = python::extract<double>(pfget("delta1", 0.0));
