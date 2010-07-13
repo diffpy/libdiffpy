@@ -37,7 +37,6 @@ namespace diffpy {
 namespace srreal {
 
 class PointsInSphere;
-class PDFCalculator;
 
 class DiffPyStructureAdapter : public StructureAdapter
 {
@@ -64,7 +63,6 @@ class DiffPyStructureAdapter : public StructureAdapter
 
         // methods
         void fetchPythonData(boost::python::object dpstru);
-        void configurePDFCalculator(PDFCalculator* pdfc) const;
         bool isPeriodic() const;
 
         // data
