@@ -3,7 +3,8 @@ import os
 Import('env')
 
 # Environment for building unit test driver
-env_test = env.Clone(tools=['default', 'cxxtest'], CXXTEST_SUFFIX='.hpp')
+env_test = env.Clone(CXXTEST_SUFFIX='.hpp')
+env_test.Tool('cxxtest')
 lib_dir = Dir('../').abspath
 env_test.PrependUnique(LIBS='libdiffpy', LIBPATH=lib_dir)
 env_test.PrependENVPath('LD_LIBRARY_PATH', lib_dir)

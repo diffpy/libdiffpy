@@ -118,9 +118,9 @@ class PDFCalculator :
 
         // methods - calculation specific
         /// complete lower bound extension of the calculated grid
-        const double rcalclo() const;
+        double rcalclo() const;
         /// complete upper bound extension of the calculated grid
-        const double rcalchi() const;
+        double rcalchi() const;
         /// r-range extension to allow propagation of termination ripples
         double extFromTerminationRipples() const;
         /// r-range extension to account for tails from out-of-range peaks

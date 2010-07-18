@@ -249,7 +249,7 @@ const double& PDFCalculator::getQstep() const
     static double rv;
     // replicate the zero padding as done in fftgtof
     int Npad1 = this->extendedRmaxSteps();
-    int Npad2 = pow(2, int(ceil(log2(Npad1))));
+    int Npad2 = (1 << int(ceil(log2(Npad1))));
     rv = M_PI / (Npad2 * this->getRstep());
     return rv;
 }
@@ -482,14 +482,14 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
 
 // calculation specific
 
-const double PDFCalculator::rcalclo() const
+double PDFCalculator::rcalclo() const
 {
     double rv = this->rcalcloSteps() * this->getRstep();
     return rv;
 }
 
 
-const double PDFCalculator::rcalchi() const
+double PDFCalculator::rcalchi() const
 {
     double rv = this->rcalchiSteps() * this->getRstep();
     return rv;
