@@ -24,7 +24,6 @@
 
 #include <diffpy/mathutils.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 
 using namespace std;
 using diffpy::mathutils::eps_eq;

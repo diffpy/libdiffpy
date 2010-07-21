@@ -28,7 +28,6 @@
 
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/PairQuantity.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 
 using namespace std;

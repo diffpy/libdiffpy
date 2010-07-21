@@ -34,7 +34,6 @@
 
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/Lattice.hpp>
 
 #include <ObjCryst/ObjCryst/Crystal.h>

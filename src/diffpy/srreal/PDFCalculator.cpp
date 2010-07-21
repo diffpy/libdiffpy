@@ -25,7 +25,6 @@
 
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/mathutils.hpp>

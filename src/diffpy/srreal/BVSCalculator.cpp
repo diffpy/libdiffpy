@@ -24,7 +24,6 @@
 #include <diffpy/validators.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
 
 using namespace std;

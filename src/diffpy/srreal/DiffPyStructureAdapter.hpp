@@ -30,7 +30,6 @@
 #include <boost/unordered_map.hpp>
 
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/Lattice.hpp>
 
 namespace diffpy {

@@ -27,7 +27,6 @@
 
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 
 namespace diffpy {
 namespace srreal {

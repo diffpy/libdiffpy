@@ -19,7 +19,6 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/ConstantPeakWidth.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 
 using namespace std;
 using namespace diffpy::srreal;

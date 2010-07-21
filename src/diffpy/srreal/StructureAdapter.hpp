@@ -24,11 +24,11 @@
 
 #include <boost/shared_ptr.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
+#include <diffpy/srreal/BaseBondGenerator.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class BaseBondGenerator;
 class PairQuantity;
 
 /// shared pointer to StructureAdapter

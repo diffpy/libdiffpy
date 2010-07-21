@@ -28,7 +28,6 @@
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 
 using namespace std;
 using namespace diffpy::validators;

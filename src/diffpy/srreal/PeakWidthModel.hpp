@@ -29,11 +29,10 @@
 
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
+#include <diffpy/srreal/BaseBondGenerator.hpp>
 
 namespace diffpy {
 namespace srreal {
-
-class BaseBondGenerator;
 
 class PeakWidthModel :
     public diffpy::Attributes,

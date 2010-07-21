@@ -28,7 +28,6 @@
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/srreal/GaussianProfile.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
 

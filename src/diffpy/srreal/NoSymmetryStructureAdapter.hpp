@@ -30,7 +30,6 @@
 #define NOSYMMETRYSTRUCTUREADAPTER_HPP_INCLUDED
 
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 
 namespace diffpy {
 namespace srreal {

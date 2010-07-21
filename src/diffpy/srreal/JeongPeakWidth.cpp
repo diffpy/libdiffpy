@@ -21,7 +21,6 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/JeongPeakWidth.hpp>
-#include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/mathutils.hpp>
 
 using namespace std;
