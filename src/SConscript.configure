@@ -19,7 +19,6 @@ def CheckBoostVersion(context, version):
     context.Result(rv)
     return rv
 
-
 # Helper functions -----------------------------------------------------------
 
 boostlibtags = ['-mt', '']
@@ -49,9 +48,6 @@ conf = Configure(env, custom_tests={
 
 # boost_python
 configure_boost_library('boost_python')
-# In Boost 1.35 - 1.39 boost_python needs to link with boost_system
-if conf.CheckBoostVersion('1.35') and not conf.CheckBoostVersion('1.40'):
-    configure_boost_library('boost_system')
 
 # check for ObjCryst, autoadd appends to LIBS if found.
 conf.env['has_objcryst'] = (conf.env['enable_objcryst'] and
