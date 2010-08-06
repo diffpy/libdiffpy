@@ -77,7 +77,7 @@ class SFTperiodictableXray : public ScatteringFactorTable
 
         double lookupatq(const string& smbl, double q) const
         {
-            return this->fetchatq(smbl, 0.0);
+            return this->fetchatq(smbl, q);
         }
 
     protected:
