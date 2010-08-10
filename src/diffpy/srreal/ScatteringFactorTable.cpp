@@ -49,13 +49,6 @@ double ScatteringFactorTable::lookup(const string& smbl) const
 }
 
 
-double ScatteringFactorTable::lookupatq(const std::string& smbl,
-        double q) const
-{
-    return this->lookup(smbl);
-}
-
-
 void ScatteringFactorTable::setCustom(const string& smbl, double value)
 {
     mtable[smbl] = value;
