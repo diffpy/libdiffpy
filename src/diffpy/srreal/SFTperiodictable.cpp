@@ -62,7 +62,7 @@ class SFTperiodictableXray : public ScatteringFactorTable
 
         const string& type() const
         {
-            static string rv = "SFTperiodictableXray";
+            static string rv = "periodictablexray";
             return rv;
         }
 
@@ -129,7 +129,7 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
 
         const string& type() const
         {
-            static string rv = "SFTperiodictableNeutron";
+            static string rv = "periodictableneutron";
             return rv;
         }
 
@@ -167,12 +167,12 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
 
 bool reg_SFTperiodictableXray = (
         SFTperiodictableXray().registerThisType() &&
-        ScatteringFactorTable::aliasType("SFTperiodictableXray", "X")
+        ScatteringFactorTable::aliasType("periodictablexray", "X")
         );
 
 bool reg_SFTperiodictableNeutron = (
         SFTperiodictableNeutron().registerThisType() &&
-        ScatteringFactorTable::aliasType("SFTperiodictableNeutron", "N")
+        ScatteringFactorTable::aliasType("periodictableneutron", "N")
         );
 
 }   // namespace srreal

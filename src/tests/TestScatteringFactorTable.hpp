@@ -45,14 +45,14 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             ScatteringFactorTablePtr sfx0, sfx1, sfn0, sfn1;
             TS_ASSERT_THROWS(ScatteringFactorTable::createByType("invalid"),
                     invalid_argument);
-            sfx0 = ScatteringFactorTable::createByType("SFTperiodictableXray");
+            sfx0 = ScatteringFactorTable::createByType("periodictablexray");
             sfx1 = ScatteringFactorTable::createByType("X");
             TS_ASSERT(sfx0.get());
             TS_ASSERT(sfx1.get());
             TS_ASSERT_EQUALS(sfx0->type(), sfx1->type());
             TS_ASSERT(typeid(*sfx0) == typeid(*sfx1));
             sfn0 = ScatteringFactorTable::createByType(
-                    "SFTperiodictableNeutron");
+                    "periodictableneutron");
             sfn1 = ScatteringFactorTable::createByType("N");
             TS_ASSERT(sfn0.get());
             TS_ASSERT(sfn1.get());

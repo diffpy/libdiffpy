@@ -48,7 +48,7 @@ DebyePDFCalculator::DebyePDFCalculator()
     mrcalclosteps = 0;
     mrcalchisteps = 0;
     // default configuration
-    this->setScatteringFactorTableByType("SFTperiodictableXray");
+    this->setScatteringFactorTableByType("periodictablexray");
     this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
     this->setMaxExtension(DEFAULT_PDFCALCULATOR_MAXEXTENSION);
