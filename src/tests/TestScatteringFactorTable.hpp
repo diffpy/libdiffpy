@@ -101,6 +101,19 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_DELTA(6.6484, sftb->lookup("C"), mtol);
         }
 
+
+        void test_ElectronNumber()
+        {
+            sftb = ScatteringFactorTable::createByType("electronnumber");
+            TS_ASSERT_EQUALS(8.0, sftb->lookup("O"));
+            TS_ASSERT_EQUALS(10.0, sftb->lookup("O2-"));
+            TS_ASSERT_EQUALS(18.0, sftb->lookup("K+"));
+            TS_ASSERT_EQUALS(18.0, sftb->lookup("K1+"));
+            TS_ASSERT_EQUALS(68.0, sftb->lookup("W6+"));
+            TS_ASSERT_THROWS(sftb->lookup("H4+"), invalid_argument);
+            TS_ASSERT_THROWS(sftb->lookup("O0+"), invalid_argument);
+        }
+
 };
 
 // End of file
