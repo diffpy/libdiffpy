@@ -68,7 +68,7 @@ class SFTElectronNumber : public ScatteringFactorTable
 
         const string& radiationType() const
         {
-            static string rv = "E";
+            static string rv = "EN";
             return rv;
         }
 
