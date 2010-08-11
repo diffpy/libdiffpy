@@ -145,11 +145,11 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
         double lookupatq(const string& smbl, double q) const
         {
             diffpy::initializePython();
-            static python::object symbol = diffpy::importFromPyModule(
-                    "periodictable", "elements").attr("symbol");
+            static python::object isotope = diffpy::importFromPyModule(
+                    "periodictable", "elements").attr("isotope");
             double rv;
             try {
-                python::object el = symbol(smbl);
+                python::object el = isotope(smbl);
                 python::object b_c = el.attr("neutron").attr("b_c");
                 rv = python::extract<double>(b_c);
             }
