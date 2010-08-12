@@ -241,7 +241,8 @@ const char* SFTElectronNumber::mendata_lines[] = {
 
 // Registration --------------------------------------------------------------
 
-bool reg_SFTElectronNumber = SFTElectronNumber().registerThisType();
+bool reg_SFTElectronNumber = SFTElectronNumber().registerThisType() &&
+        ScatteringFactorTable::aliasType("electronnumber", "EN");
 
 }   // namespace srreal
 }   // namespace diffpy
