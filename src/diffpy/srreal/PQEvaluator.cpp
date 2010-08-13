@@ -32,6 +32,13 @@
 
 using namespace std;
 
+// Local Constants -----------------------------------------------------------
+
+namespace {
+// tolerated load variance for splitting outer loop for parallel evaluation
+const double CPU_LOAD_VARIANCE = 0.1;
+}
+
 namespace diffpy {
 namespace srreal {
 
@@ -47,22 +54,41 @@ PQEvaluatorType PQEvaluatorBasic::typeint() const
 
 void PQEvaluatorBasic::updateValue(PairQuantity& pq)
 {
-    pq.resetValue();
     auto_ptr<BaseBondGenerator> bnds;
     bnds.reset(pq.mstructure->createBondGenerator());
     pq.configureBondGenerator(*bnds);
     int cntsites = pq.mstructure->countSites();
+    // loop counter
+    long n = mcpuindex;
+    // split outer loop for many atoms.  The CPUs should have similar load.
+    bool chop_outer = (mncpu <= ((cntsites - 1) * CPU_LOAD_VARIANCE + 1));
+    bool chop_inner = !chop_outer;
     for (int i0 = 0; i0 < cntsites; ++i0)
     {
+        if (chop_outer && (n++ % mncpu))    continue;
         bnds->selectAnchorSite(i0);
         bnds->selectSiteRange(0, i0 + 1);
         for (bnds->rewind(); !bnds->finished(); bnds->next())
         {
+            if (chop_inner && (n++ % mncpu))    continue;
             if (!pq.getPairMask(bnds->site0(), bnds->site1()))  continue;
             int summationscale = (bnds->site0() == bnds->site1()) ? 1 : 2;
             pq.addPairContribution(*bnds, summationscale);
         }
     }
+}
+
+
+void PQEvaluatorBasic::setupParallelRun(int cpuindex, int ncpu)
+{
+    // make sure ncpu is at least one
+    if (ncpu < 1)
+    {
+        const char* emsg = "Number of CPU ncpu must be at least 1.";
+        throw invalid_argument(emsg);
+    }
+    mcpuindex = cpuindex;
+    mncpu = ncpu;
 }
 
 //////////////////////////////////////////////////////////////////////////////

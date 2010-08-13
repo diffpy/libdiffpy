@@ -89,6 +89,31 @@ public:
         TS_ASSERT_EQUALS(100*99/2 - 1, pcount(mline100));
     }
 
+
+    void test_parallel()
+    {
+        PairCounter pmaster;
+        int ncpu = 7;
+        PairCounter pslave[ncpu];
+        bool allequal = true;
+        for (int cpuindex = 0; cpuindex < ncpu; ++cpuindex)
+        {
+            pslave[cpuindex].setupParallelRun(cpuindex, ncpu);
+            pslave[cpuindex].eval(mline100);
+            allequal = allequal &&
+                (pslave[cpuindex].value()[0] == pslave[0].value()[0]);
+        }
+        TS_ASSERT(!allequal);
+        pmaster.setStructure(mline100);
+        TS_ASSERT_EQUALS(1, pmaster.value().size());
+        TS_ASSERT_EQUALS(0.0, pmaster.value()[0]);
+        for (PairCounter* p = pslave; p != pslave + ncpu; ++p)
+        {
+            pmaster.mergeParallelValue(p->value());
+        }
+        TS_ASSERT_EQUALS(100 * 99 / 2, pmaster.value()[0]);
+    }
+
 };  // class TestPairCounter
 
 // End of file

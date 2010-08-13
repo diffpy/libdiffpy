@@ -44,16 +44,19 @@ class PairQuantity : public diffpy::Attributes
         virtual ~PairQuantity()  { }
 
         // methods
-        const QuantityType& eval(StructureAdapterPtr);
         template <class T> const QuantityType& eval(const T&);
         const QuantityType& value() const;
+        void mergeParallelValue(const QuantityType&);
 
         // configuration
+        void setStructure(StructureAdapterPtr);
+        template <class T> void setStructure(const T&);
         virtual void setRmin(double);
         const double& getRmin() const;
         virtual void setRmax(double);
         const double& getRmax() const;
         void setEvaluator(PQEvaluatorType evtp);
+        void setupParallelRun(int cpuindex, int ncpu);
         int countSites() const;
         void maskAllPairs(bool mask);
         void maskSitePair(int i, int j, bool mask);
@@ -87,8 +90,17 @@ class PairQuantity : public diffpy::Attributes
 template <class T>
 const QuantityType& PairQuantity::eval(const T& stru)
 {
+    this->setStructure(stru);
+    mevaluator->updateValue(*this);
+    return this->value();
+}
+
+
+template <class T>
+void PairQuantity::setStructure(const T& stru)
+{
     StructureAdapterPtr bstru = createStructureAdapter(stru);
-    return this->eval(bstru);
+    this->setStructure(bstru);
 }
 
 

@@ -45,19 +45,29 @@ PairQuantity::PairQuantity()
 
 // Public Methods ------------------------------------------------------------
 
-const QuantityType& PairQuantity::eval(StructureAdapterPtr stru)
+void PairQuantity::setStructure(StructureAdapterPtr stru)
 {
     mstructure = stru;
     mcountsites = mstructure->countSites();
     mstructure->customPQConfig(this);
-    mevaluator->updateValue(*this);
-    return this->value();
+    this->resetValue();
 }
 
 
 const QuantityType& PairQuantity::value() const
 {
     return mvalue;
+}
+
+
+void PairQuantity::mergeParallelValue(const QuantityType& pvalue)
+{
+    if (pvalue.size() != mvalue.size())
+    {
+        throw invalid_argument("Merged value array must have the same size.");
+    }
+    transform(mvalue.begin(), mvalue.end(), pvalue.begin(),
+            mvalue.begin(), plus<double>());
 }
 
 
@@ -90,6 +100,12 @@ void PairQuantity::setEvaluator(PQEvaluatorType evtp)
     if (mevaluator.get() && mevaluator->typeint() == evtp)  return;
     mevaluator.reset(createPQEvaluator(evtp));
     this->resetValue();
+}
+
+
+void PairQuantity::setupParallelRun(int cpuindex, int ncpu)
+{
+    mevaluator->setupParallelRun(cpuindex, ncpu);
 }
 
 

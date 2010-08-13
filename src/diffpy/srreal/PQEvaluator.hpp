@@ -37,10 +37,20 @@ class PQEvaluatorBasic
 {
     public:
 
+        // constructor
+        PQEvaluatorBasic() : mcpuindex(0), mncpu(1)  { }
         // methods
         virtual PQEvaluatorType typeint() const;
         virtual void updateValue(PairQuantity& pq);
+        void setupParallelRun(int cpuindex, int ncpu);
 
+    protected:
+
+        // data
+        /// zero-based index of this CPU
+        int mcpuindex;
+        /// total number of the CPU units
+        int mncpu;
 };
 
 
