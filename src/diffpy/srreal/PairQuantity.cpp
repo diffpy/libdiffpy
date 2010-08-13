@@ -152,7 +152,7 @@ void PairQuantity::resetValue()
 }
 
 
-void PairQuantity::configureBondGenerator(BaseBondGenerator& bnds)
+void PairQuantity::configureBondGenerator(BaseBondGenerator& bnds) const
 {
     bnds.setRmin(this->getRmin());
     bnds.setRmax(this->getRmax());

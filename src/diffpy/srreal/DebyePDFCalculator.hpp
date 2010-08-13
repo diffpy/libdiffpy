@@ -100,7 +100,7 @@ class DebyePDFCalculator :
 
         // BaseDebyeSum overloads
         virtual void resetValue();
-        virtual void configureBondGenerator(BaseBondGenerator&);
+        virtual void configureBondGenerator(BaseBondGenerator&) const;
         virtual double sfSiteAtQ(int, const double& Q) const;
 
     private:

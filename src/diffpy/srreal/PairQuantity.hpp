@@ -70,7 +70,7 @@ class PairQuantity : public diffpy::Attributes
         // methods
         virtual void resizeValue(size_t);
         virtual void resetValue();
-        virtual void configureBondGenerator(BaseBondGenerator&);
+        virtual void configureBondGenerator(BaseBondGenerator&) const;
         virtual void addPairContribution(const BaseBondGenerator&, int) { }
 
         // data

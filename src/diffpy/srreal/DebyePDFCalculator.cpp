@@ -237,7 +237,7 @@ void DebyePDFCalculator::resetValue()
 }
 
 
-void DebyePDFCalculator::configureBondGenerator(BaseBondGenerator& bnds)
+void DebyePDFCalculator::configureBondGenerator(BaseBondGenerator& bnds) const
 {
     bnds.setRmin(this->rcalclo());
     bnds.setRmax(this->rcalchi());

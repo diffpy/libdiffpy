@@ -64,7 +64,7 @@ class BVSCalculator : public PairQuantity
 
         // PairQuantity overloads
         virtual void resetValue();
-        virtual void configureBondGenerator(BaseBondGenerator&);
+        virtual void configureBondGenerator(BaseBondGenerator&) const;
         virtual void addPairContribution(const BaseBondGenerator&, int);
 
     private:

@@ -446,7 +446,7 @@ void PDFCalculator::resetValue()
 }
 
 
-void PDFCalculator::configureBondGenerator(BaseBondGenerator& bnds)
+void PDFCalculator::configureBondGenerator(BaseBondGenerator& bnds) const
 {
     bnds.setRmin(this->rcalclo());
     bnds.setRmax(this->rcalchi());

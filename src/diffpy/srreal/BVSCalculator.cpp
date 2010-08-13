@@ -148,7 +148,7 @@ void BVSCalculator::resetValue()
 }
 
 
-void BVSCalculator::configureBondGenerator(BaseBondGenerator& bnds)
+void BVSCalculator::configureBondGenerator(BaseBondGenerator& bnds) const
 {
     bnds.setRmax(this->getRmaxUsed());
 }
