@@ -105,7 +105,7 @@ public:
         }
         TS_ASSERT(!allequal);
         pmaster.setStructure(mline100);
-        TS_ASSERT_EQUALS(1, pmaster.value().size());
+        TS_ASSERT_EQUALS(1u, pmaster.value().size());
         TS_ASSERT_EQUALS(0.0, pmaster.value()[0]);
         for (PairCounter* p = pslave; p != pslave + ncpu; ++p)
         {
