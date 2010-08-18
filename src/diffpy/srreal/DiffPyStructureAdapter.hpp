@@ -106,6 +106,7 @@ class DiffPyStructurePeriodicBondGenerator : public DiffPyStructureBaseBondGener
         virtual void setRmax(double);
 
         // data access
+        virtual const R3::Vector& r0() const;
         virtual const R3::Vector& r1() const;
 
     protected:
@@ -118,6 +119,7 @@ class DiffPyStructurePeriodicBondGenerator : public DiffPyStructureBaseBondGener
 
         // data
         std::auto_ptr<PointsInSphere> msphere;
+        std::vector<R3::Vector> mcartesian_positions_uc;
 };
 
 

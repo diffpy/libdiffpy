@@ -276,7 +276,16 @@ DiffPyStructureBaseBondGenerator::DiffPyStructureBaseBondGenerator(
 DiffPyStructurePeriodicBondGenerator::DiffPyStructurePeriodicBondGenerator(
         const DiffPyStructureAdapter* adpt
         ) : DiffPyStructureBaseBondGenerator(adpt)
-{ }
+{
+    int cntsites = mdpstructure->countSites();
+    mcartesian_positions_uc.reserve(cntsites);
+    const Lattice& L = mdpstructure->getLattice();
+    for (int i = 0; i < cntsites; ++i)
+    {
+        const R3::Vector& xyzi = mdpstructure->siteCartesianPosition(i);
+        mcartesian_positions_uc.push_back(L.ucvCartesian(xyzi));
+    }
+}
 
 // Public Methods ------------------------------------------------------------
 
@@ -314,11 +323,17 @@ void DiffPyStructurePeriodicBondGenerator::setRmax(double rmax)
 }
 
 
+const R3::Vector& DiffPyStructurePeriodicBondGenerator::r0() const
+{
+    return mcartesian_positions_uc[this->site0()];
+}
+
+
 const R3::Vector& DiffPyStructurePeriodicBondGenerator::r1() const
 {
     static R3::Vector rv;
     const Lattice& L = mdpstructure->getLattice();
-    rv = this->BaseBondGenerator::r1() + L.cartesian(msphere->mno());
+    rv = mcartesian_positions_uc[this->site1()] + L.cartesian(msphere->mno());
     return rv;
 }
 
