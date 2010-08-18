@@ -56,8 +56,8 @@ class ScatteringFactorTableOwner
         // access and configuration of scattering factors
         void setScatteringFactorTable(ScatteringFactorTablePtr);
         void setScatteringFactorTableByType(const std::string& tp);
-        ScatteringFactorTablePtr getScatteringFactorTable();
-        const ScatteringFactorTablePtr getScatteringFactorTable() const;
+        ScatteringFactorTablePtr& getScatteringFactorTable();
+        const ScatteringFactorTablePtr& getScatteringFactorTable() const;
         const std::string& getRadiationType() const;
 
 

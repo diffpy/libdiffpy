@@ -67,8 +67,8 @@ class PDFEnvelopeOwner
         void addEnvelopeByType(const std::string& tp);
         void popEnvelope(PDFEnvelopePtr);
         void popEnvelopeByType(const std::string& tp);
-        const PDFEnvelopePtr getEnvelopeByType(const std::string& tp) const;
-        PDFEnvelopePtr getEnvelopeByType(const std::string& tp);
+        const PDFEnvelopePtr& getEnvelopeByType(const std::string& tp) const;
+        PDFEnvelopePtr& getEnvelopeByType(const std::string& tp);
         std::set<std::string> usedEnvelopeTypes() const;
         void clearEnvelopes();
 

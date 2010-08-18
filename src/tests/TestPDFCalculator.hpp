@@ -45,7 +45,7 @@ class TestPDFCalculator : public CxxTest::TestSuite
 
         void test_setPeakWidthModel()
         {
-            const PeakWidthModelPtr jpw0 = mpdfc->getPeakWidthModel();
+            const PeakWidthModelPtr& jpw0 = mpdfc->getPeakWidthModel();
             TS_ASSERT_EQUALS(0.0, jpw0->getDoubleAttr("delta1"));
             TS_ASSERT_EQUALS(0.0, jpw0->getDoubleAttr("delta2"));
             TS_ASSERT_EQUALS(0.0, jpw0->getDoubleAttr("qbroad"));
@@ -54,7 +54,7 @@ class TestPDFCalculator : public CxxTest::TestSuite
             jpw.setDelta2(2.0);
             jpw.setQbroad(3.0);
             mpdfc->setPeakWidthModel(jpw.clone());
-            const PeakWidthModelPtr jpw1 = mpdfc->getPeakWidthModel();
+            const PeakWidthModelPtr& jpw1 = mpdfc->getPeakWidthModel();
             TS_ASSERT_EQUALS(1.0, jpw1->getDoubleAttr("delta1"));
             TS_ASSERT_EQUALS(2.0, jpw1->getDoubleAttr("delta2"));
             TS_ASSERT_EQUALS(3.0, jpw1->getDoubleAttr("qbroad"));

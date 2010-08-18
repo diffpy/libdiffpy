@@ -57,8 +57,8 @@ class PeakWidthModelOwner
         // PDF peak width configuration
         void setPeakWidthModel(PeakWidthModelPtr);
         void setPeakWidthModelByType(const std::string& tp);
-        PeakWidthModelPtr getPeakWidthModel();
-        const PeakWidthModelPtr getPeakWidthModel() const;
+        PeakWidthModelPtr& getPeakWidthModel();
+        const PeakWidthModelPtr& getPeakWidthModel() const;
 
     private:
 

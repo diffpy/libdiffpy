@@ -82,7 +82,7 @@ void ScatteringFactorTableOwner::setScatteringFactorTableByType(
 }
 
 
-ScatteringFactorTablePtr
+ScatteringFactorTablePtr&
 ScatteringFactorTableOwner::getScatteringFactorTable()
 {
     assert(msftable.get());
@@ -90,7 +90,7 @@ ScatteringFactorTableOwner::getScatteringFactorTable()
 }
 
 
-const ScatteringFactorTablePtr
+const ScatteringFactorTablePtr&
 ScatteringFactorTableOwner::getScatteringFactorTable() const
 {
     assert(msftable.get());

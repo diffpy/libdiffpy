@@ -92,16 +92,16 @@ class PDFCalculator :
         // PDF profile configuration
         void setPeakProfile(PeakProfilePtr);
         void setPeakProfileByType(const std::string& tp);
-        PeakProfilePtr getPeakProfile();
-        const PeakProfilePtr getPeakProfile() const;
+        PeakProfilePtr& getPeakProfile();
+        const PeakProfilePtr& getPeakProfile() const;
 
         // PDF baseline configuration
         // application on an array
         QuantityType applyBaseline(const QuantityType& x, const QuantityType& y) const;
         void setBaseline(PDFBaselinePtr);
         void setBaselineByType(const std::string& tp);
-        PDFBaselinePtr getBaseline();
-        const PDFBaselinePtr getBaseline() const;
+        PDFBaselinePtr& getBaseline();
+        const PDFBaselinePtr& getBaseline() const;
 
     protected:
 

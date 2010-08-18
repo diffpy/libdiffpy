@@ -89,16 +89,16 @@ void PDFEnvelopeOwner::popEnvelopeByType(const string& tp)
 }
 
 
-const PDFEnvelopePtr PDFEnvelopeOwner::getEnvelopeByType(const string& tp) const
+const PDFEnvelopePtr& PDFEnvelopeOwner::getEnvelopeByType(const string& tp) const
 {
     // call non-constant method
-    const PDFEnvelopePtr rv =
+    const PDFEnvelopePtr& rv =
         const_cast<PDFEnvelopeOwner*>(this)->getEnvelopeByType(tp);
     return rv;
 }
 
 
-PDFEnvelopePtr PDFEnvelopeOwner::getEnvelopeByType(const string& tp)
+PDFEnvelopePtr& PDFEnvelopeOwner::getEnvelopeByType(const string& tp)
 {
     if (!menvelope.count(tp))
     {
@@ -106,7 +106,7 @@ PDFEnvelopePtr PDFEnvelopeOwner::getEnvelopeByType(const string& tp)
         emsg << "Invalid or missing PDFEnvelope type '" << tp << "'.";
         throw invalid_argument(emsg.str());
     }
-    PDFEnvelopePtr rv = menvelope[tp];
+    PDFEnvelopePtr& rv = menvelope[tp];
     return rv;
 }
 

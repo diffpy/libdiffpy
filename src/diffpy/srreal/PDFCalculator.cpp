@@ -333,14 +333,14 @@ void PDFCalculator::setPeakProfileByType(const string& tp)
 }
 
 
-PeakProfilePtr PDFCalculator::getPeakProfile()
+PeakProfilePtr& PDFCalculator::getPeakProfile()
 {
     assert(mpeakprofile.get());
     return mpeakprofile;
 }
 
 
-const PeakProfilePtr PDFCalculator::getPeakProfile() const
+const PeakProfilePtr& PDFCalculator::getPeakProfile() const
 {
     assert(mpeakprofile.get());
     return mpeakprofile;
@@ -377,14 +377,14 @@ void PDFCalculator::setBaselineByType(const std::string& tp)
 }
 
 
-PDFBaselinePtr PDFCalculator::getBaseline()
+PDFBaselinePtr& PDFCalculator::getBaseline()
 {
     assert(mbaseline.get());
     return mbaseline;
 }
 
 
-const PDFBaselinePtr PDFCalculator::getBaseline() const
+const PDFBaselinePtr& PDFCalculator::getBaseline() const
 {
     assert(mbaseline.get());
     return mbaseline;

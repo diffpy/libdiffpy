@@ -45,14 +45,14 @@ void PeakWidthModelOwner::setPeakWidthModelByType(const string& tp)
 }
 
 
-PeakWidthModelPtr PeakWidthModelOwner::getPeakWidthModel()
+PeakWidthModelPtr& PeakWidthModelOwner::getPeakWidthModel()
 {
     assert(mpwmodel.get());
     return mpwmodel;
 }
 
 
-const PeakWidthModelPtr PeakWidthModelOwner::getPeakWidthModel() const
+const PeakWidthModelPtr& PeakWidthModelOwner::getPeakWidthModel() const
 {
     assert(mpwmodel.get());
     return mpwmodel;
