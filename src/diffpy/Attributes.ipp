@@ -54,10 +54,15 @@ class DoubleAttribute : public BaseDoubleAttribute
 
         void setValue(Attributes* obj, double value)
         {
-            if (!msetter)   throwDoubleAttributeReadOnly();
+            if (this->isreadonly())  throwDoubleAttributeReadOnly();
             T* tobj = dynamic_cast<T*>(obj);
             assert(tobj);
             (tobj->*msetter)(value);
+        }
+
+        bool isreadonly() const
+        {
+            return !msetter;
         }
 
     private:

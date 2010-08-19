@@ -61,7 +61,18 @@ bool Attributes::hasDoubleAttr(const string& name) const
 
 set<string> Attributes::namesOfDoubleAttributes() const
 {
-    NamesOfDoubleAttributesVisitor vn;
+    const bool excludereadonly = false;
+    NamesOfDoubleAttributesVisitor vn(excludereadonly);
+    this->accept(vn);
+    set<string> rv = vn.names();
+    return rv;
+}
+
+
+set<string> Attributes::namesOfWritableDoubleAttributes() const
+{
+    const bool excludereadonly = true;
+    NamesOfDoubleAttributesVisitor vn(excludereadonly);
     this->accept(vn);
     set<string> rv = vn.names();
     return rv;
@@ -159,12 +170,20 @@ visit(Attributes& a)
 
 // NamesOfDoubleAttributesVisitor
 
+Attributes::NamesOfDoubleAttributesVisitor::
+NamesOfDoubleAttributesVisitor(bool excludereadonly)
+{
+    mexcludereadonly = excludereadonly;
+}
+
+
 void Attributes::NamesOfDoubleAttributesVisitor::
 visit(const Attributes& a)
 {
     DoubleAttributeStorage::const_iterator ati;
     for (ati = a.mdoubleattrs.begin(); ati != a.mdoubleattrs.end(); ++ati)
     {
+        if (mexcludereadonly && ati->second->isreadonly())  continue;
         mnames.insert(ati->first);
     }
 }

@@ -44,6 +44,7 @@ class BaseDoubleAttribute
         virtual ~BaseDoubleAttribute() { }
         virtual double getValue(const Attributes* obj) const = 0;
         virtual void setValue(Attributes* obj, double value) = 0;
+        virtual bool isreadonly() const = 0;
 };
 
 
@@ -87,6 +88,7 @@ class Attributes
         void setDoubleAttr(const std::string& name, double value);
         bool hasDoubleAttr(const std::string& name) const;
         std::set<std::string> namesOfDoubleAttributes() const;
+        std::set<std::string> namesOfWritableDoubleAttributes() const;
         // visitors
         virtual void accept(BaseAttributesVisitor& v)  { v.visit(*this); }
         virtual void accept(BaseAttributesVisitor& v) const  { v.visit(*this); }
@@ -165,12 +167,14 @@ class Attributes
         {
             public:
 
+                NamesOfDoubleAttributesVisitor(bool excludereadonly);
                 virtual void visit(const Attributes& a);
                 const std::set<std::string>& names() const;
 
             private:
 
                 // data
+                bool mexcludereadonly;
                 std::set<std::string> mnames;
         };
 
