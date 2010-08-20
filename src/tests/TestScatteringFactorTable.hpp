@@ -78,6 +78,23 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
         }
 
 
+        void test_getAllCustom()
+        {
+            sftb = ScatteringFactorTable::createByType("X");
+            TS_ASSERT(sftb->getAllCustom().empty());
+            sftb->setCustom("C", 6.3);
+            TS_ASSERT_EQUALS(1u, sftb->getAllCustom().size());
+            TS_ASSERT_EQUALS(6.3, sftb->getAllCustom()["C"]);
+            ScatteringFactorTablePtr sftb1 = sftb->clone();
+            sftb->resetCustom("C");
+            TS_ASSERT(sftb->getAllCustom().empty());
+            TS_ASSERT_EQUALS(1u, sftb1->getAllCustom().size());
+            TS_ASSERT_EQUALS(6.3, sftb1->getAllCustom()["C"]);
+            sftb1->resetAll();
+            TS_ASSERT(sftb->getAllCustom().empty());
+        }
+
+
         void test_periodictableXray()
         {
             sftb = ScatteringFactorTable::createByType("X");

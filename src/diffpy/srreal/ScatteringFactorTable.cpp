@@ -52,18 +52,33 @@ double ScatteringFactorTable::lookup(const string& smbl) const
 void ScatteringFactorTable::setCustom(const string& smbl, double value)
 {
     mtable[smbl] = value;
+    mcustomsymbols.insert(smbl);
 }
 
 
 void ScatteringFactorTable::resetCustom(const string& smbl)
 {
     mtable.erase(smbl);
+    mcustomsymbols.erase(smbl);
+}
+
+
+map<string,double> ScatteringFactorTable::getAllCustom() const
+{
+    map<string,double> rv;
+    set<string>::const_iterator smbl;
+    for (smbl = mcustomsymbols.begin(); smbl != mcustomsymbols.end(); ++smbl)
+    {
+        rv[*smbl] = this->lookup(*smbl);
+    }
+    return rv;
 }
 
 
 void ScatteringFactorTable::resetAll()
 {
     mtable.clear();
+    mcustomsymbols.clear();
 }
 
 // class ScatteringFactorTableOwner ------------------------------------------

@@ -40,11 +40,13 @@ class ScatteringFactorTable :
         virtual double lookupatq(const std::string&, double) const = 0;
         void setCustom(const std::string& smbl, double value);
         void resetCustom(const std::string& smbl);
+        std::map<std::string,double> getAllCustom() const;
         void resetAll();
 
     protected:
 
         mutable std::map<std::string,double> mtable;
+        std::set<std::string> mcustomsymbols;
 };
 
 typedef ScatteringFactorTable::SharedPtr ScatteringFactorTablePtr;
