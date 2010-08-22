@@ -390,7 +390,7 @@ class TestObjCrystMoleculeAdapter : public CxxTest::TestSuite
         virtual ~TestObjCrystMoleculeAdapter()
         {
             // Delete the crystal in the molecule
-            Crystal* cryst = &mmol_c60->GetCrystal();
+            Crystal* cryst = mmol_c60.get() ? &mmol_c60->GetCrystal() : NULL;
             delete cryst;
         }
 
@@ -508,7 +508,7 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
         virtual ~TestObjCrystMoleculeBondGenerator()
         {
             // Delete the crystal in the molecule
-            Crystal* cryst = &mmol_c60->GetCrystal();
+            Crystal* cryst = mmol_c60.get() ? &mmol_c60->GetCrystal() : NULL;
             delete cryst;
         }
 
