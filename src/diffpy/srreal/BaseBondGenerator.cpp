@@ -216,13 +216,6 @@ void BaseBondGenerator::rewindSymmetry()
 }
 
 
-void BaseBondGenerator::uncache()
-{
-    mdistance_cached = false;
-}
-
-// Private Methods -----------------------------------------------------------
-
 void BaseBondGenerator::getNextBond()
 {
     this->uncache();
@@ -230,6 +223,13 @@ void BaseBondGenerator::getNextBond()
     this->nextsite();
 }
 
+
+void BaseBondGenerator::uncache()
+{
+    mdistance_cached = false;
+}
+
+// Private Methods -----------------------------------------------------------
 
 void BaseBondGenerator::advanceWhileInvalid()
 {

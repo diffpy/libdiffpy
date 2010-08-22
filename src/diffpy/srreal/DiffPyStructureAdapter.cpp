@@ -332,8 +332,7 @@ const R3::Vector& DiffPyStructurePeriodicBondGenerator::r0() const
 const R3::Vector& DiffPyStructurePeriodicBondGenerator::r1() const
 {
     static R3::Vector rv;
-    const Lattice& L = mdpstructure->getLattice();
-    rv = mcartesian_positions_uc[this->site1()] + L.cartesian(msphere->mno());
+    rv = mcartesian_positions_uc[this->site1()] + mrcsphere;
     return rv;
 }
 
@@ -343,7 +342,9 @@ bool DiffPyStructurePeriodicBondGenerator::iterateSymmetry()
 {
     this->uncache();
     msphere->next();
-    return !msphere->finished();
+    bool ok = !msphere->finished();
+    if (ok)  mrcsphere = mdpstructure->getLattice().cartesian(msphere->mno());
+    return ok;
 }
 
 
@@ -351,6 +352,18 @@ void DiffPyStructurePeriodicBondGenerator::rewindSymmetry()
 {
     this->uncache();
     msphere->rewind();
+    if (!msphere->finished()) {
+        mrcsphere = mdpstructure->getLattice().cartesian(msphere->mno());
+    }
+}
+
+
+void DiffPyStructurePeriodicBondGenerator::getNextBond()
+{
+    this->uncache();
+    if (++msite_current < msite_last)  return;
+    // leave at finished state when iterateSymmetry returns false
+    if (this->iterateSymmetry())   msite_current = msite_first;
 }
 
 // Factory Function and its Registration -------------------------------------

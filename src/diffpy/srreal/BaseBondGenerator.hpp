@@ -81,6 +81,7 @@ class BaseBondGenerator
         // methods
         virtual bool iterateSymmetry();
         virtual void rewindSymmetry();
+        virtual void getNextBond();
         void uncache();
 
     private:
@@ -90,7 +91,6 @@ class BaseBondGenerator
         mutable double mdistance;
 
         // methods
-        void getNextBond();
         void advanceWhileInvalid();
         bool bondOutOfRange() const;
         bool atSelfPair() const;

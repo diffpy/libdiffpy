@@ -114,12 +114,14 @@ class DiffPyStructurePeriodicBondGenerator : public DiffPyStructureBaseBondGener
         // methods
         virtual bool iterateSymmetry();
         virtual void rewindSymmetry();
+        virtual void getNextBond();
 
     private:
 
         // data
         std::auto_ptr<PointsInSphere> msphere;
         std::vector<R3::Vector> mcartesian_positions_uc;
+        R3::Vector mrcsphere;
 };
 
 
