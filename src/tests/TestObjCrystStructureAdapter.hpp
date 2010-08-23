@@ -387,13 +387,6 @@ class TestObjCrystMoleculeAdapter : public CxxTest::TestSuite
             }
         }
 
-        virtual ~TestObjCrystMoleculeAdapter()
-        {
-            // Delete the crystal in the molecule
-            Crystal* cryst = mmol_c60.get() ? &mmol_c60->GetCrystal() : NULL;
-            delete cryst;
-        }
-
         void test_typeid()
         {
             TS_ASSERT(typeid(ObjCrystMoleculeAdapter) == typeid(*m_c60));
@@ -505,13 +498,6 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
             m_c60bnds.reset(m_c60->createBondGenerator());
         }
 
-        virtual ~TestObjCrystMoleculeBondGenerator()
-        {
-            // Delete the crystal in the molecule
-            Crystal* cryst = mmol_c60.get() ? &mmol_c60->GetCrystal() : NULL;
-            delete cryst;
-        }
-
         void test_typeid()
         {
             TS_ASSERT(typeid(ObjCrystMoleculeBondGenerator) ==
@@ -546,9 +532,11 @@ Molecule* makeC60Molecule()
 
     Crystal* cryst = new Crystal(1, 1, 1, "P1");
     Molecule* mol = new Molecule(*cryst, "c60");
+    cryst->AddScatterer(mol);
 
     // Populate the molecule
     ScatteringPowerAtom* sp = new ScatteringPowerAtom("C", "C");
+    cryst->AddScatteringPower(sp);
     mol->AddAtom(3.451266498, 0.685000000, 0.000000000, sp, "C0");
     mol->AddAtom(3.451266498, -0.685000000, 0.000000000, sp, "C1");
     mol->AddAtom(-3.451266498, 0.685000000, 0.000000000, sp, "C2");
