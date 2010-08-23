@@ -37,7 +37,7 @@
 //      = 2/N sum_i sum_(j<i) (f_i/<f>) (f_j/<f>) sin(Q r_ij)/r_ij
 //
 // We then add a thermal motion by multiplying a each term by a Debye-Waller
-// factor: exp( -0.5 rij^2 MSDij )
+// factor: exp( -0.5 q^2 MSDij )
 //
 // According to Warren, this gives us g(r) = 4 pi r rho(r).  When we
 // calculate G(r) from reciprocal space data into real space, we see:
