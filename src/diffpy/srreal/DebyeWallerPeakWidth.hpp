@@ -39,8 +39,6 @@ class DebyeWallerPeakWidth : public PeakWidthModel
         // methods
         virtual const std::string& type() const;
         virtual double calculate(const BaseBondGenerator&) const;
-        virtual double calculateFromMSD(double msdval) const;
-
 };
 
 

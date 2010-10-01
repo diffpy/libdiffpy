@@ -42,7 +42,7 @@ class PeakWidthModel :
 
         // methods
         virtual double calculate(const BaseBondGenerator&) const = 0;
-        virtual double calculateFromMSD(double msdval) const = 0;
+        virtual double calculateFromMSD(double msdval) const;
 
 };
 

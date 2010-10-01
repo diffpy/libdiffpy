@@ -30,6 +30,15 @@ template class HasClassRegistry<PeakWidthModel>;
 namespace diffpy {
 namespace srreal {
 
+// class PeakWidthModel ------------------------------------------------------
+
+double PeakWidthModel::calculateFromMSD(double msdval) const
+{
+    const double tofwhm = 2 * sqrt(2 * M_LN2);
+    double fwhm = tofwhm * sqrt(msdval);
+    return fwhm;
+}
+
 // class PeakWidthModelOwner -------------------------------------------------
 
 void PeakWidthModelOwner::setPeakWidthModel(PeakWidthModelPtr pwm)
