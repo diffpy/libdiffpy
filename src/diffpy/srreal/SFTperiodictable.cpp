@@ -13,12 +13,17 @@
 ******************************************************************************
 *
 * class SFTperiodictableXray
+* class SFTElectron
 * class SFTperiodictableNeutron
 *
 * Implementations of x-ray and neutron ScatteringFactorTable using Paul
 * Kienzle periodictable library for Python.  The instances can be created
 * using the createByType factory method, see the end of this file for
 * available type strings.
+*
+* SFTElectron gives Q-dependent electron scattering factor according to
+* the formula in International Tables Volume C, page 224.
+* The formula diverges at Q = 0, where SFTElectron returns DOUBLE_MAX.
 *
 * $Id$
 *
@@ -30,6 +35,7 @@
 
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 #include <diffpy/PythonInterface.hpp>
+#include <diffpy/mathutils.hpp>
 
 using namespace std;
 namespace python = boost::python;
@@ -77,15 +83,6 @@ class SFTperiodictableXray : public ScatteringFactorTable
 
         double lookupatq(const string& smbl, double q) const
         {
-            return this->fetchatq(smbl, q);
-        }
-
-    protected:
-
-        // methods
-
-        double fetchatq(const string& smbl, double q) const
-        {
             diffpy::initializePython();
             static python::object fxrayatq = diffpy::importFromPyModule(
                     "periodictable.cromermann", "fxrayatq");
@@ -102,6 +99,59 @@ class SFTperiodictableXray : public ScatteringFactorTable
         }
 
 };  // class SFTperiodictableXray
+
+//////////////////////////////////////////////////////////////////////////////
+// class SFTElectron
+//////////////////////////////////////////////////////////////////////////////
+
+class SFTElectron : public SFTperiodictableXray
+{
+    public:
+
+        // HasClassRegistry methods
+
+        ScatteringFactorTablePtr create() const
+        {
+            ScatteringFactorTablePtr rv(new SFTElectron());
+            return rv;
+        }
+
+
+        ScatteringFactorTablePtr clone() const
+        {
+            ScatteringFactorTablePtr rv(new SFTElectron(*this));
+            return rv;
+        }
+
+        const string& type() const
+        {
+            static string rv = "electron";
+            return rv;
+        }
+
+        // own methods
+
+        const string& radiationType() const
+        {
+            static string rv = "E";
+            return rv;
+        }
+
+
+        double lookupatq(const string& smbl, double q) const
+        {
+            using namespace diffpy::mathutils;
+            // resolve Z first so that invalid symbol can throw an exception
+            double Z = round(this->SFTperiodictableXray::lookupatq(smbl, 0.0));
+            if (eps_eq(q, 0.0))     return DOUBLE_MAX;
+            double stol = q / (4 * M_PI);
+            double rv = 0.023934 *
+                (Z - this->SFTperiodictableXray::lookupatq(smbl, q)) /
+                (stol * stol);
+            return rv;
+        }
+
+};  // class SFTElectron
 
 //////////////////////////////////////////////////////////////////////////////
 // class SFTperiodictableNeutron
@@ -168,6 +218,11 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
 bool reg_SFTperiodictableXray = (
         SFTperiodictableXray().registerThisType() &&
         ScatteringFactorTable::aliasType("periodictablexray", "X")
+        );
+
+bool reg_SFTelectron = (
+        SFTElectron().registerThisType() &&
+        ScatteringFactorTable::aliasType("electron", "E")
         );
 
 bool reg_SFTperiodictableNeutron = (

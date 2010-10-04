@@ -25,6 +25,7 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
+#include <diffpy/mathutils.hpp>
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -106,6 +107,20 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(sftb->lookup("Na+"), sftb->lookup("Na1+"));
             TS_ASSERT_DELTA(74.0, sftb->lookup("W"), 0.04);
             TS_ASSERT_DELTA(88.0, sftb->lookup("Ra"), 0.04);
+        }
+
+
+        void test_periodictableElectron()
+        {
+            using diffpy::mathutils::DOUBLE_MAX;
+            sftb = ScatteringFactorTable::createByType("E");
+            TS_ASSERT_EQUALS(DOUBLE_MAX, sftb->lookup("H"));
+            TS_ASSERT_EQUALS(DOUBLE_MAX, sftb->lookup("Ra"));
+            TS_ASSERT_DELTA(3.42104, sftb->lookupatq("Na", 1), 1e-5);
+            TS_ASSERT_DELTA(1.34868, sftb->lookupatq("Na", 3), 1e-5);
+            TS_ASSERT_DELTA(0.832158, sftb->lookupatq("Na", 5), 1e-5);
+            TS_ASSERT_THROWS(sftb->lookup("H4+"), invalid_argument);
+            TS_ASSERT_THROWS(sftb->lookupatq("H4+", 3), invalid_argument);
         }
 
 
