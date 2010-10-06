@@ -13,9 +13,6 @@ Import('DIFFPY_VERSION_STR')
 
 version_sources = ['version.tpl']
 svnentries = env.File('#/src/.svn/entries').srcnode()
-srcdir = os.path.dirname(os.path.dirname(str(svnentries)))
-svnrev = (os.path.isfile(str(svnentries)) and
-        os.popen('svnversion -c %s' % srcdir).read().strip().split(':')[-1])
 
 def build_VersionCode(target, source, env):
     import re
@@ -26,6 +23,9 @@ def build_VersionCode(target, source, env):
         'DIFFPY_VERSION_DATE' : '2009-11-23 00:00:00Z',
     }
     major, minor = map(int, DIFFPY_VERSION_STR.split("."))
+    srcdir = os.path.dirname(os.path.dirname(str(svnentries)))
+    svnrev = (os.path.isfile(str(svnentries)) and
+        os.popen('svnversion -c %s' % srcdir).read().strip().split(':')[-1])
     rev = svnrev and int(svnrev.rstrip('MS')) or 0
     flds['DIFFPY_VERSION'] = 10000000 * major + 100000 * minor + rev
     if rev:
