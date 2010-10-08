@@ -51,7 +51,7 @@ template <class T>
 int PairCounter::operator()(const T& stru)
 {
     this->eval(stru);
-    int cnt = this->value().front();
+    int cnt = int(this->value().front());
     return cnt;
 }
 
