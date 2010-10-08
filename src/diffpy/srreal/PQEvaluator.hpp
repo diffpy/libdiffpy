@@ -39,6 +39,8 @@ class PQEvaluatorBasic
 
         // constructor
         PQEvaluatorBasic() : mcpuindex(0), mncpu(1)  { }
+        virtual ~PQEvaluatorBasic()  { }
+
         // methods
         virtual PQEvaluatorType typeint() const;
         virtual void updateValue(PairQuantity& pq);
