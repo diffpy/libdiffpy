@@ -70,7 +70,7 @@ class StructureAdapter
         virtual const R3::Vector& siteCartesianPosition(int idx) const = 0;
 
         /// multiplicity of the independent site @param idx in the structure
-        virtual double siteMultiplicity(int idx) const;
+        virtual int siteMultiplicity(int idx) const;
 
         /// site occupancy at the independent site @param idx
         virtual double siteOccupancy(int idx) const;

@@ -148,7 +148,7 @@ siteAnisotropy(int idx) const
 }
 
 
-double
+int
 ObjCrystStructureAdapter::
 siteMultiplicity(int idx) const
 {

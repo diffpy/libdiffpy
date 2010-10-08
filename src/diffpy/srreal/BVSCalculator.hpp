@@ -82,7 +82,7 @@ class BVSCalculator : public PairQuantity
         struct {
             std::vector<std::string> baresymbols;
             std::vector<int> valences;
-            QuantityType multiplicities;
+            std::vector<int> multiplicities;
             QuantityType occupancies;
             double total_occupancy;
         } mstructure_cache;

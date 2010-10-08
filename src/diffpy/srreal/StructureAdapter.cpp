@@ -58,9 +58,9 @@ const string& StructureAdapter::siteAtomType(int idx) const
 }
 
 
-double StructureAdapter::siteMultiplicity(int idx) const
+int StructureAdapter::siteMultiplicity(int idx) const
 {
-    return 1.0;
+    return 1;
 }
 
 
