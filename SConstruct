@@ -43,11 +43,11 @@ vars.Update(env)
 vars.Add(PathVariable('libdir',
     'object code library directory [prefix/lib]',
     env['prefix'] + '/lib',
-    PathVariable.PathIsDirCreate))
+    PathVariable.PathAccept))
 vars.Add(PathVariable('includedir',
     'installation directory for C++ header files [prefix/include]',
     env['prefix'] + '/include',
-    PathVariable.PathIsDirCreate))
+    PathVariable.PathAccept))
 vars.Add(BoolVariable('enable_objcryst',
     'enable objcryst support, when installed', True))
 vars.Update(env)
