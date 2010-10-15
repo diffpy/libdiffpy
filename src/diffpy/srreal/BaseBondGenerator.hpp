@@ -59,9 +59,9 @@ class BaseBondGenerator
         int site0() const;
         int site1() const;
         int multiplicity() const;
-        virtual const R3::Vector& r0() const;
-        virtual const R3::Vector& r1() const;
-        double distance() const;
+        const R3::Vector& r0() const;
+        const R3::Vector& r1() const;
+        const double& distance() const;
         const R3::Vector& r01() const;
         virtual const R3::Matrix& Ucartesian0() const;
         virtual const R3::Matrix& Ucartesian1() const;
@@ -77,18 +77,18 @@ class BaseBondGenerator
         double mrmin;
         double mrmax;
         const StructureAdapter* mstructure;
+        R3::Vector mr0;
+        R3::Vector mr1;
+        R3::Vector mr01;
+        double mdistance;
 
         // methods
         virtual bool iterateSymmetry();
         virtual void rewindSymmetry();
         virtual void getNextBond();
-        void uncache();
+        void updateDistance();
 
     private:
-
-        // data
-        mutable bool mdistance_cached;
-        mutable double mdistance;
 
         // methods
         void advanceWhileInvalid();

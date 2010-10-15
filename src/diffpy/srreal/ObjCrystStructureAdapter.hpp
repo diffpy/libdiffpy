@@ -104,7 +104,6 @@ class ObjCrystBondGenerator : public BaseBondGenerator
         virtual void rewind();
 
         // data access
-        virtual const R3::Vector& r1() const;
         virtual const R3::Matrix& Ucartesian1() const;
 
         // configuration
@@ -123,6 +122,10 @@ class ObjCrystBondGenerator : public BaseBondGenerator
 
     private:
 
+        // methods
+        void updater1();
+
+        // data
         std::auto_ptr<PointsInSphere> msphere;
 };
 

@@ -322,48 +322,45 @@ void DiffPyStructurePeriodicBondGenerator::setRmax(double rmax)
     this->BaseBondGenerator::setRmax(rmax);
 }
 
-
-const R3::Vector& DiffPyStructurePeriodicBondGenerator::r0() const
-{
-    return mcartesian_positions_uc[this->site0()];
-}
-
-
-const R3::Vector& DiffPyStructurePeriodicBondGenerator::r1() const
-{
-    static R3::Vector rv;
-    rv = mcartesian_positions_uc[this->site1()] + mrcsphere;
-    return rv;
-}
-
 // Protected Methods ---------------------------------------------------------
 
 bool DiffPyStructurePeriodicBondGenerator::iterateSymmetry()
 {
-    this->uncache();
     msphere->next();
-    bool ok = !msphere->finished();
-    if (ok)  mrcsphere = mdpstructure->getLattice().cartesian(msphere->mno());
-    return ok;
+    bool done = msphere->finished();
+    mrcsphere = done ? 0.0 :
+        mdpstructure->getLattice().cartesian(msphere->mno());
+    return !done;
 }
 
 
 void DiffPyStructurePeriodicBondGenerator::rewindSymmetry()
 {
-    this->uncache();
     msphere->rewind();
-    if (!msphere->finished()) {
-        mrcsphere = mdpstructure->getLattice().cartesian(msphere->mno());
-    }
+    mrcsphere = msphere->finished() ? 0.0 :
+        mdpstructure->getLattice().cartesian(msphere->mno());
+    this->updater1();
 }
 
 
 void DiffPyStructurePeriodicBondGenerator::getNextBond()
 {
-    this->uncache();
-    if (++msite_current < msite_last)  return;
-    // leave at finished state when iterateSymmetry returns false
-    if (this->iterateSymmetry())   msite_current = msite_first;
+    ++msite_current;
+    // go back to the first site if there is next symmetry element
+    if (msite_current >= msite_last && this->iterateSymmetry())
+    {
+        msite_current = msite_first;
+    }
+    // update values only if not finished
+    if (!this->finished())  this->updater1();
+}
+
+// Private Methods -----------------------------------------------------------
+
+void DiffPyStructurePeriodicBondGenerator::updater1()
+{
+    mr1 = mrcsphere + mcartesian_positions_uc[this->site1()];
+    this->updateDistance();
 }
 
 // Factory Function and its Registration -------------------------------------

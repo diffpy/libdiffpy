@@ -105,10 +105,6 @@ class DiffPyStructurePeriodicBondGenerator : public DiffPyStructureBaseBondGener
         virtual void setRmin(double);
         virtual void setRmax(double);
 
-        // data access
-        virtual const R3::Vector& r0() const;
-        virtual const R3::Vector& r1() const;
-
     protected:
 
         // methods
@@ -117,6 +113,9 @@ class DiffPyStructurePeriodicBondGenerator : public DiffPyStructureBaseBondGener
         virtual void getNextBond();
 
     private:
+
+        // methods
+        void updater1();
 
         // data
         std::auto_ptr<PointsInSphere> msphere;

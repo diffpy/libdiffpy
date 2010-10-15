@@ -340,18 +340,6 @@ rewind()
 }
 
 
-const R3::Vector& 
-ObjCrystBondGenerator::
-r1() const
-{
-    size_t siteidx = this->site1();
-    assert(msymidx < mpstructure->mvsym[siteidx].size());
-    const Lattice& L = mpstructure->getLattice();
-    static R3::Vector rv; 
-    rv = L.cartesian(msphere->mno()) + mpstructure->mvsym[siteidx][msymidx];
-    return rv;
-}
-
 const R3::Matrix&
 ObjCrystBondGenerator::
 Ucartesian1() const
@@ -387,7 +375,6 @@ iterateSymmetry()
 {
     // Iterate the sphere. If it is finished, rewind and iterate the symmetry
     // counter. If that is also finished, then we're done.
-    this->uncache();
     msphere->next();
     if (msphere->finished())
     {
@@ -397,6 +384,7 @@ iterateSymmetry()
         }
         msphere->rewind();
     }
+    this->updater1();
     return true;
 }
 
@@ -407,8 +395,21 @@ rewindSymmetry()
 {
     this->msphere->rewind();
     msymidx = 0;
+    this->updater1();
 }
 
+// Private Methods -----------------------------------------------------------
+
+void
+ObjCrystBondGenerator::
+updater1()
+{
+    size_t siteidx = this->site1();
+    assert(msymidx < mpstructure->mvsym[siteidx].size());
+    const Lattice& L = mpstructure->getLattice();
+    mr1 = L.cartesian(msphere->mno()) + mpstructure->mvsym[siteidx][msymidx];
+    this->updateDistance();
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // class ObjCrystMoleculeAdapter

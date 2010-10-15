@@ -34,12 +34,18 @@ namespace srreal {
 
 BaseBondGenerator::BaseBondGenerator(const StructureAdapter* stru)
 {
+    msite_anchor = 0;
+    msite_first = 0;
+    msite_last = 0;
+    msite_current = 0;
     mstructure = stru;
-    this->uncache();
     this->setRmin(0.0);
     this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
-    this->selectAnchorSite(0);
-    this->selectSiteRange(0, mstructure->countSites());
+    if (mstructure->countSites())
+    {
+        this->selectAnchorSite(0);
+        this->selectSiteRange(0, mstructure->countSites());
+    }
 }
 
 // Public Methods ------------------------------------------------------------
@@ -48,7 +54,6 @@ BaseBondGenerator::BaseBondGenerator(const StructureAdapter* stru)
 
 void BaseBondGenerator::rewind()
 {
-    this->uncache();
     msite_current = msite_first;
     // avoid calling rewindSymmetry at an invalid site
     if (this->finished())   return;
@@ -59,7 +64,6 @@ void BaseBondGenerator::rewind()
 
 void BaseBondGenerator::next()
 {
-    this->uncache();
     this->getNextBond();
     this->advanceWhileInvalid();
 }
@@ -67,7 +71,6 @@ void BaseBondGenerator::next()
 
 void BaseBondGenerator::nextsite()
 {
-    this->uncache();
     msite_current += 1;
     // avoid calling rewindSymmetry at an invalid site
     if (this->finished())   return;
@@ -84,13 +87,17 @@ bool BaseBondGenerator::finished() const
 
 void BaseBondGenerator::selectAnchorSite(int anchor)
 {
+    assert(0 <= anchor && anchor < mstructure->countSites());
     msite_anchor = anchor;
+    mr0 = mstructure->siteCartesianPosition(msite_anchor);
     this->setFinishedFlag();
 }
 
 
 void BaseBondGenerator::selectSiteRange(int first, int last)
 {
+    assert(0 <= first && first < mstructure->countSites());
+    assert(last <= mstructure->countSites());
     msite_first = first;
     msite_last = last;
     this->setFinishedFlag();
@@ -99,7 +106,6 @@ void BaseBondGenerator::selectSiteRange(int first, int last)
 
 void BaseBondGenerator::setRmin(double rmin)
 {
-    this->uncache();
     if (rmin != mrmin)  this->setFinishedFlag();
     mrmin = rmin;
 }
@@ -107,7 +113,6 @@ void BaseBondGenerator::setRmin(double rmin)
 
 void BaseBondGenerator::setRmax(double rmax)
 {
-    this->uncache();
     if (rmax != mrmax)  this->setFinishedFlag();
     mrmax = rmax;
 }
@@ -146,34 +151,25 @@ int BaseBondGenerator::multiplicity() const
 
 const R3::Vector& BaseBondGenerator::r0() const
 {
-    const R3::Vector& rv = mstructure->siteCartesianPosition(this->site0());
-    return rv;
+    return mr0;
 }
 
 
 const R3::Vector& BaseBondGenerator::r1() const
 {
-    const R3::Vector& rv = mstructure->siteCartesianPosition(this->site1());
-    return rv;
+    return mr1;
 }
 
 
-double BaseBondGenerator::distance() const
+const double& BaseBondGenerator::distance() const
 {
-    if (!mdistance_cached)
-    {
-        mdistance = R3::distance(this->r0(), this->r1());
-        mdistance_cached = true;
-    }
     return mdistance;
 }
 
 
 const R3::Vector& BaseBondGenerator::r01() const
 {
-    static R3::Vector rv;
-    rv = this->r1() - this->r0();
-    return rv;
+    return mr01;
 }
 
 
@@ -205,35 +201,36 @@ double BaseBondGenerator::msd() const
 
 bool BaseBondGenerator::iterateSymmetry()
 {
-    this->uncache();
     return false;
 }
 
 
 void BaseBondGenerator::rewindSymmetry()
 {
-    this->uncache();
+    mr1 = mstructure->siteCartesianPosition(this->site1());
+    this->updateDistance();
 }
 
 
 void BaseBondGenerator::getNextBond()
 {
-    this->uncache();
     if (this->iterateSymmetry())  return;
     this->nextsite();
 }
 
 
-void BaseBondGenerator::uncache()
+void BaseBondGenerator::updateDistance()
 {
-    mdistance_cached = false;
+    if ((mdistance = fabs(mr01[0] = mr1[0] - mr0[0])) > mrmax)  return;
+    if ((mdistance = fabs(mr01[1] = mr1[1] - mr0[1])) > mrmax)  return;
+    if ((mdistance = fabs(mr01[2] = mr1[2] - mr0[2])) > mrmax)  return;
+    mdistance = R3::norm(mr01);
 }
 
 // Private Methods -----------------------------------------------------------
 
 void BaseBondGenerator::advanceWhileInvalid()
 {
-    this->uncache();
     while (!this->finished() &&
             (this->bondOutOfRange() || this->atSelfPair()))
     {
@@ -241,10 +238,11 @@ void BaseBondGenerator::advanceWhileInvalid()
     }
 }
 
+// Private Methods -----------------------------------------------------------
 
 bool BaseBondGenerator::bondOutOfRange() const
 {
-    double d = this->distance();
+    const double& d = this->distance();
     bool rv = (d < this->getRmin()) || (d > this->getRmax());
     return rv;
 }
@@ -260,7 +258,6 @@ bool BaseBondGenerator::atSelfPair() const
 
 void BaseBondGenerator::setFinishedFlag()
 {
-    this->uncache();
     msite_current = msite_last;
 }
 
