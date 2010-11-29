@@ -29,6 +29,7 @@
 #ifndef NOSYMMETRYSTRUCTUREADAPTER_HPP_INCLUDED
 #define NOSYMMETRYSTRUCTUREADAPTER_HPP_INCLUDED
 
+#include <boost/serialization/export.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 
 namespace diffpy {
@@ -39,6 +40,7 @@ class NoSymmetryStructureAdapter : public StructureAdapter
     public:
 
         // constructors
+        NoSymmetryStructureAdapter()  { }
         NoSymmetryStructureAdapter(StructureAdapterPtr);
 
         // methods - overloaded
@@ -56,6 +58,16 @@ class NoSymmetryStructureAdapter : public StructureAdapter
 
         // data
         StructureAdapterPtr msrcstructure;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<StructureAdapter>(*this);
+            ar & msrcstructure;
+        }
+
 };
 
 // Routines ------------------------------------------------------------------
@@ -74,5 +86,9 @@ StructureAdapterPtr nosymmetry(const T& stru)
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT(diffpy::srreal::NoSymmetryStructureAdapter)
 
 #endif  // NOSYMMETRYSTRUCTUREADAPTER_HPP_INCLUDED
