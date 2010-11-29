@@ -27,6 +27,7 @@
 #ifndef NOMETASTRUCTUREADAPTER_HPP_INCLUDED
 #define NOMETASTRUCTUREADAPTER_HPP_INCLUDED
 
+#include <boost/serialization/export.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 
 namespace diffpy {
@@ -37,6 +38,7 @@ class NoMetaStructureAdapter : public StructureAdapter
     public:
 
         // constructors
+        NoMetaStructureAdapter()  { }
         NoMetaStructureAdapter(StructureAdapterPtr);
 
         // methods - overloaded
@@ -54,6 +56,16 @@ class NoMetaStructureAdapter : public StructureAdapter
 
         // data
         StructureAdapterPtr msrcstructure;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<StructureAdapter>(*this);
+            ar & msrcstructure;
+        }
+
 };
 
 // Routines ------------------------------------------------------------------
@@ -72,5 +84,9 @@ StructureAdapterPtr nometa(const T& stru)
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT(diffpy::srreal::NoMetaStructureAdapter)
 
 #endif  // NOMETASTRUCTUREADAPTER_HPP_INCLUDED
