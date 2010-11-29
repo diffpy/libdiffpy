@@ -132,26 +132,27 @@ void configurePDFCalculator(Tpdfcalc* pdfc, const Tmap& pdffit)
     // scale
     PDFEnvelopePtr envelope;
     envelope = PDFEnvelope::createByType("scale");
-    envelope->setDoubleAttr("scale", pdffit.at("scale"));
+    envelope->setDoubleAttr("scale", pdffit.find("scale")->second);
     pdfc->addEnvelope(envelope);
     // delta1, delta2 - set these only when using JeongPeakWidth model
     if (pdfc->getPeakWidthModel()->type() == "jeong")
     {
-        pdfc->setDoubleAttr("delta1", pdffit.at("delta1"));
-        pdfc->setDoubleAttr("delta2", pdffit.at("delta2"));
+        pdfc->setDoubleAttr("delta1", pdffit.find("delta1")->second);
+        pdfc->setDoubleAttr("delta2", pdffit.find("delta2")->second);
     }
     // spdiameter
     if (pdffit.count("spdiameter"))
     {
         envelope = PDFEnvelope::createByType("sphericalshape");
-        envelope->setDoubleAttr("spdiameter", pdffit.at("spdiameter"));
+        envelope->setDoubleAttr("spdiameter",
+                pdffit.find("spdiameter")->second);
         pdfc->addEnvelope(envelope);
     }
     // stepcut
     if (pdffit.count("stepcut"))
     {
         envelope = PDFEnvelope::createByType("stepcut");
-        envelope->setDoubleAttr("stepcut", pdffit.at("stepcut"));
+        envelope->setDoubleAttr("stepcut", pdffit.find("stepcut")->second);
         pdfc->addEnvelope(envelope);
     }
 }

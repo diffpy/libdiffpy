@@ -48,6 +48,7 @@ conf = Configure(env, custom_tests={
 
 # boost_python
 configure_boost_library('boost_python')
+configure_boost_library('boost_serialization')
 
 # check for ObjCryst, autoadd appends to LIBS if found.
 conf.env['has_objcryst'] = (conf.env['enable_objcryst'] and

@@ -23,6 +23,7 @@
 #define R3LINALG_HPP_INCLUDED
 
 #include <algorithm>
+#include <boost/serialization/base_object.hpp>
 #include <blitz/tinyvec-et.h>
 #include <blitz/tinymat.h>
 #include <diffpy/mathutils.hpp>
@@ -164,5 +165,33 @@ bool EpsEqual(const T& A, const T& B, double eps)
 }   // namespace R3
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+namespace boost {
+namespace serialization {
+
+template<class Archive>
+void serialize(Archive& ar,
+        diffpy::srreal::R3::Vector& v, const unsigned int version)
+{
+    ar & v[0] & v[1] & v[2];
+}
+
+
+template<class Archive>
+void serialize(Archive& ar,
+        diffpy::srreal::R3::Matrix& A, const unsigned int version)
+{
+    using namespace diffpy::srreal;
+    R3::Matrix::T_numtype* p = A.data();
+    R3::Matrix::T_numtype* plast = p + R3::Ndim * R3::Ndim;
+    for (; p != plast; ++p)     ar & (*p);
+}
+
+
+} // namespace serialization
+} // namespace boost
+
 
 #endif  // R3LINALG_HPP_INCLUDED

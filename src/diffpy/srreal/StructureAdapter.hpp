@@ -23,6 +23,8 @@
 #define STRUCTUREADAPTER_HPP_INCLUDED
 
 #include <boost/shared_ptr.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 
@@ -86,6 +88,14 @@ class StructureAdapter
         /// this method allows custom special configuration for a concrete 
         /// pair of StructureAdapter and PairQuantity objects.
         virtual void customPQConfig(PairQuantity* pq) const  { }
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)  { }
+
 };
 
 // Routines ------------------------------------------------------------------
@@ -106,5 +116,9 @@ int atomValence(const std::string& atomtype);
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_SERIALIZATION_SHARED_PTR(diffpy::srreal::StructureAdapter)
 
 #endif  // STRUCTUREADAPTER_HPP_INCLUDED

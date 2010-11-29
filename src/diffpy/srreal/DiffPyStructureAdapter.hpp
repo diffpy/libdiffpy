@@ -26,8 +26,11 @@
 
 #include <memory>
 #include <vector>
+#include <map>
 #include <boost/python.hpp>
-#include <boost/unordered_map.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/export.hpp>
 
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/Lattice.hpp>
@@ -42,6 +45,7 @@ class DiffPyStructureAdapter : public StructureAdapter
     public:
 
         // constructors
+        DiffPyStructureAdapter()  { }
         DiffPyStructureAdapter(boost::python::object);
 
         // methods - overloaded
@@ -71,7 +75,22 @@ class DiffPyStructureAdapter : public StructureAdapter
         std::vector<bool> manisotropies;
         std::vector<R3::Matrix> mcartesian_uijs;
         std::vector<std::string> matomtypes;
-        boost::unordered_map<std::string, double> mpdffit;
+        std::map<std::string, double> mpdffit;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<StructureAdapter>(*this);
+            ar & mlattice;
+            ar & mcartesian_positions;
+            ar & moccupancies;
+            ar & manisotropies;
+            ar & mcartesian_uijs;
+            ar & matomtypes;
+            ar & mpdffit;
+        }
 
 };
 
@@ -126,5 +145,9 @@ class DiffPyStructurePeriodicBondGenerator : public DiffPyStructureBaseBondGener
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT(diffpy::srreal::DiffPyStructureAdapter)
 
 #endif  // DIFFPYSTRUCTUREADAPTER_HPP_INCLUDED

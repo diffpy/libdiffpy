@@ -22,6 +22,9 @@
 *****************************************************************************/
 
 #include <typeinfo>
+#include <sstream>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
@@ -211,6 +214,28 @@ class TestDiffPyStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_DELTA(98.64, L.beta(), eps);
             TS_ASSERT_DELTA(87.96, L.gamma(), eps);
         }
+
+
+        void test_serialization()
+        {
+            stringstream storage(ios::in | ios::out | ios::binary);
+            boost::archive::binary_oarchive oa(storage, ios::binary);
+            oa << m_kbise;
+            boost::archive::binary_iarchive ia(storage, ios::binary);
+            StructureAdapterPtr kbise1;
+            TS_ASSERT(!kbise1.get());
+            ia >> kbise1;
+            TS_ASSERT_DIFFERS(m_kbise.get(), kbise1.get());
+            const double eps = 1.0e-7;
+            TS_ASSERT_EQUALS(23, kbise1->countSites());
+            TS_ASSERT_EQUALS(23.0, kbise1->totalOccupancy());
+            TS_ASSERT_DELTA(0.0335565, kbise1->numberDensity(), eps);
+            TS_ASSERT_EQUALS(string("K1+"), kbise1->siteAtomType(0));
+            TS_ASSERT_EQUALS(string("Bi3+"), kbise1->siteAtomType(2));
+            TS_ASSERT_EQUALS(string("Se"), kbise1->siteAtomType(10));
+            TS_ASSERT_EQUALS(string("Se"), kbise1->siteAtomType(22));
+        }
+
 
 };  // class TestDiffPyStructureAdapter
 

@@ -11,6 +11,7 @@
 #ifndef LATTICE_HPP_INCLUDED
 #define LATTICE_HPP_INCLUDED
 
+#include <boost/serialization/base_object.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
 
@@ -150,6 +151,30 @@ class Lattice
         // base multiplied by magnitudes of reciprocal vectors
         R3::Matrix mnormbase;
         R3::Matrix mrecnormbase;    // inverse of mnormbase
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & ma & mb & mc;
+            ar & malpha & mbeta & mgamma;
+            ar & mcosa & mcosb & mcosg;
+            ar & msina & msinb & msing;
+            ar & mva & mvb & mvc;
+            ar & mar & mbr & mcr;
+            ar & malphar & mbetar & mgammar;
+            ar & mcosar & mcosbr & mcosgr;
+            ar & msinar & msinbr & msingr;
+            ar & mvar & mvbr & mvcr;
+            ar & mmetrics;
+            ar & mbase;
+            ar & mstdbase;
+            ar & mbaserot;
+            ar & mrecbase;
+            ar & mnormbase;
+            ar & mrecnormbase;
+        }
 
 };
 
