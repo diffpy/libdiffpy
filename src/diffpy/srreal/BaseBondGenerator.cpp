@@ -250,8 +250,7 @@ bool BaseBondGenerator::bondOutOfRange() const
 
 bool BaseBondGenerator::atSelfPair() const
 {
-    bool rv = (this->site0() == this->site1()) &&
-        eps_eq(this->distance(), 0.0);
+    bool rv = eps_eq(this->distance(), 0.0);
     return rv;
 }
 
