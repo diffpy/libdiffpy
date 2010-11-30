@@ -23,10 +23,9 @@
 
 #include <typeinfo>
 #include <sstream>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
 #include <cxxtest/TestSuite.h>
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
 #include "python_helpers.hpp"
@@ -219,9 +218,9 @@ class TestDiffPyStructureAdapter : public CxxTest::TestSuite
         void test_serialization()
         {
             stringstream storage(ios::in | ios::out | ios::binary);
-            boost::archive::binary_oarchive oa(storage, ios::binary);
+            diffpy::serialization::oarchive oa(storage, ios::binary);
             oa << m_kbise;
-            boost::archive::binary_iarchive ia(storage, ios::binary);
+            diffpy::serialization::iarchive ia(storage, ios::binary);
             StructureAdapterPtr kbise1;
             TS_ASSERT(!kbise1.get());
             ia >> kbise1;

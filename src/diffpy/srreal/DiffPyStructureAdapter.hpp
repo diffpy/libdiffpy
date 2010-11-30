@@ -30,7 +30,6 @@
 #include <boost/python.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
-#include <boost/serialization/export.hpp>
 
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/Lattice.hpp>
@@ -145,9 +144,5 @@ class DiffPyStructurePeriodicBondGenerator : public DiffPyStructureBaseBondGener
 
 }   // namespace srreal
 }   // namespace diffpy
-
-// Serialization -------------------------------------------------------------
-
-BOOST_CLASS_EXPORT(diffpy::srreal::DiffPyStructureAdapter)
 
 #endif  // DIFFPYSTRUCTUREADAPTER_HPP_INCLUDED

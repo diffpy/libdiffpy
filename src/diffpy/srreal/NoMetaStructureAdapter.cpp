@@ -24,6 +24,7 @@
 *
 *****************************************************************************/
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/srreal/NoMetaStructureAdapter.hpp>
 
 namespace diffpy {
@@ -110,5 +111,10 @@ StructureAdapterPtr nometa(StructureAdapterPtr stru)
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::NoMetaStructureAdapter)
+BOOST_CLASS_EXPORT(diffpy::srreal::NoMetaStructureAdapter)
 
 // End of file

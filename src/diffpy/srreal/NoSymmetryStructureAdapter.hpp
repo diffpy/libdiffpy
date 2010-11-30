@@ -29,7 +29,6 @@
 #ifndef NOSYMMETRYSTRUCTUREADAPTER_HPP_INCLUDED
 #define NOSYMMETRYSTRUCTUREADAPTER_HPP_INCLUDED
 
-#include <boost/serialization/export.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 
 namespace diffpy {
@@ -86,9 +85,5 @@ StructureAdapterPtr nosymmetry(const T& stru)
 
 }   // namespace srreal
 }   // namespace diffpy
-
-// Serialization -------------------------------------------------------------
-
-BOOST_CLASS_EXPORT(diffpy::srreal::NoSymmetryStructureAdapter)
 
 #endif  // NOSYMMETRYSTRUCTUREADAPTER_HPP_INCLUDED

@@ -21,13 +21,12 @@
 
 #include <typeinfo>
 #include <sstream>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/NoMetaStructureAdapter.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
+#include <diffpy/serialization.hpp>
 #include "python_helpers.hpp"
 
 using namespace std;
@@ -82,11 +81,12 @@ class TestNoMetaStructureAdapter : public CxxTest::TestSuite
 
         void test_serialization()
         {
+            using namespace diffpy::serialization;
             stringstream storage(ios::in | ios::out | ios::binary);
-            boost::archive::binary_oarchive oa(storage, ios::binary);
+            oarchive oa(storage, ios::binary);
             StructureAdapterPtr pswtbare0(nometa(m_pswt));
             oa << pswtbare0;
-            boost::archive::binary_iarchive ia(storage, ios::binary);
+            iarchive ia(storage, ios::binary);
             StructureAdapterPtr pswtbare1;
             TS_ASSERT(!pswtbare1.get());
             ia >> pswtbare1;

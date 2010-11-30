@@ -26,6 +26,7 @@
 *
 *****************************************************************************/
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/srreal/NoSymmetryStructureAdapter.hpp>
 
 namespace diffpy {
@@ -112,5 +113,8 @@ StructureAdapterPtr nosymmetry(StructureAdapterPtr stru)
 
 }   // namespace srreal
 }   // namespace diffpy
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::NoSymmetryStructureAdapter)
+BOOST_CLASS_EXPORT(diffpy::srreal::NoSymmetryStructureAdapter)
 
 // End of file

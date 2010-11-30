@@ -29,6 +29,7 @@
 #include <boost/python.hpp>
 #include <boost/python/stl_iterator.hpp>
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
@@ -39,7 +40,9 @@
 
 using namespace std;
 using namespace boost;
-using namespace diffpy::srreal;
+
+namespace diffpy {
+namespace srreal {
 
 //////////////////////////////////////////////////////////////////////////////
 // class DiffPyStructureAdapter
@@ -382,5 +385,13 @@ StructureAdapterPtr createDiffPyStructureAdapter(python::object stru)
 
 bool reg_DiffPyStructureAdapterFactory =
 registerPythonStructureAdapterFactory(createDiffPyStructureAdapter);
+
+}   // namespace srreal
+}   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::DiffPyStructureAdapter)
+BOOST_CLASS_EXPORT(diffpy::srreal::DiffPyStructureAdapter)
 
 // End of file

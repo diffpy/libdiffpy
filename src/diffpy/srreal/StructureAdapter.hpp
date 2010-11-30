@@ -24,7 +24,9 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/export.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 
@@ -119,6 +121,7 @@ int atomValence(const std::string& atomtype);
 
 // Serialization -------------------------------------------------------------
 
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::StructureAdapter)
 BOOST_SERIALIZATION_SHARED_PTR(diffpy::srreal::StructureAdapter)
 
 #endif  // STRUCTUREADAPTER_HPP_INCLUDED

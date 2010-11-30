@@ -27,7 +27,6 @@
 #ifndef NOMETASTRUCTUREADAPTER_HPP_INCLUDED
 #define NOMETASTRUCTUREADAPTER_HPP_INCLUDED
 
-#include <boost/serialization/export.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 
 namespace diffpy {
@@ -84,9 +83,5 @@ StructureAdapterPtr nometa(const T& stru)
 
 }   // namespace srreal
 }   // namespace diffpy
-
-// Serialization -------------------------------------------------------------
-
-BOOST_CLASS_EXPORT(diffpy::srreal::NoMetaStructureAdapter)
 
 #endif  // NOMETASTRUCTUREADAPTER_HPP_INCLUDED
