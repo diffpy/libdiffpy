@@ -233,6 +233,18 @@ class TestDiffPyStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(string("Bi3+"), kbise1->siteAtomType(2));
             TS_ASSERT_EQUALS(string("Se"), kbise1->siteAtomType(10));
             TS_ASSERT_EQUALS(string("Se"), kbise1->siteAtomType(22));
+            DiffPyStructureAdapter* pkbise =
+                dynamic_cast<DiffPyStructureAdapter*>(m_kbise.get());
+            DiffPyStructureAdapter* pkbise1 =
+                dynamic_cast<DiffPyStructureAdapter*>(kbise1.get());
+            const Lattice& L = pkbise->getLattice();
+            const Lattice& L1 = pkbise1->getLattice();
+            TS_ASSERT_EQUALS(L.a(), L1.a());
+            TS_ASSERT_EQUALS(L.b(), L1.b());
+            TS_ASSERT_EQUALS(L.c(), L1.c());
+            TS_ASSERT_EQUALS(L.alpha(), L1.alpha());
+            TS_ASSERT_EQUALS(L.beta(), L1.beta());
+            TS_ASSERT_EQUALS(L.gamma(), L1.gamma());
         }
 
 

@@ -32,6 +32,7 @@
 #include <string>
 #include <vector>
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/Lattice.hpp>
@@ -43,11 +44,38 @@ using namespace diffpy::srreal;
 
 namespace {
 
+// Local constants -----------------------------------------------------------
+
 const double rtod = 180 / M_PI;
 const double UtoB = 8 * M_PI * M_PI;
 const double BtoU = 1.0 / UtoB;
 
+// Utility functions ---------------------------------------------------------
+
+R3::Matrix 
+getUij(const ObjCryst::ScatteringPower* sp)
+{
+    R3::Matrix Uij;
+    if (sp->IsIsotropic())
+    {
+        Uij(0,0) = Uij(1,1) = Uij(2,2) = sp->GetBiso() * BtoU;
+        Uij(0,1) = Uij(1,0) = 0;
+        Uij(0,2) = Uij(2,0) = 0;
+        Uij(2,1) = Uij(1,2) = 0;
+    }
+    else
+    {
+        Uij(0,0) = sp->GetBij(1,1) * BtoU;
+        Uij(1,1) = sp->GetBij(2,2) * BtoU;
+        Uij(2,2) = sp->GetBij(3,3) * BtoU;
+        Uij(0,1) = Uij(1,0) = sp->GetBij(1,2) * BtoU;
+        Uij(0,2) = Uij(2,0) = sp->GetBij(1,3) * BtoU;
+        Uij(1,2) = Uij(2,1) = sp->GetBij(2,3) * BtoU;
+    }
+    return Uij;
 }
+
+}   // namespace
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -100,7 +128,7 @@ int
 ObjCrystStructureAdapter::
 countSites() const
 {
-    return mvsc.size();
+    return mvsym.size();
 }
 
 
@@ -135,7 +163,7 @@ ObjCrystStructureAdapter::
 siteOccupancy(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return mvsc[idx].mOccupancy;
+    return moccupancies[idx];
 }
 
 
@@ -144,7 +172,7 @@ ObjCrystStructureAdapter::
 siteAnisotropy(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return !(mvsc[idx].mpScattPow->IsIsotropic());
+    return manisotropies[idx];
 }
 
 
@@ -172,7 +200,7 @@ ObjCrystStructureAdapter::
 siteAtomType(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return mvsc[idx].mpScattPow->GetSymbol();
+    return matomtypes[idx];
 }
 
 // Private Methods -----------------------------------------------------------
@@ -196,10 +224,14 @@ getUnitCell(const ObjCryst::Crystal& cryst)
     double x, y, z, junk;
     CrystMatrix<double> symmetricsCoords;
 
-    mvsc.clear();
+    moccupancies.clear();
+    manisotropies.clear();
+    matomtypes.clear();
     mvsym.clear();
     mvuij.clear();
-    mvsc.reserve(nbComponent);
+    moccupancies.reserve(nbComponent);
+    manisotropies.reserve(nbComponent);
+    matomtypes.reserve(nbComponent);
     mvsym.reserve(nbComponent);
     mvuij.reserve(nbComponent);
 
@@ -215,28 +247,31 @@ getUnitCell(const ObjCryst::Crystal& cryst)
     for (size_t i = 0; i < nbComponent; ++i)
     {
 
-        const ObjCryst::ScatteringPower* sp = scl(i).mpScattPow;
+        const ObjCryst::ScatteringComponent& sc = scl(i);
+        const ObjCryst::ScatteringPower* sp = sc.mpScattPow;
 
         // Skip over this if it is a dummy atom. A dummy atom has no
         // mpScattPow, and therefore no type. It's just in a structure as a
         // reference position.
         if (sp == NULL) continue;
 
-        mvsc.push_back(scl(i));
+        moccupancies.push_back(sc.mOccupancy);
+        manisotropies.push_back(!(sp->IsIsotropic()));
+        matomtypes.push_back(sp->GetSymbol());
         SymPosSet symset = SymPosSet(R3::EpsCompare(mtoler));
         SymPosVec symvec = SymPosVec();
         SymUijVec uijvec = SymUijVec();
         size_t numsym = 0;
 
         // Store Uij.
-        R3::Matrix Uij = objcrystutil::getUij(sp);
+        R3::Matrix Uij = getUij(sp);
 
         // Get all the symmetric coordinates. Symmetric coordinates are created
         // by translation vector in the outer loop, and rotation matrix in the
         // inner loop. The first translation is [0,0,0]. We need to know this
         // to determine the rotation matrices.
         symmetricsCoords = spacegroup.GetAllSymmetrics(
-            scl(i).mX, scl(i).mY, scl(i).mZ);
+            sc.mX, sc.mY, sc.mZ);
 
         // Collect the unique symmetry positions.
         for (size_t j = 0; j < nbSymmetrics; ++j)
@@ -302,6 +337,12 @@ getUnitCell(const ObjCryst::Crystal& cryst)
 
     }
 
+    // Final sanity checks.
+    assert(int(moccupancies.size()) == this->countSites());
+    assert(int(manisotropies.size()) == this->countSites());
+    assert(int(matomtypes.size()) == this->countSites());
+    assert(int(mvsym.size()) == this->countSites());
+    assert(int(mvuij.size()) == this->countSites());
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -425,11 +466,15 @@ ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule)
     mlattice.setLatPar(1, 1, 1, 90, 90, 90);
 
     size_t nbComponent = molecule.GetNbComponent();
-    // Initialize positions and uij
-    mvatoms.clear();
+    // Initialize all cache stores.
+    moccupancies.clear();
+    manisotropies.clear();
+    matomtypes.clear();
     mvpos.clear();
     mvuij.clear();
-    mvatoms.reserve(nbComponent);
+    moccupancies.reserve(nbComponent);
+    manisotropies.reserve(nbComponent);
+    matomtypes.reserve(nbComponent);
     mvpos.reserve(nbComponent);
     mvuij.reserve(nbComponent);
 
@@ -440,7 +485,10 @@ ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule)
         if (atom.IsDummy()) continue;
 
         // Store the atom
-        mvatoms.push_back(atom);
+        moccupancies.push_back(atom.GetOccupancy());
+        const ObjCryst::ScatteringPower* sp = &(atom.GetScatteringPower());
+        manisotropies.push_back(!(sp->IsIsotropic()));
+        matomtypes.push_back(sp->GetSymbol());
 
         // Store position
         R3::Vector xyz; 
@@ -448,9 +496,16 @@ ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule)
         mvpos.push_back(xyz);
 
         // Store Uij
-        R3::Matrix Uij = objcrystutil::getUij(&atom.GetScatteringPower());
+        R3::Matrix Uij = getUij(&atom.GetScatteringPower());
         mvuij.push_back(Uij);
     }
+
+    // final sanity checks
+    assert(int(moccupancies.size()) == this->countSites());
+    assert(int(manisotropies.size()) == this->countSites());
+    assert(int(matomtypes.size()) == this->countSites());
+    assert(int(mvpos.size()) == this->countSites());
+    assert(int(mvuij.size()) == this->countSites());
 
 }
 
@@ -470,7 +525,7 @@ int
 ObjCrystMoleculeAdapter::
 countSites() const
 {
-    return mvatoms.size();
+    return mvpos.size();
 }
 
 
@@ -504,7 +559,7 @@ ObjCrystMoleculeAdapter::
 siteOccupancy(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return mvatoms[idx].GetOccupancy();
+    return moccupancies[idx];
 }
 
 
@@ -513,7 +568,7 @@ ObjCrystMoleculeAdapter::
 siteAnisotropy(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return !(mvatoms[idx].GetScatteringPower().IsIsotropic());
+    return manisotropies[idx];
 }
 
 
@@ -531,7 +586,7 @@ ObjCrystMoleculeAdapter::
 siteAtomType(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return mvatoms[idx].GetScatteringPower().GetSymbol();
+    return matomtypes[idx];
 }
 
 
@@ -545,34 +600,6 @@ ObjCrystMoleculeBondGenerator::
 ObjCrystMoleculeBondGenerator(const ObjCrystMoleculeAdapter* adpt) 
     : BaseBondGenerator(adpt), mpstructure(adpt)
 {
-}
-
-// Utility functions --------------------------------------------------------
-
-R3::Matrix 
-objcrystutil::
-getUij(const ObjCryst::ScatteringPower* sp)
-{
-    R3::Matrix Uij;
-    if (sp->IsIsotropic())
-    {
-        Uij(0,0) = Uij(1,1) = Uij(2,2) = sp->GetBiso() * BtoU;
-        Uij(0,1) = Uij(1,0) = 0;
-        Uij(0,2) = Uij(2,0) = 0;
-        Uij(2,1) = Uij(1,2) = 0;
-    }
-    else
-    {
-        Uij(0,0) = sp->GetBij(1,1) * BtoU;
-        Uij(1,1) = sp->GetBij(2,2) * BtoU;
-        Uij(2,2) = sp->GetBij(3,3) * BtoU;
-        Uij(0,1) = Uij(1,0) = sp->GetBij(1,2) * BtoU;
-        Uij(0,2) = Uij(2,0) = sp->GetBij(1,3) * BtoU;
-        Uij(1,2) = Uij(2,1) = sp->GetBij(2,3) * BtoU;
-    }
-
-    return Uij;
-
 }
 
 // Factory Function and its Registration -------------------------------------
@@ -618,5 +645,13 @@ registerPythonStructureAdapterFactory(createPyObjCrystStructureAdapter);
 
 bool reg_PyObjCrystMoleculeAdapter =
 registerPythonStructureAdapterFactory(createPyObjCrystMoleculeAdapter);
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::ObjCrystStructureAdapter)
+BOOST_CLASS_EXPORT(diffpy::srreal::ObjCrystStructureAdapter)
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::ObjCrystMoleculeAdapter)
+BOOST_CLASS_EXPORT(diffpy::srreal::ObjCrystMoleculeAdapter)
 
 // End of file

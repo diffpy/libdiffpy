@@ -25,6 +25,7 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
+#include <diffpy/serialization.hpp>
 #include "objcryst_helpers.hpp"
 #include <ObjCryst/ObjCryst/Crystal.h>
 #include <ObjCryst/ObjCryst/Molecule.h>
@@ -210,6 +211,41 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_DELTA(98.64, L.beta(), eps);
             TS_ASSERT_DELTA(87.96, L.gamma(), eps);
         }
+
+
+        void test_serialization()
+        {
+            stringstream storage(ios::in | ios::out | ios::binary);
+            diffpy::serialization::oarchive oa(storage, ios::binary);
+            oa << m_kbise;
+            diffpy::serialization::iarchive ia(storage, ios::binary);
+            StructureAdapterPtr kbise1;
+            TS_ASSERT(!kbise1.get());
+            ia >> kbise1;
+            TS_ASSERT_DIFFERS(m_kbise.get(), kbise1.get());
+            const double eps = 1.0e-7;
+            TS_ASSERT_EQUALS(12, kbise1->countSites());
+            TS_ASSERT_EQUALS(23.0, kbise1->totalOccupancy());
+            TS_ASSERT_DELTA(0.0335565, kbise1->numberDensity(), eps);
+            TS_ASSERT_EQUALS(string("K1+"), kbise1->siteAtomType(0));
+            TS_ASSERT_EQUALS(string("Bi3+"), kbise1->siteAtomType(1));
+            TS_ASSERT_EQUALS(string("Se"), kbise1->siteAtomType(5));
+            TS_ASSERT_EQUALS(string("Se"), kbise1->siteAtomType(11));
+            ObjCrystStructureAdapter* pkbise =
+                dynamic_cast<ObjCrystStructureAdapter*>(m_kbise.get());
+            ObjCrystStructureAdapter* pkbise1 =
+                dynamic_cast<ObjCrystStructureAdapter*>(kbise1.get());
+            const Lattice& L = pkbise->getLattice();
+            const Lattice& L1 = pkbise1->getLattice();
+            TS_ASSERT_EQUALS(L.a(), L1.a());
+            TS_ASSERT_EQUALS(L.b(), L1.b());
+            TS_ASSERT_EQUALS(L.c(), L1.c());
+            TS_ASSERT_EQUALS(L.alpha(), L1.alpha());
+            TS_ASSERT_EQUALS(L.beta(), L1.beta());
+            TS_ASSERT_EQUALS(L.gamma(), L1.gamma());
+        }
+
+
 
 };  // class TestObjCrystStructureAdapter
 
@@ -469,6 +505,31 @@ class TestObjCrystMoleculeAdapter : public CxxTest::TestSuite
             TS_ASSERT_DELTA(90, L.alpha(), eps);
             TS_ASSERT_DELTA(90, L.beta(), eps);
             TS_ASSERT_DELTA(90, L.gamma(), eps);
+        }
+
+
+        void test_serialization()
+        {
+            stringstream storage(ios::in | ios::out | ios::binary);
+            diffpy::serialization::oarchive oa(storage, ios::binary);
+            oa << m_c60;
+            diffpy::serialization::iarchive ia(storage, ios::binary);
+            StructureAdapterPtr c60a;
+            TS_ASSERT(!c60a.get());
+            ia >> c60a;
+            TS_ASSERT_DIFFERS(m_c60.get(), c60a.get());
+            TS_ASSERT_EQUALS(60, c60a->countSites());
+            TS_ASSERT_EQUALS(60.0, c60a->totalOccupancy());
+            TS_ASSERT_EQUALS(0.0, c60a->numberDensity());
+            R3::Vector dxyz(1, 2, 3);
+            dxyz = m_c60->siteCartesianPosition(0) - c60a->siteCartesianPosition(0);
+            TS_ASSERT_EQUALS(0.0, R3::norm(dxyz));
+            dxyz = m_c60->siteCartesianPosition(37) - c60a->siteCartesianPosition(37);
+            TS_ASSERT_EQUALS(0.0, R3::norm(dxyz));
+            for (int i = 0; i < c60a->countSites(); ++i)
+            {
+                TS_ASSERT_EQUALS(string("C"), c60a->siteAtomType(i));
+            }
         }
 
 };  // class TestObjCrystMoleculeAdapter

@@ -31,6 +31,7 @@
 #include <memory>
 #include <set>
 #include <vector>
+#include <boost/serialization/vector.hpp>
 
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -54,6 +55,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
     public:
 
         // constructors
+        ObjCrystStructureAdapter()  { }
         ObjCrystStructureAdapter(const ObjCryst::Crystal&);
 
         // methods - overloaded
@@ -80,14 +82,30 @@ class ObjCrystStructureAdapter : public StructureAdapter
         // Tolerance on distance measurements.  Two sites are the same if
         // their fractional coordinates are within this tolerance
         static const double mtoler;
-        // The asymmetric unit cell of ScatteringComponent instances
-        std::vector< ObjCryst::ScatteringComponent > mvsc;
+        // cached data per each site in asymmetric unit cell
+        std::vector<double> moccupancies;
+        std::vector<bool> manisotropies;
+        std::vector<std::string> matomtypes;
         // The symmetry-related positions of the asymmetric unit cell
         std::vector<SymPosVec> mvsym;
         // The Uij for scatterers. Stored in same order as mvsym.
         std::vector<SymUijVec> mvuij;
         // The Lattice instance needed by the bond generator
         Lattice mlattice;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<StructureAdapter>(*this);
+            ar & moccupancies;
+            ar & manisotropies;
+            ar & matomtypes;
+            ar & mvsym;
+            ar & mvuij;
+            ar & mlattice;
+        }
 
 };
 
@@ -143,6 +161,7 @@ class ObjCrystMoleculeAdapter : public StructureAdapter
     public:
 
         // constructors
+        ObjCrystMoleculeAdapter()  { }
         ObjCrystMoleculeAdapter(const ObjCryst::Molecule&);
 
         // methods - overloaded
@@ -159,15 +178,30 @@ class ObjCrystMoleculeAdapter : public StructureAdapter
 
     private:
 
-        // The MolAtom instances
-        std::vector< ObjCryst::MolAtom > mvatoms;
-        // The positions of the scatterers. Same order as mvatoms.
+        // cached data per each atom in the molecule
+        std::vector<double> moccupancies;
+        std::vector<bool> manisotropies;
+        std::vector<std::string> matomtypes;
+        // The positions of the scatterers.
         std::vector<R3::Vector> mvpos;
-        // The Uij for scatterers. Same order as mvatoms.
+        // The Uij for scatterers.
         std::vector<R3::Matrix> mvuij;
         // The Lattice instance needed by the bond generator
         Lattice mlattice;
 
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<StructureAdapter>(*this);
+            ar & moccupancies;
+            ar & manisotropies;
+            ar & matomtypes;
+            ar & mvpos;
+            ar & mvuij;
+            ar & mlattice;
+        }
 };
 
 
@@ -184,12 +218,6 @@ class ObjCrystMoleculeBondGenerator : public BaseBondGenerator
         const ObjCrystMoleculeAdapter* mpstructure;
 
 };
-
-
-namespace objcrystutil
-{
-    R3::Matrix getUij(const ObjCryst::ScatteringPower* sp);
-} // namespace objcrystutil
 
 
 inline
