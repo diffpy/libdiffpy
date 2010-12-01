@@ -58,6 +58,7 @@ class PairQuantity : public diffpy::Attributes
         void setupParallelRun(int cpuindex, int ncpu);
         int countSites() const;
         void maskAllPairs(bool mask);
+        void invertMask();
         void setPairMask(int i, int j, bool mask);
         bool getPairMask(int i, int j);
         // FIXME: remove this when serialization works

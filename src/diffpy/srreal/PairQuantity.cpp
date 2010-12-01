@@ -122,6 +122,12 @@ void PairQuantity::maskAllPairs(bool mask)
 }
 
 
+void PairQuantity::invertMask()
+{
+    mdefaultpairmask = !mdefaultpairmask;
+}
+
+
 void PairQuantity::setPairMask(int i, int j, bool mask)
 {
     pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
