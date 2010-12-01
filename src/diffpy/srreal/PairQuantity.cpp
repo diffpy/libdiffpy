@@ -122,7 +122,7 @@ void PairQuantity::maskAllPairs(bool mask)
 }
 
 
-void PairQuantity::maskSitePair(int i, int j, bool mask)
+void PairQuantity::setPairMask(int i, int j, bool mask)
 {
     pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
     if (mask == mdefaultpairmask)  minvertpairmask.erase(ij);
