@@ -43,6 +43,7 @@ PDFCalculator::PDFCalculator()
     // initialize mstructure_cache
     mstructure_cache.sfaverage = 0.0;
     mstructure_cache.totaloccupancy = 0.0;
+    mstructure_cache.activeoccupancy = 0.0;
     // initialize mrlimits_cache
     mrlimits_cache.extendedrminsteps = 0;
     mrlimits_cache.extendedrmaxsteps = 0;
@@ -435,11 +436,13 @@ void PDFCalculator::resetValue()
     this->cacheStructureData();
     this->cacheRlimitsData();
     // when applicable, configure linear baseline
-    double numdensity = mstructure->numberDensity();
     if (this->getBaseline()->type() == "linear")
     {
+        double partialpdfscale = mstructure_cache.activeoccupancy /
+            mstructure_cache.totaloccupancy;
+        double pnumdensity = partialpdfscale * mstructure->numberDensity();
         PDFBaseline& bl = *(this->getBaseline());
-        bl.setDoubleAttr("slope", -4 * M_PI * numdensity);
+        bl.setDoubleAttr("slope", -4 * M_PI * pnumdensity);
     }
     this->resizeValue(this->countCalcPoints());
     this->PairQuantity::resetValue();
@@ -611,6 +614,22 @@ void PDFCalculator::cacheStructureData()
     mstructure_cache.sfaverage = (totocc == 0.0) ? 0.0 : (totsf / totocc);
     // totaloccupancy
     mstructure_cache.totaloccupancy = totocc;
+    // active occupancy
+    double invmasktotal = 0.0;
+    boost::unordered_set< std::pair<int,int> >::const_iterator ij;
+    for (ij = minvertpairmask.begin(); ij != minvertpairmask.end(); ++ij)
+    {
+        const int& i = ij->first;
+        const int& j = ij->second;
+        int sumscale = (i == j) ? 1 : 2;
+        double occij = sumscale * 
+            mstructure->siteOccupancy(i) * mstructure->siteMultiplicity(i) *
+            mstructure->siteOccupancy(j) * mstructure->siteMultiplicity(j);
+        invmasktotal += occij;
+    }
+    if (totocc > 0.0)   invmasktotal /= totocc;
+    mstructure_cache.activeoccupancy = (mdefaultpairmask) ?
+        (totocc - invmasktotal) : invmasktotal;
 }
 
 

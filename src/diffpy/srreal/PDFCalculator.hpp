@@ -163,6 +163,7 @@ class PDFCalculator :
             std::vector<double> sfsite;
             double sfaverage;
             double totaloccupancy;
+            double activeoccupancy;
         } mstructure_cache;
         struct {
             int extendedrminsteps;
