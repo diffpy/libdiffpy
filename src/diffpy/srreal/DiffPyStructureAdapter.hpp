@@ -26,11 +26,10 @@
 
 #include <memory>
 #include <vector>
-#include <map>
 #include <boost/python.hpp>
+#include <boost/unordered_map.hpp>
 #include <boost/serialization/vector.hpp>
-#include <boost/serialization/map.hpp>
-
+#include <diffpy/boostextensions/serialize_unordered_map.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/Lattice.hpp>
 
@@ -74,7 +73,7 @@ class DiffPyStructureAdapter : public StructureAdapter
         std::vector<bool> manisotropies;
         std::vector<R3::Matrix> mcartesian_uijs;
         std::vector<std::string> matomtypes;
-        std::map<std::string, double> mpdffit;
+        boost::unordered_map<std::string, double> mpdffit;
 
         // serialization
         friend class boost::serialization::access;
