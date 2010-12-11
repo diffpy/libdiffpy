@@ -21,6 +21,7 @@
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 
@@ -98,7 +99,7 @@ const double& PairQuantity::getRmax() const
 void PairQuantity::setEvaluator(PQEvaluatorType evtp)
 {
     if (mevaluator.get() && mevaluator->typeint() == evtp)  return;
-    mevaluator.reset(createPQEvaluator(evtp));
+    mevaluator = createPQEvaluator(evtp);
     this->resetValue();
 }
 
@@ -166,5 +167,10 @@ void PairQuantity::configureBondGenerator(BaseBondGenerator& bnds) const
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::PairQuantity)
+BOOST_CLASS_EXPORT(diffpy::srreal::PairQuantity)
 
 // End of file

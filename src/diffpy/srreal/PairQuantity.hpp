@@ -23,7 +23,12 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_set.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/assume_abstract.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/vector.hpp>
 
+#include <diffpy/boostextensions/serialize_unordered_set.hpp>
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/PairQuantityUtils.hpp>
@@ -81,10 +86,27 @@ class PairQuantity : public diffpy::Attributes
         StructureAdapterPtr mstructure;
         double mrmin;
         double mrmax;
-        boost::shared_ptr<PQEvaluatorBasic> mevaluator;
+        PQEvaluatorPtr mevaluator;
         int mcountsites;
         boost::unordered_set< std::pair<int,int> > minvertpairmask;
         bool mdefaultpairmask;
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & mvalue;
+            ar & mstructure;
+            ar & mrmin;
+            ar & mrmax;
+            ar & mevaluator;
+            ar & mcountsites;
+            ar & minvertpairmask;
+            ar & mdefaultpairmask;
+        }
 
 };
 
@@ -109,5 +131,9 @@ void PairQuantity::setStructure(const T& stru)
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::StructureAdapter)
 
 #endif  // PAIRQUANTITY_HPP_INCLUDED

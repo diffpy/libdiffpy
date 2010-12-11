@@ -26,6 +26,7 @@
 #include <stdexcept>
 #include <sstream>
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -107,17 +108,17 @@ void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
 
 // Factory for PairQuantity evaluators ---------------------------------------
 
-PQEvaluatorBasic* createPQEvaluator(PQEvaluatorType pqtp)
+PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp)
 {
-    PQEvaluatorBasic* rv = NULL;
+    PQEvaluatorPtr rv;
     switch (pqtp)
     {
         case BASIC:
-            rv = new PQEvaluatorBasic();
+            rv.reset(new PQEvaluatorBasic());
             break;
 
         case OPTIMIZED:
-            rv = new PQEvaluatorOptimized();
+            rv.reset(new PQEvaluatorOptimized());
             break;
 
         default:
@@ -131,5 +132,10 @@ PQEvaluatorBasic* createPQEvaluator(PQEvaluatorType pqtp)
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::PQEvaluatorBasic)
+BOOST_CLASS_EXPORT(diffpy::srreal::PQEvaluatorBasic)
 
 // End of file

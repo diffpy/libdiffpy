@@ -48,8 +48,6 @@ class StructureAdapter
     public:
 
         virtual ~StructureAdapter()  { }
-        // FIXME: clone may be needed for parallel evaluator
-        // virtual StructureAdapterPtr clone() const = 0;
 
         // methods
 
