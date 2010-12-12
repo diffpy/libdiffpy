@@ -53,7 +53,7 @@ BVParam::BVParam(const string& atom0, int valence0,
         swap(mvalence0, mvalence1);
     }
     mRo = Ro;
-    mB = mB;
+    mB = B;
     mref_id = ref_id;
 }
 
