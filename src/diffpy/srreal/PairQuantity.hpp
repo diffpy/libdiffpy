@@ -134,6 +134,7 @@ void PairQuantity::setStructure(const T& stru)
 
 // Serialization -------------------------------------------------------------
 
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::StructureAdapter)
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PairQuantity)
+BOOST_SERIALIZATION_SHARED_PTR(diffpy::srreal::PairQuantity)
 
 #endif  // PAIRQUANTITY_HPP_INCLUDED

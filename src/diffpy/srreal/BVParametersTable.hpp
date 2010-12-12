@@ -30,6 +30,8 @@
 namespace diffpy {
 namespace srreal {
 
+typedef boost::shared_ptr<class BVParametersTable> BVParametersTablePtr;
+
 class BVParametersTable
 { 
 
@@ -43,7 +45,6 @@ class BVParametersTable
 
         // constructors
         BVParametersTable();
-        boost::shared_ptr<BVParametersTable> clone() const;
 
         // methods
         const BVParam& lookup(const BVParam&) const;

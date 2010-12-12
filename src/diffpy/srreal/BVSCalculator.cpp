@@ -38,7 +38,7 @@ BVSCalculator::BVSCalculator()
 {
     // default configuration
     const double valence_precision = 1e-5;
-    BVParametersTable bvtb;
+    BVParametersTablePtr bvtb(new BVParametersTable);
     this->setBVParamTable(bvtb);
     this->setValencePrecision(valence_precision);
     // attributes
@@ -101,17 +101,21 @@ double BVSCalculator::bvrmsdiff() const
 }
 
 
-void BVSCalculator::setBVParamTable(const BVParametersTable& bvpt)
+void BVSCalculator::setBVParamTable(BVParametersTablePtr bvtb)
 {
-    if (mbvptable.get() == &bvpt)   return;
-    mbvptable = bvpt.clone();
+    mbvptable = bvtb;
 }
 
 
-const BVParametersTable& BVSCalculator::getBVParamTable() const
+BVParametersTablePtr& BVSCalculator::getBVParamTable()
 {
-    assert(mbvptable.get());
-    return *mbvptable;
+    return mbvptable;
+}
+
+
+const BVParametersTablePtr& BVSCalculator::getBVParamTable() const
+{
+    return mbvptable;
 }
 
 
@@ -161,7 +165,7 @@ void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds,
     const string& a1 = mstructure_cache.baresymbols[bnds.site1()];
     int v0 = mstructure_cache.valences[bnds.site0()];
     int v1 = mstructure_cache.valences[bnds.site1()];
-    const BVParametersTable& bvtb = this->getBVParamTable();
+    const BVParametersTable& bvtb = *(this->getBVParamTable());
     const BVParam& bp = bvtb.lookup(a0, v0, a1, v1);
     // do nothing if there are no bond parameters for this pair
     if (&bp == &bvtb.none())    return;
@@ -197,7 +201,7 @@ void BVSCalculator::cacheStructureData()
 
 double BVSCalculator::rmaxFromPrecision(double eps) const
 {
-    const BVParametersTable& bptb = this->getBVParamTable();
+    const BVParametersTable& bvtb = *(this->getBVParamTable());
     BVParametersTable::SetOfBVParam bpused;
     for (int i0 = 0; i0 < this->countSites(); ++i0)
     {
@@ -207,7 +211,7 @@ double BVSCalculator::rmaxFromPrecision(double eps) const
             const string& a1 = mstructure_cache.baresymbols[i1];
             int v0 = mstructure_cache.valences[i0];
             int v1 = mstructure_cache.valences[i1];
-            const BVParam& bp = bptb.lookup(a0, v0, a1, v1);
+            const BVParam& bp = bvtb.lookup(a0, v0, a1, v1);
             bpused.insert(bp);
         }
     }

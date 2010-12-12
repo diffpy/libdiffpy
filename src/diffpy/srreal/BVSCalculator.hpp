@@ -48,8 +48,9 @@ class BVSCalculator : public PairQuantity
         double bvrmsdiff() const;
 
         // access and configuration of BVS parameters
-        void setBVParamTable(const BVParametersTable&);
-        const BVParametersTable& getBVParamTable() const;
+        void setBVParamTable(BVParametersTablePtr);
+        BVParametersTablePtr& getBVParamTable();
+        const BVParametersTablePtr& getBVParamTable() const;
 
         // R-range configuration using the valence precision
         /// set cutoff value for bond valence contributions
@@ -76,7 +77,7 @@ class BVSCalculator : public PairQuantity
 
         // data
         // configuration
-        boost::shared_ptr<BVParametersTable> mbvptable;
+        BVParametersTablePtr mbvptable;
         double mvalenceprecision;
         // cache
         struct {

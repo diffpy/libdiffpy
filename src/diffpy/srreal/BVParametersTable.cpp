@@ -48,12 +48,6 @@ BVParametersTable::BVParametersTable()
 }
 
 
-boost::shared_ptr<BVParametersTable> BVParametersTable::clone() const
-{
-    boost::shared_ptr<BVParametersTable> rv(new BVParametersTable(*this));
-    return rv;
-}
-
 // Public Methods ------------------------------------------------------------
 
 const BVParam& BVParametersTable::lookup(const BVParam& bpk) const
