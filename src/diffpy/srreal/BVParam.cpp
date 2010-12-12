@@ -75,15 +75,17 @@ double BVParam::bondvalenceToDistance(double bvalence) const
 
 void BVParam::setFromCifLine(const std::string& cifline)
 {
-    BVParam bp1;
+    string a0, a1, ref;
+    int v0, v1;
+    double Ro, B;
     istringstream linefp(cifline);
-    linefp >> bp1.matom0 >> bp1.mvalence0 >>
-        bp1.matom1 >> bp1.mvalence1 >> bp1.mRo >> bp1.mB >> bp1.mref_id;
+    linefp >> a0 >> v0 >> a1 >> v1 >> Ro >> B >> ref;
     if (!linefp)
     {
         const char* emsg = "Cannot parse cif line.";
         throw invalid_argument(emsg);
     }
+    BVParam bp1(a0, v0, a1, v1, Ro, B, ref);
     *this = bp1;
 }
 
