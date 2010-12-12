@@ -22,6 +22,7 @@
 #define BVPARAM_HPP_INCLUDED
 
 #include <string>
+#include <boost/serialization/base_object.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -59,6 +60,23 @@ class BVParam
             public:
                 bool operator()(const BVParam&, const BVParam&) const;
         };
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & matom0;
+            ar & mvalence0;
+            ar & matom1;
+            ar & mvalence1;
+            ar & mRo;
+            ar & mB;
+            ar & mref_id;
+        }
+
 
 };  // class BVParam
 

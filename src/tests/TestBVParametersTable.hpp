@@ -22,6 +22,7 @@
 #include <memory>
 #include <cxxtest/TestSuite.h>
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
 #include <diffpy/PythonInterface.hpp>
 
@@ -141,6 +142,35 @@ class TestBVParametersTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(cnt0 + 1, cnt1);
             mbvtb->resetAll();
             TS_ASSERT_EQUALS(cnt0, mbvtb->getAll().size());
+        }
+
+
+        void test_serialization()
+        {
+            BVParam mynacl("Cl", -1, "Na", 1, 2.345, 0.44, "pj1");
+            BVParam mymgo("O", -2, "Mg", 2, 3.456, 0.55, "pj2");
+            mbvtb->setCustom(mynacl);
+            mbvtb->setCustom(mymgo);
+            stringstream storage(ios::in | ios::out | ios::binary);
+            diffpy::serialization::oarchive oa(storage, ios::binary);
+            oa << mbvtb;
+            diffpy::serialization::iarchive ia(storage, ios::binary);
+            BVParametersTablePtr bvtb1;
+            TS_ASSERT(!bvtb1.get());
+            ia >> bvtb1;
+            TS_ASSERT_DIFFERS(mbvtb.get(), bvtb1.get());
+            TS_ASSERT_EQUALS(2.345,
+                    bvtb1->lookup("Cl", -1, "Na", 1).mRo);
+            TS_ASSERT_EQUALS(0.44,
+                    bvtb1->lookup("Cl", -1, "Na", 1).mB);
+            TS_ASSERT_EQUALS(string("pj1"),
+                    bvtb1->lookup("Cl", -1, "Na", 1).mref_id);
+            TS_ASSERT_EQUALS(3.456,
+                    bvtb1->lookup("O", -2, "Mg", 2).mRo);
+            TS_ASSERT_EQUALS(0.55,
+                    bvtb1->lookup("O", -2, "Mg", 2).mB);
+            TS_ASSERT_EQUALS(string("pj2"),
+                    bvtb1->lookup("O", -2, "Mg", 2).mref_id);
         }
 
 };  // class TestBVParametersTable

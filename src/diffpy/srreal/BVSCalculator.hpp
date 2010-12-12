@@ -88,6 +88,21 @@ class BVSCalculator : public PairQuantity
             double total_occupancy;
         } mstructure_cache;
 
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<PairQuantity>(*this);
+            ar & mbvptable;
+            ar & mvalenceprecision;
+            ar & mstructure_cache.baresymbols;
+            ar & mstructure_cache.valences;
+            ar & mstructure_cache.multiplicities;
+            ar & mstructure_cache.occupancies;
+            ar & mstructure_cache.total_occupancy;
+        }
+
 };  // class BVSCalculator
 
 }   // namespace srreal

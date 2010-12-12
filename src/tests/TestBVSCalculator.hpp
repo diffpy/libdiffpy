@@ -20,6 +20,7 @@
 
 #include <cxxtest/TestSuite.h>
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
@@ -38,7 +39,7 @@ class TestBVSCalculator : public CxxTest::TestSuite
     private:
 
         python::object mnacl;
-        auto_ptr<BVSCalculator> mbvc;
+        shared_ptr<BVSCalculator> mbvc;
 
     public:
 
@@ -100,6 +101,30 @@ class TestBVSCalculator : public CxxTest::TestSuite
             mbvc->setValencePrecision(1e-7);
             mbvc->setDoubleAttr("rmax", 5.0);
             TS_ASSERT_EQUALS(5.0, mbvc->getDoubleAttr("rmaxused"));
+        }
+
+
+        void test_serialization()
+        {
+            mbvc->eval(mnacl);
+            stringstream storage(ios::in | ios::out | ios::binary);
+            diffpy::serialization::oarchive oa(storage, ios::binary);
+            oa << mbvc;
+            diffpy::serialization::iarchive ia(storage, ios::binary);
+            shared_ptr<BVSCalculator> bvc1;
+            TS_ASSERT(!bvc1.get());
+            ia >> bvc1;
+            TS_ASSERT_DIFFERS(mbvc.get(), bvc1.get());
+            const double eps=1e-4;
+            TS_ASSERT_EQUALS(8u, bvc1->value().size());
+            TS_ASSERT_DELTA(+1.01352, bvc1->value()[0], eps);
+            TS_ASSERT_DELTA(+1.01352, bvc1->value()[1], eps);
+            TS_ASSERT_DELTA(+1.01352, bvc1->value()[2], eps);
+            TS_ASSERT_DELTA(+1.01352, bvc1->value()[3], eps);
+            TS_ASSERT_DELTA(-1.01352, bvc1->value()[4], eps);
+            TS_ASSERT_DELTA(-1.01352, bvc1->value()[5], eps);
+            TS_ASSERT_DELTA(-1.01352, bvc1->value()[6], eps);
+            TS_ASSERT_DELTA(-1.01352, bvc1->value()[7], eps);
         }
 
 };  // class TestBVSCalculator

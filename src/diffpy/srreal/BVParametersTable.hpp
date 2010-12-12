@@ -24,6 +24,9 @@
 #include <string>
 #include <set>
 #include <boost/smart_ptr.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/set.hpp>
 
 #include <diffpy/srreal/BVParam.hpp>
 
@@ -66,9 +69,21 @@ class BVParametersTable
         // methods
         SetOfBVParam* getStandardSetOfBVParam() const;
 
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & mcustomtable;
+        }
+
 };  // class BVParametersTable
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_SERIALIZATION_SHARED_PTR(diffpy::srreal::BVParametersTable)
 
 #endif  // BVPARAMETERSTABLE_HPP_INCLUDED

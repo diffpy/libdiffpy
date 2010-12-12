@@ -20,7 +20,9 @@
 
 #include <cassert>
 #include <string>
+#include <boost/serialization/export.hpp>
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
 
 using namespace std;
@@ -137,5 +139,10 @@ BVParametersTable::getStandardSetOfBVParam() const
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::BVParametersTable)
+BOOST_CLASS_EXPORT(diffpy::srreal::BVParametersTable)
 
 // End of file
