@@ -21,9 +21,6 @@
 #ifndef PDFCALCULATOR_HPP_INCLUDED
 #define PDFCALCULATOR_HPP_INCLUDED
 
-#include <set>
-#include <boost/shared_ptr.hpp>
-
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/PeakProfile.hpp>
 #include <diffpy/srreal/PeakWidthModel.hpp>

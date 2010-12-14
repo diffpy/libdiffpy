@@ -82,8 +82,4 @@ class BVParametersTable
 }   // namespace srreal
 }   // namespace diffpy
 
-// Serialization -------------------------------------------------------------
-
-BOOST_SERIALIZATION_SHARED_PTR(diffpy::srreal::BVParametersTable)
-
 #endif  // BVPARAMETERSTABLE_HPP_INCLUDED

@@ -121,6 +121,5 @@ int atomValence(const std::string& atomtype);
 // Serialization -------------------------------------------------------------
 
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::StructureAdapter)
-BOOST_SERIALIZATION_SHARED_PTR(diffpy::srreal::StructureAdapter)
 
 #endif  // STRUCTUREADAPTER_HPP_INCLUDED

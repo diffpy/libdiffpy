@@ -21,8 +21,6 @@
 #ifndef BVSCALCULATOR_HPP_INCLUDED
 #define BVSCALCULATOR_HPP_INCLUDED
 
-#include <boost/shared_ptr.hpp>
-
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
 

@@ -21,7 +21,6 @@
 #ifndef PAIRQUANTITY_HPP_INCLUDED
 #define PAIRQUANTITY_HPP_INCLUDED
 
-#include <boost/shared_ptr.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
@@ -135,6 +134,5 @@ void PairQuantity::setStructure(const T& stru)
 // Serialization -------------------------------------------------------------
 
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PairQuantity)
-BOOST_SERIALIZATION_SHARED_PTR(diffpy::srreal::PairQuantity)
 
 #endif  // PAIRQUANTITY_HPP_INCLUDED

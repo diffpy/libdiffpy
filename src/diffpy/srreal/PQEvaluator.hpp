@@ -98,6 +98,5 @@ PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp);
 // Serialization -------------------------------------------------------------
 
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PQEvaluatorBasic)
-BOOST_SERIALIZATION_SHARED_PTR(diffpy::srreal::PQEvaluatorBasic)
 
 #endif  // PQEVALUATOR_HPP_INCLUDED

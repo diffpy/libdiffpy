@@ -26,7 +26,6 @@
 #include <set>
 #include <map>
 #include <stdexcept>
-
 #include <boost/shared_ptr.hpp>
 
 namespace diffpy {
