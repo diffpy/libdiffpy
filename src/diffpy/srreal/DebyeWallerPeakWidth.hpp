@@ -39,6 +39,16 @@ class DebyeWallerPeakWidth : public PeakWidthModel
         // methods
         virtual const std::string& type() const;
         virtual double calculate(const BaseBondGenerator&) const;
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<PeakWidthModel>(*this);
+        }
 };
 
 

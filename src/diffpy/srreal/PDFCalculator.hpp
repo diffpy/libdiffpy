@@ -169,6 +169,32 @@ class PDFCalculator :
             int rcalchisteps;
         } mrlimits_cache;
 
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<PairQuantity>(*this);
+            ar & base_object<PeakWidthModelOwner>(*this);
+            ar & base_object<ScatteringFactorTableOwner>(*this);
+            ar & base_object<PDFEnvelopeOwner>(*this);
+            ar & mqmin;
+            ar & mqmax;
+            ar & mrstep;
+            ar & mmaxextension;
+            ar & mpeakprofile;
+            ar & mbaseline;
+            ar & mstructure_cache.sfsite;
+            ar & mstructure_cache.sfaverage;
+            ar & mstructure_cache.totaloccupancy;
+            ar & mstructure_cache.activeoccupancy;
+            ar & mrlimits_cache.extendedrminsteps;
+            ar & mrlimits_cache.extendedrmaxsteps;
+            ar & mrlimits_cache.rcalclosteps;
+            ar & mrlimits_cache.rcalchisteps;
+        }
+
 };  // class PDFCalculator
 
 }   // namespace srreal

@@ -22,6 +22,7 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/PDFEnvelope.hpp>
+#include "serialization_helpers.hpp"
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -76,6 +77,15 @@ class TestSphericalShapeEnvelope : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(0.0, fne(100));
             TS_ASSERT(fne(9.99) > 0.0);
             TS_ASSERT_DELTA(0.3125, fne(5), 1e-8);
+        }
+
+
+        void test_serialization()
+        {
+            menvelope->setDoubleAttr("spdiameter", 13.1);
+            PDFEnvelopePtr e1 = dumpandload(menvelope);
+            TS_ASSERT_EQUALS(string("sphericalshape"), e1->type());
+            TS_ASSERT_EQUALS(13.1, e1->getDoubleAttr("spdiameter"));
         }
 
 };  // class TestDiffPyStructureBondGenerator

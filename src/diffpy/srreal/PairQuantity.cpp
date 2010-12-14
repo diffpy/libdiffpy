@@ -21,7 +21,6 @@
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/mathutils.hpp>
-#include <diffpy/serialization.hpp>
 
 using namespace std;
 
@@ -170,7 +169,6 @@ void PairQuantity::configureBondGenerator(BaseBondGenerator& bnds) const
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::PairQuantity)
 BOOST_CLASS_EXPORT(diffpy::srreal::PairQuantity)
 
 // End of file

@@ -26,6 +26,11 @@
 #ifndef PEAKPROFILE_HPP_INCLUDED
 #define PEAKPROFILE_HPP_INCLUDED
 
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/assume_abstract.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/export.hpp>
+
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
 
@@ -51,11 +56,21 @@ class PeakProfile :
 
         // data
         double mprecision;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & mprecision;
+        }
 };
 
 typedef PeakProfile::SharedPtr PeakProfilePtr;
 
 }   // namespace srreal
 }   // namespace diffpy
+
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PeakProfile)
 
 #endif  // PEAKPROFILE_HPP_INCLUDED

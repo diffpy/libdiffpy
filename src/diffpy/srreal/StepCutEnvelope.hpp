@@ -12,7 +12,7 @@
 *
 ******************************************************************************
 *
-* class StepCutEnvelope -- empirical step-function PDF envelope. 
+* class StepCutEnvelope -- empirical step-function PDF envelope.
 *
 * $Id$
 *
@@ -50,6 +50,15 @@ class StepCutEnvelope : public PDFEnvelope
 
         // data
         double mstepcut;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<PDFEnvelope>(*this);
+            ar & mstepcut;
+        }
 
 };  // class StepCutEnvelope
 

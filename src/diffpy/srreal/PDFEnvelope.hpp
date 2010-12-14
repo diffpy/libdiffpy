@@ -26,6 +26,11 @@
 
 #include <string>
 #include <set>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/assume_abstract.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/map.hpp>
 
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
@@ -44,6 +49,12 @@ class PDFEnvelope :
 {
     public:
         virtual double operator()(const double& r) const = 0;
+
+    private:
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)  { }
 };
 
 
@@ -79,9 +90,23 @@ class PDFEnvelopeOwner
 
         // data
         EnvelopeStorage menvelope;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & menvelope;
+        }
+
 };
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PDFEnvelope)
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PDFEnvelopeOwner)
 
 #endif  // PDFENVELOPE_HPP_INCLUDED

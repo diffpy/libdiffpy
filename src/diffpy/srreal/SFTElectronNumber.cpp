@@ -29,6 +29,7 @@
 
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 
@@ -129,6 +130,15 @@ class SFTElectronNumber : public ScatteringFactorTable
                 assert(436 == entable.size());
             }
             return entable;
+        }
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<ScatteringFactorTable>(*this);
         }
 
 };  // class SFTElectronNumber
@@ -246,5 +256,10 @@ bool reg_SFTElectronNumber = SFTElectronNumber().registerThisType() &&
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::SFTElectronNumber)
+BOOST_CLASS_EXPORT(diffpy::srreal::SFTElectronNumber)
 
 // End of file

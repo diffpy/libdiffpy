@@ -12,7 +12,7 @@
 *
 ******************************************************************************
 *
-* class GaussianProfile -- concrete implementation of the PeakProfile class. 
+* class GaussianProfile -- concrete implementation of the PeakProfile class.
 *     GaussianProfile is registered as "gaussian".
 *
 * $Id$
@@ -23,6 +23,7 @@
 
 #include <diffpy/srreal/GaussianProfile.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 
@@ -96,5 +97,10 @@ bool reg_GaussianProfile = GaussianProfile().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::GaussianProfile)
+BOOST_CLASS_EXPORT(diffpy::srreal::GaussianProfile)
 
 // End of file

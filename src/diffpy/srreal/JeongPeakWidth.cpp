@@ -22,9 +22,12 @@
 
 #include <diffpy/srreal/JeongPeakWidth.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/serialization.hpp>
+
+namespace diffpy {
+namespace srreal {
 
 using namespace std;
-using namespace diffpy::srreal;
 
 // Constructors --------------------------------------------------------------
 
@@ -116,6 +119,14 @@ void JeongPeakWidth::setQbroad(double qbroad)
 
 // Registration --------------------------------------------------------------
 
-bool reg_JeongPeakWidthModel = JeongPeakWidth().registerThisType();
+bool reg_JeongPeakWidth = JeongPeakWidth().registerThisType();
+
+}   // namespace srreal
+}   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::JeongPeakWidth)
+BOOST_CLASS_EXPORT(diffpy::srreal::JeongPeakWidth)
 
 // End of file

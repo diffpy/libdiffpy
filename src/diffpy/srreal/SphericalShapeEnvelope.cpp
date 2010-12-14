@@ -20,6 +20,7 @@
 
 #include <cmath>
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/srreal/SphericalShapeEnvelope.hpp>
 
 using namespace std;
@@ -87,5 +88,10 @@ bool reg_SphericalShapeEnvelope = SphericalShapeEnvelope().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::SphericalShapeEnvelope)
+BOOST_CLASS_EXPORT(diffpy::srreal::SphericalShapeEnvelope)
 
 // End of file

@@ -24,6 +24,13 @@
 #ifndef SCATTERINGFACTORTABLE_HPP_INCLUDED
 #define SCATTERINGFACTORTABLE_HPP_INCLUDED
 
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/assume_abstract.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/set.hpp>
+
 #include <diffpy/HasClassRegistry.hpp>
 
 namespace diffpy {
@@ -47,6 +54,17 @@ class ScatteringFactorTable :
 
         mutable std::map<std::string,double> mtable;
         std::set<std::string> mcustomsymbols;
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & mtable;
+            ar & mcustomsymbols;
+        }
 };
 
 typedef ScatteringFactorTable::SharedPtr ScatteringFactorTablePtr;
@@ -67,9 +85,22 @@ class ScatteringFactorTableOwner
 
         // data
         ScatteringFactorTablePtr msftable;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & msftable;
+        }
 };
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::ScatteringFactorTable)
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::ScatteringFactorTableOwner)
 
 #endif  // SCATTERINGFACTORTABLE_HPP_INCLUDED

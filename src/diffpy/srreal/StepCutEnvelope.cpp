@@ -12,13 +12,14 @@
 *
 ******************************************************************************
 *
-* class StepCutEnvelope -- empirical step-function PDF envelope. 
+* class StepCutEnvelope -- empirical step-function PDF envelope.
 *
 * $Id$
 *
 *****************************************************************************/
 
 #include <diffpy/srreal/StepCutEnvelope.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 
@@ -81,5 +82,10 @@ bool reg_StepCutEnvelope = StepCutEnvelope().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::StepCutEnvelope)
+BOOST_CLASS_EXPORT(diffpy::srreal::StepCutEnvelope)
 
 // End of file

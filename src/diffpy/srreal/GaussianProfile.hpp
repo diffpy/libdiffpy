@@ -12,7 +12,7 @@
 *
 ******************************************************************************
 *
-* class GaussianProfile -- concrete implementation of the PeakProfile class. 
+* class GaussianProfile -- concrete implementation of the PeakProfile class.
 *     GaussianProfile is registered as "gaussian".
 *
 * $Id$
@@ -47,6 +47,17 @@ class GaussianProfile : public PeakProfile
 
         // data
         double mhalfboundrel;
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<PeakProfile>(*this);
+            ar & mhalfboundrel;
+        }
 
 };
 

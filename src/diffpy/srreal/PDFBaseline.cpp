@@ -26,4 +26,8 @@ using diffpy::srreal::PDFBaseline;
 // Unique instantiation of the template registry base class.
 template class HasClassRegistry<PDFBaseline>;
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT(diffpy::srreal::PDFBaseline)
+
 // End of file

@@ -19,6 +19,7 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/ZeroBaseline.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 
@@ -60,5 +61,10 @@ bool reg_ZeroBaseline = ZeroBaseline().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::ZeroBaseline)
+BOOST_CLASS_EXPORT(diffpy::srreal::ZeroBaseline)
 
 // End of file

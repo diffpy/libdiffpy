@@ -23,6 +23,7 @@
 #include <cmath>
 #include <cassert>
 
+#include <diffpy/serialization.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
@@ -622,7 +623,7 @@ void PDFCalculator::cacheStructureData()
         const int& i = ij->first;
         const int& j = ij->second;
         int sumscale = (i == j) ? 1 : 2;
-        double occij = sumscale * 
+        double occij = sumscale *
             mstructure->siteOccupancy(i) * mstructure->siteMultiplicity(i) *
             mstructure->siteOccupancy(j) * mstructure->siteMultiplicity(j);
         invmasktotal += occij;
@@ -656,5 +657,9 @@ void PDFCalculator::cacheRlimitsData()
     mrlimits_cache.rcalchisteps = int(ceil((rmax + ext_total) / dr));
 }
 
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::PDFCalculator)
+BOOST_CLASS_EXPORT(diffpy::srreal::PDFCalculator)
 
 // End of file

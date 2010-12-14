@@ -49,6 +49,15 @@ class ScaleEnvelope : public PDFEnvelope
         // data
         double mscale;
 
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<PDFEnvelope>(*this);
+            ar & mscale;
+        }
+
 };  // class ScaleEnvelope
 
 }   // namespace srreal

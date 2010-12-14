@@ -56,6 +56,18 @@ class JeongPeakWidth : public DebyeWallerPeakWidth
         double mdelta1;
         double mdelta2;
         double mqbroad;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<DebyeWallerPeakWidth>(*this);
+            ar & mdelta1;
+            ar & mdelta2;
+            ar & mqbroad;
+        }
 };
 
 

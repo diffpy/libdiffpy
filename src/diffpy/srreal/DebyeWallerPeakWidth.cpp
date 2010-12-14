@@ -19,12 +19,13 @@
 *
 *****************************************************************************/
 
-#include <cmath>
-
 #include <diffpy/srreal/DebyeWallerPeakWidth.hpp>
+#include <diffpy/serialization.hpp>
+
+namespace diffpy {
+namespace srreal {
 
 using namespace std;
-using namespace diffpy::srreal;
 
 // Constructors --------------------------------------------------------------
 
@@ -59,5 +60,13 @@ double DebyeWallerPeakWidth::calculate(const BaseBondGenerator& bnds) const
 // Registration --------------------------------------------------------------
 
 bool reg_DebyeWallerPeakWidth = DebyeWallerPeakWidth().registerThisType();
+
+}   // namespace srreal
+}   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::DebyeWallerPeakWidth)
+BOOST_CLASS_EXPORT(diffpy::srreal::DebyeWallerPeakWidth)
 
 // End of file

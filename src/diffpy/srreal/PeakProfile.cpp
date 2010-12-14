@@ -28,6 +28,9 @@ using diffpy::srreal::PeakProfile;
 // Unique instantiation of the template registry base class.
 template class HasClassRegistry<PeakProfile>;
 
+namespace diffpy {
+namespace srreal {
+
 //////////////////////////////////////////////////////////////////////////////
 // class PeakProfile
 //////////////////////////////////////////////////////////////////////////////
@@ -52,5 +55,12 @@ const double& PeakProfile::getPrecision() const
 {
     return mprecision;
 }
+
+}   // namespace srreal
+}   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT(diffpy::srreal::PeakProfile)
 
 // End of file

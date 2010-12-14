@@ -25,6 +25,7 @@
 #include <diffpy/srreal/JeongPeakWidth.hpp>
 #include <diffpy/srreal/ConstantPeakWidth.hpp>
 #include <diffpy/srreal/QResolutionEnvelope.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -106,6 +107,34 @@ class TestPDFCalculator : public CxxTest::TestSuite
             mpdfc->addEnvelope(qdamp4.clone());
             TS_ASSERT_EQUALS(4.0, mpdfc->getDoubleAttr("qdamp"));
             TS_ASSERT_THROWS(mpdfc->addEnvelopeByType("invalid"), logic_error);
+        }
+
+
+        void test_serialization()
+        {
+            // build customized PDFCalculator
+            mpdfc->setPeakWidthModelByType("constant");
+            mpdfc->setDoubleAttr("width", 0.123);
+            mpdfc->setPeakProfileByType("gaussian");
+            mpdfc->setDoubleAttr("peakprecision", 0.011);
+            mpdfc->setScatteringFactorTableByType("electronnumber");
+            mpdfc->getScatteringFactorTable()->setCustom("H", 1.1);
+            // dump it to string
+            stringstream storage(ios::in | ios::out | ios::binary);
+            diffpy::serialization::oarchive oa(storage, ios::binary);
+            oa << mpdfc;
+            diffpy::serialization::iarchive ia(storage, ios::binary);
+            boost::shared_ptr<PDFCalculator> pdfc1;
+            ia >> pdfc1;
+            TS_ASSERT_DIFFERS(pdfc1.get(), mpdfc.get());
+            TS_ASSERT_EQUALS(string("constant"),
+                    pdfc1->getPeakWidthModel()->type());
+            TS_ASSERT_EQUALS(0.123, pdfc1->getDoubleAttr("width"));
+            TS_ASSERT_EQUALS(0.011, pdfc1->getDoubleAttr("peakprecision"));
+            TS_ASSERT_EQUALS(string("electronnumber"),
+                    pdfc1->getScatteringFactorTable()->type());
+            TS_ASSERT_EQUALS(1.1,
+                    pdfc1->getScatteringFactorTable()->lookup("H"));
         }
 
 };  // class TestPDFCalculator

@@ -36,6 +36,7 @@
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 namespace python = boost::python;
@@ -98,6 +99,17 @@ class SFTperiodictableXray : public ScatteringFactorTable
             return rv;
         }
 
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<ScatteringFactorTable>(*this);
+        }
+
 };  // class SFTperiodictableXray
 
 //////////////////////////////////////////////////////////////////////////////
@@ -149,6 +161,17 @@ class SFTElectron : public SFTperiodictableXray
                 (Z - this->SFTperiodictableXray::lookupatq(smbl, q)) /
                 (stol * stol);
             return rv;
+        }
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<SFTperiodictableXray>(*this);
         }
 
 };  // class SFTElectron
@@ -211,6 +234,17 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
             return rv;
         }
 
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<ScatteringFactorTable>(*this);
+        }
+
 };  // class SFTperiodictableNeutron
 
 // Registration --------------------------------------------------------------
@@ -220,7 +254,7 @@ bool reg_SFTperiodictableXray = (
         ScatteringFactorTable::aliasType("periodictablexray", "X")
         );
 
-bool reg_SFTelectron = (
+bool reg_SFTElectron = (
         SFTElectron().registerThisType() &&
         ScatteringFactorTable::aliasType("electron", "E")
         );
@@ -232,5 +266,14 @@ bool reg_SFTperiodictableNeutron = (
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::SFTperiodictableXray)
+BOOST_CLASS_EXPORT(diffpy::srreal::SFTperiodictableXray)
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::SFTElectron)
+BOOST_CLASS_EXPORT(diffpy::srreal::SFTElectron)
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::SFTperiodictableNeutron)
+BOOST_CLASS_EXPORT(diffpy::srreal::SFTperiodictableNeutron)
 
 // End of file
