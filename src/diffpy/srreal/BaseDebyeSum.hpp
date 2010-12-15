@@ -87,6 +87,23 @@ class BaseDebyeSum :
             double totaloccupancy;
         } mstructure_cache;
 
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<PairQuantity>(*this);
+            ar & base_object<PeakWidthModelOwner>(*this);
+            ar & mqmin;
+            ar & mqmax;
+            ar & mqstep;
+            ar & mdebyeprecision;
+            ar & mstructure_cache.sfsiteatkq;
+            ar & mstructure_cache.sfaverageatkq;
+            ar & mstructure_cache.totaloccupancy;
+        }
+
 };  // class BaseDebyeSum
 
 }   // namespace srreal

@@ -58,7 +58,7 @@ namespace diffpy {
 namespace srreal {
 
 class DebyePDFCalculator :
-    public BaseDebyeSum,
+    public virtual BaseDebyeSum,
     public ScatteringFactorTableOwner,
     public PDFEnvelopeOwner
 {
@@ -123,6 +123,22 @@ class DebyePDFCalculator :
         double mmaxextension;
         int mrcalclosteps;
         int mrcalchisteps;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<BaseDebyeSum>(*this);
+            ar & base_object<ScatteringFactorTableOwner>(*this);
+            ar & base_object<PDFEnvelopeOwner>(*this);
+            ar & moptimumqstep;
+            ar & mrstep;
+            ar & mmaxextension;
+            ar & mrcalclosteps;
+            ar & mrcalchisteps;
+        }
 
 };  // class DebyePDFCalculator
 

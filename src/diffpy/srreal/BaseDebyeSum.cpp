@@ -27,7 +27,7 @@
 #include <diffpy/srreal/BaseDebyeSum.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
-#include <diffpy/srreal/StructureAdapter.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 using namespace diffpy::validators;
@@ -254,8 +254,12 @@ void BaseDebyeSum::cacheStructureData()
     mstructure_cache.totaloccupancy = mstructure->totalOccupancy();
 }
 
-
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::BaseDebyeSum)
+BOOST_CLASS_EXPORT(diffpy::srreal::BaseDebyeSum)
 
 // End of file
