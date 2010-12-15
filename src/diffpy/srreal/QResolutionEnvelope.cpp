@@ -87,9 +87,4 @@ bool reg_QResolutionEnvelope = QResolutionEnvelope().registerThisType();
 }   // namespace srreal
 }   // namespace diffpy
 
-// Serialization -------------------------------------------------------------
-
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::QResolutionEnvelope)
-BOOST_CLASS_EXPORT(diffpy::srreal::QResolutionEnvelope)
-
 // End of file

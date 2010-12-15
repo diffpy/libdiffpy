@@ -133,7 +133,6 @@ void PDFEnvelopeOwner::clearEnvelopes()
 
 // Serialization -------------------------------------------------------------
 
-BOOST_CLASS_EXPORT(diffpy::srreal::PDFEnvelope)
 BOOST_CLASS_EXPORT(diffpy::srreal::PDFEnvelopeOwner)
 
 // End of file

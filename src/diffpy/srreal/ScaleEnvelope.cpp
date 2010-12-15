@@ -83,9 +83,4 @@ bool reg_ScaleEnvelope = ScaleEnvelope().registerThisType();
 }   // namespace srreal
 }   // namespace diffpy
 
-// Serialization -------------------------------------------------------------
-
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::ScaleEnvelope)
-BOOST_CLASS_EXPORT(diffpy::srreal::ScaleEnvelope)
-
 // End of file

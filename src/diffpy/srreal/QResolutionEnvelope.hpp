@@ -50,15 +50,6 @@ class QResolutionEnvelope : public PDFEnvelope
         // data
         double mqdamp;
 
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & boost::serialization::base_object<PDFEnvelope>(*this);
-            ar & mqdamp;
-        }
-
 };  // class QResolutionEnvelope
 
 }   // namespace srreal

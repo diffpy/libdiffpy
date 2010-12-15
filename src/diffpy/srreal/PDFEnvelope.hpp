@@ -49,12 +49,6 @@ class PDFEnvelope :
 {
     public:
         virtual double operator()(const double& r) const = 0;
-
-    private:
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)  { }
 };
 
 
@@ -94,10 +88,36 @@ class PDFEnvelopeOwner
         // serialization
         friend class boost::serialization::access;
         template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
+        void save(Archive & ar, const unsigned int version) const
         {
-            ar & menvelope;
+            using namespace std;
+            using namespace diffpy::attributes;
+            map<string, AttributesDataMap> thedata;
+            EnvelopeStorage::const_iterator evit;
+            for (evit = menvelope.begin(); evit != menvelope.end(); ++evit)
+            {
+                thedata[evit->first] = saveAttributesData(*(evit->second));
+            }
+            ar & thedata;
         }
+
+        template<class Archive>
+        void load(Archive & ar, const unsigned int version)
+        {
+            using namespace std;
+            using namespace diffpy::attributes;
+            map<string, AttributesDataMap> thedata;
+            ar & thedata;
+            map<string, AttributesDataMap>::const_iterator dt;
+            this->clearEnvelopes();
+            for (dt = thedata.begin(); dt != thedata.end(); ++dt)
+            {
+                this->addEnvelopeByType(dt->first);
+                PDFEnvelopePtr e = this->getEnvelopeByType(dt->first);
+                loadAttributesData(*e, dt->second);
+            }
+        }
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 };
 

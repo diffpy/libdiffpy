@@ -213,6 +213,28 @@ void throwDoubleAttributeReadOnly()
 }
 
 
+AttributesDataMap saveAttributesData(const Attributes& obj)
+{
+    AttributesDataMap rv;
+    set<string> keys = obj.namesOfWritableDoubleAttributes();
+    set<string>::const_iterator k;
+    for (k = keys.begin(); k != keys.end(); ++k)
+    {
+        rv[*k] = obj.getDoubleAttr(*k);
+    }
+    return rv;
+}
+
+
+void loadAttributesData(Attributes& obj, const AttributesDataMap& data)
+{
+    AttributesDataMap::const_iterator kv;
+    for (kv = data.begin(); kv != data.end(); ++kv)
+    {
+        obj.setDoubleAttr(kv->first, kv->second);
+    }
+}
+
 }   // namespace attributes
 }   // namespace diffpy
 

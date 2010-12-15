@@ -51,15 +51,6 @@ class SphericalShapeEnvelope : public PDFEnvelope
         // data
         double mspdiameter;
 
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & boost::serialization::base_object<PDFEnvelope>(*this);
-            ar & mspdiameter;
-        }
-
 };  // class SphericalShapeEnvelope
 
 }   // namespace srreal

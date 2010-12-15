@@ -84,8 +84,13 @@ class TestStepCutEnvelope : public CxxTest::TestSuite
         void test_serialization()
         {
             menvelope->setDoubleAttr("stepcut", 13.1);
-            PDFEnvelopePtr e1 = dumpandload(menvelope);
-            TS_ASSERT_EQUALS(string("stepcut"), e1->type());
+            string tp = menvelope->type();
+            PDFEnvelopeOwner owner;
+            owner.addEnvelope(menvelope);
+            PDFEnvelopeOwner owner1 = dumpandload(owner);
+            TS_ASSERT_EQUALS(1u, owner1.usedEnvelopeTypes().size());
+            TS_ASSERT(owner1.usedEnvelopeTypes().count(tp));
+            PDFEnvelopePtr e1 = owner1.getEnvelopeByType(tp);
             TS_ASSERT_EQUALS(13.1, e1->getDoubleAttr("stepcut"));
         }
 
