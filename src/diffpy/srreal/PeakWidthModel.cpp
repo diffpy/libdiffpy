@@ -18,6 +18,8 @@
 *
 *****************************************************************************/
 
+#include <boost/serialization/export.hpp>
+
 #include <diffpy/srreal/PeakWidthModel.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 

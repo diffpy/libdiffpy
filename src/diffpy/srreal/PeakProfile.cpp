@@ -12,21 +12,19 @@
 *
 ******************************************************************************
 *
-* Concrete implementations of the abstract PeakProfile class:
-*
-* class GaussianProfile -- registered as "gaussian"
+* class PeakProfile -- base class for calculation of peak profiles.
 *
 * $Id$
 *
 *****************************************************************************/
 
+#include <boost/serialization/export.hpp>
+
 #include <diffpy/srreal/PeakProfile.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 
-using diffpy::srreal::PeakProfile;
-
 // Unique instantiation of the template registry base class.
-template class HasClassRegistry<PeakProfile>;
+template class HasClassRegistry<diffpy::srreal::PeakProfile>;
 
 namespace diffpy {
 namespace srreal {
@@ -61,6 +59,6 @@ const double& PeakProfile::getPrecision() const
 
 // Serialization -------------------------------------------------------------
 
-BOOST_CLASS_EXPORT(diffpy::srreal::PeakProfile)
+BOOST_CLASS_EXPORT(diffpy::srreal::PeakProfilePtr)
 
 // End of file

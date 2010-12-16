@@ -29,8 +29,7 @@
 
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/map.hpp>
-#include <boost/serialization/assume_abstract.hpp>
-#include <boost/serialization/export.hpp>
+#include <boost/serialization/split_free.hpp>
 
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
@@ -71,27 +70,11 @@ class PeakWidthModelOwner
 
         // serialization
         friend class boost::serialization::access;
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
         template<class Archive>
-        void save(Archive & ar, const unsigned int version) const
+            void serialize(Archive& ar, const unsigned int version)
         {
-            using namespace diffpy::attributes;
-            ar & mpwmodel->type();
-            AttributesDataMap dt = saveAttributesData(*mpwmodel);
-            ar & dt;
-        }
-
-        template<class Archive>
-        void load(Archive & ar, const unsigned int version)
-        {
-            using namespace diffpy::attributes;
-            std::string tp;
-            AttributesDataMap dt;
-            ar & tp;
-            ar & dt;
-            this->setPeakWidthModelByType(tp);
-            loadAttributesData(*(this->getPeakWidthModel()), dt);
+            ar & mpwmodel;
         }
 
 };
@@ -101,6 +84,44 @@ class PeakWidthModelOwner
 
 // Serialization -------------------------------------------------------------
 
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PeakWidthModelOwner)
+namespace boost {
+namespace serialization {
+
+template<class Archive>
+void save(Archive& ar,
+        const diffpy::srreal::PeakWidthModelPtr& ptr, unsigned int version)
+{
+    using namespace diffpy::attributes;
+    std::string tp;
+    AttributesDataMap dt;
+    if (ptr.get())
+    {
+        tp = ptr->type();
+        dt = saveAttributesData(*ptr);
+    }
+    ar & tp & dt;
+}
+
+
+template<class Archive>
+void load(Archive& ar,
+        diffpy::srreal::PeakWidthModelPtr& ptr, unsigned int version)
+{
+    using namespace diffpy::attributes;
+    using namespace diffpy::srreal;
+    std::string tp;
+    AttributesDataMap dt;
+    ar & tp & dt;
+    if (!tp.empty())
+    {
+        ptr = PeakWidthModel::createByType(tp);
+        loadAttributesData(*ptr, dt);
+    }
+}
+
+}   // namespace serialization
+}   // namespace boost
+
+BOOST_SERIALIZATION_SPLIT_FREE(diffpy::srreal::PeakWidthModelPtr)
 
 #endif  // PEAKWIDTHMODEL_HPP_INCLUDED

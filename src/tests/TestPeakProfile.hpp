@@ -24,7 +24,7 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/PeakProfile.hpp>
-#include <diffpy/serialization.hpp>
+#include "serialization_helpers.hpp"
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -113,12 +113,7 @@ class TestPeakProfile : public CxxTest::TestSuite
         void test_serialization()
         {
             mpkgauss->setPrecision(0.0123);
-            stringstream storage(ios::in | ios::out | ios::binary);
-            diffpy::serialization::oarchive oa(storage, ios::binary);
-            oa << mpkgauss;
-            diffpy::serialization::iarchive ia(storage, ios::binary);
-            PeakProfilePtr pk1;
-            ia >> pk1;
+            PeakProfilePtr pk1 = dumpandload(mpkgauss);
             TS_ASSERT(pk1.get());
             TS_ASSERT_DIFFERS(mpkgauss.get(), pk1.get());
             TS_ASSERT_EQUALS(string("gaussian"), pk1->type());
