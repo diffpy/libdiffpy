@@ -72,7 +72,6 @@ const PeakWidthModelPtr& PeakWidthModelOwner::getPeakWidthModel() const
 
 // Serialization -------------------------------------------------------------
 
-BOOST_CLASS_EXPORT(diffpy::srreal::PeakWidthModel)
 BOOST_CLASS_EXPORT(diffpy::srreal::PeakWidthModelOwner)
 
 // End of file

@@ -89,9 +89,4 @@ bool reg_ConstantPeakWidth = ConstantPeakWidth().registerThisType();
 }   // namespace srreal
 }   // namespace diffpy
 
-// Serialization -------------------------------------------------------------
-
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::ConstantPeakWidth)
-BOOST_CLASS_EXPORT(diffpy::srreal::ConstantPeakWidth)
-
 // End of file

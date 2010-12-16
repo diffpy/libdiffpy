@@ -28,8 +28,8 @@
 #define PEAKWIDTHMODEL_HPP_INCLUDED
 
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/map.hpp>
 #include <boost/serialization/assume_abstract.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/export.hpp>
 
 #include <diffpy/Attributes.hpp>
@@ -48,14 +48,6 @@ class PeakWidthModel :
         // methods
         virtual double calculate(const BaseBondGenerator&) const = 0;
         virtual double calculateFromMSD(double msdval) const;
-
-    private:
-
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)  { }
-
 };
 
 
@@ -79,10 +71,27 @@ class PeakWidthModelOwner
 
         // serialization
         friend class boost::serialization::access;
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
+
         template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
+        void save(Archive & ar, const unsigned int version) const
         {
-            ar & mpwmodel;
+            using namespace diffpy::attributes;
+            ar & mpwmodel->type();
+            AttributesDataMap dt = saveAttributesData(*mpwmodel);
+            ar & dt;
+        }
+
+        template<class Archive>
+        void load(Archive & ar, const unsigned int version)
+        {
+            using namespace diffpy::attributes;
+            std::string tp;
+            AttributesDataMap dt;
+            ar & tp;
+            ar & dt;
+            this->setPeakWidthModelByType(tp);
+            loadAttributesData(*(this->getPeakWidthModel()), dt);
         }
 
 };
@@ -92,7 +101,6 @@ class PeakWidthModelOwner
 
 // Serialization -------------------------------------------------------------
 
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PeakWidthModel)
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PeakWidthModelOwner)
 
 #endif  // PEAKWIDTHMODEL_HPP_INCLUDED

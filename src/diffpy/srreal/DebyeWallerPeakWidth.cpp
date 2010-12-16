@@ -64,9 +64,4 @@ bool reg_DebyeWallerPeakWidth = DebyeWallerPeakWidth().registerThisType();
 }   // namespace srreal
 }   // namespace diffpy
 
-// Serialization -------------------------------------------------------------
-
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::DebyeWallerPeakWidth)
-BOOST_CLASS_EXPORT(diffpy::srreal::DebyeWallerPeakWidth)
-
 // End of file

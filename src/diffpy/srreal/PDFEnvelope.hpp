@@ -27,10 +27,9 @@
 #include <string>
 #include <set>
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/assume_abstract.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/serialization/map.hpp>
+#include <boost/serialization/assume_abstract.hpp>
+#include <boost/serialization/export.hpp>
 
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
@@ -87,6 +86,8 @@ class PDFEnvelopeOwner
 
         // serialization
         friend class boost::serialization::access;
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
+
         template<class Archive>
         void save(Archive & ar, const unsigned int version) const
         {
@@ -117,7 +118,6 @@ class PDFEnvelopeOwner
                 loadAttributesData(*e, dt->second);
             }
         }
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 };
 
@@ -126,7 +126,6 @@ class PDFEnvelopeOwner
 
 // Serialization -------------------------------------------------------------
 
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PDFEnvelope)
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PDFEnvelopeOwner)
 
 #endif  // PDFENVELOPE_HPP_INCLUDED

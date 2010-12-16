@@ -124,9 +124,4 @@ bool reg_JeongPeakWidth = JeongPeakWidth().registerThisType();
 }   // namespace srreal
 }   // namespace diffpy
 
-// Serialization -------------------------------------------------------------
-
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::JeongPeakWidth)
-BOOST_CLASS_EXPORT(diffpy::srreal::JeongPeakWidth)
-
 // End of file
