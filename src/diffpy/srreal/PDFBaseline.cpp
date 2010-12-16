@@ -18,16 +18,16 @@
 *
 *****************************************************************************/
 
+#include <boost/serialization/export.hpp>
+
 #include <diffpy/srreal/PDFBaseline.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 
-using diffpy::srreal::PDFBaseline;
-
 // Unique instantiation of the template registry base class.
-template class HasClassRegistry<PDFBaseline>;
+template class HasClassRegistry<diffpy::srreal::PDFBaseline>;
 
 // Serialization -------------------------------------------------------------
 
-BOOST_CLASS_EXPORT(diffpy::srreal::PDFBaseline)
+BOOST_CLASS_EXPORT(diffpy::srreal::PDFBaselinePtr)
 
 // End of file

@@ -41,16 +41,6 @@ class ZeroBaseline : public PDFBaseline
         const std::string& type() const;
         double operator()(const double& r) const;
 
-    private:
-
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & boost::serialization::base_object<PDFBaseline>(*this);
-        }
-
 };  // class ZeroBaseline
 
 }   // namespace srreal

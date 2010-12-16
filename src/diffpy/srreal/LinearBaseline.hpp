@@ -49,15 +49,6 @@ class LinearBaseline : public PDFBaseline
         // data
         double mslope;
 
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & boost::serialization::base_object<PDFBaseline>(*this);
-            ar & mslope;
-        }
-
 };  // class LinearBaseline
 
 }   // namespace srreal
