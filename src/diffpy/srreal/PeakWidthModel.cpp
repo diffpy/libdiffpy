@@ -45,7 +45,6 @@ double PeakWidthModel::calculateFromMSD(double msdval) const
 
 void PeakWidthModelOwner::setPeakWidthModel(PeakWidthModelPtr pwm)
 {
-    assert(pwm.get());
     mpwmodel = pwm;
 }
 
@@ -58,14 +57,12 @@ void PeakWidthModelOwner::setPeakWidthModelByType(const string& tp)
 
 PeakWidthModelPtr& PeakWidthModelOwner::getPeakWidthModel()
 {
-    assert(mpwmodel.get());
     return mpwmodel;
 }
 
 
 const PeakWidthModelPtr& PeakWidthModelOwner::getPeakWidthModel() const
 {
-    assert(mpwmodel.get());
     return mpwmodel;
 }
 

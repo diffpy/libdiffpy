@@ -102,7 +102,6 @@ void ScatteringFactorTableOwner::setScatteringFactorTableByType(
 ScatteringFactorTablePtr&
 ScatteringFactorTableOwner::getScatteringFactorTable()
 {
-    assert(msftable.get());
     return msftable;
 }
 
@@ -110,14 +109,14 @@ ScatteringFactorTableOwner::getScatteringFactorTable()
 const ScatteringFactorTablePtr&
 ScatteringFactorTableOwner::getScatteringFactorTable() const
 {
-    assert(msftable.get());
     return msftable;
 }
 
 
 const string& ScatteringFactorTableOwner::getRadiationType() const
 {
-    const string& tp = this->getScatteringFactorTable()->radiationType();
+    static string empty;
+    const string& tp = msftable.get() ? msftable->radiationType() : empty;
     return tp;
 }
 
