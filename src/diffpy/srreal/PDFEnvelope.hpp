@@ -28,8 +28,7 @@
 #include <set>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/map.hpp>
-#include <boost/serialization/assume_abstract.hpp>
-#include <boost/serialization/export.hpp>
+#include <boost/serialization/split_free.hpp>
 
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
@@ -86,37 +85,11 @@ class PDFEnvelopeOwner
 
         // serialization
         friend class boost::serialization::access;
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
         template<class Archive>
-        void save(Archive & ar, const unsigned int version) const
+            void serialize(Archive& ar, const unsigned int version)
         {
-            using namespace std;
-            using namespace diffpy::attributes;
-            map<string, AttributesDataMap> thedata;
-            EnvelopeStorage::const_iterator evit;
-            for (evit = menvelope.begin(); evit != menvelope.end(); ++evit)
-            {
-                thedata[evit->first] = saveAttributesData(*(evit->second));
-            }
-            ar & thedata;
-        }
-
-        template<class Archive>
-        void load(Archive & ar, const unsigned int version)
-        {
-            using namespace std;
-            using namespace diffpy::attributes;
-            map<string, AttributesDataMap> thedata;
-            ar & thedata;
-            map<string, AttributesDataMap>::const_iterator dt;
-            this->clearEnvelopes();
-            for (dt = thedata.begin(); dt != thedata.end(); ++dt)
-            {
-                this->addEnvelopeByType(dt->first);
-                PDFEnvelopePtr e = this->getEnvelopeByType(dt->first);
-                loadAttributesData(*e, dt->second);
-            }
+            ar & menvelope;
         }
 
 };
@@ -126,6 +99,44 @@ class PDFEnvelopeOwner
 
 // Serialization -------------------------------------------------------------
 
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PDFEnvelopeOwner)
+namespace boost {
+namespace serialization {
+
+template<class Archive>
+void save(Archive& ar,
+        const diffpy::srreal::PDFEnvelopePtr& ptr, unsigned int version)
+{
+    using namespace diffpy::attributes;
+    std::string tp;
+    AttributesDataMap dt;
+    if (ptr.get())
+    {
+        tp = ptr->type();
+        dt = saveAttributesData(*ptr);
+    }
+    ar & tp & dt;
+}
+
+
+template<class Archive>
+void load(Archive& ar,
+        diffpy::srreal::PDFEnvelopePtr& ptr, unsigned int version)
+{
+    using namespace diffpy::attributes;
+    using namespace diffpy::srreal;
+    std::string tp;
+    AttributesDataMap dt;
+    ar & tp & dt;
+    if (!tp.empty())
+    {
+        ptr = PDFEnvelope::createByType(tp);
+        loadAttributesData(*ptr, dt);
+    }
+}
+
+}   // namespace serialization
+}   // namespace boost
+
+BOOST_SERIALIZATION_SPLIT_FREE(diffpy::srreal::PDFEnvelopePtr)
 
 #endif  // PDFENVELOPE_HPP_INCLUDED

@@ -20,6 +20,7 @@
 
 #include <sstream>
 #include <stdexcept>
+#include <boost/serialization/export.hpp>
 
 #include <diffpy/srreal/PDFEnvelope.hpp>
 #include <diffpy/HasClassRegistry.ipp>
@@ -133,6 +134,7 @@ void PDFEnvelopeOwner::clearEnvelopes()
 
 // Serialization -------------------------------------------------------------
 
+BOOST_CLASS_EXPORT(diffpy::srreal::PDFEnvelopePtr)
 BOOST_CLASS_EXPORT(diffpy::srreal::PDFEnvelopeOwner)
 
 // End of file
