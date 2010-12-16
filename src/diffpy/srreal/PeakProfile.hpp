@@ -71,15 +71,15 @@ namespace serialization {
 
 template<class Archive>
 void save(Archive& ar,
-        const diffpy::srreal::PeakProfilePtr& pk, unsigned int version)
+        const diffpy::srreal::PeakProfilePtr& ptr, unsigned int version)
 {
     using namespace diffpy::attributes;
     std::string tp;
     AttributesDataMap dt;
-    if (pk.get())
+    if (ptr.get())
     {
-        tp = pk->type();
-        dt = saveAttributesData(*pk);
+        tp = ptr->type();
+        dt = saveAttributesData(*ptr);
     }
     ar & tp & dt;
 }
@@ -87,7 +87,7 @@ void save(Archive& ar,
 
 template<class Archive>
 void load(Archive& ar,
-        diffpy::srreal::PeakProfilePtr& pk, unsigned int version)
+        diffpy::srreal::PeakProfilePtr& ptr, unsigned int version)
 {
     using namespace diffpy::attributes;
     using namespace diffpy::srreal;
@@ -96,9 +96,10 @@ void load(Archive& ar,
     ar & tp & dt;
     if (!tp.empty())
     {
-        pk = PeakProfile::createByType(tp);
-        loadAttributesData(*pk, dt);
+        ptr = PeakProfile::createByType(tp);
+        loadAttributesData(*ptr, dt);
     }
+    else  ptr.reset();
 }
 
 }   // namespace serialization

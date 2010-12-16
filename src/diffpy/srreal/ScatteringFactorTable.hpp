@@ -25,11 +25,8 @@
 #define SCATTERINGFACTORTABLE_HPP_INCLUDED
 
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/assume_abstract.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/serialization/map.hpp>
-#include <boost/serialization/set.hpp>
+#include <boost/serialization/split_free.hpp>
 
 #include <diffpy/HasClassRegistry.hpp>
 
@@ -55,16 +52,6 @@ class ScatteringFactorTable :
         mutable std::map<std::string,double> mtable;
         std::set<std::string> mcustomsymbols;
 
-    private:
-
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & mtable;
-            ar & mcustomsymbols;
-        }
 };
 
 typedef ScatteringFactorTable::SharedPtr ScatteringFactorTablePtr;
@@ -100,7 +87,49 @@ class ScatteringFactorTableOwner
 
 // Serialization -------------------------------------------------------------
 
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::ScatteringFactorTable)
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::ScatteringFactorTableOwner)
+namespace boost {
+namespace serialization {
+
+template<class Archive>
+void save(Archive& ar,
+        const diffpy::srreal::ScatteringFactorTablePtr& ptr,
+        unsigned int version)
+{
+    std::string tp;
+    std::map<std::string,double> dt;
+    if (ptr.get())
+    {
+        tp = ptr->type();
+        dt = ptr->getAllCustom();
+    }
+    ar & tp & dt;
+}
+
+
+template<class Archive>
+void load(Archive& ar,
+        diffpy::srreal::ScatteringFactorTablePtr& ptr,
+        unsigned int version)
+{
+    using namespace diffpy::srreal;
+    std::string tp;
+    std::map<std::string,double> dt;
+    ar & tp & dt;
+    if (!tp.empty())
+    {
+        ptr = ScatteringFactorTable::createByType(tp);
+        std::map<std::string,double>::const_iterator kv;
+        for (kv = dt.begin(); kv != dt.end(); ++kv)
+        {
+            ptr->setCustom(kv->first, kv->second);
+        }
+    }
+    else  ptr.reset();
+}
+
+}   // namespace serialization
+}   // namespace boost
+
+BOOST_SERIALIZATION_SPLIT_FREE(diffpy::srreal::ScatteringFactorTablePtr)
 
 #endif  // SCATTERINGFACTORTABLE_HPP_INCLUDED

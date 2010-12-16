@@ -117,6 +117,7 @@ void load(Archive& ar,
         ptr = PeakWidthModel::createByType(tp);
         loadAttributesData(*ptr, dt);
     }
+    else  ptr.reset();
 }
 
 }   // namespace serialization

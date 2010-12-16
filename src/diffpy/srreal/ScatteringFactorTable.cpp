@@ -18,6 +18,8 @@
 *
 *****************************************************************************/
 
+#include <boost/serialization/export.hpp>
+
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 
@@ -124,7 +126,7 @@ const string& ScatteringFactorTableOwner::getRadiationType() const
 
 // Serialization -------------------------------------------------------------
 
-BOOST_CLASS_EXPORT(diffpy::srreal::ScatteringFactorTable)
+BOOST_CLASS_EXPORT(diffpy::srreal::ScatteringFactorTablePtr)
 BOOST_CLASS_EXPORT(diffpy::srreal::ScatteringFactorTableOwner)
 
 // End of file
