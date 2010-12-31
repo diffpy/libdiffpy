@@ -27,77 +27,63 @@
 
 #include <boost/config.hpp>
 #include <boost/unordered_set.hpp>
-
-#include <boost/serialization/hash_collections_save_imp.hpp>
-#include <diffpy/boostextensions/unordered_collections_load_imp.hpp>
+#include <boost/serialization/list.hpp>
 #include <boost/serialization/split_free.hpp>
 
 namespace boost { 
 namespace serialization {
 
 template<
-    class Archive, 
-    class Key, 
-    class HashFcn, 
-    class EqualKey,
-    class Allocator
+    class Archive,
+    class T,
+    class Hash,
+    class Pred,
+    class Alloc
 >
 inline void save(
     Archive & ar,
     const boost::unordered_set<
-        Key, HashFcn, EqualKey, Allocator
+        T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
-    boost::serialization::stl::save_hash_collection<
-        Archive, 
-        boost::unordered_set<
-            Key, HashFcn, EqualKey, Allocator
-        > 
-    >(ar, t);
+    std::list<T, Alloc> values(t.begin(), t.end());
+    ar & values;
 }
 
 template<
     class Archive, 
-    class Key, 
-    class HashFcn, 
-    class EqualKey,
-    class Allocator
+    class T, 
+    class Hash, 
+    class Pred,
+    class Alloc
 >
 inline void load(
     Archive & ar,
     boost::unordered_set<
-        Key, HashFcn, EqualKey, Allocator
+        T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
-    boost::serialization::stl::load_unordered_collection<
-        Archive,
-        boost::unordered_set<
-            Key, HashFcn, EqualKey, Allocator
-        >,
-        boost::serialization::stl::archive_input_set<
-            Archive, 
-            boost::unordered_set<
-                Key, HashFcn, EqualKey, Allocator
-            >
-        >
-    >(ar, t);
+    std::list<T, Alloc> values;
+    ar & values;
+    t.clear();
+    t.insert(values.begin(), values.end());
 }
 
 // split non-intrusive serialization function member into separate
 // non intrusive save/load member functions
 template<
     class Archive, 
-    class Key, 
-    class HashFcn, 
-    class EqualKey,
-    class Allocator
+    class T, 
+    class Hash, 
+    class Pred,
+    class Alloc
 >
 inline void serialize(
     Archive & ar,
     boost::unordered_set<
-        Key, HashFcn, EqualKey, Allocator
+        T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
@@ -106,68 +92,57 @@ inline void serialize(
 
 // hash_multiset
 template<
-    class Archive, 
-    class Key, 
-    class HashFcn, 
-    class EqualKey,
-    class Allocator
+    class Archive,
+    class T,
+    class Hash,
+    class Pred,
+    class Alloc
 >
 inline void save(
     Archive & ar,
     const boost::unordered_multiset<
-        Key, HashFcn, EqualKey, Allocator
+        T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
-    boost::serialization::stl::save_hash_collection<
-        Archive, 
-        boost::unordered_multiset<
-            Key, HashFcn, EqualKey, Allocator
-        > 
-    >(ar, t);
+    std::list<T, Alloc> values(t.begin(), t.end()); 
+    ar & values;
 }
 
 template<
     class Archive, 
-    class Key, 
-    class HashFcn, 
-    class EqualKey,
-    class Allocator
+    class T, 
+    class Hash, 
+    class Pred,
+    class Alloc
 >
 inline void load(
     Archive & ar,
     boost::unordered_multiset<
-        Key, HashFcn, EqualKey, Allocator
+        T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
-    boost::serialization::stl::load_unordered_collection<
-        Archive,
-        boost::unordered_multiset<
-            Key, HashFcn, EqualKey, Allocator
-        >,
-        boost::serialization::stl::archive_input_multiset<
-            Archive,
-            boost::unordered_multiset<
-                Key, HashFcn, EqualKey, Allocator
-            > 
-        >
-    >(ar, t);
+    std::list<T, Alloc> values;
+    ar & values;
+    t.clear();
+    t.insert(values.begin(), values.end());
 }
+
 
 // split non-intrusive serialization function member into separate
 // non intrusive save/load member functions
 template<
-    class Archive, 
-    class Key, 
-    class HashFcn, 
-    class EqualKey,
-    class Allocator
+    class Archive,
+    class T,
+    class Hash,
+    class Pred,
+    class Alloc
 >
 inline void serialize(
     Archive & ar,
     boost::unordered_multiset<
-        Key, HashFcn, EqualKey, Allocator
+        T, Hash, Pred, Alloc
     > & t,
     const unsigned int file_version
 ){

@@ -29,8 +29,7 @@
 #include <boost/config.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/serialization/utility.hpp>
-#include <boost/serialization/hash_collections_save_imp.hpp>
-#include <diffpy/boostextensions/unordered_collections_load_imp.hpp>
+#include <boost/serialization/list.hpp>
 #include <boost/serialization/split_free.hpp>
 
 namespace boost {
@@ -39,51 +38,43 @@ namespace serialization {
 template<
     class Archive,
     class Key,
-    class HashFcn,
-    class EqualKey,
-    class Allocator
+    class T,
+    class Hash,
+    class Pred,
+    class Alloc
 >
 inline void save(
     Archive & ar,
     const boost::unordered_map<
-        Key, HashFcn, EqualKey, Allocator
+        Key, T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
-    boost::serialization::stl::save_hash_collection<
-        Archive,
-        boost::unordered_map<
-            Key, HashFcn, EqualKey, Allocator
-        >
-    >(ar, t);
+    typedef std::pair<const Key, T> value_type;
+    std::list<value_type, Alloc> values(t.begin(), t.end());
+    ar & values;
 }
 
 template<
     class Archive,
     class Key,
-    class HashFcn,
-    class EqualKey,
-    class Allocator
+    class T,
+    class Hash,
+    class Pred,
+    class Alloc
 >
 inline void load(
     Archive & ar,
     boost::unordered_map<
-        Key, HashFcn, EqualKey, Allocator
+        Key, T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
-    boost::serialization::stl::load_unordered_collection<
-        Archive,
-        boost::unordered_map<
-            Key, HashFcn, EqualKey, Allocator
-        >,
-        boost::serialization::stl::archive_input_map<
-            Archive,
-            boost::unordered_map<
-                Key, HashFcn, EqualKey, Allocator
-            >
-        >
-    >(ar, t);
+    typedef std::pair<const Key, T> value_type;
+    std::list<value_type, Alloc> values;
+    ar & values;
+    t.clear();
+    t.insert(values.begin(), values.end());
 }
 
 // split non-intrusive serialization function member into separate
@@ -91,14 +82,15 @@ inline void load(
 template<
     class Archive,
     class Key,
-    class HashFcn,
-    class EqualKey,
-    class Allocator
+    class T,
+    class Hash,
+    class Pred,
+    class Alloc
 >
 inline void serialize(
     Archive & ar,
     boost::unordered_map<
-        Key, HashFcn, EqualKey, Allocator
+        Key, T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
@@ -109,71 +101,60 @@ inline void serialize(
 template<
     class Archive,
     class Key,
-    class HashFcn,
-    class EqualKey,
-    class Allocator
+    class T,
+    class Hash,
+    class Pred,
+    class Alloc
 >
 inline void save(
     Archive & ar,
     const boost::unordered_multimap<
-        Key, HashFcn, EqualKey, Allocator
+        Key, T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
-    boost::serialization::stl::save_hash_collection<
-        Archive,
-        boost::unordered_multimap<
-            Key, HashFcn, EqualKey, Allocator
-        >
-    >(ar, t);
+    typedef std::pair<const Key, T> value_type;
+    std::list<value_type, Alloc> values(t.begin(), t.end()); 
+    ar & values;
 }
 
 template<
     class Archive,
     class Key,
-    class HashFcn,
-    class EqualKey,
-    class Allocator
+    class T,
+    class Hash,
+    class Pred,
+    class Alloc
 >
 inline void load(
     Archive & ar,
     boost::unordered_multimap<
-        Key, HashFcn, EqualKey, Allocator
+        Key, T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
-    boost::serialization::stl::load_unordered_collection<
-        Archive,
-        boost::unordered_multimap<
-            Key, HashFcn, EqualKey, Allocator
-        >,
-        boost::serialization::stl::archive_input_multimap<
-            Archive,
-            boost::unordered_multimap<
-                Key, HashFcn, EqualKey, Allocator
-            >
-//        ,
-//        boost::serialization::stl::no_reserve_imp<
-//            boost::unordered_multimap<
-//                Key, HashFcn, EqualKey, Allocator
-//            >
-        >
-    >(ar, t);
+    typedef std::pair<const Key, T> value_type;
+    std::list<value_type, Alloc> values;
+    ar & values;
+    t.clear();
+    t.insert(values.begin(), values.end());
 }
+
 
 // split non-intrusive serialization function member into separate
 // non intrusive save/load member functions
 template<
     class Archive,
     class Key,
-    class HashFcn,
-    class EqualKey,
-    class Allocator
+    class T,
+    class Hash,
+    class Pred,
+    class Alloc
 >
 inline void serialize(
     Archive & ar,
     boost::unordered_multimap<
-        Key, HashFcn, EqualKey, Allocator
+        Key, T, Hash, Pred, Alloc
     > &t,
     const unsigned int file_version
 ){
