@@ -136,7 +136,7 @@ void PairQuantity::setPairMask(int i, int j, bool mask)
 }
 
 
-bool PairQuantity::getPairMask(int i, int j)
+bool PairQuantity::getPairMask(int i, int j) const
 {
     pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
     bool rv = minvertpairmask.count(ij) ?

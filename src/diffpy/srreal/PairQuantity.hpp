@@ -64,10 +64,7 @@ class PairQuantity : public diffpy::Attributes
         void maskAllPairs(bool mask);
         void invertMask();
         void setPairMask(int i, int j, bool mask);
-        bool getPairMask(int i, int j);
-        // FIXME: remove this when serialization works
-        const boost::unordered_set< std::pair<int,int> >&
-            getMaskData() const  { return minvertpairmask; }
+        bool getPairMask(int i, int j) const;
 
     protected:
 
