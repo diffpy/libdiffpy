@@ -34,7 +34,6 @@ PairQuantity::PairQuantity()
     this->setRmin(0.0);
     this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
     this->setEvaluator(BASIC);
-    mcountsites = 0;
     this->maskAllPairs(true);
     // attributes
     this->registerDoubleAttribute("rmin", this,
@@ -48,7 +47,6 @@ PairQuantity::PairQuantity()
 void PairQuantity::setStructure(StructureAdapterPtr stru)
 {
     mstructure = stru;
-    mcountsites = mstructure->countSites();
     mstructure->customPQConfig(this);
     this->resetValue();
 }
@@ -106,12 +104,6 @@ void PairQuantity::setEvaluator(PQEvaluatorType evtp)
 void PairQuantity::setupParallelRun(int cpuindex, int ncpu)
 {
     mevaluator->setupParallelRun(cpuindex, ncpu);
-}
-
-
-int PairQuantity::countSites() const
-{
-    return mcountsites;
 }
 
 
@@ -183,6 +175,13 @@ void PairQuantity::configureBondGenerator(BaseBondGenerator& bnds) const
 {
     bnds.setRmin(this->getRmin());
     bnds.setRmax(this->getRmax());
+}
+
+
+int PairQuantity::countSites() const
+{
+    int rv = mstructure.get() ? mstructure->countSites() : 0;
+    return rv;
 }
 
 }   // namespace srreal

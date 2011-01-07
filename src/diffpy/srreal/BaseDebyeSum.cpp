@@ -201,7 +201,7 @@ double BaseDebyeSum::sfAverageAtkQ(int kq) const
 
 void BaseDebyeSum::cacheStructureData()
 {
-    int cntsites = mstructure->countSites();
+    int cntsites = this->countSites();
     const int nqpts = pdfutils_qmaxSteps(this);
     QuantityType zeros(nqpts, 0.0);
     map<string,int> atomtypeidx;

@@ -60,7 +60,6 @@ class PairQuantity : public diffpy::Attributes
         const double& getRmax() const;
         void setEvaluator(PQEvaluatorType evtp);
         void setupParallelRun(int cpuindex, int ncpu);
-        int countSites() const;
         void maskAllPairs(bool mask);
         void invertMask();
         void setPairMask(int i, int j, bool mask);
@@ -78,6 +77,7 @@ class PairQuantity : public diffpy::Attributes
         virtual void resetValue();
         virtual void configureBondGenerator(BaseBondGenerator&) const;
         virtual void addPairContribution(const BaseBondGenerator&, int) { }
+        int countSites() const;
 
         // data
         QuantityType mvalue;
@@ -85,8 +85,6 @@ class PairQuantity : public diffpy::Attributes
         double mrmin;
         double mrmax;
         PQEvaluatorPtr mevaluator;
-// FIXME: get rid off this variable:
-        int mcountsites;
         bool mdefaultpairmask;
         boost::unordered_set< std::pair<int,int> > minvertpairmask;
         boost::unordered_set< std::pair<std::string,std::string> >
@@ -104,7 +102,6 @@ class PairQuantity : public diffpy::Attributes
             ar & mrmin;
             ar & mrmax;
             ar & mevaluator;
-            ar & mcountsites;
             ar & mdefaultpairmask;
             ar & minvertpairmask;
             ar & minverttypemask;

@@ -115,7 +115,7 @@ bool PQEvaluatorBasic::getTypeMaskOfSites(int i, int j) const
 void PQEvaluatorBasic::updateTypeMaskData(const PairQuantity& pq)
 {
     boost::unordered_map<string, int> tpidx;
-    int cntsites = pq.mstructure->countSites();
+    int cntsites = pq.countSites();
     mtypeindex.resize(cntsites);
     for (int i = 0; i < cntsites; ++i)
     {

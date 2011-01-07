@@ -148,7 +148,7 @@ void BVSCalculator::resetValue()
 {
     // calcPoints requires that structure and rlimits data are cached.
     this->cacheStructureData();
-    this->resizeValue(this->mstructure->countSites());
+    this->resizeValue(this->countSites());
     this->PairQuantity::resetValue();
 }
 

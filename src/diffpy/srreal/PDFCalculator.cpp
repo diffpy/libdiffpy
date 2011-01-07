@@ -595,7 +595,7 @@ double PDFCalculator::sfAverage() const
 
 void PDFCalculator::cacheStructureData()
 {
-    int cntsites = mstructure->countSites();
+    int cntsites = this->countSites();
     // sfsite
     mstructure_cache.sfsite.resize(cntsites);
     const ScatteringFactorTablePtr sftable = this->getScatteringFactorTable();
