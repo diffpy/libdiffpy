@@ -65,6 +65,8 @@ class PairQuantity : public diffpy::Attributes
         void invertMask();
         void setPairMask(int i, int j, bool mask);
         bool getPairMask(int i, int j) const;
+        void setTypeMask(const std::string&, const std::string&, bool mask);
+        bool getTypeMask(const std::string&, const std::string&) const;
 
     protected:
 
@@ -83,9 +85,12 @@ class PairQuantity : public diffpy::Attributes
         double mrmin;
         double mrmax;
         PQEvaluatorPtr mevaluator;
+// FIXME: get rid off this variable:
         int mcountsites;
-        boost::unordered_set< std::pair<int,int> > minvertpairmask;
         bool mdefaultpairmask;
+        boost::unordered_set< std::pair<int,int> > minvertpairmask;
+        boost::unordered_set< std::pair<std::string,std::string> >
+            minverttypemask;
 
     private:
 
@@ -100,8 +105,9 @@ class PairQuantity : public diffpy::Attributes
             ar & mrmax;
             ar & mevaluator;
             ar & mcountsites;
-            ar & minvertpairmask;
             ar & mdefaultpairmask;
+            ar & minvertpairmask;
+            ar & minverttypemask;
         }
 
 };

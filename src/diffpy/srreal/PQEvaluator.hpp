@@ -26,11 +26,13 @@
 #ifndef PQEVALUATOR_HPP_INCLUDED
 #define PQEVALUATOR_HPP_INCLUDED
 
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/export.hpp>
+#include <blitz/array.h>
 
 namespace diffpy {
 namespace srreal {
@@ -58,11 +60,19 @@ class PQEvaluatorBasic
 
     protected:
 
+        // methods
+        bool getTypeMaskOfSites(int i, int j) const;
+        void updateTypeMaskData(const PairQuantity& pq);
+
         // data
         /// zero-based index of this CPU
         int mcpuindex;
         /// total number of the CPU units
         int mncpu;
+        /// mapping of site index to type index
+        std::vector<int> mtypeindex;
+        /// type mask in a matrix of typeindices
+        blitz::Array<bool,2> mtypemaskmatrix;
 
     private:
 

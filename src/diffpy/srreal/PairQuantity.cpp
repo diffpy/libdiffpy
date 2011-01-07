@@ -118,6 +118,7 @@ int PairQuantity::countSites() const
 void PairQuantity::maskAllPairs(bool mask)
 {
     minvertpairmask.clear();
+    minverttypemask.clear();
     mdefaultpairmask = mask;
 }
 
@@ -140,6 +141,26 @@ bool PairQuantity::getPairMask(int i, int j) const
 {
     pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
     bool rv = minvertpairmask.count(ij) ?
+        !mdefaultpairmask : mdefaultpairmask;
+    return rv;
+}
+
+
+void PairQuantity::
+setTypeMask(const string& smbli, const string& smblj, bool mask)
+{
+    pair<string,string> smblij = (smbli > smblj) ?
+        make_pair(smblj, smbli) : make_pair(smbli, smblj);
+    if (mask == mdefaultpairmask)  minverttypemask.erase(smblij);
+    else    minverttypemask.insert(smblij);
+}
+
+
+bool PairQuantity::getTypeMask(const string& smbli, const string& smblj) const
+{
+    pair<string,string> smblij = (smbli > smblj) ?
+        make_pair(smblj, smbli) : make_pair(smbli, smblj);
+    bool rv = minverttypemask.count(smblij) ?
         !mdefaultpairmask : mdefaultpairmask;
     return rv;
 }
