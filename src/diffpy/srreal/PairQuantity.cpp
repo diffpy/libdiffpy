@@ -48,6 +48,7 @@ void PairQuantity::setStructure(StructureAdapterPtr stru)
 {
     mstructure = stru;
     mstructure->customPQConfig(this);
+    this->updateMaskData();
     this->resetValue();
 }
 
@@ -110,7 +111,7 @@ void PairQuantity::setupParallelRun(int cpuindex, int ncpu)
 void PairQuantity::maskAllPairs(bool mask)
 {
     minvertpairmask.clear();
-    minverttypemask.clear();
+    mtypemask.clear();
     mdefaultpairmask = mask;
 }
 
@@ -118,14 +119,18 @@ void PairQuantity::maskAllPairs(bool mask)
 void PairQuantity::invertMask()
 {
     mdefaultpairmask = !mdefaultpairmask;
+    TypeMaskStorage::iterator tpmsk;
+    for (tpmsk = mtypemask.begin(); tpmsk != mtypemask.end(); ++tpmsk)
+    {
+        tpmsk->second = !(tpmsk->second);
+    }
 }
 
 
 void PairQuantity::setPairMask(int i, int j, bool mask)
 {
-    pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
-    if (mask == mdefaultpairmask)  minvertpairmask.erase(ij);
-    else    minvertpairmask.insert(ij);
+    mtypemask.clear();
+    this->setPairMaskValue(i, j, mask);
 }
 
 
@@ -143,8 +148,7 @@ setTypeMask(const string& smbli, const string& smblj, bool mask)
 {
     pair<string,string> smblij = (smbli > smblj) ?
         make_pair(smblj, smbli) : make_pair(smbli, smblj);
-    if (mask == mdefaultpairmask)  minverttypemask.erase(smblij);
-    else    minverttypemask.insert(smblij);
+    mtypemask[smblij] = mask;
 }
 
 
@@ -152,8 +156,8 @@ bool PairQuantity::getTypeMask(const string& smbli, const string& smblj) const
 {
     pair<string,string> smblij = (smbli > smblj) ?
         make_pair(smblj, smbli) : make_pair(smbli, smblj);
-    bool rv = minverttypemask.count(smblij) ?
-        !mdefaultpairmask : mdefaultpairmask;
+    bool rv = mtypemask.count(smblij) ?
+        mtypemask.at(smblij) : mdefaultpairmask;
     return rv;
 }
 
@@ -182,6 +186,46 @@ int PairQuantity::countSites() const
 {
     int rv = mstructure.get() ? mstructure->countSites() : 0;
     return rv;
+}
+
+// Private Methods -----------------------------------------------------------
+
+void PairQuantity::updateMaskData()
+{
+    if (mtypemask.empty())  return;
+    // build a list of indices per each unique atom type
+    boost::unordered_map< string, list<int> >  siteindices;
+    int cntsites = this->countSites();
+    for (int i = 0; i < cntsites; ++i)
+    {
+        const string& smbl = mstructure->siteAtomType(i);
+        siteindices[smbl].push_back(i);
+    }
+    // rebuild minvertpairmask according to mtypemask
+    minvertpairmask.clear();
+    TypeMaskStorage::const_iterator tpmsk;
+    for (tpmsk = mtypemask.begin(); tpmsk != mtypemask.end(); ++tpmsk)
+    {
+        const list<int>& isites = siteindices[tpmsk->first.first];
+        const list<int>& jsites = siteindices[tpmsk->first.second];
+        list<int>::const_iterator ii, jj;
+        for (ii = isites.begin(); ii != isites.end(); ++ii)
+        {
+            jj = (&isites == &jsites) ? ii : jsites.begin();
+            for (; jj != jsites.end(); ++jj)
+            {
+                this->setPairMaskValue(*ii, *jj, tpmsk->second);
+            }
+        }
+    }
+}
+
+
+void PairQuantity::setPairMaskValue(int i, int j, bool mask)
+{
+    pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
+    if (mask == mdefaultpairmask)  minvertpairmask.erase(ij);
+    else    minvertpairmask.insert(ij);
 }
 
 }   // namespace srreal

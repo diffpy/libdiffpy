@@ -21,13 +21,13 @@
 #ifndef PAIRQUANTITY_HPP_INCLUDED
 #define PAIRQUANTITY_HPP_INCLUDED
 
-#include <boost/unordered_set.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
 
 #include <diffpy/boostextensions/serialize_unordered_set.hpp>
+#include <diffpy/boostextensions/serialize_unordered_map.hpp>
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/PairQuantityUtils.hpp>
@@ -80,6 +80,8 @@ class PairQuantity : public diffpy::Attributes
         int countSites() const;
 
         // data
+        typedef boost::unordered_map<
+            std::pair<std::string,std::string>, bool> TypeMaskStorage;
         QuantityType mvalue;
         StructureAdapterPtr mstructure;
         double mrmin;
@@ -87,10 +89,13 @@ class PairQuantity : public diffpy::Attributes
         PQEvaluatorPtr mevaluator;
         bool mdefaultpairmask;
         boost::unordered_set< std::pair<int,int> > minvertpairmask;
-        boost::unordered_set< std::pair<std::string,std::string> >
-            minverttypemask;
+        TypeMaskStorage mtypemask;
 
     private:
+
+        // methods
+        void updateMaskData();
+        void setPairMaskValue(int i, int j, bool mask);
 
         // serialization
         friend class boost::serialization::access;
@@ -104,7 +109,7 @@ class PairQuantity : public diffpy::Attributes
             ar & mevaluator;
             ar & mdefaultpairmask;
             ar & minvertpairmask;
-            ar & minverttypemask;
+            ar & mtypemask;
         }
 
 };
