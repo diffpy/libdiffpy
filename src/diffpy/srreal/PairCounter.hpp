@@ -26,8 +26,6 @@
 namespace diffpy {
 namespace srreal {
 
-class BaseBondGenerator;
-
 class PairCounter : public PairQuantity
 {
     public:

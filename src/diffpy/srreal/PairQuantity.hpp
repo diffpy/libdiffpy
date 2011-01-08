@@ -49,7 +49,7 @@ class PairQuantity : public diffpy::Attributes
         // methods
         template <class T> const QuantityType& eval(const T&);
         const QuantityType& value() const;
-        void mergeParallelValue(const QuantityType&);
+        virtual void mergeParallelValue(const QuantityType&);
 
         // configuration
         void setStructure(StructureAdapterPtr);
@@ -77,6 +77,7 @@ class PairQuantity : public diffpy::Attributes
         virtual void resetValue();
         virtual void configureBondGenerator(BaseBondGenerator&) const;
         virtual void addPairContribution(const BaseBondGenerator&, int) { }
+        virtual void finishValue() { }
         int countSites() const;
 
         // data
