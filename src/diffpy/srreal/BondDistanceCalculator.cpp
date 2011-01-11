@@ -148,7 +148,7 @@ void BondDistanceCalculator::finishValue()
         w.assign(v0, v0 + CHUNK_SIZE);
         chunks.push_back(w);
     }
-    stable_sort(chunks.begin(), chunks.end());
+    sort(chunks.begin(), chunks.end());
     vector<QuantityType>::const_iterator wi = chunks.begin();
     QuantityType::iterator v2 = mvalue.begin();
     for (; wi != chunks.end(); ++wi, v2 += CHUNK_SIZE)

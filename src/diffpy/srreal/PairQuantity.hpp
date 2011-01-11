@@ -122,6 +122,7 @@ const QuantityType& PairQuantity::eval(const T& stru)
 {
     this->setStructure(stru);
     mevaluator->updateValue(*this);
+    this->finishValue();
     return this->value();
 }
 
