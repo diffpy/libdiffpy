@@ -18,6 +18,7 @@
 *
 *****************************************************************************/
 
+#include <cassert>
 #include <cmath>
 
 #include <diffpy/srreal/BondDistanceCalculator.hpp>
@@ -119,17 +120,13 @@ vector<int> BondDistanceCalculator::sites1() const
 }
 
 
-void BondDistanceCalculator::filterCone(R3::Vector cartesiandir,
-        double degrees)
+void BondDistanceCalculator::filterCone(R3::Vector coneaxis, double degrees)
 {
     using namespace diffpy::validators;
-    double nmcartesiandir = R3::norm(cartesiandir);
-    ensureEpsilonPositive("direction vector magnitude", nmcartesiandir);
-    cartesiandir /= nmcartesiandir;
-    ensureNonNegative("filter angle", degrees);
-    // ignore any all-inclusive angles
-    if (degrees >= M_PI_2)  return;
-    mfilter_directions.push_back(cartesiandir);
+    double nmconeaxis = R3::norm(coneaxis);
+    ensureEpsilonPositive("magnitude of cone vector", nmconeaxis);
+    coneaxis /= nmconeaxis;
+    mfilter_directions.push_back(coneaxis);
     mfilter_degrees.push_back(degrees);
 }
 
@@ -152,8 +149,12 @@ void BondDistanceCalculator::addPairContribution(
         const BaseBondGenerator& bnds,
         int summationscale)
 {
-    const R3::Vector r01 = bnds.r01();
-    if (!(this->checkConeFilters(r01)))  return;
+    using diffpy::mathutils::eps_eq;
+    const R3::Vector& r01 = bnds.r01();
+    if (eps_eq(0.0, bnds.distance()))    return;
+    static R3::Vector ru01;
+    ru01 = r01 / bnds.distance();
+    if (!(this->checkConeFilters(ru01)))  return;
     int baseidx = mvalue.size();
     mvalue.insert(mvalue.end(), CHUNK_SIZE, 0.0);
     mvalue[baseidx + DISTANCE_OFFSET] = bnds.distance();
@@ -184,6 +185,7 @@ void BondDistanceCalculator::finishValue()
     }
 }
 
+// Private Methods -----------------------------------------------------------
 
 int BondDistanceCalculator::count() const
 {
@@ -192,20 +194,17 @@ int BondDistanceCalculator::count() const
 }
 
 
-bool BondDistanceCalculator::checkConeFilters(
-        const R3::Vector& cartesiandir) const
+bool BondDistanceCalculator::checkConeFilters(const R3::Vector& ru01) const
 {
     using diffpy::mathutils::eps_eq;
     if (mfilter_directions.empty())     return true;
-    double nmcartesiandir = R3::norm(cartesiandir);
-    if (eps_eq(0.0, nmcartesiandir))    return true;
-    vector<R3::Vector>::const_iterator xyz = mfilter_directions.begin();
+    assert(eps_eq(1.0, R3::norm(ru01)));
+    vector<R3::Vector>::const_iterator coneax = mfilter_directions.begin();
     vector<double>::const_iterator deg = mfilter_degrees.begin();
-    for (; xyz != mfilter_directions.end(); ++xyz, ++deg)
+    for (;  coneax != mfilter_directions.end(); ++coneax, ++deg)
     {
-        double angledegrees = 180.0 / M_PI *
-            acos(R3::dot(cartesiandir, *xyz) / nmcartesiandir);
-        if (angledegrees < *deg)    return true;
+        double angledegrees = 180.0 / M_PI * acos(R3::dot(ru01, *coneax));
+        if (angledegrees <= *deg)    return true;
     }
     return false;
 }

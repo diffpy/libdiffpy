@@ -40,7 +40,7 @@ class BondDistanceCalculator : public PairQuantity
         std::vector<R3::Vector> directions() const;
         std::vector<int> sites0() const;
         std::vector<int> sites1() const;
-        void filterCone(R3::Vector cartesiandir, double degrees);
+        void filterCone(R3::Vector coneaxis, double degrees);
         void filterOff();
 
     protected:
@@ -49,8 +49,6 @@ class BondDistanceCalculator : public PairQuantity
         virtual void resetValue();
         virtual void addPairContribution(const BaseBondGenerator&, int);
         virtual void finishValue();
-        int count() const;
-        bool checkConeFilters(const R3::Vector& cartesiandir) const;
 
     private:
 
@@ -64,6 +62,10 @@ class BondDistanceCalculator : public PairQuantity
             ar & mfilter_directions;
             ar & mfilter_degrees;
         }
+
+        // methods
+        int count() const;
+        bool checkConeFilters(const R3::Vector& ru01) const;
 
         // data
         std::vector<R3::Vector> mfilter_directions;
