@@ -40,6 +40,8 @@ class BondDistanceCalculator : public PairQuantity
         std::vector<R3::Vector> directions() const;
         std::vector<int> sites0() const;
         std::vector<int> sites1() const;
+        void filterCone(R3::Vector cartesiandir, double degrees);
+        void filterOff();
 
     protected:
 
@@ -48,6 +50,7 @@ class BondDistanceCalculator : public PairQuantity
         virtual void addPairContribution(const BaseBondGenerator&, int);
         virtual void finishValue();
         int count() const;
+        bool checkConeFilters(const R3::Vector& cartesiandir) const;
 
     private:
 
@@ -58,7 +61,13 @@ class BondDistanceCalculator : public PairQuantity
         {
             using boost::serialization::base_object;
             ar & base_object<PairQuantity>(*this);
+            ar & mfilter_directions;
+            ar & mfilter_degrees;
         }
+
+        // data
+        std::vector<R3::Vector> mfilter_directions;
+        std::vector<double> mfilter_degrees;
 
 };
 

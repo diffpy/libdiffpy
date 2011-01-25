@@ -18,7 +18,11 @@
 *
 *****************************************************************************/
 
+#include <cmath>
+
 #include <diffpy/srreal/BondDistanceCalculator.hpp>
+#include <diffpy/validators.hpp>
+#include <diffpy/mathutils.hpp>
 
 using namespace std;
 
@@ -114,6 +118,28 @@ vector<int> BondDistanceCalculator::sites1() const
     return rv;
 }
 
+
+void BondDistanceCalculator::filterCone(R3::Vector cartesiandir,
+        double degrees)
+{
+    using namespace diffpy::validators;
+    double nmcartesiandir = R3::norm(cartesiandir);
+    ensureEpsilonPositive("direction vector magnitude", nmcartesiandir);
+    cartesiandir /= nmcartesiandir;
+    ensureNonNegative("filter angle", degrees);
+    // ignore any all-inclusive angles
+    if (degrees >= M_PI_2)  return;
+    mfilter_directions.push_back(cartesiandir);
+    mfilter_degrees.push_back(degrees);
+}
+
+
+void BondDistanceCalculator::filterOff()
+{
+    mfilter_directions.clear();
+    mfilter_degrees.clear();
+}
+
 // Protected Methods ---------------------------------------------------------
 
 void BondDistanceCalculator::resetValue()
@@ -126,10 +152,11 @@ void BondDistanceCalculator::addPairContribution(
         const BaseBondGenerator& bnds,
         int summationscale)
 {
+    const R3::Vector r01 = bnds.r01();
+    if (!(this->checkConeFilters(r01)))  return;
     int baseidx = mvalue.size();
     mvalue.insert(mvalue.end(), CHUNK_SIZE, 0.0);
     mvalue[baseidx + DISTANCE_OFFSET] = bnds.distance();
-    const R3::Vector r01 = bnds.r01();
     mvalue[baseidx + DIRECTION0_OFFSET] = r01[0];
     mvalue[baseidx + DIRECTION1_OFFSET] = r01[1];
     mvalue[baseidx + DIRECTION2_OFFSET] = r01[2];
@@ -162,6 +189,25 @@ int BondDistanceCalculator::count() const
 {
     int rv = int(mvalue.size()) / CHUNK_SIZE;
     return rv;
+}
+
+
+bool BondDistanceCalculator::checkConeFilters(
+        const R3::Vector& cartesiandir) const
+{
+    using diffpy::mathutils::eps_eq;
+    if (mfilter_directions.empty())     return true;
+    double nmcartesiandir = R3::norm(cartesiandir);
+    if (eps_eq(0.0, nmcartesiandir))    return true;
+    vector<R3::Vector>::const_iterator xyz = mfilter_directions.begin();
+    vector<double>::const_iterator deg = mfilter_degrees.begin();
+    for (; xyz != mfilter_directions.end(); ++xyz, ++deg)
+    {
+        double angledegrees = 180.0 / M_PI *
+            acos(R3::dot(cartesiandir, *xyz) / nmcartesiandir);
+        if (angledegrees < *deg)    return true;
+    }
+    return false;
 }
 
 }   // namespace srreal
