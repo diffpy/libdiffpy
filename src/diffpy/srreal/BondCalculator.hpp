@@ -12,26 +12,26 @@
 *
 ******************************************************************************
 *
-* class BondDistanceCalculator -- bond distance calculator
+* class BondCalculator -- bond distance calculator
 *
 * $Id$
 *
 *****************************************************************************/
 
-#ifndef BONDDISTANCECALCULATOR_HPP_INCLUDED
-#define BONDDISTANCECALCULATOR_HPP_INCLUDED
+#ifndef BONDCALCULATOR_HPP_INCLUDED
+#define BONDCALCULATOR_HPP_INCLUDED
 
 #include <diffpy/srreal/PairQuantity.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class BondDistanceCalculator : public PairQuantity
+class BondCalculator : public PairQuantity
 {
     public:
 
         // constructor
-        BondDistanceCalculator();
+        BondCalculator();
 
         // methods
         template <class T> QuantityType operator()(const T&);
@@ -76,7 +76,7 @@ class BondDistanceCalculator : public PairQuantity
 // Public Template Methods ---------------------------------------------------
 
 template <class T>
-QuantityType BondDistanceCalculator::operator()(const T& stru)
+QuantityType BondCalculator::operator()(const T& stru)
 {
     this->eval(stru);
     return this->distances();
@@ -86,4 +86,4 @@ QuantityType BondDistanceCalculator::operator()(const T& stru)
 }   // namespace srreal
 }   // namespace diffpy
 
-#endif  // BONDDISTANCECALCULATOR_HPP_INCLUDED
+#endif  // BONDCALCULATOR_HPP_INCLUDED

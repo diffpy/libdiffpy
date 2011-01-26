@@ -12,7 +12,7 @@
 *
 ******************************************************************************
 *
-* class BondDistanceCalculator -- bond distance calculator
+* class BondCalculator -- bond distance calculator
 *
 * $Id$
 *
@@ -21,7 +21,7 @@
 #include <cassert>
 #include <cmath>
 
-#include <diffpy/srreal/BondDistanceCalculator.hpp>
+#include <diffpy/srreal/BondCalculator.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/mathutils.hpp>
 
@@ -34,7 +34,7 @@ namespace srreal {
 
 namespace {
 
-const double DEFAULT_BONDDISTANCECALCULATOR_RMAX = 5.0;
+const double DEFAULT_BONDCALCULATOR_RMAX = 5.0;
 
 enum {
     DISTANCE_OFFSET,
@@ -50,21 +50,21 @@ enum {
 
 // Constructor ---------------------------------------------------------------
 
-BondDistanceCalculator::BondDistanceCalculator()
+BondCalculator::BondCalculator()
 {
-    this->setRmax(DEFAULT_BONDDISTANCECALCULATOR_RMAX);
+    this->setRmax(DEFAULT_BONDCALCULATOR_RMAX);
 }
 
 // Public Methods ------------------------------------------------------------
 
-void BondDistanceCalculator::mergeParallelValue(const QuantityType& pvalue)
+void BondCalculator::mergeParallelValue(const QuantityType& pvalue)
 {
     mvalue.insert(mvalue.end(), pvalue.begin(), pvalue.end());
     this->finishValue();
 }
 
 
-QuantityType BondDistanceCalculator::distances() const
+QuantityType BondCalculator::distances() const
 {
     QuantityType rv;
     rv.reserve(this->count());
@@ -77,7 +77,7 @@ QuantityType BondDistanceCalculator::distances() const
 }
 
 
-vector<R3::Vector> BondDistanceCalculator::directions() const
+vector<R3::Vector> BondCalculator::directions() const
 {
     vector<R3::Vector> rv;
     rv.reserve(this->count());
@@ -94,7 +94,7 @@ vector<R3::Vector> BondDistanceCalculator::directions() const
 }
 
 
-vector<int> BondDistanceCalculator::sites0() const
+vector<int> BondCalculator::sites0() const
 {
     vector<int> rv;
     rv.reserve(this->count());
@@ -107,7 +107,7 @@ vector<int> BondDistanceCalculator::sites0() const
 }
 
 
-vector<int> BondDistanceCalculator::sites1() const
+vector<int> BondCalculator::sites1() const
 {
     vector<int> rv;
     rv.reserve(this->count());
@@ -120,7 +120,7 @@ vector<int> BondDistanceCalculator::sites1() const
 }
 
 
-void BondDistanceCalculator::filterCone(R3::Vector coneaxis, double degrees)
+void BondCalculator::filterCone(R3::Vector coneaxis, double degrees)
 {
     using namespace diffpy::validators;
     double nmconeaxis = R3::norm(coneaxis);
@@ -131,7 +131,7 @@ void BondDistanceCalculator::filterCone(R3::Vector coneaxis, double degrees)
 }
 
 
-void BondDistanceCalculator::filterOff()
+void BondCalculator::filterOff()
 {
     mfilter_directions.clear();
     mfilter_degrees.clear();
@@ -139,13 +139,13 @@ void BondDistanceCalculator::filterOff()
 
 // Protected Methods ---------------------------------------------------------
 
-void BondDistanceCalculator::resetValue()
+void BondCalculator::resetValue()
 {
     mvalue.clear();
 }
 
 
-void BondDistanceCalculator::addPairContribution(
+void BondCalculator::addPairContribution(
         const BaseBondGenerator& bnds,
         int summationscale)
 {
@@ -166,7 +166,7 @@ void BondDistanceCalculator::addPairContribution(
 }
 
 
-void BondDistanceCalculator::finishValue()
+void BondCalculator::finishValue()
 {
     vector<QuantityType> chunks;
     QuantityType::const_iterator v0 = mvalue.begin();
@@ -187,14 +187,14 @@ void BondDistanceCalculator::finishValue()
 
 // Private Methods -----------------------------------------------------------
 
-int BondDistanceCalculator::count() const
+int BondCalculator::count() const
 {
     int rv = int(mvalue.size()) / CHUNK_SIZE;
     return rv;
 }
 
 
-bool BondDistanceCalculator::checkConeFilters(const R3::Vector& ru01) const
+bool BondCalculator::checkConeFilters(const R3::Vector& ru01) const
 {
     using diffpy::mathutils::eps_eq;
     if (mfilter_directions.empty())     return true;
