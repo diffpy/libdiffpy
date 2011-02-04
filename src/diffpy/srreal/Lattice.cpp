@@ -12,7 +12,6 @@
 #include <stdexcept>
 
 #include <diffpy/srreal/Lattice.hpp>
-#include <diffpy/mathutils.hpp>
 
 using namespace std;
 using namespace diffpy::srreal;

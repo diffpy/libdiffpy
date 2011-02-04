@@ -25,7 +25,6 @@
 #include <diffpy/serialization.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/BVParametersTable.hpp>
 
 using namespace std;
 using namespace diffpy::validators;

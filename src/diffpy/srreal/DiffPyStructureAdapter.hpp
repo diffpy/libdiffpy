@@ -25,10 +25,9 @@
 #define DIFFPYSTRUCTUREADAPTER_HPP_INCLUDED
 
 #include <memory>
-#include <vector>
 #include <boost/python.hpp>
-#include <boost/unordered_map.hpp>
 #include <boost/serialization/vector.hpp>
+
 #include <diffpy/boostextensions/serialize_unordered_map.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/Lattice.hpp>

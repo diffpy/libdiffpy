@@ -29,8 +29,6 @@
 #define OBJCRYSTSTRUCTUREADAPTER_HPP_INCLUDED
 
 #include <memory>
-#include <set>
-#include <vector>
 #include <boost/serialization/vector.hpp>
 
 #include <diffpy/srreal/R3linalg.hpp>

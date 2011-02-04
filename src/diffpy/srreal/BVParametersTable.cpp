@@ -19,7 +19,6 @@
 *****************************************************************************/
 
 #include <cassert>
-#include <string>
 #include <boost/serialization/export.hpp>
 
 #include <diffpy/serialization.hpp>

@@ -19,7 +19,6 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/PairQuantity.hpp>
-#include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/mathutils.hpp>
 
 using namespace std;

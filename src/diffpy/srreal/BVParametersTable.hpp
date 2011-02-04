@@ -22,7 +22,6 @@
 #define BVPARAMETERSTABLE_HPP_INCLUDED
 
 #include <string>
-#include <set>
 #include <boost/smart_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/shared_ptr.hpp>

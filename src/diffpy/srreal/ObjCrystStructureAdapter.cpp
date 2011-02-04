@@ -29,13 +29,10 @@
 #include <cassert>
 #include <cmath>
 #include <set>
-#include <string>
-#include <vector>
 
 #include <diffpy/serialization.hpp>
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
-#include <diffpy/srreal/Lattice.hpp>
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
 

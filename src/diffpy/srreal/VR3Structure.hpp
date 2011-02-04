@@ -23,7 +23,7 @@
 #ifndef VR3STRUCTURE_HPP_INCLUDED
 #define VR3STRUCTURE_HPP_INCLUDED
 
-#include <vector>
+#include <boost/serialization/vector.hpp>
 
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -37,9 +37,11 @@ typedef std::vector<R3::Vector> VR3Structure;
 class VR3Adapter : public StructureAdapter
 {
     friend class VR3BondGenerator;
+
     public:
 
         // constructors
+        VR3Adapter()  { }
         VR3Adapter(const VR3Structure& vr3s);
 
         // methods
@@ -54,6 +56,16 @@ class VR3Adapter : public StructureAdapter
 
         // data
         VR3Structure mvr3structure;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & boost::serialization::base_object<StructureAdapter>(*this);
+            ar & mvr3structure;
+        }
+
 };
 
 
@@ -73,86 +85,13 @@ class VR3BondGenerator : public BaseBondGenerator
         const VR3Structure& mvr3structure;
 };
 
-
-//////////////////////////////////////////////////////////////////////////////
-// Definitions
-//////////////////////////////////////////////////////////////////////////////
-
-// VR3Adapter - Constructor --------------------------------------------------
-
-inline
-VR3Adapter::VR3Adapter(const VR3Structure& vr3s) : mvr3structure(vr3s)
-{ }
-
-// VR3Adapter - Public Methods -----------------------------------------------
-
-inline
-int VR3Adapter::countSites() const
-{
-    return mvr3structure.size();
-}
-
-
-inline
-const R3::Vector& VR3Adapter::siteCartesianPosition(int idx) const
-{
-    return mvr3structure[idx];
-}
-
-
-inline
-bool VR3Adapter::siteAnisotropy(int idx) const
-{
-    return false;
-}
-
-
-inline
-const R3::Matrix& VR3Adapter::siteCartesianUij(int idx) const
-{
-    return R3::zeros();
-}
-
-
-inline
-BaseBondGenerator* VR3Adapter::createBondGenerator() const
-{
-    BaseBondGenerator* bnds = new VR3BondGenerator(this);
-    return bnds;
-}
-
-
-// VR3BondGenerator - Constructor --------------------------------------------
-
-inline
-VR3BondGenerator::VR3BondGenerator(const VR3Adapter* adpt) :
-    BaseBondGenerator(adpt), mvr3structure(adpt->mvr3structure)
-{ }
-
-// VR3BondGenerator - Public Methods -----------------------------------------
-
-inline
-const R3::Vector& VR3BondGenerator::r0() const
-{
-    return mvr3structure.at(this->site0());
-}
-
-
-inline
-const R3::Vector& VR3BondGenerator::r1() const
-{
-    return mvr3structure.at(this->site1());
-}
-
-// Inline Routines -----------------------------------------------------------
-
+/// Factory for constructing StructureAdapter for VR3Structure
 inline
 StructureAdapterPtr createStructureAdapter(const VR3Structure& vr3stru)
 {
     StructureAdapterPtr adapter(new VR3Adapter(vr3stru));
     return adapter;
 }
-
 
 }   // namespace srreal
 }   // namespace diffpy

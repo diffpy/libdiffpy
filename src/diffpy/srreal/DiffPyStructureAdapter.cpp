@@ -36,7 +36,6 @@
 #include <diffpy/srreal/PointsInSphere.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
-#include <diffpy/srreal/ScaleEnvelope.hpp>
 
 using namespace std;
 using namespace boost;
@@ -216,7 +215,7 @@ void DiffPyStructureAdapter::fetchPythonData(python::object dpstru)
         R3::Matrix Ufrac;
         python::object uflat = ai.attr("U").attr("flat");
         python::stl_input_iterator<double> ufirst(uflat), ulast;
-        std::copy(ufirst, ulast, Ufrac.data());
+        copy(ufirst, ulast, Ufrac.data());
         R3::Matrix Ucart = mlattice.cartesianMatrix(Ufrac);
         mcartesian_uijs.push_back(Ucart);
         // matomtypes
