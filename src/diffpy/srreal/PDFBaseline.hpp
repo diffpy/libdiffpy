@@ -59,7 +59,7 @@ namespace serialization {
 
 template<class Archive>
 void save(Archive& ar,
-        const diffpy::srreal::PDFBaselinePtr& ptr, unsigned int version)
+        const diffpy::srreal::PDFBaselinePtr& ptr, const unsigned int version)
 {
     using namespace diffpy::attributes;
     std::string tp;
@@ -75,7 +75,7 @@ void save(Archive& ar,
 
 template<class Archive>
 void load(Archive& ar,
-        diffpy::srreal::PDFBaselinePtr& ptr, unsigned int version)
+        diffpy::srreal::PDFBaselinePtr& ptr, const unsigned int version)
 {
     using namespace diffpy::attributes;
     using namespace diffpy::srreal;

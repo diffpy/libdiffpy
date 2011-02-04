@@ -87,7 +87,7 @@ class TestBVSCalculator : public CxxTest::TestSuite
             TS_ASSERT_THROWS(mbvc->setDoubleAttr("valenceprecision", 0),
                     invalid_argument);
         }
-        
+
 
         void test_getRmaxUsed()
         {

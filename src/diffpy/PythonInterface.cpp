@@ -43,12 +43,12 @@ bool python_is_embedded = false;
 python::object do_python_import(const string& modname, const string& item)
 {
     typedef std::map<string, python::object> ObjectCache;
-    static ObjectCache cacheditems; 
+    static ObjectCache cacheditems;
     string fullname = modname + ":" + item;
     ObjectCache::iterator ii = cacheditems.find(fullname);
     if (ii == cacheditems.end())
     {
-        cacheditems[fullname] = 
+        cacheditems[fullname] =
             python::import(modname.c_str()).attr(item.c_str());
         ii = cacheditems.find(fullname);
     }

@@ -105,7 +105,7 @@ void NoSymmetryStructureAdapter::customPQConfig(PairQuantity* pq) const
 
 StructureAdapterPtr nosymmetry(StructureAdapterPtr stru)
 {
-    StructureAdapterPtr rv = 
+    StructureAdapterPtr rv =
         boost::dynamic_pointer_cast<NoSymmetryStructureAdapter>(stru) ? stru :
         StructureAdapterPtr(new NoSymmetryStructureAdapter(stru));
     return rv;

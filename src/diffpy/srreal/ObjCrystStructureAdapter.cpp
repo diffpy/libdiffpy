@@ -12,9 +12,9 @@
 *
 ******************************************************************************
 *
-* class ObjCrystStructureAdapter   
+* class ObjCrystStructureAdapter
 *   -- adapter to the Crystal class from ObjCryst++.
-* class ObjCrystBondGenerator     
+* class ObjCrystBondGenerator
 *   -- Generate bonds from periodic ObjCrystStructureAdapter.
 * class ObjCrystMoleculeAdapter
 *   -- adapter class for Molecule class from ObjCryst++.
@@ -49,7 +49,7 @@ const double BtoU = 1.0 / UtoB;
 
 // Utility functions ---------------------------------------------------------
 
-R3::Matrix 
+R3::Matrix
 getUij(const ObjCryst::ScatteringPower* sp)
 {
     R3::Matrix Uij;
@@ -89,11 +89,11 @@ ObjCrystStructureAdapter::
 ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst)
 {
     using ObjCryst::Crystal;
-    mlattice.setLatPar( cryst.GetLatticePar(0), 
+    mlattice.setLatPar( cryst.GetLatticePar(0),
                         cryst.GetLatticePar(1),
-                        cryst.GetLatticePar(2), 
+                        cryst.GetLatticePar(2),
                         rtod * cryst.GetLatticePar(3),
-                        rtod * cryst.GetLatticePar(4), 
+                        rtod * cryst.GetLatticePar(4),
                         rtod * cryst.GetLatticePar(5) );
 
     // The dynamic population correction in ObjCryst is used by its interal
@@ -111,7 +111,7 @@ ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst)
 
 // Public Methods ------------------------------------------------------------
 
-BaseBondGenerator* 
+BaseBondGenerator*
 ObjCrystStructureAdapter::
 createBondGenerator() const
 {
@@ -121,7 +121,7 @@ createBondGenerator() const
 }
 
 
-int 
+int
 ObjCrystStructureAdapter::
 countSites() const
 {
@@ -129,7 +129,7 @@ countSites() const
 }
 
 
-double 
+double
 ObjCrystStructureAdapter::
 numberDensity() const
 {
@@ -138,7 +138,7 @@ numberDensity() const
 }
 
 
-const Lattice& 
+const Lattice&
 ObjCrystStructureAdapter::
 getLattice() const
 {
@@ -146,7 +146,7 @@ getLattice() const
 }
 
 
-const R3::Vector& 
+const R3::Vector&
 ObjCrystStructureAdapter::
 siteCartesianPosition(int idx) const
 {
@@ -155,7 +155,7 @@ siteCartesianPosition(int idx) const
 }
 
 
-double 
+double
 ObjCrystStructureAdapter::
 siteOccupancy(int idx) const
 {
@@ -164,7 +164,7 @@ siteOccupancy(int idx) const
 }
 
 
-bool 
+bool
 ObjCrystStructureAdapter::
 siteAnisotropy(int idx) const
 {
@@ -192,7 +192,7 @@ siteCartesianUij(int idx) const
 }
 
 
-const string& 
+const string&
 ObjCrystStructureAdapter::
 siteAtomType(int idx) const
 {
@@ -235,7 +235,7 @@ getUnitCell(const ObjCryst::Crystal& cryst)
     typedef std::set<R3::Vector, R3::EpsCompare> SymPosSet;
 
     // Get the symmetry operations
-    const std::vector<ObjCryst::SpaceGroup::SMx>& symops = 
+    const std::vector<ObjCryst::SpaceGroup::SMx>& symops =
         spacegroup.GetSymmetryOperations();
     const size_t symsize = symops.size();
 
@@ -284,7 +284,7 @@ getUnitCell(const ObjCryst::Crystal& cryst)
             if (z < 0) z += 1.;
 
             // Record the position
-            R3::Vector xyz; 
+            R3::Vector xyz;
             xyz = x, y, z;
 
             // We use this to filter unique positions
@@ -297,7 +297,7 @@ getUnitCell(const ObjCryst::Crystal& cryst)
 
                 // Get this in Cartesian
                 R3::Vector xyzc = mlattice.cartesian(xyz);
-                
+
                 // Store this in the symvec so we are assured that the order
                 // will not change.
                 symvec.push_back(xyzc);
@@ -310,7 +310,7 @@ getUnitCell(const ObjCryst::Crystal& cryst)
                     symops[k].mx[6], symops[k].mx[7], symops[k].mx[8];
 
                 // rotate the Uij matrix
-                R3::Matrix Utmp, Urot, UCart; 
+                R3::Matrix Utmp, Urot, UCart;
                 // Get UCart
                 if (sp->IsIsotropic())
                 {
@@ -349,7 +349,7 @@ getUnitCell(const ObjCryst::Crystal& cryst)
 // Constructor ---------------------------------------------------------------
 
 ObjCrystBondGenerator::
-ObjCrystBondGenerator(const ObjCrystStructureAdapter* adpt) 
+ObjCrystBondGenerator(const ObjCrystStructureAdapter* adpt)
     : BaseBondGenerator(adpt), mpstructure(adpt), msymidx(0)
 {
 }
@@ -357,7 +357,7 @@ ObjCrystBondGenerator(const ObjCrystStructureAdapter* adpt)
 
 // Public Methods ------------------------------------------------------------
 
-void 
+void
 ObjCrystBondGenerator::
 rewind()
 {
@@ -397,7 +397,7 @@ setRmin(double rmin)
 }
 
 
-void 
+void
 ObjCrystBondGenerator::
 setRmax(double rmax)
 {
@@ -407,7 +407,7 @@ setRmax(double rmax)
 }
 
 
-bool 
+bool
 ObjCrystBondGenerator::
 iterateSymmetry()
 {
@@ -427,7 +427,7 @@ iterateSymmetry()
 }
 
 
-void 
+void
 ObjCrystBondGenerator::
 rewindSymmetry()
 {
@@ -456,7 +456,7 @@ updater1()
 // Constructor ---------------------------------------------------------------
 
 ObjCrystMoleculeAdapter::
-ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule) 
+ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule)
 {
     using ObjCryst::MolAtom;
 
@@ -488,7 +488,7 @@ ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule)
         matomtypes.push_back(sp->GetSymbol());
 
         // Store position
-        R3::Vector xyz; 
+        R3::Vector xyz;
         xyz = atom.X(), atom.Y(), atom.Z();
         mvpos.push_back(xyz);
 
@@ -508,7 +508,7 @@ ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule)
 
 // Public Methods ------------------------------------------------------------
 
-BaseBondGenerator* 
+BaseBondGenerator*
 ObjCrystMoleculeAdapter::
 createBondGenerator() const
 {
@@ -518,7 +518,7 @@ createBondGenerator() const
 }
 
 
-int 
+int
 ObjCrystMoleculeAdapter::
 countSites() const
 {
@@ -526,7 +526,7 @@ countSites() const
 }
 
 
-double 
+double
 ObjCrystMoleculeAdapter::
 numberDensity() const
 {
@@ -534,7 +534,7 @@ numberDensity() const
 }
 
 
-const Lattice& 
+const Lattice&
 ObjCrystMoleculeAdapter::
 getLattice() const
 {
@@ -542,7 +542,7 @@ getLattice() const
 }
 
 
-const R3::Vector& 
+const R3::Vector&
 ObjCrystMoleculeAdapter::
 siteCartesianPosition(int idx) const
 {
@@ -551,7 +551,7 @@ siteCartesianPosition(int idx) const
 }
 
 
-double 
+double
 ObjCrystMoleculeAdapter::
 siteOccupancy(int idx) const
 {
@@ -560,7 +560,7 @@ siteOccupancy(int idx) const
 }
 
 
-bool 
+bool
 ObjCrystMoleculeAdapter::
 siteAnisotropy(int idx) const
 {
@@ -578,7 +578,7 @@ siteCartesianUij(int idx) const
 }
 
 
-const string& 
+const string&
 ObjCrystMoleculeAdapter::
 siteAtomType(int idx) const
 {
@@ -594,7 +594,7 @@ siteAtomType(int idx) const
 // Constructor ---------------------------------------------------------------
 
 ObjCrystMoleculeBondGenerator::
-ObjCrystMoleculeBondGenerator(const ObjCrystMoleculeAdapter* adpt) 
+ObjCrystMoleculeBondGenerator(const ObjCrystMoleculeAdapter* adpt)
     : BaseBondGenerator(adpt), mpstructure(adpt)
 {
 }

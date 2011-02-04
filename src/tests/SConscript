@@ -22,7 +22,7 @@ test_sources = []
 if env_test.get('tests') is None:
     test_sources += filter(srcsupported, Glob('Test*.hpp'))
 else:
-    test_sources = Split(env_test['tests']) 
+    test_sources = Split(env_test['tests'])
 
 # special builder for tests_dir.cpp
 def build_tests_dir(target, source, env):

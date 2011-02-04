@@ -12,9 +12,9 @@
 *
 ******************************************************************************
 *
-* class ObjCrystStructureAdapter   
+* class ObjCrystStructureAdapter
 *   -- adapter to the Crystal class from ObjCryst++.
-* class ObjCrystBondGenerator     
+* class ObjCrystBondGenerator
 *   -- Generate bonds from periodic ObjCrystStructureAdapter.
 * class ObjCrystMoleculeAdapter
 *   -- adapter class for Molecule class from ObjCryst++.
@@ -149,7 +149,7 @@ class ObjCrystBondGenerator : public BaseBondGenerator
 //
 // Molecules are always considered aperiodic. The anisotropic ADPs are treated
 // as if in a cartesian cell. If this is not what is intended, pass the
-// molecule as a scattering component within an ObjCryst::Crystal. 
+// molecule as a scattering component within an ObjCryst::Crystal.
 
 class ObjCrystMoleculeAdapter : public StructureAdapter
 {
@@ -219,7 +219,7 @@ class ObjCrystMoleculeBondGenerator : public BaseBondGenerator
 
 
 inline
-StructureAdapterPtr 
+StructureAdapterPtr
 createStructureAdapter(const ObjCryst::Crystal& cryst)
 {
     StructureAdapterPtr adapter(new ObjCrystStructureAdapter(cryst));
@@ -228,7 +228,7 @@ createStructureAdapter(const ObjCryst::Crystal& cryst)
 
 
 inline
-StructureAdapterPtr 
+StructureAdapterPtr
 createStructureAdapter(const ObjCryst::Molecule& molecule)
 {
     StructureAdapterPtr adapter(new ObjCrystMoleculeAdapter(molecule));

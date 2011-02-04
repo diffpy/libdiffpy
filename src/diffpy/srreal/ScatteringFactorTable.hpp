@@ -93,7 +93,7 @@ namespace serialization {
 template<class Archive>
 void save(Archive& ar,
         const diffpy::srreal::ScatteringFactorTablePtr& ptr,
-        unsigned int version)
+        const unsigned int version)
 {
     std::string tp;
     std::map<std::string,double> dt;
@@ -109,7 +109,7 @@ void save(Archive& ar,
 template<class Archive>
 void load(Archive& ar,
         diffpy::srreal::ScatteringFactorTablePtr& ptr,
-        unsigned int version)
+        const unsigned int version)
 {
     using namespace diffpy::srreal;
     std::string tp;

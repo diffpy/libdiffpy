@@ -103,7 +103,7 @@ void NoMetaStructureAdapter::customPQConfig(PairQuantity* pq) const
 
 StructureAdapterPtr nometa(StructureAdapterPtr stru)
 {
-    StructureAdapterPtr rv = 
+    StructureAdapterPtr rv =
         boost::dynamic_pointer_cast<NoMetaStructureAdapter>(stru) ? stru :
         StructureAdapterPtr(new NoMetaStructureAdapter(stru));
     return rv;

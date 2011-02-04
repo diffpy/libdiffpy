@@ -35,7 +35,7 @@ namespace srreal {
 typedef boost::shared_ptr<class BVParametersTable> BVParametersTablePtr;
 
 class BVParametersTable
-{ 
+{
 
     public:
 
