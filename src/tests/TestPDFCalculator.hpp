@@ -139,13 +139,13 @@ class TestPDFCalculator : public CxxTest::TestSuite
         {
             QuantityType rdf = mpdfc->getRDF();
             TS_ASSERT_EQUALS(1000u, rdf.size());
-            TS_ASSERT_EQUALS(0.0, *min(rdf.begin(), rdf.end()));
-            TS_ASSERT_EQUALS(0.0, *max(rdf.begin(), rdf.end()));
+            TS_ASSERT_EQUALS(0.0, *min_element(rdf.begin(), rdf.end()));
+            TS_ASSERT_EQUALS(0.0, *max_element(rdf.begin(), rdf.end()));
             mpdfc->eval(memptystru);
             rdf = mpdfc->getRDF();
             TS_ASSERT_EQUALS(1000u, rdf.size());
-            TS_ASSERT_EQUALS(0.0, *min(rdf.begin(), rdf.end()));
-            TS_ASSERT_EQUALS(0.0, *max(rdf.begin(), rdf.end()));
+            TS_ASSERT_EQUALS(0.0, *min_element(rdf.begin(), rdf.end()));
+            TS_ASSERT_EQUALS(0.0, *max_element(rdf.begin(), rdf.end()));
             mpdfc->setRmin(2.0);
             mpdfc->setRmax(0.0);
             mpdfc->eval(memptystru);
@@ -159,8 +159,8 @@ class TestPDFCalculator : public CxxTest::TestSuite
         {
             QuantityType fq = mpdfc->getF();
             TS_ASSERT_EQUALS(1024u, fq.size());
-            TS_ASSERT_EQUALS(0.0, *min(fq.begin(), fq.end()));
-            TS_ASSERT_EQUALS(0.0, *max(fq.begin(), fq.end()));
+            TS_ASSERT_EQUALS(0.0, *min_element(fq.begin(), fq.end()));
+            TS_ASSERT_EQUALS(0.0, *max_element(fq.begin(), fq.end()));
         }
 
 
