@@ -28,6 +28,7 @@
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
+#include <diffpy/srreal/VR3Structure.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
 
@@ -41,15 +42,6 @@ using namespace diffpy::mathutils;
 
 PDFCalculator::PDFCalculator()
 {
-    // initialize mstructure_cache
-    mstructure_cache.sfaverage = 0.0;
-    mstructure_cache.totaloccupancy = 0.0;
-    mstructure_cache.activeoccupancy = 0.0;
-    // initialize mrlimits_cache
-    mrlimits_cache.extendedrminsteps = 0;
-    mrlimits_cache.extendedrmaxsteps = 0;
-    mrlimits_cache.rcalclosteps = 0;
-    mrlimits_cache.rcalchisteps = 0;
     // default configuration
     this->setPeakWidthModelByType("jeong");
     this->setPeakProfileByType("gaussian");
@@ -64,6 +56,9 @@ PDFCalculator::PDFCalculator()
     // envelopes
     this->addEnvelopeByType("scale");
     this->addEnvelopeByType("qresolution");
+    // cache all internal data according to an empty structure.
+    // this rebuilds mstructure_cache and mrlimits_cache.
+    this->setStructure(VR3Structure());
     // attributes
     this->registerDoubleAttribute("qmin", this,
             &PDFCalculator::getQmin, &PDFCalculator::setQmin);
@@ -125,7 +120,6 @@ QuantityType PDFCalculator::getF() const
 QuantityType PDFCalculator::getExtendedPDF() const
 {
     // we need a full range PDF to apply termination ripples correctly
-    QuantityType rdfperr_ext = this->getExtendedRDFperR();
     QuantityType rgrid_ext = this->getExtendedRgrid();
     QuantityType f_ext = this->getExtendedF();
     QuantityType pdf0 = fftftog(f_ext, this->getQstep());
@@ -181,7 +175,8 @@ QuantityType PDFCalculator::getExtendedF() const
     QuantityType rdfperr_ext = this->getExtendedRDFperR();
     const double rmin_ext = this->getRstep() * this->extendedRminSteps();
     QuantityType rv = fftgtof(rdfperr_ext, this->getRstep(), rmin_ext);
-    assert(eps_eq(this->getQstep(), M_PI / (rv.size() * this->getRstep())));
+    assert(rv.empty() || eps_eq(M_PI,
+                this->getQstep() * rv.size() * this->getRstep()));
     // zero all F points at Q < Qmin
     QuantityType::iterator rvqmin =
         rv.begin() + min(pdfutils_qminSteps(this), int(rv.size()));
@@ -250,8 +245,8 @@ const double& PDFCalculator::getQstep() const
     static double rv;
     // replicate the zero padding as done in fftgtof
     int Npad1 = this->extendedRmaxSteps();
-    int Npad2 = (1 << int(ceil(log2(Npad1))));
-    rv = M_PI / (Npad2 * this->getRstep());
+    int Npad2 = (Npad1 > 0) ? (1 << int(ceil(log2(Npad1)))) : 0;
+    rv = (Npad2 > 0) ? M_PI / (Npad2 * this->getRstep()) : 0.0;
     return rv;
 }
 
@@ -550,6 +545,7 @@ int PDFCalculator::extendedRmaxSteps() const
 int PDFCalculator::countExtendedPoints() const
 {
     int rv = this->extendedRmaxSteps() - this->extendedRminSteps();
+    assert(rv >= 0);
     return rv;
 }
 
@@ -557,6 +553,7 @@ int PDFCalculator::countExtendedPoints() const
 int PDFCalculator::countCalcPoints() const
 {
     int rv = this->rcalchiSteps() - this->rcalcloSteps();
+    assert(rv >= 0);
     return rv;
 }
 
@@ -570,6 +567,7 @@ int PDFCalculator::calcIndex(double r) const
 
 void PDFCalculator::cutRipplePoints(QuantityType& y) const
 {
+    if (y.empty())  return;
     assert(int(y.size()) ==
             this->extendedRmaxSteps() - this->extendedRminSteps());
     int ncutlo = pdfutils_rminSteps(this) - this->extendedRminSteps();
@@ -622,6 +620,7 @@ void PDFCalculator::cacheStructureData()
     {
         const int& i = ij->first;
         const int& j = ij->second;
+        if (i >= cntsites || j >= cntsites)  continue;
         int sumscale = (i == j) ? 1 : 2;
         double occij = sumscale *
             mstructure->siteOccupancy(i) * mstructure->siteMultiplicity(i) *
@@ -636,6 +635,11 @@ void PDFCalculator::cacheStructureData()
 
 void PDFCalculator::cacheRlimitsData()
 {
+    mrlimits_cache.extendedrminsteps = 0;
+    mrlimits_cache.extendedrmaxsteps = 0;
+    mrlimits_cache.rcalclosteps = 0;
+    mrlimits_cache.rcalchisteps = 0;
+    if (pdfutils_rminSteps(this) >= pdfutils_rmaxSteps(this))   return;
     // obtain extension magnitudes and rescale to fit maximum extension
     double ext_ripples = this->extFromTerminationRipples();
     double ext_pktails = this->extFromPeakTails();

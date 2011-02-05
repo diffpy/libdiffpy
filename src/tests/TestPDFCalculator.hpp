@@ -25,6 +25,7 @@
 #include <diffpy/srreal/JeongPeakWidth.hpp>
 #include <diffpy/srreal/ConstantPeakWidth.hpp>
 #include <diffpy/srreal/QResolutionEnvelope.hpp>
+#include <diffpy/srreal/VR3Structure.hpp>
 #include <diffpy/serialization.hpp>
 
 using namespace std;
@@ -35,11 +36,14 @@ class TestPDFCalculator : public CxxTest::TestSuite
     private:
 
         boost::shared_ptr<PDFCalculator> mpdfc;
+        VR3Structure memptystru;
+        double meps;
 
     public:
 
         void setUp()
         {
+            meps = diffpy::mathutils::SQRT_DOUBLE_EPS;
             mpdfc.reset(new PDFCalculator);
         }
 
@@ -107,6 +111,90 @@ class TestPDFCalculator : public CxxTest::TestSuite
             mpdfc->addEnvelope(qdamp4.clone());
             TS_ASSERT_EQUALS(4.0, mpdfc->getDoubleAttr("qdamp"));
             TS_ASSERT_THROWS(mpdfc->addEnvelopeByType("invalid"), logic_error);
+        }
+
+
+        void test_getPDF()
+        {
+            QuantityType pdf;
+            TS_ASSERT_EQUALS(1000u, mpdfc->getPDF().size());
+            mpdfc->setRmin(2.0);
+            mpdfc->setRmax(0.0);
+            mpdfc->eval(memptystru);
+            pdf = mpdfc->getPDF();
+            TS_ASSERT(mpdfc->getPDF().empty());
+            mpdfc->setRmax(2.0);
+            mpdfc->eval(memptystru);
+            pdf = mpdfc->getPDF();
+            TS_ASSERT(mpdfc->getPDF().empty());
+            // FIXME
+            // mpdfc->setRmax(2.01001);
+            // mpdfc->eval(memptystru);
+            // pdf = mpdfc->getPDF();
+            // TS_ASSERT_EQUALS(1u, pdf.size());
+        }
+
+
+        void test_getRDF()
+        {
+            QuantityType rdf = mpdfc->getRDF();
+            TS_ASSERT_EQUALS(1000u, rdf.size());
+            TS_ASSERT_EQUALS(0.0, *min(rdf.begin(), rdf.end()));
+            TS_ASSERT_EQUALS(0.0, *max(rdf.begin(), rdf.end()));
+            mpdfc->eval(memptystru);
+            rdf = mpdfc->getRDF();
+            TS_ASSERT_EQUALS(1000u, rdf.size());
+            TS_ASSERT_EQUALS(0.0, *min(rdf.begin(), rdf.end()));
+            TS_ASSERT_EQUALS(0.0, *max(rdf.begin(), rdf.end()));
+            mpdfc->setRmin(2.0);
+            mpdfc->setRmax(0.0);
+            mpdfc->eval(memptystru);
+            rdf = mpdfc->getRDF();
+            TS_ASSERT(rdf.empty());
+
+        }
+
+
+        void test_getF()
+        {
+            QuantityType fq = mpdfc->getF();
+            TS_ASSERT_EQUALS(1024u, fq.size());
+            TS_ASSERT_EQUALS(0.0, *min(fq.begin(), fq.end()));
+            TS_ASSERT_EQUALS(0.0, *max(fq.begin(), fq.end()));
+        }
+
+
+        void test_getQgrid()
+        {
+            TS_ASSERT_EQUALS(1024u, mpdfc->getQgrid().size());
+        }
+
+
+        void test_getQmin()
+        {
+            TS_ASSERT_EQUALS(0.0, mpdfc->getQmin());
+        }
+
+
+        void test_getQmax()
+        {
+            TS_ASSERT_DELTA(100 * M_PI, mpdfc->getQmax(), meps);
+        }
+
+
+        void test_getQstep()
+        {
+            TS_ASSERT_DELTA(100 * M_PI / 1024, mpdfc->getQstep(), meps);
+        }
+
+
+        void test_getRgrid()
+        {
+            QuantityType rgrid0 = mpdfc->getRgrid();
+            TS_ASSERT_EQUALS(rgrid0, mpdfc->getRgrid());
+            mpdfc->setRmin(5);
+            mpdfc->setRmax(4);
+            TS_ASSERT(mpdfc->getRgrid().empty());
         }
 
 

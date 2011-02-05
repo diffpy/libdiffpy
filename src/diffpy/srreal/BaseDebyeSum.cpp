@@ -68,7 +68,7 @@ BaseDebyeSum::BaseDebyeSum()
 
 QuantityType BaseDebyeSum::getF() const
 {
-    QuantityType rv = mvalue;
+    QuantityType rv = this->value();
     const double& totocc = mstructure_cache.totaloccupancy;
     const int npts = pdfutils_qmaxSteps(this);
     for (int kq = pdfutils_qminSteps(this); kq < npts; ++kq)

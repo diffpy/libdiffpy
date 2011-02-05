@@ -223,7 +223,7 @@ void DiffPyStructureAdapter::fetchPythonData(python::object dpstru)
         matomtypes.push_back(atp);
     }
     assert(int(mcartesian_positions.size()) == this->countSites());
-    assert(int(mcartesian_positions.size()) == this->countSites());
+    assert(int(moccupancies.size()) == this->countSites());
     assert(int(manisotropies.size()) == this->countSites());
     assert(int(mcartesian_uijs.size()) == this->countSites());
     assert(int(matomtypes.size()) == this->countSites());

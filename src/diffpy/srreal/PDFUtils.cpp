@@ -46,6 +46,7 @@ const char* EMSGFFT = "Fourier Transformation failed.";
 
 QuantityType fftgtof(const QuantityType& g, double rstep, double rmin)
 {
+    if (g.empty())  return g;
     int padrmin = int(round(rmin / rstep));
     int Npad1 = padrmin + g.size();
     // pad to the next power of 2 for fast Fourier transformation

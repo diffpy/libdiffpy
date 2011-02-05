@@ -45,6 +45,7 @@ int pdfutils_qminSteps(const T* pdfc)
     using diffpy::mathutils::eps_eq;
     const double qmin = pdfc->getQmin();
     const double dq = pdfc->getQstep();
+    if (dq <= 0.0)  return 0;
     int rv = int(ceil(qmin / dq));
     if (eps_eq(qmin, (rv - 1) * dq))  rv -= 1;
     return rv;
@@ -54,7 +55,9 @@ int pdfutils_qminSteps(const T* pdfc)
 template <class T>
 int pdfutils_qmaxSteps(const T* pdfc)
 {
-    int rv = int(ceil(pdfc->getQmax() / pdfc->getQstep()));
+    const double dq = pdfc->getQstep();
+    if (dq <= 0.0)  return 0;
+    int rv = int(ceil(pdfc->getQmax() / dq));
     return rv;
 }
 
@@ -66,7 +69,7 @@ QuantityType pdfutils_getRgrid(const T* pdfc)
     int ndrmin = pdfutils_rminSteps(pdfc);
     int ndrmax = pdfutils_rmaxSteps(pdfc);
     const double dr = pdfc->getRstep();
-    rv.reserve(ndrmax - ndrmin);
+    if (ndrmax > ndrmin)    rv.reserve(ndrmax - ndrmin);
     for (int ndr = ndrmin; ndr < ndrmax; ++ndr)
     {
         rv.push_back(ndr * dr);
