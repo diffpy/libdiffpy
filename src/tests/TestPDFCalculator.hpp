@@ -117,21 +117,23 @@ class TestPDFCalculator : public CxxTest::TestSuite
         void test_getPDF()
         {
             QuantityType pdf;
-            TS_ASSERT_EQUALS(1000u, mpdfc->getPDF().size());
+            pdf = mpdfc->getPDF();
+            TS_ASSERT_EQUALS(1000u, pdf.size());
             mpdfc->setRmin(2.0);
             mpdfc->setRmax(0.0);
             mpdfc->eval(memptystru);
             pdf = mpdfc->getPDF();
-            TS_ASSERT(mpdfc->getPDF().empty());
+            TS_ASSERT(pdf.empty());
             mpdfc->setRmax(2.0);
             mpdfc->eval(memptystru);
             pdf = mpdfc->getPDF();
-            TS_ASSERT(mpdfc->getPDF().empty());
-            // FIXME
-            // mpdfc->setRmax(2.01001);
-            // mpdfc->eval(memptystru);
-            // pdf = mpdfc->getPDF();
-            // TS_ASSERT_EQUALS(1u, pdf.size());
+            TS_ASSERT(pdf.empty());
+            mpdfc->setRmax(2.01001);
+            mpdfc->eval(memptystru);
+            pdf = mpdfc->getPDF();
+            TS_ASSERT_EQUALS(2u, pdf.size());
+            TS_ASSERT_EQUALS(0.0, pdf[0]);
+            TS_ASSERT_EQUALS(0.0, pdf[1]);
         }
 
 
@@ -151,6 +153,12 @@ class TestPDFCalculator : public CxxTest::TestSuite
             mpdfc->eval(memptystru);
             rdf = mpdfc->getRDF();
             TS_ASSERT(rdf.empty());
+            mpdfc->setRmax(2.01001);
+            mpdfc->eval(memptystru);
+            rdf = mpdfc->getRDF();
+            TS_ASSERT_EQUALS(2u, rdf.size());
+            TS_ASSERT_EQUALS(0.0, rdf[0]);
+            TS_ASSERT_EQUALS(0.0, rdf[1]);
 
         }
 
@@ -195,6 +203,26 @@ class TestPDFCalculator : public CxxTest::TestSuite
             mpdfc->setRmin(5);
             mpdfc->setRmax(4);
             TS_ASSERT(mpdfc->getRgrid().empty());
+        }
+
+
+        void test_getExtendedRmin()
+        {
+            // empty structure should not extend the grid at all.
+            TS_ASSERT_EQUALS(0.0, mpdfc->getExtendedRmin());
+            mpdfc->setRmin(5);
+            mpdfc->eval(memptystru);
+            TS_ASSERT_EQUALS(5.0, mpdfc->getExtendedRmin());
+        }
+
+
+        void test_getExtendedRmax()
+        {
+            // empty structure should not extend the grid at all.
+            TS_ASSERT_EQUALS(10.0, mpdfc->getExtendedRmax());
+            mpdfc->setRmax(7);
+            mpdfc->eval(memptystru);
+            TS_ASSERT_EQUALS(7.0, mpdfc->getExtendedRmax());
         }
 
 

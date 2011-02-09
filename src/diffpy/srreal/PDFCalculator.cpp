@@ -142,8 +142,10 @@ QuantityType PDFCalculator::getExtendedRDF() const
         1.0 / (totocc * sfavg * sfavg);
     QuantityType::iterator iirdf = rdf.begin();
     QuantityType::const_iterator iival, iival_last;
-    iival = this->value().begin() + this->extendedRminSteps();
-    iival_last = this->value().begin() + this->extendedRmaxSteps();
+    iival = this->value().begin() +
+        this->extendedRminSteps() - this->rcalcloSteps();
+    iival_last = this->value().begin() +
+        this->extendedRmaxSteps() - this->rcalcloSteps();
     assert(iival >= this->value().begin());
     assert(iival_last <= this->value().end());
     assert(rdf.size() == size_t(iival_last - iival));
@@ -434,8 +436,9 @@ void PDFCalculator::resetValue()
     // when applicable, configure linear baseline
     if (this->getBaseline()->type() == "linear")
     {
-        double partialpdfscale = mstructure_cache.activeoccupancy /
-            mstructure_cache.totaloccupancy;
+        double partialpdfscale =
+            (0.0 == mstructure_cache.totaloccupancy) ? 0.0 :
+            mstructure_cache.activeoccupancy / mstructure_cache.totaloccupancy;
         double pnumdensity = partialpdfscale * mstructure->numberDensity();
         PDFBaseline& bl = *(this->getBaseline());
         bl.setDoubleAttr("slope", -4 * M_PI * pnumdensity);
@@ -498,9 +501,12 @@ double PDFCalculator::extFromTerminationRipples() const
 {
     // number of termination ripples for extending the r-range
     const int nripples = 6;
-    // extension due to termination ripples
-    double rv = (this->getQmax() > 0.0) ?
-        (nripples*2*M_PI / this->getQmax()) : 0.0;
+    // extension due to termination ripples.
+    // apply only when qmax is below the Nyquist frequency for rstep.
+    const double& qmax = this->getQmax();
+    const double& dr = this->getRstep();
+    double rv = (eps_gt(qmax, 0.0) && eps_lt(qmax, M_PI / dr)) ?
+        (nripples * 2 * M_PI / qmax) : 0.0;
     return rv;
 }
 
