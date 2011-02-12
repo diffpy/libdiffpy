@@ -229,7 +229,9 @@ void DiffPyStructureAdapter::fetchPythonData(python::object dpstru)
     assert(int(matomtypes.size()) == this->countSites());
     // fetch the pdffit dictionary if present in dpstru
     mpdffit.clear();
-    if (PyObject_HasAttrString(dpstru.ptr(), "pdffit"))
+    bool haspdffitdata = PyObject_HasAttrString(dpstru.ptr(), "pdffit") &&
+        dpstru.attr("pdffit");
+    if (haspdffitdata)
     {
         // get method of the stru.pdffit dictionary
         python::object stru_pdffit = dpstru.attr("pdffit");
