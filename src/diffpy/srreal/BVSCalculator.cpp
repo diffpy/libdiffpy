@@ -25,6 +25,7 @@
 #include <diffpy/serialization.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
+#include <diffpy/srreal/VR3Structure.hpp>
 
 using namespace std;
 using namespace diffpy::validators;
@@ -41,6 +42,7 @@ BVSCalculator::BVSCalculator()
     BVParametersTablePtr bvtb(new BVParametersTable);
     this->setBVParamTable(bvtb);
     this->setValencePrecision(valence_precision);
+    this->setStructure(VR3Structure());
     // attributes
     this->registerDoubleAttribute("valenceprecision", this,
             &BVSCalculator::getValencePrecision,
