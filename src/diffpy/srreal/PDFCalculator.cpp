@@ -32,11 +32,12 @@
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
 
+namespace diffpy {
+namespace srreal {
+
 using namespace std;
-using namespace diffpy::srreal;
 using namespace diffpy::validators;
 using namespace diffpy::mathutils;
-
 
 // Constructor ---------------------------------------------------------------
 
@@ -661,11 +662,14 @@ void PDFCalculator::cacheRlimitsData()
     const double& rmin = this->getRmin();
     const double& rmax = this->getRmax();
     const double& dr = this->getRstep();
-    mrlimits_cache.extendedrminsteps = max(int((rmin - ext_ripples) / dr), 0);
-    mrlimits_cache.extendedrmaxsteps = int(ceil((rmax + ext_ripples) / dr));
-    mrlimits_cache.rcalclosteps = max(int((rmin - ext_total) / dr), 0);
-    mrlimits_cache.rcalchisteps = int(ceil((rmax + ext_total) / dr));
+    mrlimits_cache.extendedrminsteps = max(0, pdfutils_rminSteps(rmin - ext_ripples, dr));
+    mrlimits_cache.extendedrmaxsteps = pdfutils_rmaxSteps(rmax + ext_ripples, dr);
+    mrlimits_cache.rcalclosteps = max(0, pdfutils_rminSteps(rmin - ext_total, dr));
+    mrlimits_cache.rcalchisteps = pdfutils_rmaxSteps(rmax + ext_total, dr);
 }
+
+}   // namespace diffpy
+}   // namespace srreal
 
 // Serialization -------------------------------------------------------------
 

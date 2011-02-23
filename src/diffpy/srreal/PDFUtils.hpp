@@ -55,7 +55,9 @@ template <class T> QuantityType pdfutils_getQgrid(const T* pdfc);
 template <class T> int pdfutils_qminSteps(const T* pdfc);
 template <class T> int pdfutils_qmaxSteps(const T* pdfc);
 template <class T> QuantityType pdfutils_getRgrid(const T* pdfc);
+int pdfutils_rminSteps(const double& rmin, const double& rstep);
 template <class T> int pdfutils_rminSteps(const T* pdfc);
+int pdfutils_rmaxSteps(const double& rmax, const double& rstep);
 template <class T> int pdfutils_rmaxSteps(const T* pdfc);
 
 }   // namespace srreal

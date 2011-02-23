@@ -78,14 +78,30 @@ QuantityType pdfutils_getRgrid(const T* pdfc)
 }
 
 
+inline
+int pdfutils_rminSteps(const double& rmin, const double& rstep)
+{
+    using diffpy::mathutils::eps_eq;
+    int rv = int(ceil(rmin / rstep));
+    if (eps_eq(rmin, (rv - 1) * rstep))  rv -= 1;
+    return rv;
+}
+
+
 template <class T>
 int pdfutils_rminSteps(const T* pdfc)
 {
-    using diffpy::mathutils::eps_eq;
-    const double rmin = pdfc->getRmin();
-    const double dr = pdfc->getRstep();
-    int rv = int(ceil(rmin / dr));
-    if (eps_eq(rmin, (rv - 1) * dr))  rv -= 1;
+    const double& rmin = pdfc->getRmin();
+    const double& rstep = pdfc->getRstep();
+    int rv = pdfutils_rminSteps(rmin, rstep);
+    return rv;
+}
+
+
+inline
+int pdfutils_rmaxSteps(const double& rmax, const double& rstep)
+{
+    int rv = int(ceil(rmax / rstep));
     return rv;
 }
 
@@ -93,7 +109,9 @@ int pdfutils_rminSteps(const T* pdfc)
 template <class T>
 int pdfutils_rmaxSteps(const T* pdfc)
 {
-    int rv = int(ceil(pdfc->getRmax() / pdfc->getRstep()));
+    const double& rmax = pdfc->getRmax();
+    const double& rstep = pdfc->getRstep();
+    int rv = pdfutils_rmaxSteps(rmax, rstep);
     return rv;
 }
 

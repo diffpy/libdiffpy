@@ -318,8 +318,8 @@ void DebyePDFCalculator::cacheRlimitsData()
     const double& rmin = this->getRmin();
     const double& rmax = this->getRmax();
     const double& dr = this->getRstep();
-    mrcalclosteps = max(int((rmin - ext_total) / dr), 0);
-    mrcalchisteps = int(ceil((rmax + ext_total) / dr));
+    mrcalclosteps = max(0, pdfutils_rminSteps(rmin - ext_total, dr));
+    mrcalchisteps = pdfutils_rmaxSteps(rmax + ext_total, dr);
 }
 
 }   // namespace srreal
