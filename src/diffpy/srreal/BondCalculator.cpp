@@ -203,6 +203,7 @@ bool BondCalculator::checkConeFilters(const R3::Vector& ru01) const
     vector<double>::const_iterator deg = mfilter_degrees.begin();
     for (;  coneax != mfilter_directions.end(); ++coneax, ++deg)
     {
+        if (180.0 <= *deg)    return true;
         double angledegrees = 180.0 / M_PI * acos(R3::dot(ru01, *coneax));
         if (angledegrees <= *deg)    return true;
     }
