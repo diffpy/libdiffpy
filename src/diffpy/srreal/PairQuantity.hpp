@@ -42,6 +42,10 @@ class PairQuantity : public diffpy::Attributes
 {
     public:
 
+        // class constants
+        static const int ALLATOMSINT;
+        static const std::string ALLATOMSSTR;
+
         // constructor
         PairQuantity();
         virtual ~PairQuantity()  { }
@@ -64,7 +68,7 @@ class PairQuantity : public diffpy::Attributes
         void invertMask();
         void setPairMask(int i, int j, bool mask);
         bool getPairMask(int i, int j) const;
-        void setTypeMask(const std::string&, const std::string&, bool mask);
+        void setTypeMask(std::string, std::string, bool mask);
         bool getTypeMask(const std::string&, const std::string&) const;
 
     protected:
