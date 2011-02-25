@@ -627,7 +627,8 @@ void PDFCalculator::cacheStructureData()
     {
         const int& i = ij->first;
         const int& j = ij->second;
-        if (i >= cntsites || j >= cntsites)  continue;
+        bool outofbounds = (i < 0 || i >= cntsites || j < 0 || j >= cntsites);
+        if (outofbounds)  continue;
         int sumscale = (i == j) ? 1 : 2;
         double occij = sumscale *
             mstructure->siteOccupancy(i) * mstructure->siteMultiplicity(i) *
