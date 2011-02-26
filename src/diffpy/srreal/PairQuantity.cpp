@@ -50,6 +50,12 @@ PairQuantity::PairQuantity()
 
 // Public Methods ------------------------------------------------------------
 
+const QuantityType& PairQuantity::eval()
+{
+    return this->eval(mstructure);
+}
+
+
 void PairQuantity::setStructure(StructureAdapterPtr stru)
 {
     mstructure = stru;

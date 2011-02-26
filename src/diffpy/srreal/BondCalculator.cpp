@@ -142,6 +142,7 @@ void BondCalculator::filterOff()
 void BondCalculator::resetValue()
 {
     mvalue.clear();
+    this->PairQuantity::resetValue();
 }
 
 

@@ -51,6 +51,7 @@ class PairQuantity : public diffpy::Attributes
         virtual ~PairQuantity()  { }
 
         // methods
+        const QuantityType& eval();
         template <class T> const QuantityType& eval(const T&);
         const QuantityType& value() const;
         virtual void mergeParallelValue(const QuantityType&);
