@@ -68,12 +68,12 @@ StructureAdapterPtr createStructureAdapter(const boost::python::object stru)
         if (rv.get())  return rv;
     }
     // We get here only if nothing worked.
-    python::object pytype = python::import("__builtin__").attr("type");
-    python::object tp = python::str(pytype(stru));
-    ostringstream emsg;
-    emsg << "Cannot create structure adapter for Python " <<
-        string(python::extract<string>(tp)) << ".";
-    throw invalid_argument(emsg.str());
+    python::object emsg = "Cannot create structure adapter for %r." %
+        python::make_tuple(stru);
+    PyErr_SetObject(PyExc_TypeError, emsg.ptr());
+    python::throw_error_already_set();
+    // This should be never reached
+    return rv;
 }
 
 // Factory functions registration --------------------------------------------
