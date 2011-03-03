@@ -57,8 +57,9 @@ class PairQuantity : public diffpy::Attributes
         void mergeParallelValue(const QuantityType& pvalue, int ncpu);
 
         // configuration
-        void setStructure(StructureAdapterPtr);
         template <class T> void setStructure(const T&);
+        void setStructure(StructureAdapterPtr);
+        const StructureAdapterPtr& getStructure() const;
         virtual void setRmin(double);
         const double& getRmin() const;
         virtual void setRmax(double);

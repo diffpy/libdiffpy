@@ -65,6 +65,12 @@ void PairQuantity::setStructure(StructureAdapterPtr stru)
 }
 
 
+const StructureAdapterPtr& PairQuantity::getStructure() const
+{
+    return mstructure;
+}
+
+
 const QuantityType& PairQuantity::value() const
 {
     return mvalue;
