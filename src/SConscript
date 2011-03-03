@@ -7,6 +7,10 @@ Import('env')
 # The directory of this SConscript should be searched first for any headers.
 env.PrependUnique(CPPPATH=Dir('.'))
 
+# Insert LIBRARY_PATH explicitly because some compilers
+# ignore it in the system environemnt.
+env.PrependUnique(LIBPATH=env['ENV'].get('LIBRARY_PATH', '').split(':'))
+
 # Use Intel C++ compiler when it is available
 icpc = env.WhereIs('icpc')
 if icpc:
