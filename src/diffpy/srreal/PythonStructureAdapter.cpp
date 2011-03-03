@@ -56,7 +56,7 @@ StructureAdapterPtr createStructureAdapter(const boost::python::object stru)
     if (getadapter.check())
     {
         rv = getadapter();
-        return rv;
+        if (rv.get())  return rv;
     }
     // Loop over all registered factories.  They should return
     // a new StructureAdapter instance or NULL on failure.
