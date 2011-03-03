@@ -35,7 +35,6 @@ class BondCalculator : public PairQuantity
 
         // methods
         template <class T> QuantityType operator()(const T&);
-        virtual void mergeParallelValue(const QuantityType&);
         QuantityType distances() const;
         std::vector<R3::Vector> directions() const;
         std::vector<int> sites0() const;
@@ -48,6 +47,7 @@ class BondCalculator : public PairQuantity
         // PairQuantity overloads
         virtual void resetValue();
         virtual void addPairContribution(const BaseBondGenerator&, int);
+        virtual void executeParallelMerge(const QuantityType&);
         virtual void finishValue();
 
     private:

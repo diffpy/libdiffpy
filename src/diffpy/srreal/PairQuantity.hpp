@@ -54,7 +54,7 @@ class PairQuantity : public diffpy::Attributes
         const QuantityType& eval();
         template <class T> const QuantityType& eval(const T&);
         const QuantityType& value() const;
-        virtual void mergeParallelValue(const QuantityType&);
+        void mergeParallelValue(const QuantityType& pvalue, int ncpu);
 
         // configuration
         void setStructure(StructureAdapterPtr);
@@ -82,6 +82,7 @@ class PairQuantity : public diffpy::Attributes
         virtual void resetValue();
         virtual void configureBondGenerator(BaseBondGenerator&) const;
         virtual void addPairContribution(const BaseBondGenerator&, int) { }
+        virtual void executeParallelMerge(const QuantityType& pvalue);
         virtual void finishValue() { }
         int countSites() const;
 
@@ -96,6 +97,7 @@ class PairQuantity : public diffpy::Attributes
         bool mdefaultpairmask;
         boost::unordered_set< std::pair<int,int> > minvertpairmask;
         TypeMaskStorage mtypemask;
+        int mmergedvaluescount;
 
     private:
 
@@ -116,6 +118,7 @@ class PairQuantity : public diffpy::Attributes
             ar & mdefaultpairmask;
             ar & minvertpairmask;
             ar & mtypemask;
+            ar & mmergedvaluescount;
         }
 
 };

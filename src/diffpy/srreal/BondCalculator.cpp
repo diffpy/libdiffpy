@@ -57,13 +57,6 @@ BondCalculator::BondCalculator()
 
 // Public Methods ------------------------------------------------------------
 
-void BondCalculator::mergeParallelValue(const QuantityType& pvalue)
-{
-    mvalue.insert(mvalue.end(), pvalue.begin(), pvalue.end());
-    this->finishValue();
-}
-
-
 QuantityType BondCalculator::distances() const
 {
     QuantityType rv;
@@ -164,6 +157,12 @@ void BondCalculator::addPairContribution(
     mvalue[baseidx + DIRECTION2_OFFSET] = r01[2];
     mvalue[baseidx + SITE0_OFFSET] = bnds.site0();
     mvalue[baseidx + SITE1_OFFSET] = bnds.site1();
+}
+
+
+void BondCalculator::executeParallelMerge(const QuantityType& pvalue)
+{
+    mvalue.insert(mvalue.end(), pvalue.begin(), pvalue.end());
 }
 
 

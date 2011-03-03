@@ -92,8 +92,8 @@ public:
 
     void test_parallel()
     {
-        PairCounter pmaster;
         int ncpu = 7;
+        PairCounter pmaster;
         PairCounter pslave[ncpu];
         bool allequal = true;
         for (int cpuindex = 0; cpuindex < ncpu; ++cpuindex)
@@ -109,7 +109,7 @@ public:
         TS_ASSERT_EQUALS(0.0, pmaster.value()[0]);
         for (PairCounter* p = pslave; p != pslave + ncpu; ++p)
         {
-            pmaster.mergeParallelValue(p->value());
+            pmaster.mergeParallelValue(p->value(), ncpu);
         }
         TS_ASSERT_EQUALS(100 * 99 / 2, pmaster.value()[0]);
     }

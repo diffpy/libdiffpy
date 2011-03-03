@@ -71,14 +71,16 @@ const QuantityType& PairQuantity::value() const
 }
 
 
-void PairQuantity::mergeParallelValue(const QuantityType& pvalue)
+void PairQuantity::mergeParallelValue(const QuantityType& pvalue, int ncpu)
 {
-    if (pvalue.size() != mvalue.size())
+    if (mmergedvaluescount >= ncpu)
     {
-        throw invalid_argument("Merged value array must have the same size.");
+        const char* emsg = "Number of merged values exceeds NCPU.";
+        throw runtime_error(emsg);
     }
-    transform(mvalue.begin(), mvalue.end(), pvalue.begin(),
-            mvalue.begin(), plus<double>());
+    this->executeParallelMerge(pvalue);
+    ++mmergedvaluescount;
+    if (mmergedvaluescount == ncpu)  this->finishValue();
 }
 
 
@@ -224,6 +226,7 @@ void PairQuantity::resizeValue(size_t sz)
 
 void PairQuantity::resetValue()
 {
+    mmergedvaluescount = 0;
     fill(mvalue.begin(), mvalue.end(), 0.0);
 }
 
@@ -232,6 +235,17 @@ void PairQuantity::configureBondGenerator(BaseBondGenerator& bnds) const
 {
     bnds.setRmin(this->getRmin());
     bnds.setRmax(this->getRmax());
+}
+
+
+void PairQuantity::executeParallelMerge(const QuantityType& pvalue)
+{
+    if (pvalue.size() != mvalue.size())
+    {
+        throw invalid_argument("Merged value array must have the same size.");
+    }
+    transform(mvalue.begin(), mvalue.end(), pvalue.begin(),
+            mvalue.begin(), plus<double>());
 }
 
 
