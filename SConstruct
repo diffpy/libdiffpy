@@ -6,6 +6,7 @@
 # install-lib       -- install shared library object
 
 import os
+import platform
 
 # Version string must be in the form "MAJOR.MINOR",
 # src/diffpy/SConscript.version adds "-rSVNREV".
@@ -53,7 +54,7 @@ vars.Add(BoolVariable('enable_objcryst',
 vars.Update(env)
 env.Help(vars.GenerateHelpText(env))
 
-builddir = env.Dir('build/' + env['build'])
+builddir = env.Dir('build/%s-%s' % (env['build'], platform.machine()))
 
 Export('env')
 Export('DIFFPY_VERSION_STR')
