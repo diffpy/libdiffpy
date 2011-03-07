@@ -88,7 +88,7 @@ void Attributes::checkAttributeName(const string& name) const
     {
         ostringstream emsg;
         emsg << "Invalid attribute name '" << name << "'.";
-        throw invalid_argument(emsg.str());
+        throw DoubleAttributeError(emsg.str());
     }
     else if (v.count() > 1)
     {
@@ -158,6 +158,14 @@ SetDoubleAttrVisitor(const string& name, double value) :
 
 
 void Attributes::SetDoubleAttrVisitor::
+visit(const Attributes& a)
+{
+    const char* emsg = "Cannot set attribute of a const instance.";
+    throw logic_error(emsg);
+}
+
+
+void Attributes::SetDoubleAttrVisitor::
 visit(Attributes& a)
 {
     DoubleAttributeStorage::iterator ai;
@@ -208,8 +216,7 @@ void throwDoubleAttributeReadOnly()
 {
     const char* emsg =
         "Cannot change value of read-only DoubleAttribute.";
-    // FIXME: replace with custom attribute exception
-    throw invalid_argument(emsg);
+    throw DoubleAttributeError(emsg);
 }
 
 

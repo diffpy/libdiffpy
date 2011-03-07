@@ -33,6 +33,18 @@ namespace attributes {
 
 class Attributes;
 
+/// @class DoubleAttributeError
+/// @brief custom exception for Attributes-related errors.  This is
+/// thrown for invalid names or for attempts to set a read-only attribute.
+
+class DoubleAttributeError : public std::runtime_error
+{
+    public:
+	DoubleAttributeError(const std::string msg="") :
+            std::runtime_error(msg)
+	{ }
+};
+
 /// @class BaseDoubleAttribute
 /// @brief abstract base class for accessing a particular double attribute
 
@@ -53,13 +65,7 @@ class BaseAttributesVisitor
 
         virtual ~BaseAttributesVisitor() { }
 
-        virtual void visit(const Attributes& a)
-        {
-            const char* emsg =
-                "Visitor must be implemented in a derived class.";
-            throw std::logic_error(emsg);
-        }
-
+        virtual void visit(const Attributes& a) = 0;
         virtual void visit(Attributes& a)
         {
             visit(static_cast<const Attributes&>(a));
@@ -152,6 +158,7 @@ class Attributes
             public:
 
                 SetDoubleAttrVisitor(const std::string& name, double value);
+                virtual void visit(const Attributes& a);
                 virtual void visit(Attributes& a);
 
             private:
