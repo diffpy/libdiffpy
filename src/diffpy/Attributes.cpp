@@ -209,7 +209,7 @@ void throwDoubleAttributeReadOnly()
     const char* emsg =
         "Cannot change value of read-only DoubleAttribute.";
     // FIXME: replace with custom attribute exception
-    throw logic_error(emsg);
+    throw invalid_argument(emsg);
 }
 
 
