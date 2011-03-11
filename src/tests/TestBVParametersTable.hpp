@@ -106,10 +106,15 @@ class TestBVParametersTable : public CxxTest::TestSuite
             mbvtb->resetCustom(mymgo);
             TS_ASSERT_DIFFERS(2.34, mbvtb->lookup("Mg", 2, "O", -2).mRo);
             TS_ASSERT_DIFFERS(0.345, mbvtb->lookup(mymgo).mB);
-            const BVParam& zrh = mbvtb->lookup("Zr", 4, "H", -1);
+            BVParam zrh = mbvtb->lookup("Zr", 4, "H", -1);
             TS_ASSERT_EQUALS(1.79, zrh.mRo);
             TS_ASSERT_EQUALS(0.37, zrh.mB);
             TS_ASSERT_EQUALS(string("b"), zrh.mref_id);
+            mbvtb->setCustom("H", -1, "Zr", 4, 1.791, 0.371, "check");
+            zrh = mbvtb->lookup("Zr", 4, "H", -1);
+            TS_ASSERT_EQUALS(1.79, zrh.mRo);
+            TS_ASSERT_EQUALS(0.371, zrh.mB);
+            TS_ASSERT_EQUALS(string("check"), zrh.mref_id);
         }
 
 

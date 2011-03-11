@@ -53,6 +53,9 @@ class BVParametersTable
         const BVParam& lookup(const std::string& atom0, int valence0,
                 const std::string& atom1, int valence1) const;
         void setCustom(const BVParam&);
+        void setCustom(const std::string& atom0, int valence0,
+                const std::string& atom1, int valence1,
+                double Ro, double b, std::string ref_id="");
         void resetCustom(const BVParam&);
         void resetCustom(const std::string& atom0, int valence0,
                 const std::string& atom1, int valence1);

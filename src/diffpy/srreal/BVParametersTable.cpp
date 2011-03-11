@@ -88,6 +88,15 @@ void BVParametersTable::setCustom(const BVParam& bp)
 }
 
 
+void BVParametersTable::setCustom(const string& atom0, int valence0,
+        const string& atom1, int valence1,
+        double Ro, double b, std::string ref_id)
+{
+    BVParam bp(atom0, valence0, atom1, valence1, Ro, b, ref_id);
+    this->setCustom(bp);
+}
+
+
 void BVParametersTable::resetCustom(const BVParam& bp)
 {
     mcustomtable.erase(bp);
