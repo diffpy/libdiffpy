@@ -25,8 +25,7 @@
 #include <boost/smart_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/set.hpp>
-
+#include <diffpy/boostextensions/serialize_unordered_set.hpp>
 #include <diffpy/srreal/BVParam.hpp>
 
 namespace diffpy {
@@ -40,7 +39,7 @@ class BVParametersTable
     public:
 
         // types
-        typedef std::set<BVParam,BVParam::CompareIons> SetOfBVParam;
+        typedef boost::unordered_set<BVParam> SetOfBVParam;
 
         // static methods
         static const BVParam& none();

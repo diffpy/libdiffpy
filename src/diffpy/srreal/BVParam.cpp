@@ -21,7 +21,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <sstream>
-
+#include <boost/functional/hash.hpp>
 #include <diffpy/srreal/BVParam.hpp>
 
 using namespace std;
@@ -59,6 +59,14 @@ BVParam::BVParam(const string& atom0, int valence0,
 
 // Public Methods ------------------------------------------------------------
 
+bool BVParam::operator==(const BVParam& other) const
+{
+    return
+        mvalence0 == other.mvalence0 && mvalence1 == other.mvalence1 &&
+        matom0 == other.matom0 && matom1 == other.matom1;
+}
+
+
 double BVParam::bondvalence(double distance) const
 {
     double rv = (mB > 0.0) ? exp((mRo - distance) / mB) : 0.0;
@@ -89,21 +97,17 @@ void BVParam::setFromCifLine(const std::string& cifline)
     *this = bp1;
 }
 
+// Functions -----------------------------------------------------------------
 
-// class BVParam::CompareIons
-bool BVParam::CompareIons::operator()(
-        const BVParam& bp0, const BVParam& bp1) const
+size_t hash_value(const BVParam& bp)
 {
-    if (bp0.matom0 < bp1.matom0)  return true;
-    if (bp0.matom0 > bp1.matom0)  return false;
-    if (bp0.mvalence0 < bp1.mvalence0)  return true;
-    if (bp0.mvalence0 > bp1.mvalence0)  return false;
-    if (bp0.matom1 < bp1.matom1)  return true;
-    if (bp0.matom1 > bp1.matom1)  return false;
-    if (bp0.mvalence1 < bp1.mvalence1)  return true;
-    if (bp0.mvalence1 > bp1.mvalence1)  return false;
-    return false;
-}
+    size_t seed = 0;
+    boost::hash_combine(seed, bp.matom0);
+    boost::hash_combine(seed, bp.mvalence0);
+    boost::hash_combine(seed, bp.matom1);
+    boost::hash_combine(seed, bp.mvalence1);
+    return seed;
+};
 
 }   // namespace srreal
 }   // namespace diffpy

@@ -38,6 +38,8 @@ class BVParam
                 double Ro=0.0, double B=0.0, std::string ref_id="");
 
         // methods
+        /// comparison binary_function
+        bool operator==(const BVParam& other) const;
         /// Return bond valence at a specified distance
         double bondvalence(double distance) const;
         /// Return distance corresponding  to a specified bond valence
@@ -53,13 +55,6 @@ class BVParam
         double mRo;
         double mB;
         std::string mref_id;
-
-        // comparison binary_function
-        class CompareIons : public std::binary_function<BVParam,BVParam,bool>
-        {
-            public:
-                bool operator()(const BVParam&, const BVParam&) const;
-        };
 
     private:
 
@@ -80,6 +75,9 @@ class BVParam
 
 };  // class BVParam
 
+// Functions -----------------------------------------------------------------
+
+size_t hash_value(const BVParam& bp);
 
 }   // namespace srreal
 }   // namespace diffpy
