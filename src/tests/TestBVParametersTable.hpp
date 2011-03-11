@@ -112,7 +112,7 @@ class TestBVParametersTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(string("b"), zrh.mref_id);
             mbvtb->setCustom("H", -1, "Zr", 4, 1.791, 0.371, "check");
             zrh = mbvtb->lookup("Zr", 4, "H", -1);
-            TS_ASSERT_EQUALS(1.79, zrh.mRo);
+            TS_ASSERT_EQUALS(1.791, zrh.mRo);
             TS_ASSERT_EQUALS(0.371, zrh.mB);
             TS_ASSERT_EQUALS(string("check"), zrh.mref_id);
         }
