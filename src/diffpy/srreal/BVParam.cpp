@@ -61,9 +61,14 @@ BVParam::BVParam(const string& atom0, int valence0,
 
 bool BVParam::operator==(const BVParam& other) const
 {
-    return
-        mvalence0 == other.mvalence0 && mvalence1 == other.mvalence1 &&
-        matom0 == other.matom0 && matom1 == other.matom1;
+    return (this == &other) || (
+        mvalence0 == other.mvalence0 &&
+        mvalence1 == other.mvalence1 &&
+        mRo == other.mRo &&
+        mB == other.mB &&
+        matom0 == other.matom0 &&
+        matom1 == other.matom1 &&
+        mref_id == other.mref_id);
 }
 
 
@@ -95,6 +100,18 @@ void BVParam::setFromCifLine(const std::string& cifline)
     }
     BVParam bp1(a0, v0, a1, v1, Ro, B, ref);
     *this = bp1;
+}
+
+// class BVParam::HashEqual --------------------------------------------------
+
+bool BVParam::HashEqual::operator()(
+        const BVParam& bp0, const BVParam& bp1) const
+{
+    return (&bp0 == &bp1) || (
+        bp0.mvalence0 == bp1.mvalence0 &&
+        bp0.mvalence1 == bp1.mvalence1 &&
+        bp0.matom0 == bp1.matom0 &&
+        bp0.matom1 == bp1.matom1);
 }
 
 // Functions -----------------------------------------------------------------

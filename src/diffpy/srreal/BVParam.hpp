@@ -56,6 +56,13 @@ class BVParam
         double mB;
         std::string mref_id;
 
+        // comparison binary_function for unordered_set hasher
+        class HashEqual : public std::binary_function<BVParam,BVParam,bool>
+        {
+            public:
+                bool operator()(const BVParam& bp0, const BVParam& bp1) const;
+        };
+
     private:
 
         // serialization
@@ -71,7 +78,6 @@ class BVParam
             ar & mB;
             ar & mref_id;
         }
-
 
 };  // class BVParam
 
