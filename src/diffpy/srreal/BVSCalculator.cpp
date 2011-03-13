@@ -81,17 +81,16 @@ QuantityType BVSCalculator::bvdiff() const
 double BVSCalculator::bvmsdiff() const
 {
     QuantityType bd = this->bvdiff();
-    assert(bd.size() == mstructure_cache.multiplicities.size());
-    assert(bd.size() == mstructure_cache.occupancies.size());
     int cntsites = this->countSites();
+    assert(int(bd.size()) == cntsites);
     double sumofsquares = 0.0;
     for (int i = 0; i < cntsites; ++i)
     {
-        sumofsquares += mstructure_cache.multiplicities[i] *
-            mstructure_cache.occupancies[i] * bd[i] * bd[i];
+        sumofsquares += mstructure->siteMultiplicity(i) *
+            mstructure->siteOccupancy(i) * bd[i] * bd[i];
     }
-    double rv = (mstructure_cache.total_occupancy > 0.0) ?
-        (sumofsquares / mstructure_cache.total_occupancy) : 0.0;
+    double totocc = mstructure->totalOccupancy();
+    double rv = (totocc > 0.0) ? (sumofsquares / totocc) : 0.0;
     return rv;
 }
 
@@ -174,8 +173,8 @@ void BVSCalculator::addPairContribution(const BaseBondGenerator& bnds,
     double valencehalf = bp.bondvalence(bnds.distance()) / 2.0;
     int pm0 = (v0 >= 0) ? 1 : -1;
     int pm1 = (v1 >= 0) ? 1 : -1;
-    const double& o0 = mstructure_cache.occupancies[bnds.site0()];
-    const double& o1 = mstructure_cache.occupancies[bnds.site1()];
+    const double& o0 = mstructure->siteOccupancy(bnds.site0());
+    const double& o1 = mstructure->siteOccupancy(bnds.site1());
     mvalue[bnds.site0()] += summationscale * pm0 * valencehalf * o1;
     mvalue[bnds.site1()] += summationscale * pm1 * valencehalf * o0;
 }
@@ -187,33 +186,35 @@ void BVSCalculator::cacheStructureData()
     int cntsites = this->countSites();
     mstructure_cache.baresymbols.resize(cntsites);
     mstructure_cache.valences.resize(cntsites);
-    mstructure_cache.multiplicities.resize(cntsites);
-    mstructure_cache.occupancies.resize(cntsites);
     for (int i = 0; i < cntsites; ++i)
     {
         const string& smbl = mstructure->siteAtomType(i);
         mstructure_cache.baresymbols[i] = atomBareSymbol(smbl);
         mstructure_cache.valences[i] = atomValence(smbl);
-        mstructure_cache.multiplicities[i] = mstructure->siteMultiplicity(i);
-        mstructure_cache.occupancies[i] = mstructure->siteOccupancy(i);
     }
-    mstructure_cache.total_occupancy = mstructure->totalOccupancy();
 }
 
 
 double BVSCalculator::rmaxFromPrecision(double eps) const
 {
     const BVParametersTable& bvtb = *(this->getBVParamTable());
-    BVParametersTable::SetOfBVParam bpused;
-    for (int i0 = 0; i0 < this->countSites(); ++i0)
+    // build a set of unique (symbol, valence) pairs
+    typedef boost::unordered_set< pair<string, int> > SymbolValenceSet;
+    SymbolValenceSet allsymvals;
+    for (int i = 0; i < this->countSites(); ++i)
     {
-        for (int i1 = i0; i1 < this->countSites(); ++i1)
+        allsymvals.insert(make_pair(mstructure_cache.baresymbols[i],
+                    mstructure_cache.valences[i]));
+    }
+    // find all used bond parameters
+    BVParametersTable::SetOfBVParam bpused;
+    SymbolValenceSet::const_iterator sv0, sv1;
+    for (sv0 = allsymvals.begin(); sv0 != allsymvals.end(); ++sv0)
+    {
+        for (sv1 = sv0; sv1 != allsymvals.end(); ++sv1)
         {
-            const string& a0 = mstructure_cache.baresymbols[i0];
-            const string& a1 = mstructure_cache.baresymbols[i1];
-            int v0 = mstructure_cache.valences[i0];
-            int v1 = mstructure_cache.valences[i1];
-            const BVParam& bp = bvtb.lookup(a0, v0, a1, v1);
+            const BVParam& bp = bvtb.lookup(
+                    sv0->first, sv0->second, sv1->first, sv1->second);
             bpused.insert(bp);
         }
     }
