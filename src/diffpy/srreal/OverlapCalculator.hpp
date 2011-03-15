@@ -12,7 +12,7 @@
 *
 ******************************************************************************
 *
-* class OverlapCalculator -- calculator of atom radii overlaps.
+* class OverlapCalculator -- calculator of atom radii overlaps
 *
 * $Id$
 *
@@ -30,7 +30,7 @@ namespace srreal {
 class AtomRadiiTable
 {
     public:
-        double lookup(const std::string& smbl)  { return 1.0; }
+        double lookup(const std::string& smbl) const  { return 1.0; }
 };
 typedef boost::shared_ptr<AtomRadiiTable> AtomRadiiTablePtr;
 
@@ -88,13 +88,15 @@ class OverlapCalculator : public PairQuantity
     private:
 
         // methods
+        int count() const;
+        QuantityType subvalue(int offset) const;
         void cacheStructureData();
 
         // data
         AtomRadiiTablePtr matomradiitable;
         // cache
         struct {
-            std::vector<double> siteradii;
+            QuantityType siteradii;
         } mstructure_cache;
 
         // serialization
