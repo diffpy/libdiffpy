@@ -54,7 +54,8 @@ class PairQuantity : public diffpy::Attributes
         const QuantityType& eval();
         template <class T> const QuantityType& eval(const T&);
         const QuantityType& value() const;
-        void mergeParallelValue(const QuantityType& pvalue, int ncpu);
+        void mergeParallelData(const std::string& pdata, int ncpu);
+        virtual std::string getParallelData() const;
 
         // configuration
         template <class T> void setStructure(const T&);
@@ -83,7 +84,7 @@ class PairQuantity : public diffpy::Attributes
         virtual void resetValue();
         virtual void configureBondGenerator(BaseBondGenerator&) const;
         virtual void addPairContribution(const BaseBondGenerator&, int) { }
-        virtual void executeParallelMerge(const QuantityType& pvalue);
+        virtual void executeParallelMerge(const std::string& pdata);
         virtual void finishValue() { }
         int countSites() const;
 

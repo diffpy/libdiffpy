@@ -20,10 +20,12 @@
 
 #include <cassert>
 #include <cmath>
+#include <sstream>
 
 #include <diffpy/srreal/BondCalculator.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 
@@ -160,8 +162,12 @@ void BondCalculator::addPairContribution(
 }
 
 
-void BondCalculator::executeParallelMerge(const QuantityType& pvalue)
+void BondCalculator::executeParallelMerge(const std::string& pdata)
 {
+    istringstream storage(pdata, ios::binary);
+    diffpy::serialization::iarchive ia(storage, ios::binary);
+    QuantityType pvalue;
+    ia >> pvalue;
     mvalue.insert(mvalue.end(), pvalue.begin(), pvalue.end());
 }
 

@@ -47,7 +47,7 @@ class BondCalculator : public PairQuantity
         // PairQuantity overloads
         virtual void resetValue();
         virtual void addPairContribution(const BaseBondGenerator&, int);
-        virtual void executeParallelMerge(const QuantityType&);
+        virtual void executeParallelMerge(const std::string& pdata);
         virtual void finishValue();
 
     private:

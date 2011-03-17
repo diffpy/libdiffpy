@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <functional>
+
 #include <diffpy/srreal/OverlapCalculator.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/mathutils.hpp>
@@ -210,7 +211,7 @@ void OverlapCalculator::addPairContribution(const BaseBondGenerator&, int)
 }
 
 
-void OverlapCalculator::executeParallelMerge(const QuantityType&)
+void OverlapCalculator::executeParallelMerge(const std::string& pdata)
 {
     // FIXME
 }

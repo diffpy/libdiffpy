@@ -20,8 +20,11 @@
 
 #include <algorithm>
 #include <locale>
+#include <sstream>
+
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 
@@ -77,16 +80,25 @@ const QuantityType& PairQuantity::value() const
 }
 
 
-void PairQuantity::mergeParallelValue(const QuantityType& pvalue, int ncpu)
+void PairQuantity::mergeParallelData(const string& pdata, int ncpu)
 {
     if (mmergedvaluescount >= ncpu)
     {
         const char* emsg = "Number of merged values exceeds NCPU.";
         throw runtime_error(emsg);
     }
-    this->executeParallelMerge(pvalue);
+    this->executeParallelMerge(pdata);
     ++mmergedvaluescount;
     if (mmergedvaluescount == ncpu)  this->finishValue();
+}
+
+
+string PairQuantity::getParallelData() const
+{
+    ostringstream storage(ios::binary);
+    diffpy::serialization::oarchive oa(storage, ios::binary);
+    oa << this->value();
+    return storage.str();
 }
 
 
@@ -244,11 +256,15 @@ void PairQuantity::configureBondGenerator(BaseBondGenerator& bnds) const
 }
 
 
-void PairQuantity::executeParallelMerge(const QuantityType& pvalue)
+void PairQuantity::executeParallelMerge(const string& pdata)
 {
+    istringstream storage(pdata, ios::binary);
+    diffpy::serialization::iarchive ia(storage, ios::binary);
+    QuantityType pvalue;
+    ia >> pvalue;
     if (pvalue.size() != mvalue.size())
     {
-        throw invalid_argument("Merged value array must have the same size.");
+        throw invalid_argument("Merged data array must have the same size.");
     }
     transform(mvalue.begin(), mvalue.end(), pvalue.begin(),
             mvalue.begin(), plus<double>());
