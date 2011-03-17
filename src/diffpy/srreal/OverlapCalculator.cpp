@@ -112,7 +112,7 @@ QuantityType OverlapCalculator::siteSquareOverlaps() const
     assert(olps.size() == sts0.size());
     assert(olps.size() == sts1.size());
     QuantityType::const_iterator olpii = olps.begin();
-    vector<int>::const_iterator ii0 = sts0.begin(), ii1= sts1.begin();
+    vector<int>::const_iterator ii0 = sts0.begin(), ii1 = sts1.begin();
     for (; olpii != olps.end(); ++olpii, ++ii0, ++ii1)
     {
         double halfsqoverlap = 0.5 * (*olpii) * (*olpii);
@@ -186,8 +186,7 @@ const AtomRadiiTablePtr& OverlapCalculator::getAtomRadiiTable() const
 
 double OverlapCalculator::getRmaxUsed() const
 {
-    int cntsites = this->countSites();
-    assert(cntsites == int(mstructure_cache.siteradii.size()));
+    assert(this->countSites() == int(mstructure_cache.siteradii.size()));
     double maxradius = mstructure_cache.siteradii.empty() ? 0.0 :
         *max_element(mstructure_cache.siteradii.begin(),
                 mstructure_cache.siteradii.end());
