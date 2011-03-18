@@ -24,6 +24,7 @@
 #include <diffpy/srreal/OverlapCalculator.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/serialization.hpp>
 
 using namespace std;
 
@@ -35,7 +36,6 @@ namespace srreal {
 namespace {
 
 enum {
-    OVERLAP_OFFSET,
     DISTANCE_OFFSET,
     DIRECTION0_OFFSET,
     DIRECTION1_OFFSET,
@@ -51,6 +51,9 @@ enum {
 
 OverlapCalculator::OverlapCalculator()
 {
+    // default configuration
+    AtomRadiiTablePtr table(new AtomRadiiTable);
+    this->setAtomRadiiTable(table);
     // attributes
     this->registerDoubleAttribute("rmaxused", this,
             &OverlapCalculator::getRmaxUsed);
@@ -60,28 +63,37 @@ OverlapCalculator::OverlapCalculator()
 
 QuantityType OverlapCalculator::overlaps() const
 {
-    return this->subvalue(OVERLAP_OFFSET);
+    int n = this->count();
+    QuantityType rv;
+    rv.reserve(n);
+    for (int idx = 0; idx < n; ++idx)
+    {
+        double olp = this->suboverlap(idx);
+        if (olp >= 0.0)  rv.push_back(olp);
+    }
+    return rv;
 }
 
 
 QuantityType OverlapCalculator::distances() const
 {
-    return this->subvalue(DISTANCE_OFFSET);
+    return this->subvector(DISTANCE_OFFSET, OVERLAPPING);
 }
 
 
 vector<R3::Vector> OverlapCalculator::directions() const
 {
+    int n = this->count();
     vector<R3::Vector> rv;
-    rv.reserve(this->count());
-    QuantityType::const_iterator v = mvalue.begin();
-    for (; v < mvalue.end(); v += CHUNK_SIZE)
+    rv.reserve(n);
+    R3::Vector last;
+    for (int index = 0; index < n; ++index)
     {
-        R3::Vector dir(
-                *(v + DIRECTION0_OFFSET),
-                *(v + DIRECTION1_OFFSET),
-                *(v + DIRECTION2_OFFSET));
-        rv.push_back(dir);
+        if (this->suboverlap(index) <= 0.0)  continue;
+        last[0] = this->subvalue(DIRECTION0_OFFSET, index);
+        last[1] = this->subvalue(DIRECTION1_OFFSET, index);
+        last[2] = this->subvalue(DIRECTION2_OFFSET, index);
+        rv.push_back(last);
     }
     return rv;
 }
@@ -89,7 +101,7 @@ vector<R3::Vector> OverlapCalculator::directions() const
 
 vector<int> OverlapCalculator::sites0() const
 {
-    QuantityType rv0 = this->subvalue(SITE0_OFFSET);
+    QuantityType rv0 = this->subvector(SITE0_OFFSET, OVERLAPPING);
     vector<int> rv1(rv0.begin(), rv0.end());
     return rv1;
 }
@@ -97,7 +109,7 @@ vector<int> OverlapCalculator::sites0() const
 
 vector<int> OverlapCalculator::sites1() const
 {
-    QuantityType rv0 = this->subvalue(SITE1_OFFSET);
+    QuantityType rv0 = this->subvector(SITE1_OFFSET, OVERLAPPING);
     vector<int> rv1(rv0.begin(), rv0.end());
     return rv1;
 }
@@ -105,20 +117,18 @@ vector<int> OverlapCalculator::sites1() const
 
 QuantityType OverlapCalculator::siteSquareOverlaps() const
 {
+    int n = this->count();
     int cntsites = this->countSites();
     QuantityType rv(cntsites, 0.0);
-    QuantityType olps = this->overlaps();
-    vector<int> sts0 = this->sites0();
-    vector<int> sts1 = this->sites1();
-    assert(olps.size() == sts0.size());
-    assert(olps.size() == sts1.size());
-    QuantityType::const_iterator olpii = olps.begin();
-    vector<int>::const_iterator ii0 = sts0.begin(), ii1 = sts1.begin();
-    for (; olpii != olps.end(); ++olpii, ++ii0, ++ii1)
+    for (int index = 0; index < n; ++index)
     {
-        double halfsqoverlap = 0.5 * (*olpii) * (*olpii);
-        rv[*ii0] += halfsqoverlap * mstructure->siteOccupancy(*ii1);
-        rv[*ii1] += halfsqoverlap * mstructure->siteOccupancy(*ii0);
+        double olp = this->suboverlap(index);
+        if (olp <= 0.0)  continue;
+        double halfsqoverlap = 0.5 * olp * olp;
+        int i = int(this->subvalue(SITE0_OFFSET, index));
+        int j = int(this->subvalue(SITE1_OFFSET, index));
+        rv[i] += halfsqoverlap * mstructure->siteOccupancy(j);
+        rv[j] += halfsqoverlap * mstructure->siteOccupancy(i);
     }
     return rv;
 }
@@ -131,7 +141,7 @@ double OverlapCalculator::totalSquareOverlap() const
     double rv = 0.0;
     for (int i = 0; i < cntsites; ++i)
     {
-        rv += sqoverlap[i] * 
+        rv += sqoverlap[i] *
             mstructure->siteMultiplicity(i) * mstructure->siteOccupancy(i);
     }
     return rv;
@@ -140,8 +150,43 @@ double OverlapCalculator::totalSquareOverlap() const
 
 double OverlapCalculator::totalFlipDiff(int i, int j) const
 {
-    // FIXME
-    return 0.0;
+    int cntsites = this->countSites();
+    if (i < 0 || i >= cntsites || j < 0 || j >= cntsites)
+    {
+        const char* emsg = "Index out of range.";
+        throw invalid_argument(emsg);
+    }
+    bool sameradii = (i == j) ||
+        (mstructure_cache.siteradii[i] == mstructure_cache.siteradii[j]);
+    if (sameradii)  return 0.0;
+    // here we have to remove the overlap contributions for i and j
+    double rv = 0.0;
+    list<int> allids;
+    if (mneighborids.count(i))
+    {
+        allids.insert(allids.end(),
+                mneighborids.at(i).begin(), mneighborids.at(i).end());
+    }
+    if (mneighborids.count(j))
+    {
+        allids.insert(allids.end(),
+                mneighborids.at(j).begin(), mneighborids.at(j).end());
+    }
+    list<int>::const_iterator idx;
+    for (idx = allids.begin(); idx != allids.end(); ++idx)
+    {
+        int i1 = int(this->subvalue(SITE0_OFFSET, *idx));
+        int j1 = int(this->subvalue(SITE1_OFFSET, *idx));
+        double sqscale =
+            mstructure->siteOccupancy(i1) * mstructure->siteOccupancy(j1) *
+            0.5 * (mstructure->siteMultiplicity(i1) +
+                    mstructure->siteMultiplicity(j1));
+        double olp0 = this->suboverlap(*idx);
+        double olp1 = this->suboverlap(*idx, i, j);
+        rv -= sqscale * olp0 * olp0;
+        rv += sqscale * olp1 * olp1;
+    }
+    return rv;
 }
 
 
@@ -169,6 +214,7 @@ double OverlapCalculator::rmsoverlap() const
 
 void OverlapCalculator::setAtomRadiiTable(AtomRadiiTablePtr table)
 {
+    if (matomradiitable.get() == table.get())  return;
     matomradiitable = table;
 }
 
@@ -188,38 +234,65 @@ const AtomRadiiTablePtr& OverlapCalculator::getAtomRadiiTable() const
 double OverlapCalculator::getRmaxUsed() const
 {
     assert(this->countSites() == int(mstructure_cache.siteradii.size()));
-    double maxradius = mstructure_cache.siteradii.empty() ? 0.0 :
-        *max_element(mstructure_cache.siteradii.begin(),
-                mstructure_cache.siteradii.end());
-    double rv = min(this->getRmax(), maxradius);
+    double rv = min(this->getRmax(), mstructure_cache.maxseparation);
     return rv;
 }
-
-
 
 // Protected Methods ---------------------------------------------------------
 
 void OverlapCalculator::resetValue()
 {
-    // FIXME
+    mvalue.clear();
+    mneighborids.clear();
+    this->cacheStructureData();
+    this->PairQuantity::resetValue();
 }
 
 
-void OverlapCalculator::addPairContribution(const BaseBondGenerator&, int)
+void OverlapCalculator::configureBondGenerator(BaseBondGenerator& bnds) const
 {
-    // FIXME
+    bnds.setRmax(this->getRmaxUsed());
+}
+
+
+void OverlapCalculator::addPairContribution(
+        const BaseBondGenerator& bnds, int summationscale)
+{
+    using diffpy::mathutils::eps_eq;
+    assert(bnds.distance() <= mstructure_cache.maxseparation);
+    if (eps_eq(0.0, bnds.distance()))    return;
+    const R3::Vector& r01 = bnds.r01();
+    int baseidx = mvalue.size();
+    mvalue.insert(mvalue.end(), CHUNK_SIZE, 0.0);
+    mvalue[baseidx + DISTANCE_OFFSET] = bnds.distance();
+    mvalue[baseidx + DIRECTION0_OFFSET] = r01[0];
+    mvalue[baseidx + DIRECTION1_OFFSET] = r01[1];
+    mvalue[baseidx + DIRECTION2_OFFSET] = r01[2];
+    mvalue[baseidx + SITE0_OFFSET] = bnds.site0();
+    mvalue[baseidx + SITE1_OFFSET] = bnds.site1();
 }
 
 
 void OverlapCalculator::executeParallelMerge(const std::string& pdata)
 {
-    // FIXME
+    istringstream storage(pdata, ios::binary);
+    diffpy::serialization::iarchive ia(storage, ios::binary);
+    QuantityType pvalue;
+    ia >> pvalue;
+    mvalue.insert(mvalue.end(), pvalue.begin(), pvalue.end());
 }
 
 
 void OverlapCalculator::finishValue()
 {
-    // FIXME
+    int n = this->count();
+    for (int idx = 0; idx < n; ++idx)
+    {
+        int i = int(this->subvalue(SITE0_OFFSET, idx));
+        int j = int(this->subvalue(SITE1_OFFSET, idx));
+        mneighborids[i].push_back(idx);
+        if (i != j)  mneighborids[j].push_back(idx);
+    }
 }
 
 // Private Methods -----------------------------------------------------------
@@ -231,13 +304,50 @@ int OverlapCalculator::count() const
 }
 
 
-QuantityType OverlapCalculator::subvalue(int offset) const
+QuantityType OverlapCalculator::subvector(int offset,
+        OverlapCalculator::OverlapFlag flag) const
 {
     assert(0 <= offset && offset < CHUNK_SIZE);
+    assert(flag == ALLVALUES || flag == OVERLAPPING);
+    int n = this->count();
     QuantityType rv;
-    rv.reserve(this->count());
-    QuantityType::const_iterator v = mvalue.begin() + offset;
-    for (; v < mvalue.end(); v += CHUNK_SIZE)  rv.push_back(*v);
+    rv.reserve(n);
+    for (int index = 0; index < n; ++index)
+    {
+        if (OVERLAPPING == flag && this->suboverlap(index) <= 0.0)  continue;
+        rv.push_back(this->subvalue(offset, index));
+    }
+    return rv;
+}
+
+
+const double& OverlapCalculator::subvalue(int offset, int index) const
+{
+    assert(0 <= offset && offset < CHUNK_SIZE);
+    assert(0 <= index && index < this->count());
+    return mvalue[offset + CHUNK_SIZE * index];
+}
+
+
+double OverlapCalculator::suboverlap(int index, int flipi, int flipj) const
+{
+    int cntsites = this->countSites();
+    assert(0 <= index && index < this->count());
+    assert(0 <= flipi && flipi < cntsites);
+    assert(0 <= flipj && flipj < cntsites);
+    int i = int(this->subvalue(SITE0_OFFSET, index));
+    int j = int(this->subvalue(SITE1_OFFSET, index));
+    const double& radiusi = (flipi == flipj) ? mstructure_cache.siteradii[i] :
+        (i == flipi) ? mstructure_cache.siteradii[flipj] :
+        (i == flipj) ? mstructure_cache.siteradii[flipi] :
+        mstructure_cache.siteradii[i];
+    const double& radiusj = (flipi == flipj) ? mstructure_cache.siteradii[j] :
+        (j == flipi) ? mstructure_cache.siteradii[flipj] :
+        (j == flipj) ? mstructure_cache.siteradii[flipi] :
+        mstructure_cache.siteradii[j];
+    const double& dij = this->subvalue(DISTANCE_OFFSET, index);
+    double sepij = radiusi + radiusj;
+    double rv = (dij < sepij) ? (sepij - dij) : 0.0;
     return rv;
 }
 
@@ -246,12 +356,16 @@ void OverlapCalculator::cacheStructureData()
 {
     int cntsites = this->countSites();
     mstructure_cache.siteradii.resize(cntsites);
-    const AtomRadiiTable& table = *(this->getAtomRadiiTable());
+    const AtomRadiiTablePtr& table = this->getAtomRadiiTable();
     for (int i = 0; i < cntsites; ++i)
     {
         const string& smbl = mstructure->siteAtomType(i);
-        mstructure_cache.siteradii[i] = table.lookup(smbl);
+        mstructure_cache.siteradii[i] = table->lookup(smbl);
     }
+    double maxradius = mstructure_cache.siteradii.empty() ?
+        0.0 : *max_element(mstructure_cache.siteradii.begin(),
+                mstructure_cache.siteradii.end());
+    mstructure_cache.maxseparation = 2 * maxradius;
 }
 
 }   // namespace srreal

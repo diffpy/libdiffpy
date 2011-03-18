@@ -81,22 +81,30 @@ class OverlapCalculator : public PairQuantity
 
         // PairQuantity overloads
         virtual void resetValue();
+        virtual void configureBondGenerator(BaseBondGenerator&) const;
         virtual void addPairContribution(const BaseBondGenerator&, int);
         virtual void executeParallelMerge(const std::string&);
         virtual void finishValue();
 
     private:
 
+        // types
+        enum OverlapFlag {ALLVALUES, OVERLAPPING};
+
         // methods
         int count() const;
-        QuantityType subvalue(int offset) const;
+        QuantityType subvector(int offset, OverlapFlag flag) const;
+        const double& subvalue(int offset, int index) const;
+        double suboverlap(int index, int iflip=0, int jflip=0) const;
         void cacheStructureData();
 
         // data
         AtomRadiiTablePtr matomradiitable;
+        boost::unordered_map<int, std::list<int> > mneighborids;
         // cache
         struct {
             QuantityType siteradii;
+            double maxseparation;
         } mstructure_cache;
 
         // serialization
@@ -107,7 +115,9 @@ class OverlapCalculator : public PairQuantity
             using boost::serialization::base_object;
             ar & base_object<PairQuantity>(*this);
             // FIXME: ar & matomradiitable;
+            ar & mneighborids;
             ar & mstructure_cache.siteradii;
+            ar & mstructure_cache.maxseparation;
         }
 
 };

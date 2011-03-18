@@ -146,9 +146,9 @@ void BondCalculator::addPairContribution(
         int summationscale)
 {
     using diffpy::mathutils::eps_eq;
-    const R3::Vector& r01 = bnds.r01();
     if (eps_eq(0.0, bnds.distance()))    return;
     static R3::Vector ru01;
+    const R3::Vector& r01 = bnds.r01();
     ru01 = r01 / bnds.distance();
     if (!(this->checkConeFilters(ru01)))  return;
     int baseidx = mvalue.size();
