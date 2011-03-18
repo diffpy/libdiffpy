@@ -146,7 +146,7 @@ double BVSCalculator::getRmaxUsed() const
 
 void BVSCalculator::resetValue()
 {
-    // calcPoints requires that structure and rlimits data are cached.
+    // structure data need to be cached for rmaxFromPrecision
     this->cacheStructureData();
     this->resizeValue(this->countSites());
     this->PairQuantity::resetValue();
