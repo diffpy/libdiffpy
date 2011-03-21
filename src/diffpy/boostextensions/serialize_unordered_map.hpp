@@ -25,6 +25,7 @@
 #include <boost/config.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/serialization/list.hpp>
+#include <boost/serialization/utility.hpp>
 #include <boost/serialization/split_free.hpp>
 
 namespace boost {
