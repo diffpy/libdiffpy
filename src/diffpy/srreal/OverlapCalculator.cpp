@@ -86,14 +86,10 @@ vector<R3::Vector> OverlapCalculator::directions() const
     int n = this->count();
     vector<R3::Vector> rv;
     rv.reserve(n);
-    R3::Vector last;
     for (int index = 0; index < n; ++index)
     {
         if (this->suboverlap(index) <= 0.0)  continue;
-        last[0] = this->subvalue(DIRECTION0_OFFSET, index);
-        last[1] = this->subvalue(DIRECTION1_OFFSET, index);
-        last[2] = this->subvalue(DIRECTION2_OFFSET, index);
-        rv.push_back(last);
+        rv.push_back(this->subdirection(index));
     }
     return rv;
 }
@@ -192,8 +188,24 @@ double OverlapCalculator::totalFlipDiff(int i, int j) const
 
 vector<R3::Vector> OverlapCalculator::gradients() const
 {
-    // FIXME
-    return vector<R3::Vector>();
+    using diffpy::mathutils::eps_gt;
+    int n = this->count();
+    int cntsites = this->countSites();
+    vector<R3::Vector> rv(cntsites, R3::Vector(0.0, 0.0, 0.0));
+    R3::Vector gij;
+    for (int index = 0; index < n; ++index)
+    {
+        double olp = this->suboverlap(index);
+        if (olp <= 0.0)  continue;
+        const double& dst = this->subvalue(DISTANCE_OFFSET, index);
+        assert(eps_gt(dst, 0.0));
+        int i = int(this->subvalue(SITE0_OFFSET, index));
+        int j = int(this->subvalue(SITE1_OFFSET, index));
+        gij = -2.0 * olp / dst * this->subdirection(index);
+        rv[j] += gij;
+        rv[i] -= gij;
+    }
+    return rv;
 }
 
 
@@ -329,10 +341,20 @@ const double& OverlapCalculator::subvalue(int offset, int index) const
 }
 
 
+const R3::Vector& OverlapCalculator::subdirection(int index) const
+{
+    static R3::Vector rv;
+    double* p = rv.data();
+    *p++ = this->subvalue(DIRECTION0_OFFSET, index);
+    *p++ = this->subvalue(DIRECTION1_OFFSET, index);
+    *p++ = this->subvalue(DIRECTION2_OFFSET, index);
+    return rv;
+}
+
+
 double OverlapCalculator::suboverlap(int index, int flipi, int flipj) const
 {
     int cntsites = this->countSites();
-    assert(0 <= index && index < this->count());
     assert(0 <= flipi && flipi < cntsites);
     assert(0 <= flipj && flipj < cntsites);
     int i = int(this->subvalue(SITE0_OFFSET, index));

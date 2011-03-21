@@ -95,6 +95,7 @@ class OverlapCalculator : public PairQuantity
         int count() const;
         QuantityType subvector(int offset, OverlapFlag flag) const;
         const double& subvalue(int offset, int index) const;
+        const R3::Vector& subdirection(int index) const;
         double suboverlap(int index, int iflip=0, int jflip=0) const;
         void cacheStructureData();
 
