@@ -41,6 +41,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
         {
             meps = diffpy::mathutils::SQRT_DOUBLE_EPS;
             molc.reset(new OverlapCalculator);
+            molc->getAtomRadiiTable()->setCustom("", 1.0);
         }
 
 

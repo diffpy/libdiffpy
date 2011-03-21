@@ -22,18 +22,10 @@
 #define OVERLAPCALCULATOR_HPP_INCLUDED
 
 #include <diffpy/srreal/PairQuantity.hpp>
+#include <diffpy/srreal/AtomRadiiTable.hpp>
 
 namespace diffpy {
 namespace srreal {
-
-// FIXME: temporary types
-class AtomRadiiTable
-{
-    public:
-        double lookup(const std::string& smbl) const  { return 1.0; }
-};
-typedef boost::shared_ptr<AtomRadiiTable> AtomRadiiTablePtr;
-
 
 class OverlapCalculator : public PairQuantity
 {
@@ -115,7 +107,7 @@ class OverlapCalculator : public PairQuantity
         {
             using boost::serialization::base_object;
             ar & base_object<PairQuantity>(*this);
-            // FIXME: ar & matomradiitable;
+            ar & matomradiitable;
             ar & mneighborids;
             ar & mstructure_cache.siteradii;
             ar & mstructure_cache.maxseparation;

@@ -19,7 +19,6 @@
 *****************************************************************************/
 
 #include <algorithm>
-#include <functional>
 
 #include <diffpy/srreal/OverlapCalculator.hpp>
 #include <diffpy/validators.hpp>
