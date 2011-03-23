@@ -25,6 +25,7 @@
 #include <diffpy/srreal/VR3Structure.hpp>
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
+#include "python_helpers.hpp"
 #include "serialization_helpers.hpp"
 
 using namespace std;
@@ -35,7 +36,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
     private:
 
         boost::shared_ptr<OverlapCalculator> molc;
-        VR3Structure memptystru;
+        boost::python::object mnacl;
         double meps;
 
     public:
@@ -45,6 +46,9 @@ class TestOverlapCalculator : public CxxTest::TestSuite
             meps = diffpy::mathutils::SQRT_DOUBLE_EPS;
             molc.reset(new OverlapCalculator);
             molc->getAtomRadiiTable()->setCustom("", 1.0);
+            molc->getAtomRadiiTable()->setCustom("Na1+", 1.5);
+            molc->getAtomRadiiTable()->setCustom("Cl1-", 1.8);
+            if (mnacl.ptr() == Py_None)  mnacl = loadTestStructure("NaCl.cif");
         }
 
 
@@ -116,7 +120,6 @@ class TestOverlapCalculator : public CxxTest::TestSuite
         void test_bccTouch()
         {
             using namespace boost;
-            diffpy::initializePython();
             python::object Structure =
                 diffpy::importFromPyModule("diffpy.Structure", "Structure");
             python::object bcc = Structure();
@@ -151,10 +154,85 @@ class TestOverlapCalculator : public CxxTest::TestSuite
         };
 
 
+        void test_NaCl_overlap()
+        {
+            double olp = pow(3.3 - 5.62 / 2, 2) * 6 / 2;
+            molc->eval(mnacl);
+            TS_ASSERT_DELTA(olp, molc->msoverlap(), meps);
+            QuantityType sqolps = molc->siteSquareOverlaps();
+            TS_ASSERT_EQUALS(8u, sqolps.size());
+            for (int i = 0; i < 8; ++i)
+            {
+                TS_ASSERT_DELTA(olp, sqolps[i], meps);
+            }
+        }
+
+
+        void test_NaCl_flips()
+        {
+            molc->eval(mnacl);
+            // flipping the same type should not change the cost
+            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 0));
+            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 1));
+            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 2));
+            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 3));
+            // flipping with the second Cl neighbor
+            TS_ASSERT_DELTA(1.08, molc->totalFlipDiff(0, 4), meps);
+            // flipping with the nearest Cl neighbor
+            TS_ASSERT_DELTA(0.72, molc->totalFlipDiff(0, 5), meps);
+            TS_ASSERT_DELTA(0.72, molc->totalFlipDiff(0, 6), meps);
+            TS_ASSERT_DELTA(0.72, molc->totalFlipDiff(0, 7), meps);
+        }
+
+
+        void test_NaCl_gradient()
+        {
+            using namespace boost;
+            python::object Structure =
+                diffpy::importFromPyModule("diffpy.Structure", "Structure");
+            molc->eval(mnacl);
+            // default gradients are all zero
+            std::vector<R3::Vector> g = molc->gradients();
+            TS_ASSERT_EQUALS(8u, g.size());
+            for (int i = 0; i < 8; ++i)
+            {
+                TS_ASSERT_DELTA(0.0, R3::norm(g[i]), meps);
+            }
+            python::object nacl1 = Structure(mnacl);
+            python::object xyzc0 = nacl1[0].attr("xyz_cartn");
+            xyzc0[0] = 0.02;
+            xyzc0[1] = 0.03;
+            xyzc0[2] = 0.07;
+            molc->eval(nacl1);
+            double c0 = molc->totalSquareOverlap();
+            R3::Vector g0 = molc->gradients()[0];
+            TS_ASSERT(R3::norm(g0) > meps);
+            R3::Vector g0n;
+            const double dx = 1e-8;
+            for (int i = 0; i < R3::Ndim; ++i)
+            {
+                xyzc0[i] += dx;
+                molc->eval(nacl1);
+                g0n[i] = (molc->totalSquareOverlap() - c0) / dx;
+                xyzc0[i] -= dx;
+            }
+            TS_ASSERT_DELTA(0.0, R3::norm(g0 - g0n), 1e-6);
+        }
+
+
+        void test_NaCl_mixed_overlap()
+        {
+            boost::python::object nacl_mixed;
+            nacl_mixed = loadTestStructure("NaCl_mixed.cif");
+            molc->eval(nacl_mixed);
+            double olp = pow(3.3 - 5.62 / 2, 2) * 6 / 2;
+            TS_ASSERT_DELTA(olp, molc->msoverlap(), meps);
+        }
+
+
         void test_serialization()
         {
             // build customized PDFCalculator
-            molc->getAtomRadiiTable()->setCustom("", 1.0);
             VR3Structure stru;
             stru.push_back(R3::Vector(0.0, 0.0, 0.0));
             stru.push_back(R3::Vector(0.0, 0.0, 1.5));
