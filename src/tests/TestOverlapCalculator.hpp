@@ -23,6 +23,9 @@
 
 #include <diffpy/srreal/OverlapCalculator.hpp>
 #include <diffpy/srreal/VR3Structure.hpp>
+#include <diffpy/PythonInterface.hpp>
+#include <diffpy/srreal/PythonStructureAdapter.hpp>
+#include "serialization_helpers.hpp"
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -107,6 +110,64 @@ class TestOverlapCalculator : public CxxTest::TestSuite
             TS_ASSERT(R3::norm(gn1) > 1.0);
             TS_ASSERT_DELTA(0.0, R3::norm(gn1 - g[1]), 1e-5);
             TS_ASSERT_DELTA(0.0, R3::norm(g[0] + g[1]), 1e-5);
+        }
+
+
+        void test_bccTouch()
+        {
+            using namespace boost;
+            diffpy::initializePython();
+            python::object Structure =
+                diffpy::importFromPyModule("diffpy.Structure", "Structure");
+            python::object bcc = Structure();
+            bcc.attr("lattice").attr("setLatPar")(2.0, 2.0, 2.0);
+            bcc.attr("addNewAtom")("C", python::make_tuple(0.0, 0.0, 0.0));
+            bcc.attr("addNewAtom")("C", python::make_tuple(0.5, 0.5, 0.5));
+            molc->getAtomRadiiTable()->setCustom("C", 1.0);
+            molc->eval(bcc);
+            TS_ASSERT_EQUALS(2, molc->getStructure()->countSites());
+            TS_ASSERT_EQUALS(8 * pow(2.0 - sqrt(3.0), 2),
+                    molc->totalSquareOverlap());
+            // gradient is zero due to bcc symmetry
+            std::vector<R3::Vector> g = molc->gradients();
+            TS_ASSERT_DELTA(0.0, R3::norm(g[0]), meps);
+            TS_ASSERT_DELTA(0.0, R3::norm(g[1]), meps);
+            // move the second atom so it touches only one ball
+            bcc[1].attr("xyz")[0] = -0.25;
+            bcc[1].attr("xyz")[1] = 0.0;
+            bcc[1].attr("xyz")[2] = 0.0;
+            molc->eval(bcc);
+            double tsqo = 1.5 * 1.5 + 0.5 * 0.5;
+            TS_ASSERT_DELTA(tsqo, molc->totalSquareOverlap(), meps);
+            g = molc->gradients();
+            TS_ASSERT_EQUALS(2u, g.size());
+            double gx = 1.5 + 0.5;
+            TS_ASSERT_DELTA(-gx, g[0][0], meps);
+            TS_ASSERT_DELTA(0.0, g[0][1], meps);
+            TS_ASSERT_DELTA(0.0, g[0][2], meps);
+            TS_ASSERT_DELTA(+gx, g[1][0], meps);
+            TS_ASSERT_DELTA(0.0, g[1][1], meps);
+            TS_ASSERT_DELTA(0.0, g[1][2], meps);
+        };
+
+
+        void test_serialization()
+        {
+            // build customized PDFCalculator
+            molc->getAtomRadiiTable()->setCustom("", 1.0);
+            VR3Structure stru;
+            stru.push_back(R3::Vector(0.0, 0.0, 0.0));
+            stru.push_back(R3::Vector(0.0, 0.0, 1.5));
+            molc->eval(stru);
+            boost::shared_ptr<OverlapCalculator> olc1;
+            olc1 = dumpandload(molc);
+            TS_ASSERT_DIFFERS(molc.get(), olc1.get());
+            TS_ASSERT_EQUALS(2, olc1->getStructure()->countSites());
+            TS_ASSERT_EQUALS(0.25, olc1->totalSquareOverlap());
+            QuantityType sqolps = molc->siteSquareOverlaps();
+            TS_ASSERT_EQUALS(2u, olc1->siteSquareOverlaps().size());
+            TS_ASSERT_EQUALS(0.125, olc1->siteSquareOverlaps()[0]);
+            TS_ASSERT_EQUALS(0.125, olc1->siteSquareOverlaps()[1]);
         }
 
 };  // class TestOverlapCalculator

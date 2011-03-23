@@ -119,12 +119,16 @@ QuantityType OverlapCalculator::siteSquareOverlaps() const
     {
         double olp = this->suboverlap(index);
         if (olp <= 0.0)  continue;
-        double halfsqoverlap = 0.5 * olp * olp;
+        double sqoverlap = olp * olp;
         int i = int(this->subvalue(SITE0_OFFSET, index));
         int j = int(this->subvalue(SITE1_OFFSET, index));
-        rv[i] += halfsqoverlap * mstructure->siteOccupancy(j);
-        rv[j] += halfsqoverlap * mstructure->siteOccupancy(i);
+        int sumscale = (i == j) ? 1 : 2;
+        rv[i] += sumscale * sqoverlap * mstructure->siteOccupancy(j);
+        rv[j] += sumscale * sqoverlap * mstructure->siteOccupancy(i);
     }
+    // Overlaps have been summed twice and need to be divided among 2 atoms.
+    QuantityType::iterator xi;
+    for (xi = rv.begin(); xi != rv.end(); ++xi)  *xi /= 4;
     return rv;
 }
 
@@ -156,22 +160,15 @@ double OverlapCalculator::totalFlipDiff(int i, int j) const
     if (sameradii)  return 0.0;
     // here we have to remove the overlap contributions for i and j
     double rv = 0.0;
-    list<int> allids;
-    if (mneighborids.count(i))
-    {
-        allids.insert(allids.end(),
-                mneighborids.at(i).begin(), mneighborids.at(i).end());
-    }
-    if (mneighborids.count(j))
-    {
-        allids.insert(allids.end(),
-                mneighborids.at(j).begin(), mneighborids.at(j).end());
-    }
+    list<int> allids = this->getNeighborIds(i);
+    const list<int>& jneighbors = this->getNeighborIds(j);
+    allids.insert(allids.end(), jneighbors.begin(), jneighbors.end());
     list<int>::const_iterator idx;
     for (idx = allids.begin(); idx != allids.end(); ++idx)
     {
         int i1 = int(this->subvalue(SITE0_OFFSET, *idx));
         int j1 = int(this->subvalue(SITE1_OFFSET, *idx));
+        if (i1 == j1)  continue;
         double sqscale =
             mstructure->siteOccupancy(i1) * mstructure->siteOccupancy(j1) *
             0.5 * (mstructure->siteMultiplicity(i1) +
@@ -225,7 +222,6 @@ double OverlapCalculator::rmsoverlap() const
 
 void OverlapCalculator::setAtomRadiiTable(AtomRadiiTablePtr table)
 {
-    if (matomradiitable.get() == table.get())  return;
     matomradiitable = table;
 }
 
@@ -291,19 +287,6 @@ void OverlapCalculator::executeParallelMerge(const std::string& pdata)
     QuantityType pvalue;
     ia >> pvalue;
     mvalue.insert(mvalue.end(), pvalue.begin(), pvalue.end());
-}
-
-
-void OverlapCalculator::finishValue()
-{
-    int n = this->count();
-    for (int idx = 0; idx < n; ++idx)
-    {
-        int i = int(this->subvalue(SITE0_OFFSET, idx));
-        int j = int(this->subvalue(SITE1_OFFSET, idx));
-        mneighborids[i].push_back(idx);
-        if (i != j)  mneighborids[j].push_back(idx);
-    }
 }
 
 // Private Methods -----------------------------------------------------------
@@ -387,6 +370,35 @@ void OverlapCalculator::cacheStructureData()
         0.0 : *max_element(mstructure_cache.siteradii.begin(),
                 mstructure_cache.siteradii.end());
     mstructure_cache.maxseparation = 2 * maxradius;
+}
+
+
+const std::list<int>&
+OverlapCalculator::getNeighborIds(int k) const
+{
+    typedef std::list<int> NbList;
+    int cntsites = this->countSites();
+    assert(0 <= k && k < cntsites);
+    if (mneighborids.empty())
+    {
+        mneighborids.resize(cntsites);
+        int n = this->count();
+        for (int idx = 0; idx < n; ++idx)
+        {
+            int i = int(this->subvalue(SITE0_OFFSET, idx));
+            int j = int(this->subvalue(SITE1_OFFSET, idx));
+            if (!mneighborids[i].get())  mneighborids[i].reset(new NbList);
+            mneighborids[i]->push_back(idx);
+            if (i == j)  continue;
+            if (!mneighborids[j].get())  mneighborids[j].reset(new NbList);
+            mneighborids[j]->push_back(idx);
+        }
+    }
+    assert(cntsites == int(mneighborids.size()));
+    static NbList noneighbors;
+    const NbList& rv =
+        mneighborids[k].get() ? *mneighborids[k] : noneighbors;
+    return rv;
 }
 
 }   // namespace srreal

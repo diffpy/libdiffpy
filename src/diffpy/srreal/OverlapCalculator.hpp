@@ -76,12 +76,13 @@ class OverlapCalculator : public PairQuantity
         virtual void configureBondGenerator(BaseBondGenerator&) const;
         virtual void addPairContribution(const BaseBondGenerator&, int);
         virtual void executeParallelMerge(const std::string&);
-        virtual void finishValue();
 
     private:
 
         // types
         enum OverlapFlag {ALLVALUES, OVERLAPPING};
+        typedef std::vector< boost::shared_ptr< std::list<int> > >
+            NeighborIdsStorage;
 
         // methods
         int count() const;
@@ -90,10 +91,11 @@ class OverlapCalculator : public PairQuantity
         const R3::Vector& subdirection(int index) const;
         double suboverlap(int index, int iflip=0, int jflip=0) const;
         void cacheStructureData();
+        const std::list<int>& getNeighborIds(int i) const;
 
         // data
         AtomRadiiTablePtr matomradiitable;
-        boost::unordered_map<int, std::list<int> > mneighborids;
+        mutable NeighborIdsStorage mneighborids;
         // cache
         struct {
             QuantityType siteradii;
