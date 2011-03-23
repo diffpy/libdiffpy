@@ -51,14 +51,14 @@ class OverlapCalculator : public PairQuantity
         QuantityType siteSquareOverlaps() const;
         /// sum of squared overlaps for all atoms in the structure
         double totalSquareOverlap() const;
-        /// difference in the totalSquareOverlap for a flip of two sites
-        double totalFlipDiff(int i, int j) const;
-        /// gradients of totalFlipDiff at each site in the structure
-        std::vector<R3::Vector> gradients() const;
         /// mean square per one atom in the structure
-        double msoverlap() const;
-        /// root mean square atom-radii overlap per one atom
-        double rmsoverlap() const;
+        double meanSquareOverlap() const;
+        /// difference in the totalSquareOverlap for a flip of two sites
+        double flipDiffTotal(int i, int j) const;
+        /// difference in the meanSquareOverlap for a flip of two sites
+        double flipDiffMean(int i, int j) const;
+        /// gradients of flipDiffTotal at each site in the structure
+        std::vector<R3::Vector> gradients() const;
 
         // access and configuration of the atom radii
         void setAtomRadiiTable(AtomRadiiTablePtr);

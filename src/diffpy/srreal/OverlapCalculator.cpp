@@ -147,7 +147,15 @@ double OverlapCalculator::totalSquareOverlap() const
 }
 
 
-double OverlapCalculator::totalFlipDiff(int i, int j) const
+double OverlapCalculator::meanSquareOverlap() const
+{
+    double totocc = mstructure->totalOccupancy();
+    double rv = (totocc > 0) ? (this->totalSquareOverlap() / totocc) : 0.0;
+    return rv;
+}
+
+
+double OverlapCalculator::flipDiffTotal(int i, int j) const
 {
     int cntsites = this->countSites();
     if (i < 0 || i >= cntsites || j < 0 || j >= cntsites)
@@ -182,6 +190,14 @@ double OverlapCalculator::totalFlipDiff(int i, int j) const
 }
 
 
+double OverlapCalculator::flipDiffMean(int i, int j) const
+{
+    double totocc = mstructure->totalOccupancy();
+    double rv = (totocc > 0) ? (this->flipDiffTotal(i, j) / totocc) : 0.0;
+    return rv;
+}
+
+
 vector<R3::Vector> OverlapCalculator::gradients() const
 {
     using diffpy::mathutils::eps_gt;
@@ -201,21 +217,6 @@ vector<R3::Vector> OverlapCalculator::gradients() const
         rv[j] += gij;
         rv[i] -= gij;
     }
-    return rv;
-}
-
-
-double OverlapCalculator::msoverlap() const
-{
-    double totocc = mstructure->totalOccupancy();
-    double rv = (totocc > 0) ? (this->totalSquareOverlap() / totocc) : 0.0;
-    return rv;
-}
-
-
-double OverlapCalculator::rmsoverlap() const
-{
-    double rv = sqrt(this->msoverlap());
     return rv;
 }
 

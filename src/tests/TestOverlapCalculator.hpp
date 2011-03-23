@@ -63,8 +63,8 @@ class TestOverlapCalculator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(2u, sqolps.size());
             TS_ASSERT_EQUALS(0.0, sqolps[0]);
             TS_ASSERT_EQUALS(0.0, sqolps[1]);
-            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 0));
-            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 1));
+            TS_ASSERT_EQUALS(0.0, molc->flipDiffTotal(0, 0));
+            TS_ASSERT_EQUALS(0.0, molc->flipDiffTotal(0, 1));
             std::vector<R3::Vector> g = molc->gradients();
             TS_ASSERT_EQUALS(2u, g.size());
             TS_ASSERT_EQUALS(0.0, R3::norm(g[0]));
@@ -83,7 +83,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(2u, sqolps.size());
             TS_ASSERT_EQUALS(0.125, sqolps[0]);
             TS_ASSERT_EQUALS(0.125, sqolps[1]);
-            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 1));
+            TS_ASSERT_EQUALS(0.0, molc->flipDiffTotal(0, 1));
             std::vector<R3::Vector> g = molc->gradients();
             TS_ASSERT_EQUALS(2u, g.size());
             R3::Vector g0(0.0, 0.0, +1);
@@ -158,7 +158,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
         {
             double olp = pow(3.3 - 5.62 / 2, 2) * 6 / 2;
             molc->eval(mnacl);
-            TS_ASSERT_DELTA(olp, molc->msoverlap(), meps);
+            TS_ASSERT_DELTA(olp, molc->meanSquareOverlap(), meps);
             QuantityType sqolps = molc->siteSquareOverlaps();
             TS_ASSERT_EQUALS(8u, sqolps.size());
             for (int i = 0; i < 8; ++i)
@@ -172,16 +172,17 @@ class TestOverlapCalculator : public CxxTest::TestSuite
         {
             molc->eval(mnacl);
             // flipping the same type should not change the cost
-            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 0));
-            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 1));
-            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 2));
-            TS_ASSERT_EQUALS(0.0, molc->totalFlipDiff(0, 3));
+            TS_ASSERT_EQUALS(0.0, molc->flipDiffTotal(0, 0));
+            TS_ASSERT_EQUALS(0.0, molc->flipDiffTotal(0, 1));
+            TS_ASSERT_EQUALS(0.0, molc->flipDiffTotal(0, 2));
+            TS_ASSERT_EQUALS(0.0, molc->flipDiffTotal(0, 3));
             // flipping with the second Cl neighbor
-            TS_ASSERT_DELTA(1.08, molc->totalFlipDiff(0, 4), meps);
+            TS_ASSERT_DELTA(1.08, molc->flipDiffTotal(0, 4), meps);
+            TS_ASSERT_DELTA(1.08 / 8, molc->flipDiffMean(0, 4), meps);
             // flipping with the nearest Cl neighbor
-            TS_ASSERT_DELTA(0.72, molc->totalFlipDiff(0, 5), meps);
-            TS_ASSERT_DELTA(0.72, molc->totalFlipDiff(0, 6), meps);
-            TS_ASSERT_DELTA(0.72, molc->totalFlipDiff(0, 7), meps);
+            TS_ASSERT_DELTA(0.72, molc->flipDiffTotal(0, 5), meps);
+            TS_ASSERT_DELTA(0.72, molc->flipDiffTotal(0, 6), meps);
+            TS_ASSERT_DELTA(0.72, molc->flipDiffTotal(0, 7), meps);
         }
 
 
@@ -226,7 +227,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
             nacl_mixed = loadTestStructure("NaCl_mixed.cif");
             molc->eval(nacl_mixed);
             double olp = pow(3.3 - 5.62 / 2, 2) * 6 / 2;
-            TS_ASSERT_DELTA(olp, molc->msoverlap(), meps);
+            TS_ASSERT_DELTA(olp, molc->meanSquareOverlap(), meps);
         }
 
 
