@@ -22,6 +22,7 @@
 #ifndef STRUCTUREADAPTER_HPP_INCLUDED
 #define STRUCTUREADAPTER_HPP_INCLUDED
 
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
@@ -114,6 +115,22 @@ std::string atomBareSymbol(const std::string& atomtype);
 
 /// Return valence of possibly ionic symbol such as "S2-" or "Cl-".
 int atomValence(const std::string& atomtype);
+
+/// Translate an index container to a vector of string symbols
+template <class T>
+std::vector<std::string>
+siteIndicesToTypes(const StructureAdapterPtr stru, const T& indices)
+{
+    std::vector<std::string> rv;
+    rv.reserve(stru->countSites());
+    typename T::const_iterator i;
+    for (i = indices.begin(); i != indices.end(); ++i)
+    {
+        const std::string& smbl = stru->siteAtomType(*i);
+        rv.push_back(smbl);
+    }
+    return rv;
+}
 
 }   // namespace srreal
 }   // namespace diffpy

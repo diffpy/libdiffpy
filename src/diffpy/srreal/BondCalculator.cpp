@@ -115,6 +115,18 @@ vector<int> BondCalculator::sites1() const
 }
 
 
+vector<string> BondCalculator::types0() const
+{
+    return siteIndicesToTypes(mstructure, this->sites0());
+}
+
+
+vector<string> BondCalculator::types1() const
+{
+    return siteIndicesToTypes(mstructure, this->sites1());
+}
+
+
 void BondCalculator::filterCone(R3::Vector coneaxis, double degrees)
 {
     using namespace diffpy::validators;

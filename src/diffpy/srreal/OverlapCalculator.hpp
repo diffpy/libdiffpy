@@ -47,6 +47,10 @@ class OverlapCalculator : public PairQuantity
         std::vector<int> sites0() const;
         /// indices of the second site for all overlapping pairs
         std::vector<int> sites1() const;
+        /// atom symbols for the first site of all overlapping pairs
+        std::vector<std::string> types0() const;
+        /// atom symbols for the second site of all overlapping pairs
+        std::vector<std::string> types1() const;
         /// sum of squared overlaps at each structure site
         QuantityType siteSquareOverlaps() const;
         /// sum of squared overlaps for all atoms in the structure

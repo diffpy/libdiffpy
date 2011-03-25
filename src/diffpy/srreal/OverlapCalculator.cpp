@@ -110,6 +110,18 @@ vector<int> OverlapCalculator::sites1() const
 }
 
 
+vector<string> OverlapCalculator::types0() const
+{
+    return siteIndicesToTypes(mstructure, this->sites0());
+}
+
+
+vector<string> OverlapCalculator::types1() const
+{
+    return siteIndicesToTypes(mstructure, this->sites1());
+}
+
+
 QuantityType OverlapCalculator::siteSquareOverlaps() const
 {
     int n = this->count();
