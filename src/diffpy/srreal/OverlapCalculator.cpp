@@ -53,6 +53,7 @@ OverlapCalculator::OverlapCalculator()
     // default configuration
     AtomRadiiTablePtr table(new AtomRadiiTable);
     this->setAtomRadiiTable(table);
+    this->cacheStructureData();
     // attributes
     this->registerDoubleAttribute("rmaxused", this,
             &OverlapCalculator::getRmaxUsed);
