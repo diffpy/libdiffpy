@@ -337,9 +337,8 @@ const R3::Vector& OverlapCalculator::subdirection(int index) const
 
 double OverlapCalculator::suboverlap(int index, int flipi, int flipj) const
 {
-    int cntsites = this->countSites();
-    assert(0 <= flipi && flipi < cntsites);
-    assert(0 <= flipj && flipj < cntsites);
+    assert(0 <= flipi && flipi < this->countSites());
+    assert(0 <= flipj && flipj < this->countSites());
     int i = int(this->subvalue(SITE0_OFFSET, index));
     int j = int(this->subvalue(SITE1_OFFSET, index));
     const double& radiusi = (flipi == flipj) ? mstructure_cache.siteradii[i] :
