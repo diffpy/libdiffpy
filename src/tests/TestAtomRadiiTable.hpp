@@ -45,7 +45,7 @@ class TestAtomRadiiTable : public CxxTest::TestSuite
 
         void test_lookup()
         {
-            TS_ASSERT_THROWS(mrtb->lookup("invalid"), invalid_argument);
+            TS_ASSERT_EQUALS(0.0, mrtb->lookup("everything"));
         }
 
 
@@ -54,7 +54,7 @@ class TestAtomRadiiTable : public CxxTest::TestSuite
             mrtb->setCustom("C", 1.23);
             TS_ASSERT_EQUALS(1.23, mrtb->lookup("C"));
             mrtb->resetAll();
-            TS_ASSERT_THROWS(mrtb->lookup("C"), invalid_argument);
+            TS_ASSERT_EQUALS(0.0, mrtb->lookup("C"));
         }
 
 

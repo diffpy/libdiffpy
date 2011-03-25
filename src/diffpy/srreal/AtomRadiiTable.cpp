@@ -45,10 +45,7 @@ double AtomRadiiTable::lookup(const string& smbl) const
 
 double AtomRadiiTable::tableLookup(const string& smbl) const
 {
-    string emsg = "Undefined radius for element '";
-    emsg += smbl;
-    emsg += "'.";
-    throw invalid_argument(emsg);
+    return 0.0;
 }
 
 
