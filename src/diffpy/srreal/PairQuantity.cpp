@@ -341,15 +341,26 @@ void PairQuantity::setPairMaskValue(int i, int j, bool mask)
 {
     assert(i != ALLATOMSINT || j != ALLATOMSINT);
     pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
-    if (ALLATOMSINT == ij.first && mask == mdefaultpairmask)
+    if (ALLATOMSINT == ij.first)
     {
-        // erase any inverted masks for the second site
         int k = ij.second;
-        boost::unordered_set< pair<int,int> >::iterator ii;
-        for (ii = minvertpairmask.begin(); ii != minvertpairmask.end();)
+        if (mask == mdefaultpairmask)
         {
-            ii = (ii->first == k || ii->second == k) ?
-                minvertpairmask.erase(ii) : ++ii;
+            // erase any inverted masks for the second site
+            boost::unordered_set< pair<int,int> >::iterator ii;
+            for (ii = minvertpairmask.begin(); ii != minvertpairmask.end();)
+            {
+                ii = (ii->first == k || ii->second == k) ?
+                    minvertpairmask.erase(ii) : ++ii;
+            }
+        }
+        else {
+            // invert mask for every index in the current structure
+            int cntsites = this->countSites();
+            for (int l = 0; l < cntsites; ++l)
+            {
+                this->setPairMaskValue(k, l, mask);
+            }
         }
     }
     if (mask == mdefaultpairmask)  minvertpairmask.erase(ij);
