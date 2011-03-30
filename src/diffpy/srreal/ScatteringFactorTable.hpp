@@ -24,10 +24,11 @@
 #ifndef SCATTERINGFACTORTABLE_HPP_INCLUDED
 #define SCATTERINGFACTORTABLE_HPP_INCLUDED
 
+#include <boost/unordered_set.hpp>
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/map.hpp>
 #include <boost/serialization/split_free.hpp>
 
+#include <diffpy/boostextensions/serialize_unordered_map.hpp>
 #include <diffpy/HasClassRegistry.hpp>
 
 namespace diffpy {
@@ -44,13 +45,13 @@ class ScatteringFactorTable :
         virtual double lookupatq(const std::string&, double) const = 0;
         void setCustom(const std::string& smbl, double value);
         void resetCustom(const std::string& smbl);
-        std::map<std::string,double> getAllCustom() const;
+        boost::unordered_map<std::string,double> getAllCustom() const;
         void resetAll();
 
     protected:
 
-        mutable std::map<std::string,double> mtable;
-        std::set<std::string> mcustomsymbols;
+        mutable boost::unordered_map<std::string,double> mtable;
+        boost::unordered_set<std::string> mcustomsymbols;
 
 };
 
@@ -96,7 +97,7 @@ void save(Archive& ar,
         const unsigned int version)
 {
     std::string tp;
-    std::map<std::string,double> dt;
+    boost::unordered_map<std::string,double> dt;
     if (ptr.get())
     {
         tp = ptr->type();
@@ -113,12 +114,12 @@ void load(Archive& ar,
 {
     using namespace diffpy::srreal;
     std::string tp;
-    std::map<std::string,double> dt;
+    boost::unordered_map<std::string,double> dt;
     ar & tp & dt;
     if (!tp.empty())
     {
         ptr = ScatteringFactorTable::createByType(tp);
-        std::map<std::string,double>::const_iterator kv;
+        boost::unordered_map<std::string,double>::const_iterator kv;
         for (kv = dt.begin(); kv != dt.end(); ++kv)
         {
             ptr->setCustom(kv->first, kv->second);

@@ -25,6 +25,7 @@
 
 using namespace std;
 using diffpy::srreal::ScatteringFactorTable;
+using boost::unordered_map;
 
 // Unique instantiation of the template registry base class.
 template class HasClassRegistry<ScatteringFactorTable>;
@@ -39,7 +40,7 @@ namespace srreal {
 double ScatteringFactorTable::lookup(const string& smbl) const
 {
     using namespace std;
-    map<string, double>::const_iterator isft;
+    unordered_map<string, double>::const_iterator isft;
     isft = mtable.find(smbl);
     if (isft == mtable.end())
     {
@@ -65,10 +66,10 @@ void ScatteringFactorTable::resetCustom(const string& smbl)
 }
 
 
-map<string,double> ScatteringFactorTable::getAllCustom() const
+unordered_map<string,double> ScatteringFactorTable::getAllCustom() const
 {
-    map<string,double> rv;
-    set<string>::const_iterator smbl;
+    unordered_map<string,double> rv;
+    boost::unordered_set<string>::const_iterator smbl;
     for (smbl = mcustomsymbols.begin(); smbl != mcustomsymbols.end(); ++smbl)
     {
         rv[*smbl] = this->lookup(*smbl);
