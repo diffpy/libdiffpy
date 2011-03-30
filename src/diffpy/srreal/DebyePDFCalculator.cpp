@@ -28,7 +28,6 @@
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/srreal/GaussianProfile.hpp>
-#include <diffpy/srreal/VR3Structure.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/serialization.hpp>
@@ -61,7 +60,7 @@ DebyePDFCalculator::DebyePDFCalculator()
     this->addEnvelopeByType("qresolution");
     // cache all internal data according to an empty structure.
     // this rebuilds mstructure_cache and mrlimits_cache.
-    this->setStructure(VR3Structure());
+    this->setStructure(mstructure);
     // attributes
     this->registerDoubleAttribute("qmin", this,
             &DebyePDFCalculator::getQmin, &DebyePDFCalculator::setQmin);

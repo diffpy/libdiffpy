@@ -28,7 +28,6 @@
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
-#include <diffpy/srreal/VR3Structure.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
 
@@ -59,7 +58,7 @@ PDFCalculator::PDFCalculator()
     this->addEnvelopeByType("qresolution");
     // cache all internal data according to an empty structure.
     // this rebuilds mstructure_cache and mrlimits_cache.
-    this->setStructure(VR3Structure());
+    this->setStructure(mstructure);
     // attributes
     this->registerDoubleAttribute("qmin", this,
             &PDFCalculator::getQmin, &PDFCalculator::setQmin);
