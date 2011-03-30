@@ -137,7 +137,8 @@ QuantityType OverlapCalculator::siteSquareOverlaps() const
         int j = int(this->subvalue(SITE1_OFFSET, index));
         int sumscale = (i == j) ? 1 : 2;
         rv[i] += sumscale * sqoverlap * mstructure->siteOccupancy(j);
-        rv[j] += sumscale * sqoverlap * mstructure->siteOccupancy(i);
+        rv[j] += sumscale * sqoverlap * mstructure->siteOccupancy(i) *
+            mstructure->siteMultiplicity(i) / mstructure->siteMultiplicity(j);
     }
     // Overlaps have been summed twice and need to be divided among 2 atoms.
     QuantityType::iterator xi;
@@ -181,19 +182,20 @@ double OverlapCalculator::flipDiffTotal(int i, int j) const
     if (sameradii)  return 0.0;
     // here we have to remove the overlap contributions for i and j
     double rv = 0.0;
-    list<int> allids = this->getNeighborIds(i);
+    const list<int>& ineighbors = this->getNeighborIds(i);
     const list<int>& jneighbors = this->getNeighborIds(j);
-    allids.insert(allids.end(), jneighbors.begin(), jneighbors.end());
-    list<int>::const_iterator idx;
+    boost::unordered_set<int> allids;
+    allids.insert(ineighbors.begin(), ineighbors.end());
+    allids.insert(jneighbors.begin(), jneighbors.end());
+    boost::unordered_set<int>::const_iterator idx;
     for (idx = allids.begin(); idx != allids.end(); ++idx)
     {
         int i1 = int(this->subvalue(SITE0_OFFSET, *idx));
         int j1 = int(this->subvalue(SITE1_OFFSET, *idx));
-        if (i1 == j1)  continue;
         double sqscale =
+            ((i1 == j1) ? 1 : 2) *
             mstructure->siteOccupancy(i1) * mstructure->siteOccupancy(j1) *
-            0.5 * (mstructure->siteMultiplicity(i1) +
-                    mstructure->siteMultiplicity(j1));
+            mstructure->siteMultiplicity(i1) / 2;
         double olp0 = this->suboverlap(*idx);
         double olp1 = this->suboverlap(*idx, i, j);
         rv -= sqscale * olp0 * olp0;
