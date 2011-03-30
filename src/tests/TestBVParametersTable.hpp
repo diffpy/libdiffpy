@@ -115,6 +115,10 @@ class TestBVParametersTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(1.791, zrh.mRo);
             TS_ASSERT_EQUALS(0.371, zrh.mB);
             TS_ASSERT_EQUALS(string("check"), zrh.mref_id);
+            mbvtb->setCustom("H", -1, "Zr", 4, 1.791, 0.444, "mate");
+            zrh = mbvtb->lookup("Zr", 4, "H", -1);
+            TS_ASSERT_EQUALS(0.444, zrh.mB);
+            TS_ASSERT_EQUALS(string("mate"), zrh.mref_id);
         }
 
 
@@ -147,6 +151,11 @@ class TestBVParametersTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(cnt0 + 1, cnt1);
             mbvtb->resetAll();
             TS_ASSERT_EQUALS(cnt0, mbvtb->getAll().size());
+            mbvtb->setCustom(BVParam("Mg", 2, "O", -2, 77, 88));
+            allpars1 = mbvtb->getAll();
+            const BVParam& mgo = *allpars1.find(BVParam("Mg", 2, "O", -2));
+            TS_ASSERT_EQUALS(77.0, mgo.mRo);
+            TS_ASSERT_EQUALS(88.0, mgo.mB);
         }
 
 

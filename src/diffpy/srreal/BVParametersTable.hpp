@@ -45,9 +45,6 @@ class BVParametersTable
         // static methods
         static const BVParam& none();
 
-        // constructors
-        BVParametersTable();
-
         // methods
         const BVParam& lookup(const BVParam&) const;
         const BVParam& lookup(const std::string& atom0, int valence0,
@@ -65,11 +62,10 @@ class BVParametersTable
     private:
 
         // data
-        const SetOfBVParam* mstandardtable;
         SetOfBVParam mcustomtable;
 
         // methods
-        SetOfBVParam* getStandardSetOfBVParam() const;
+        const SetOfBVParam& getStandardSetOfBVParam() const;
 
         // serialization
         friend class boost::serialization::access;

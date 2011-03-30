@@ -41,24 +41,16 @@ const BVParam& BVParametersTable::none()
     return bpnone;
 }
 
-// Constructor ---------------------------------------------------------------
-
-BVParametersTable::BVParametersTable()
-{
-    mstandardtable = this->getStandardSetOfBVParam();
-}
-
-
 // Public Methods ------------------------------------------------------------
 
 const BVParam& BVParametersTable::lookup(const BVParam& bpk) const
 {
-    assert(mstandardtable);
     SetOfBVParam::const_iterator bpit;
     bpit = mcustomtable.find(bpk);
     if (bpit != mcustomtable.end())  return *bpit;
-    bpit = mstandardtable->find(bpk);
-    if (bpit != mstandardtable->end())  return *bpit;
+    const SetOfBVParam& stdtable = this->getStandardSetOfBVParam();
+    bpit = stdtable.find(bpk);
+    if (bpit != stdtable.end())  return *bpit;
     // unspecified cations are marked with valence 9
     // perform this search only if the first atom is indeed a cation
     if (!(bpk.mvalence0 > 0))  return this->none();
@@ -66,8 +58,8 @@ const BVParam& BVParametersTable::lookup(const BVParam& bpk) const
     bpk9.mvalence0 = 9;
     bpit = mcustomtable.find(bpk9);
     if (bpit != mcustomtable.end())  return *bpit;
-    bpit = mstandardtable->find(bpk9);
-    if (bpit != mstandardtable->end())  return *bpit;
+    bpit = stdtable.find(bpk9);
+    if (bpit != stdtable.end())  return *bpit;
     // not found - return blank BVParam
     return this->none();
 }
@@ -84,6 +76,7 @@ const BVParam& BVParametersTable::lookup(const string& atom0, int valence0,
 
 void BVParametersTable::setCustom(const BVParam& bp)
 {
+    this->resetCustom(bp);
     mcustomtable.insert(bp);
 }
 
@@ -120,14 +113,17 @@ void BVParametersTable::resetAll()
 BVParametersTable::SetOfBVParam
 BVParametersTable::getAll() const
 {
-    SetOfBVParam rv = *mstandardtable;
-    rv.insert(mcustomtable.begin(), mcustomtable.end());
+    // insert inserts only those items that are not yet in the set, therefore
+    // we start with the custom table and then add the standard entries.
+    SetOfBVParam rv = mcustomtable;
+    const SetOfBVParam& stdtable = this->getStandardSetOfBVParam();
+    rv.insert(stdtable.begin(), stdtable.end());
     return rv;
 }
 
 // Private Methods -----------------------------------------------------------
 
-BVParametersTable::SetOfBVParam*
+const BVParametersTable::SetOfBVParam&
 BVParametersTable::getStandardSetOfBVParam() const
 {
     static SetOfBVParam the_set;
@@ -142,7 +138,7 @@ BVParametersTable::getStandardSetOfBVParam() const
             the_set.insert(bp);
         }
     }
-    return &the_set;
+    return the_set;
 }
 
 }   // namespace srreal
