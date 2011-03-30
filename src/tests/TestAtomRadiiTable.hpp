@@ -53,6 +53,8 @@ class TestAtomRadiiTable : public CxxTest::TestSuite
         {
             mrtb->setCustom("C", 1.23);
             TS_ASSERT_EQUALS(1.23, mrtb->lookup("C"));
+            mrtb->setCustom("C", 1.5);
+            TS_ASSERT_EQUALS(1.5, mrtb->lookup("C"));
             mrtb->resetAll();
             TS_ASSERT_EQUALS(0.0, mrtb->lookup("C"));
         }

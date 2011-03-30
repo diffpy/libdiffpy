@@ -86,7 +86,8 @@ void AtomRadiiTable::fromString(const string& s)
         rds[smbl] = value;
     }
     // everything worked up to here, we can do the assignment
-    mcustomradius.insert(rds.begin(), rds.end());
+    boost::unordered_map<string,double>::const_iterator kv = rds.begin();
+    for (; kv != rds.end(); ++kv)  mcustomradius[kv->first] = kv->second;
 }
 
 
