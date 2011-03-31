@@ -55,8 +55,7 @@ PQEvaluatorType PQEvaluatorBasic::typeint() const
 
 void PQEvaluatorBasic::updateValue(PairQuantity& pq)
 {
-    auto_ptr<BaseBondGenerator> bnds;
-    bnds.reset(pq.mstructure->createBondGenerator());
+    BaseBondGeneratorPtr bnds = pq.mstructure->createBondGenerator();
     pq.configureBondGenerator(*bnds);
     int cntsites = pq.mstructure->countSites();
     // loop counter

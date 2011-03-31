@@ -19,7 +19,6 @@
 *****************************************************************************/
 
 #include <stdexcept>
-#include <memory>
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/serialization.hpp>

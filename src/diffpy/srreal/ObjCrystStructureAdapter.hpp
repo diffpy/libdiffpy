@@ -57,7 +57,7 @@ class ObjCrystStructureAdapter : public StructureAdapter
         ObjCrystStructureAdapter(const ObjCryst::Crystal&);
 
         // methods - overloaded
-        virtual BaseBondGenerator* createBondGenerator() const;
+        virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int countSites() const;
         virtual double numberDensity() const;
         virtual const R3::Vector& siteCartesianPosition(int idx) const;
@@ -114,7 +114,7 @@ class ObjCrystBondGenerator : public BaseBondGenerator
     public:
 
         // constructors
-        ObjCrystBondGenerator(const ObjCrystStructureAdapter*);
+        ObjCrystBondGenerator(StructureAdapterConstPtr);
 
         // loop control
         virtual void rewind();
@@ -163,7 +163,7 @@ class ObjCrystMoleculeAdapter : public StructureAdapter
         ObjCrystMoleculeAdapter(const ObjCryst::Molecule&);
 
         // methods - overloaded
-        virtual BaseBondGenerator* createBondGenerator() const;
+        virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int countSites() const;
         virtual double numberDensity() const;
         virtual const R3::Vector& siteCartesianPosition(int idx) const;
@@ -208,7 +208,7 @@ class ObjCrystMoleculeBondGenerator : public BaseBondGenerator
     public:
 
         // constructors
-        ObjCrystMoleculeBondGenerator(const ObjCrystMoleculeAdapter*);
+        ObjCrystMoleculeBondGenerator(StructureAdapterConstPtr);
 
     protected:
 

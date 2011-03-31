@@ -259,7 +259,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
 
         auto_ptr<Crystal> mcryst_ni;
         StructureAdapterPtr m_ni;
-        auto_ptr<BaseBondGenerator> m_nibnds;
+        BaseBondGeneratorPtr m_nibnds;
 
     public:
 
@@ -270,7 +270,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
                 mcryst_ni.reset(loadTestCrystal("Ni.cif"));
                 m_ni = createStructureAdapter(*mcryst_ni);
             }
-            m_nibnds.reset(m_ni->createBondGenerator());
+            m_nibnds = m_ni->createBondGenerator();
         }
 
 
@@ -309,7 +309,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
         {
             auto_ptr<Crystal> wurtzite(loadTestCrystal("ZnS_wurtzite.cif"));
             StructureAdapterPtr stru = createStructureAdapter(*wurtzite);
-            auto_ptr<BaseBondGenerator> bnds(stru->createBondGenerator());
+            BaseBondGeneratorPtr bnds = stru->createBondGenerator();
             TS_ASSERT_EQUALS(2, stru->countSites());
             bnds->selectAnchorSite(0);
             bnds->selectSiteRange(0, 2);
@@ -347,7 +347,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
             auto_ptr<Crystal> litao3(loadTestCrystal("LiTaO3.cif"));
             StructureAdapterPtr stru = createStructureAdapter(*litao3);
             TS_ASSERT_EQUALS(3, stru->countSites());
-            auto_ptr<BaseBondGenerator> bnds(stru->createBondGenerator());
+            BaseBondGeneratorPtr bnds = stru->createBondGenerator();
             bnds->selectAnchorSite(0);
             bnds->selectSiteRange(0, 3);
             // there are 3 oxygen neighbors at 2.065
@@ -545,7 +545,7 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
 
         auto_ptr<Molecule> mmol_c60;
         StructureAdapterPtr m_c60;
-        auto_ptr<BaseBondGenerator> m_c60bnds;
+        BaseBondGeneratorPtr m_c60bnds;
 
     public:
 
@@ -556,7 +556,7 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
                 mmol_c60.reset(makeC60Molecule());
                 m_c60 = createStructureAdapter(*mmol_c60);
             }
-            m_c60bnds.reset(m_c60->createBondGenerator());
+            m_c60bnds = m_c60->createBondGenerator();
         }
 
         void test_typeid()

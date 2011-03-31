@@ -56,13 +56,13 @@ DiffPyStructureAdapter::DiffPyStructureAdapter(python::object dpstru)
 
 // Public Methods ------------------------------------------------------------
 
-BaseBondGenerator* DiffPyStructureAdapter::createBondGenerator() const
+BaseBondGeneratorPtr DiffPyStructureAdapter::createBondGenerator() const
 {
     // FIXME: hack for handling non-periodic structures
     // should diffpy.Structure get an isPeriodic method?
-    BaseBondGenerator* bnds = this->isPeriodic() ?
-        new DiffPyStructurePeriodicBondGenerator(this) :
-        new DiffPyStructureBaseBondGenerator(this);
+    BaseBondGeneratorPtr bnds(this->isPeriodic() ?
+        new DiffPyStructurePeriodicBondGenerator(shared_from_this()) :
+        new DiffPyStructureBaseBondGenerator(shared_from_this()));
     return bnds;
 }
 
@@ -266,9 +266,10 @@ bool DiffPyStructureAdapter::isPeriodic() const
 // Constructor ---------------------------------------------------------------
 
 DiffPyStructureBaseBondGenerator::DiffPyStructureBaseBondGenerator(
-        const DiffPyStructureAdapter* adpt) : BaseBondGenerator(adpt)
+        StructureAdapterConstPtr adpt) : BaseBondGenerator(adpt)
 {
-    mdpstructure = adpt;
+    mdpstructure = dynamic_cast<const DiffPyStructureAdapter*>(adpt.get());
+    assert(mdpstructure);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -278,7 +279,7 @@ DiffPyStructureBaseBondGenerator::DiffPyStructureBaseBondGenerator(
 // Constructor ---------------------------------------------------------------
 
 DiffPyStructurePeriodicBondGenerator::DiffPyStructurePeriodicBondGenerator(
-        const DiffPyStructureAdapter* adpt
+        StructureAdapterConstPtr adpt
         ) : DiffPyStructureBaseBondGenerator(adpt)
 {
     int cntsites = mdpstructure->countSites();

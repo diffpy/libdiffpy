@@ -44,9 +44,9 @@ NoMetaStructureAdapter::NoMetaStructureAdapter(
 
 // Public Methods ------------------------------------------------------------
 
-BaseBondGenerator* NoMetaStructureAdapter::createBondGenerator() const
+BaseBondGeneratorPtr NoMetaStructureAdapter::createBondGenerator() const
 {
-    BaseBondGenerator* bnds = msrcstructure->createBondGenerator();
+    BaseBondGeneratorPtr bnds = msrcstructure->createBondGenerator();
     return bnds;
 }
 

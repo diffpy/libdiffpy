@@ -258,8 +258,8 @@ class TestDiffPyStructureBondGenerator : public CxxTest::TestSuite
 {
     private:
 
-        auto_ptr<DiffPyStructureAdapter> m_ni;
-        auto_ptr<BaseBondGenerator> m_nibnds;
+        StructureAdapterPtr m_ni;
+        BaseBondGeneratorPtr m_nibnds;
 
     public:
 
@@ -271,7 +271,7 @@ class TestDiffPyStructureBondGenerator : public CxxTest::TestSuite
                 stru = loadTestStructure("Ni.cif");
                 m_ni.reset(new DiffPyStructureAdapter(stru));
             }
-            m_nibnds.reset(m_ni->createBondGenerator());
+            m_nibnds = m_ni->createBondGenerator();
         }
 
 
@@ -323,7 +323,7 @@ class TestDiffPyStructureBondGenerator : public CxxTest::TestSuite
         {
             python::object wurtzite = loadTestStructure("ZnS_wurtzite.cif");
             StructureAdapterPtr stru = createStructureAdapter(wurtzite);
-            auto_ptr<BaseBondGenerator> bnds(stru->createBondGenerator());
+            BaseBondGeneratorPtr bnds = stru->createBondGenerator();
             TS_ASSERT_EQUALS(4, stru->countSites());
             bnds->selectAnchorSite(0);
             bnds->selectSiteRange(0, 4);
@@ -365,7 +365,7 @@ class TestDiffPyStructureBondGenerator : public CxxTest::TestSuite
             python::object litao3 = loadTestStructure("LiTaO3.cif");
             StructureAdapterPtr stru = createStructureAdapter(litao3);
             TS_ASSERT_EQUALS(30, stru->countSites());
-            auto_ptr<BaseBondGenerator> bnds(stru->createBondGenerator());
+            BaseBondGeneratorPtr bnds = stru->createBondGenerator();
             bnds->selectAnchorSite(0);
             bnds->selectSiteRange(0, 30);
             // there are 3 oxygen neighbors at 2.065

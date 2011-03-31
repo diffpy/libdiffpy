@@ -111,12 +111,11 @@ ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst)
 
 // Public Methods ------------------------------------------------------------
 
-BaseBondGenerator*
+BaseBondGeneratorPtr
 ObjCrystStructureAdapter::
 createBondGenerator() const
 {
-
-    BaseBondGenerator* bnds = new ObjCrystBondGenerator(this);
+    BaseBondGeneratorPtr bnds(new ObjCrystBondGenerator(shared_from_this()));
     return bnds;
 }
 
@@ -349,11 +348,13 @@ getUnitCell(const ObjCryst::Crystal& cryst)
 // Constructor ---------------------------------------------------------------
 
 ObjCrystBondGenerator::
-ObjCrystBondGenerator(const ObjCrystStructureAdapter* adpt)
-    : BaseBondGenerator(adpt), mpstructure(adpt), msymidx(0)
+ObjCrystBondGenerator(StructureAdapterConstPtr adpt)
+    : BaseBondGenerator(adpt)
 {
+    mpstructure = dynamic_cast<const ObjCrystStructureAdapter*>(adpt.get());
+    assert(mpstructure);
+    msymidx = 0;
 }
-
 
 // Public Methods ------------------------------------------------------------
 
@@ -508,12 +509,13 @@ ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule)
 
 // Public Methods ------------------------------------------------------------
 
-BaseBondGenerator*
+BaseBondGeneratorPtr
 ObjCrystMoleculeAdapter::
 createBondGenerator() const
 {
 
-    BaseBondGenerator* bnds = new ObjCrystMoleculeBondGenerator(this);
+    BaseBondGeneratorPtr bnds(
+            new ObjCrystMoleculeBondGenerator(shared_from_this()));
     return bnds;
 }
 
@@ -594,9 +596,11 @@ siteAtomType(int idx) const
 // Constructor ---------------------------------------------------------------
 
 ObjCrystMoleculeBondGenerator::
-ObjCrystMoleculeBondGenerator(const ObjCrystMoleculeAdapter* adpt)
-    : BaseBondGenerator(adpt), mpstructure(adpt)
+ObjCrystMoleculeBondGenerator(StructureAdapterConstPtr adpt)
+    : BaseBondGenerator(adpt)
 {
+    mpstructure = dynamic_cast<const ObjCrystMoleculeAdapter*>(adpt.get());
+    assert(mpstructure);
 }
 
 // Factory Function and its Registration -------------------------------------

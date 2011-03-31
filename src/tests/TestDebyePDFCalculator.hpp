@@ -18,7 +18,6 @@
 *
 *****************************************************************************/
 
-#include <memory>
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/DebyePDFCalculator.hpp>

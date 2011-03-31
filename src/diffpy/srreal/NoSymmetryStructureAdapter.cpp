@@ -46,9 +46,9 @@ NoSymmetryStructureAdapter::NoSymmetryStructureAdapter(
 
 // Public Methods ------------------------------------------------------------
 
-BaseBondGenerator* NoSymmetryStructureAdapter::createBondGenerator() const
+BaseBondGeneratorPtr NoSymmetryStructureAdapter::createBondGenerator() const
 {
-    BaseBondGenerator* bnds = new BaseBondGenerator(this);
+    BaseBondGeneratorPtr bnds(new BaseBondGenerator(shared_from_this()));
     return bnds;
 }
 

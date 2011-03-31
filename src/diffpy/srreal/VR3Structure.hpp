@@ -50,7 +50,7 @@ class VR3Adapter : public StructureAdapter
         virtual bool siteAnisotropy(int idx) const;
         virtual const R3::Matrix& siteCartesianUij(int idx) const;
 
-        virtual BaseBondGenerator* createBondGenerator() const;
+        virtual BaseBondGeneratorPtr createBondGenerator() const;
 
     private:
 
@@ -74,7 +74,7 @@ class VR3BondGenerator : public BaseBondGenerator
     public:
 
         // constructors
-        VR3BondGenerator(const VR3Adapter*);
+        VR3BondGenerator(StructureAdapterConstPtr);
 
         // methods
         virtual const R3::Vector& r0() const;

@@ -59,9 +59,9 @@ const R3::Matrix& VR3Adapter::siteCartesianUij(int idx) const
 }
 
 
-BaseBondGenerator* VR3Adapter::createBondGenerator() const
+BaseBondGeneratorPtr VR3Adapter::createBondGenerator() const
 {
-    BaseBondGenerator* bnds = new VR3BondGenerator(this);
+    BaseBondGeneratorPtr bnds(new VR3BondGenerator(shared_from_this()));
     return bnds;
 }
 
@@ -71,8 +71,9 @@ BaseBondGenerator* VR3Adapter::createBondGenerator() const
 
 // Constructor ---------------------------------------------------------------
 
-VR3BondGenerator::VR3BondGenerator(const VR3Adapter* adpt) :
-    BaseBondGenerator(adpt), mvr3structure(adpt->mvr3structure)
+VR3BondGenerator::VR3BondGenerator(StructureAdapterConstPtr adpt) :
+    BaseBondGenerator(adpt),
+    mvr3structure(dynamic_cast<const VR3Adapter*>(adpt.get())->mvr3structure)
 { }
 
 // Public Methods ------------------------------------------------------------

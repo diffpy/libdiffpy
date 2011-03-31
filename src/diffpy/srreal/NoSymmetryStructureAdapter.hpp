@@ -43,7 +43,7 @@ class NoSymmetryStructureAdapter : public StructureAdapter
         NoSymmetryStructureAdapter(StructureAdapterPtr);
 
         // methods - overloaded
-        virtual BaseBondGenerator* createBondGenerator() const;
+        virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int countSites() const;
         virtual double numberDensity() const;
         virtual const R3::Vector& siteCartesianPosition(int idx) const;

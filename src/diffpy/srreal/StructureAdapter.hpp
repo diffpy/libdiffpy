@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/shared_ptr.hpp>
@@ -37,15 +38,13 @@ namespace srreal {
 
 class PairQuantity;
 
-/// shared pointer to StructureAdapter
-
-typedef boost::shared_ptr<class StructureAdapter> StructureAdapterPtr;
 
 /// @class StructureAdapter
 /// @brief abstract adaptor to structure data needed by
 /// PairQuantity calculator
 
-class StructureAdapter
+class StructureAdapter :
+    public boost::enable_shared_from_this<StructureAdapter>
 {
     public:
 
@@ -54,7 +53,7 @@ class StructureAdapter
         // methods
 
         /// factory for creating compatible BondGenerator instance.
-        virtual BaseBondGenerator* createBondGenerator() const = 0;
+        virtual BaseBondGeneratorPtr createBondGenerator() const = 0;
 
         /// number of independent sites in the structure, before
         /// any symmetry expansion.
@@ -119,7 +118,7 @@ int atomValence(const std::string& atomtype);
 /// Translate an index container to a vector of string symbols
 template <class T>
 std::vector<std::string>
-siteIndicesToTypes(const StructureAdapterPtr stru, const T& indices)
+siteIndicesToTypes(const StructureAdapterPtr& stru, const T& indices)
 {
     std::vector<std::string> rv;
     rv.reserve(stru->countSites());

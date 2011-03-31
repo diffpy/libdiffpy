@@ -32,7 +32,7 @@ namespace srreal {
 
 // Constructor ---------------------------------------------------------------
 
-BaseBondGenerator::BaseBondGenerator(const StructureAdapter* stru)
+BaseBondGenerator::BaseBondGenerator(StructureAdapterConstPtr stru)
 {
     msite_anchor = 0;
     msite_first = 0;

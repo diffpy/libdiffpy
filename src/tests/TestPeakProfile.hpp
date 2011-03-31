@@ -20,7 +20,6 @@
 
 #include <cmath>
 #include <stdexcept>
-#include <memory>
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/PeakProfile.hpp>

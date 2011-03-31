@@ -46,7 +46,7 @@ class DiffPyStructureAdapter : public StructureAdapter
         DiffPyStructureAdapter(boost::python::object);
 
         // methods - overloaded
-        virtual BaseBondGenerator* createBondGenerator() const;
+        virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int countSites() const;
         virtual double numberDensity() const;
         virtual const R3::Vector& siteCartesianPosition(int idx) const;
@@ -97,7 +97,7 @@ class DiffPyStructureBaseBondGenerator : public BaseBondGenerator
     public:
 
         // constructors
-        DiffPyStructureBaseBondGenerator(const DiffPyStructureAdapter*);
+        DiffPyStructureBaseBondGenerator(StructureAdapterConstPtr);
 
     protected:
 
@@ -111,7 +111,7 @@ class DiffPyStructurePeriodicBondGenerator : public DiffPyStructureBaseBondGener
     public:
 
         // constructors
-        DiffPyStructurePeriodicBondGenerator(const DiffPyStructureAdapter*);
+        DiffPyStructurePeriodicBondGenerator(StructureAdapterConstPtr);
 
         // methods
         // loop control
