@@ -61,8 +61,17 @@ class OverlapCalculator : public PairQuantity
         double flipDiffTotal(int i, int j) const;
         /// difference in the meanSquareOverlap for a flip of two sites
         double flipDiffMean(int i, int j) const;
-        /// gradients of flipDiffTotal at each site in the structure
+        /// gradients of totalSquareOverlap at each site in the structure
         std::vector<R3::Vector> gradients() const;
+        /// indices of the neighboring sites
+        boost::unordered_set<int> getNeighborSites(int i) const;
+        /// coordination number at each site of the structure
+        QuantityType coordinations() const;
+        /// coordination number split per each type of neighboring atoms
+        boost::unordered_map<std::string,double>
+            coordinationByTypes(int i) const;
+        /// sets of site inidices per each sites neighborhood in the structure
+        std::vector< boost::unordered_set<int> > neighborhoods() const;
 
         // access and configuration of the atom radii
         void setAtomRadiiTable(AtomRadiiTablePtr);
