@@ -32,7 +32,7 @@
 
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
-#include <diffpy/srreal/PairQuantity.hpp>
+#include <diffpy/srreal/PairQuantityUtils.hpp>
 
 namespace diffpy {
 namespace srreal {
