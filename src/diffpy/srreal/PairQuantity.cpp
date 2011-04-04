@@ -144,6 +144,7 @@ void PairQuantity::setupParallelRun(int cpuindex, int ncpu)
 void PairQuantity::maskAllPairs(bool mask)
 {
     minvertpairmask.clear();
+    msiteallmask.clear();
     mtypemask.clear();
     mdefaultpairmask = mask;
 }
@@ -170,6 +171,26 @@ void PairQuantity::setPairMask(int i, int j, bool mask)
     {
         this->maskAllPairs(mask);
         return;
+    }
+    if (ALLATOMSINT == i || ALLATOMSINT == j)
+    {
+        int k = (ALLATOMSINT != i) ? i : j;
+        msiteallmask[k] = mask;
+        int cntsites = this->countSites();
+        for (int l = 0; l < cntsites; ++l)
+        {
+            this->setPairMaskValue(k, l, mask);
+        }
+        return;
+    }
+    // here neither i nor j is ALLATOMSINT
+    if (msiteallmask.count(i) && mask != msiteallmask.at(i))
+    {
+        msiteallmask.erase(i);
+    }
+    if (msiteallmask.count(j) && mask != msiteallmask.at(j))
+    {
+        msiteallmask.erase(j);
     }
     this->setPairMaskValue(i, j, mask);
 }
@@ -286,12 +307,12 @@ void PairQuantity::updateMaskData()
     // Propagate masks with ALLATOMSINT to all valid indices.
     if (mtypemask.empty())
     {
-        for (int i = 0; i < cntsites; ++i)
+        boost::unordered_map<int, bool>::const_iterator ia;
+        for (ia = msiteallmask.begin(); ia != msiteallmask.end(); ++ia)
         {
-            bool maskall = minvertpairmask.count(make_pair(ALLATOMSINT, i));
-            for (int j = 0; maskall && j < cntsites; ++j)
+            for (int j = 0; j < cntsites; ++j)
             {
-                this->setPairMaskValue(i, j, !mdefaultpairmask);
+                this->setPairMaskValue(ia->first, j, ia->second);
             }
         }
     }
@@ -340,30 +361,8 @@ void PairQuantity::updateMaskData()
 
 void PairQuantity::setPairMaskValue(int i, int j, bool mask)
 {
-    assert(i != ALLATOMSINT || j != ALLATOMSINT);
+    assert(i >= ALLATOMSINT && j >= ALLATOMSINT);
     pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
-    if (ALLATOMSINT == ij.first)
-    {
-        int k = ij.second;
-        if (mask == mdefaultpairmask)
-        {
-            // erase any inverted masks for the second site
-            boost::unordered_set< pair<int,int> >::iterator ii;
-            for (ii = minvertpairmask.begin(); ii != minvertpairmask.end();)
-            {
-                ii = (ii->first == k || ii->second == k) ?
-                    minvertpairmask.erase(ii) : ++ii;
-            }
-        }
-        else {
-            // invert mask for every index in the current structure
-            int cntsites = this->countSites();
-            for (int l = 0; l < cntsites; ++l)
-            {
-                this->setPairMaskValue(k, l, mask);
-            }
-        }
-    }
     if (mask == mdefaultpairmask)  minvertpairmask.erase(ij);
     else    minvertpairmask.insert(ij);
 }

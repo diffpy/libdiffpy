@@ -98,6 +98,7 @@ class PairQuantity : public diffpy::Attributes
         PQEvaluatorPtr mevaluator;
         bool mdefaultpairmask;
         boost::unordered_set< std::pair<int,int> > minvertpairmask;
+        boost::unordered_map<int, bool> msiteallmask;
         TypeMaskStorage mtypemask;
         int mmergedvaluescount;
 
@@ -119,6 +120,7 @@ class PairQuantity : public diffpy::Attributes
             ar & mevaluator;
             ar & mdefaultpairmask;
             ar & minvertpairmask;
+            ar & msiteallmask;
             ar & mtypemask;
             ar & mmergedvaluescount;
         }
