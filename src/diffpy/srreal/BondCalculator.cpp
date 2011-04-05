@@ -40,13 +40,16 @@ const double DEFAULT_BONDCALCULATOR_RMAX = 5.0;
 
 enum {
     DISTANCE_OFFSET,
+    SITE0_OFFSET,
+    SITE1_OFFSET,
     DIRECTION0_OFFSET,
     DIRECTION1_OFFSET,
     DIRECTION2_OFFSET,
-    SITE0_OFFSET,
-    SITE1_OFFSET,
     CHUNK_SIZE,
 };
+
+const short REVERSE = -1;
+const short DIRECT = +1;
 
 }   // namespace
 
@@ -159,18 +162,8 @@ void BondCalculator::addPairContribution(
 {
     using diffpy::mathutils::eps_eq;
     if (eps_eq(0.0, bnds.distance()))    return;
-    static R3::Vector ru01;
-    const R3::Vector& r01 = bnds.r01();
-    ru01 = r01 / bnds.distance();
-    if (!(this->checkConeFilters(ru01)))  return;
-    int baseidx = mvalue.size();
-    mvalue.insert(mvalue.end(), CHUNK_SIZE, 0.0);
-    mvalue[baseidx + DISTANCE_OFFSET] = bnds.distance();
-    mvalue[baseidx + DIRECTION0_OFFSET] = r01[0];
-    mvalue[baseidx + DIRECTION1_OFFSET] = r01[1];
-    mvalue[baseidx + DIRECTION2_OFFSET] = r01[2];
-    mvalue[baseidx + SITE0_OFFSET] = bnds.site0();
-    mvalue[baseidx + SITE1_OFFSET] = bnds.site1();
+    if (summationscale > 0)  this->appendBond(bnds, DIRECT);
+    if (summationscale > 1)  this->appendBond(bnds, REVERSE);
 }
 
 
@@ -209,6 +202,34 @@ int BondCalculator::count() const
 {
     int rv = int(mvalue.size()) / CHUNK_SIZE;
     return rv;
+}
+
+
+void BondCalculator::appendBond(
+        const BaseBondGenerator& bnds,
+        short orientation)
+{
+    static R3::Vector ru01;
+    const R3::Vector& r01 = bnds.r01();
+    ru01 = r01 * (orientation / bnds.distance());
+    if (!(this->checkConeFilters(ru01)))  return;
+    int baseidx = mvalue.size();
+    mvalue.insert(mvalue.end(), CHUNK_SIZE, 0.0);
+    mvalue[baseidx + DISTANCE_OFFSET] = bnds.distance();
+    if (orientation == DIRECT)
+    {
+        mvalue[baseidx + SITE0_OFFSET] = bnds.site0();
+        mvalue[baseidx + SITE1_OFFSET] = bnds.site1();
+    }
+    else {
+        assert(orientation == REVERSE);
+        assert(bnds.site0() != bnds.site1());
+        mvalue[baseidx + SITE0_OFFSET] = bnds.site1();
+        mvalue[baseidx + SITE1_OFFSET] = bnds.site0();
+    }
+    mvalue[baseidx + DIRECTION0_OFFSET] = orientation * r01[0];
+    mvalue[baseidx + DIRECTION1_OFFSET] = orientation * r01[1];
+    mvalue[baseidx + DIRECTION2_OFFSET] = orientation * r01[2];
 }
 
 
