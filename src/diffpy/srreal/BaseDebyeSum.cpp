@@ -162,14 +162,16 @@ void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds,
     const double fwhmtosigma = 1.0 / (2 * sqrt(2 * M_LN2));
     const double dwsigma = fwhmtosigma * fwhm;
     const int nqpts = pdfutils_qmaxSteps(this);
+    const int smscale = summationscale * bnds.multiplicity();
+    const double& sineprec = this->getDebyePrecision();
     for (int kq = pdfutils_qminSteps(this); kq < nqpts; ++kq)
     {
         const double q = kq * this->getQstep();
         const double dwscale = exp(-0.5 * pow(dwsigma * q, 2));
-        const double sinescale = summationscale * dwscale *
+        const double sinescale = smscale * dwscale *
             this->sfSiteAtkQ(bnds.site0(), kq) *
             this->sfSiteAtkQ(bnds.site1(), kq) / dist;
-        if (sinescale < this->getDebyePrecision())   break;
+        if (eps_eq(0.0, sinescale, sineprec))   break;
         mvalue[kq] += sinescale * sin(q * dist);
     }
 }
