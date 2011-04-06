@@ -48,8 +48,7 @@ enum {
     CHUNK_SIZE,
 };
 
-const short REVERSE = -1;
-const short DIRECT = +1;
+enum {REVERSE = -1, DIRECT = +1};
 
 }   // namespace
 

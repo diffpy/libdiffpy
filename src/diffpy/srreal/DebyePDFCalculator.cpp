@@ -250,7 +250,7 @@ void DebyePDFCalculator::configureBondGenerator(BaseBondGenerator& bnds) const
 
 double DebyePDFCalculator::sfSiteAtQ(int siteidx, const double& Q) const
 {
-    const ScatteringFactorTablePtr sftable = this->getScatteringFactorTable();
+    const ScatteringFactorTablePtr& sftable = this->getScatteringFactorTable();
     const string& smbl = mstructure->siteAtomType(siteidx);
     const double occupancy = mstructure->siteOccupancy(siteidx);
     double rv = sftable->lookupatq(smbl, Q) * occupancy;
