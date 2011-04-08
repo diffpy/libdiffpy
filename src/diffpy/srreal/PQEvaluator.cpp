@@ -47,6 +47,12 @@ namespace srreal {
 // class PQEvaluatorBasic
 //////////////////////////////////////////////////////////////////////////////
 
+PQEvaluatorBasic::PQEvaluatorBasic() :
+    musefullsum(false),
+    mcpuindex(0), mncpu(1)
+{ }
+
+
 PQEvaluatorType PQEvaluatorBasic::typeint() const
 {
     return BASIC;
@@ -67,16 +73,23 @@ void PQEvaluatorBasic::updateValue(PairQuantity& pq)
     {
         if (chop_outer && (n++ % mncpu))    continue;
         bnds->selectAnchorSite(i0);
-        bnds->selectSiteRange(0, i0 + 1);
+        int i1hi = musefullsum ? cntsites : (i0 + 1);
+        bnds->selectSiteRange(0, i1hi);
         for (bnds->rewind(); !bnds->finished(); bnds->next())
         {
             if (chop_inner && (n++ % mncpu))    continue;
             int i1 = bnds->site1();
             if (!pq.getPairMask(i0, i1))   continue;
-            int summationscale = (i0 == i1) ? 1 : 2;
+            int summationscale = (musefullsum || i0 == i1) ? 1 : 2;
             pq.addPairContribution(*bnds, summationscale);
         }
     }
+}
+
+
+void PQEvaluatorBasic::useFullSum(bool flag)
+{
+    musefullsum = flag;
 }
 
 

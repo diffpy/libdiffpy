@@ -57,6 +57,7 @@ enum {REVERSE = -1, DIRECT = +1};
 BondCalculator::BondCalculator()
 {
     this->setRmax(DEFAULT_BONDCALCULATOR_RMAX);
+    mevaluator->useFullSum(true);
 }
 
 // Public Methods ------------------------------------------------------------
@@ -161,8 +162,8 @@ void BondCalculator::addPairContribution(
 {
     using diffpy::mathutils::eps_eq;
     if (eps_eq(0.0, bnds.distance()))    return;
-    if (summationscale > 0)  this->appendBond(bnds, DIRECT);
-    if (summationscale > 1)  this->appendBond(bnds, REVERSE);
+    assert(summationscale == 1);
+    this->appendBond(bnds, DIRECT);
 }
 
 

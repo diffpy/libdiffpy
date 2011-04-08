@@ -48,17 +48,20 @@ class PQEvaluatorBasic
     public:
 
         // constructor
-        PQEvaluatorBasic() : mcpuindex(0), mncpu(1)  { }
+        PQEvaluatorBasic();
         virtual ~PQEvaluatorBasic()  { }
 
         // methods
         virtual PQEvaluatorType typeint() const;
         virtual void updateValue(PairQuantity& pq);
+        void useFullSum(bool flag);
         void setupParallelRun(int cpuindex, int ncpu);
 
     protected:
 
         // data
+        /// flag for performing full double summation in updateValue
+        bool musefullsum;
         /// zero-based index of this CPU
         int mcpuindex;
         /// total number of the CPU units
@@ -71,7 +74,7 @@ class PQEvaluatorBasic
         template<class Archive>
             void serialize(Archive& ar, const unsigned int version)
         {
-            ar & mcpuindex & mncpu;
+            ar & musefullsum & mcpuindex & mncpu;
         }
 };
 

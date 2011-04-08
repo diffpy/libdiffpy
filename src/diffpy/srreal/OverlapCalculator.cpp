@@ -50,6 +50,7 @@ enum {
 
 OverlapCalculator::OverlapCalculator()
 {
+    mevaluator->useFullSum(true);
     // default configuration
     AtomRadiiTablePtr table(new AtomRadiiTable);
     this->setAtomRadiiTable(table);
@@ -135,14 +136,11 @@ QuantityType OverlapCalculator::siteSquareOverlaps() const
         double sqoverlap = olp * olp;
         int i = int(this->subvalue(SITE0_OFFSET, index));
         int j = int(this->subvalue(SITE1_OFFSET, index));
-        int sumscale = (i == j) ? 1 : 2;
-        rv[i] += sumscale * sqoverlap * mstructure->siteOccupancy(j);
-        rv[j] += sumscale * sqoverlap * mstructure->siteOccupancy(i) *
-            mstructure->siteMultiplicity(i) / mstructure->siteMultiplicity(j);
+        rv[i] += sqoverlap * mstructure->siteOccupancy(j);
     }
-    // Overlaps have been summed twice and need to be divided among 2 atoms.
+    // overlaps are shared by 2 atoms
     QuantityType::iterator xi;
-    for (xi = rv.begin(); xi != rv.end(); ++xi)  *xi /= 4;
+    for (xi = rv.begin(); xi != rv.end(); ++xi)  *xi /= 2;
     return rv;
 }
 
@@ -226,11 +224,9 @@ vector<R3::Vector> OverlapCalculator::gradients() const
         if (olp <= 0.0)  continue;
         const double& dst = this->subvalue(DISTANCE_OFFSET, index);
         assert(eps_gt(dst, 0.0));
-        int i = int(this->subvalue(SITE0_OFFSET, index));
         int j = int(this->subvalue(SITE1_OFFSET, index));
         gij = -2.0 * olp / dst * this->subdirection(index);
         rv[j] += gij;
-        rv[i] -= gij;
     }
     return rv;
 }
@@ -245,11 +241,9 @@ boost::unordered_set<int> OverlapCalculator::getNeighborSites(int i) const
     {
         double olp = this->suboverlap(*idx);
         if (olp <= 0.0)  continue;
-        int j0 = int(this->subvalue(SITE0_OFFSET, *idx));
+        assert(i == int(this->subvalue(SITE0_OFFSET, *idx)));
         int j1 = int(this->subvalue(SITE1_OFFSET, *idx));
-        assert(i == j0 || i == j1);
-        int k = (i == j0) ? j1 : j0;
-        rv.insert(k);
+        rv.insert(j1);
     }
     return rv;
 }
@@ -266,15 +260,8 @@ QuantityType OverlapCalculator::coordinations() const
         if (olp <= 0.0)  continue;
         int j0 = int(this->subvalue(SITE0_OFFSET, index));
         int j1 = int(this->subvalue(SITE1_OFFSET, index));
-        int sumscale = (j0 == j1) ? 1 : 2;
-        rv[j0] += sumscale * mstructure->siteOccupancy(j1);
-        rv[j1] += sumscale * mstructure->siteOccupancy(j0) *
-            mstructure->siteMultiplicity(j0) /
-            mstructure->siteMultiplicity(j1);
+        rv[j0] += mstructure->siteOccupancy(j1);
     }
-    // coordinations have been summed twice
-    QuantityType::iterator xi;
-    for (xi = rv.begin(); xi != rv.end(); ++xi)  *xi /= 2;
     return rv;
 }
 
@@ -408,6 +395,7 @@ void OverlapCalculator::addPairContribution(
         const BaseBondGenerator& bnds, int summationscale)
 {
     using diffpy::mathutils::eps_eq;
+    assert(summationscale == 1);
     assert(bnds.distance() <= mstructure_cache.maxseparation);
     if (eps_eq(0.0, bnds.distance()))    return;
     const R3::Vector& r01 = bnds.r01();
@@ -527,12 +515,8 @@ OverlapCalculator::getNeighborIds(int k) const
         for (int idx = 0; idx < n; ++idx)
         {
             int i = int(this->subvalue(SITE0_OFFSET, idx));
-            int j = int(this->subvalue(SITE1_OFFSET, idx));
             if (!mneighborids[i].get())  mneighborids[i].reset(new NbList);
             mneighborids[i]->push_back(idx);
-            if (i == j)  continue;
-            if (!mneighborids[j].get())  mneighborids[j].reset(new NbList);
-            mneighborids[j]->push_back(idx);
         }
     }
     assert(cntsites == int(mneighborids.size()));
