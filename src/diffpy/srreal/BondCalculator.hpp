@@ -67,7 +67,6 @@ class BondCalculator : public PairQuantity
 
         // methods
         int count() const;
-        void appendBond(const BaseBondGenerator&, short orientation);
         bool checkConeFilters(const R3::Vector& ru01) const;
 
         // data
