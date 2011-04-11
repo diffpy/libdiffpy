@@ -233,7 +233,7 @@ class TestPDFCalculator : public CxxTest::TestSuite
             mpdfc->setPeakProfileByType("gaussian");
             mpdfc->setDoubleAttr("peakprecision", 0.011);
             mpdfc->setScatteringFactorTableByType("electronnumber");
-            mpdfc->getScatteringFactorTable()->setCustom("H", 1.1);
+            mpdfc->getScatteringFactorTable()->setCustomFrom("H", "H", 1.1);
             // dump it to string
             stringstream storage(ios::in | ios::out | ios::binary);
             diffpy::serialization::oarchive oa(storage, ios::binary);

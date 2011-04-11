@@ -41,18 +41,25 @@ class ScatteringFactorTable :
 
         // methods
         virtual const std::string& radiationType() const = 0;
-        double lookup(const std::string& smbl) const;
-        virtual double lookupatq(const std::string&, double) const = 0;
-        void setCustom(const std::string& smbl, double value);
+        double lookup(const std::string& smbl, double q=0.0) const;
+        virtual double standardLookup(const std::string&, double) const = 0;
+        void setCustomFrom(const std::string& smbl, const std::string& srcsmbl,
+                double value, double q=0.0);
         void resetCustom(const std::string& smbl);
-        boost::unordered_map<std::string,double> getAllCustom() const;
         void resetAll();
+        boost::unordered_set<std::string> getCustomSymbols() const;
+
+        typedef boost::unordered_map<std::string,
+                std::pair<std::string, double> > CustomDataStorage;
 
     protected:
 
-        mutable boost::unordered_map<std::string,double> mtable;
-        boost::unordered_set<std::string> mcustomsymbols;
+        // data
+        CustomDataStorage mcustom;
 
+        // serialization helpers for accessing mcustom
+        friend const CustomDataStorage& getsftcustomdata(const SharedPtr&);
+        friend void setsftcustomdata(SharedPtr&, const CustomDataStorage&);
 };
 
 typedef ScatteringFactorTable::SharedPtr ScatteringFactorTablePtr;
@@ -83,6 +90,23 @@ class ScatteringFactorTableOwner
         }
 };
 
+// serialization helpers for accessing ScatteringFactorTable data
+
+inline
+const ScatteringFactorTable::CustomDataStorage&
+getsftcustomdata(const ScatteringFactorTablePtr& ptr)
+{
+    return ptr->mcustom;
+}
+
+
+inline
+void setsftcustomdata(ScatteringFactorTablePtr& ptr,
+        const ScatteringFactorTable::CustomDataStorage& dt)
+{
+    ptr->mcustom = dt;
+}
+
 }   // namespace srreal
 }   // namespace diffpy
 
@@ -96,12 +120,13 @@ void save(Archive& ar,
         const diffpy::srreal::ScatteringFactorTablePtr& ptr,
         const unsigned int version)
 {
+    using namespace diffpy::srreal;
     std::string tp;
-    boost::unordered_map<std::string,double> dt;
+    ScatteringFactorTable::CustomDataStorage dt;
     if (ptr.get())
     {
         tp = ptr->type();
-        dt = ptr->getAllCustom();
+        dt = getsftcustomdata(ptr);
     }
     ar & tp & dt;
 }
@@ -114,16 +139,12 @@ void load(Archive& ar,
 {
     using namespace diffpy::srreal;
     std::string tp;
-    boost::unordered_map<std::string,double> dt;
+    ScatteringFactorTable::CustomDataStorage dt;
     ar & tp & dt;
     if (!tp.empty())
     {
         ptr = ScatteringFactorTable::createByType(tp);
-        boost::unordered_map<std::string,double>::const_iterator kv;
-        for (kv = dt.begin(); kv != dt.end(); ++kv)
-        {
-            ptr->setCustom(kv->first, kv->second);
-        }
+        setsftcustomdata(ptr, dt);
     }
     else  ptr.reset();
 }

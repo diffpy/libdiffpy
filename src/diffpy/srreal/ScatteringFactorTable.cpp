@@ -37,51 +37,54 @@ namespace srreal {
 
 // public methods
 
-double ScatteringFactorTable::lookup(const string& smbl) const
+double ScatteringFactorTable::lookup(const string& smbl, double q) const
 {
-    using namespace std;
-    unordered_map<string, double>::const_iterator isft;
-    isft = mtable.find(smbl);
-    if (isft == mtable.end())
+    CustomDataStorage::const_iterator csft = mcustom.find(smbl);
+    double rv;
+    if (csft != mcustom.end())
     {
-        double value = this->lookupatq(smbl, 0.0);
-        mtable[smbl] = value;
-        isft = mtable.find(smbl);
+        const string& srcsmbl = csft->second.first;
+        const double& scale = csft->second.second;
+        rv = this->standardLookup(srcsmbl, q) * scale;
     }
-    return isft->second;
-}
-
-
-void ScatteringFactorTable::setCustom(const string& smbl, double value)
-{
-    mtable[smbl] = value;
-    mcustomsymbols.insert(smbl);
-}
-
-
-void ScatteringFactorTable::resetCustom(const string& smbl)
-{
-    mtable.erase(smbl);
-    mcustomsymbols.erase(smbl);
-}
-
-
-unordered_map<string,double> ScatteringFactorTable::getAllCustom() const
-{
-    unordered_map<string,double> rv;
-    boost::unordered_set<string>::const_iterator smbl;
-    for (smbl = mcustomsymbols.begin(); smbl != mcustomsymbols.end(); ++smbl)
-    {
-        rv[*smbl] = this->lookup(*smbl);
+    else {
+        rv = this->standardLookup(smbl, q);
     }
     return rv;
 }
 
 
+void ScatteringFactorTable::setCustomFrom(
+        const string& smbl, const string& srcsmbl,
+        double value, double q)
+{
+    double fsrc = this->standardLookup(srcsmbl, q);
+    double scale = value / fsrc;
+    mcustom[smbl] = make_pair(srcsmbl, scale);
+}
+
+
+void ScatteringFactorTable::resetCustom(const string& smbl)
+{
+    mcustom.erase(smbl);
+}
+
+
 void ScatteringFactorTable::resetAll()
 {
-    mtable.clear();
-    mcustomsymbols.clear();
+    mcustom.clear();
+}
+
+
+boost::unordered_set<string> ScatteringFactorTable::getCustomSymbols() const
+{
+    boost::unordered_set<string> rv;
+    CustomDataStorage::const_iterator csft;
+    for (csft = mcustom.begin(); csft != mcustom.end(); ++csft)
+    {
+        rv.insert(csft->first);
+    }
+    return rv;
 }
 
 // class ScatteringFactorTableOwner ------------------------------------------

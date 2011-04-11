@@ -81,7 +81,7 @@ class SFTperiodictableXray : public ScatteringFactorTable
         }
 
 
-        double lookupatq(const string& smbl, double q) const
+        double standardLookup(const string& smbl, double q) const
         {
             diffpy::initializePython();
             static python::object fxrayatq = diffpy::importFromPyModule(
@@ -138,15 +138,16 @@ class SFTElectron : public SFTperiodictableXray
         }
 
 
-        double lookupatq(const string& smbl, double q) const
+        double standardLookup(const string& smbl, double q) const
         {
             using namespace diffpy::mathutils;
             // resolve Z first so that invalid symbol can throw an exception
-            double Z = round(this->SFTperiodictableXray::lookupatq(smbl, 0.0));
+            double Z = round(
+                this->SFTperiodictableXray::standardLookup(smbl, 0.0));
             if (eps_eq(q, 0.0))     return DOUBLE_MAX;
             double stol = q / (4 * M_PI);
             double rv = 0.023934 *
-                (Z - this->SFTperiodictableXray::lookupatq(smbl, q)) /
+                (Z - this->SFTperiodictableXray::standardLookup(smbl, q)) /
                 (stol * stol);
             return rv;
         }
@@ -192,7 +193,7 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
         }
 
 
-        double lookupatq(const string& smbl, double q) const
+        double standardLookup(const string& smbl, double q) const
         {
             diffpy::initializePython();
             static python::object isotope = diffpy::importFromPyModule(

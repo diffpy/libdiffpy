@@ -73,7 +73,7 @@ class SFTElectronNumber : public ScatteringFactorTable
         }
 
 
-        double lookupatq(const string& smbl, double q) const
+        double standardLookup(const string& smbl, double q) const
         {
             const boost::unordered_map<string,int>&
                 entable = this->getElectronNumberTable();
@@ -119,7 +119,7 @@ class SFTElectronNumber : public ScatteringFactorTable
                     fp >> element >> z;
                     assert(fp);
                     entable[element] = z;
-                    for (int v = 0; fp >> v;)
+                    for (int v; fp >> v;)
                     {
                         ostringstream smbl;
                         smbl << element << abs(v) << ((v > 0) ? '+' : '-');

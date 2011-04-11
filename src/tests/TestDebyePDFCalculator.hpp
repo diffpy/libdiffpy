@@ -145,7 +145,7 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
             mpdfc->setDoubleAttr("width", 0.123);
             mpdfc->setDoubleAttr("debyeprecision", 0.00011);
             mpdfc->setScatteringFactorTableByType("electronnumber");
-            mpdfc->getScatteringFactorTable()->setCustom("H", 1.1);
+            mpdfc->getScatteringFactorTable()->setCustomFrom("H", "H", 1.1);
             // dump it to string
             stringstream storage(ios::in | ios::out | ios::binary);
             diffpy::serialization::oarchive oa(storage, ios::binary);
