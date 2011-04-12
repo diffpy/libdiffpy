@@ -39,6 +39,12 @@ namespace srreal {
 
 double ScatteringFactorTable::lookup(const string& smbl, double q) const
 {
+    if (0.0 == q)
+    {
+        boost::unordered_map<std::string,double>::const_iterator ii =
+            mqzerocache.find(smbl);
+        if (ii != mqzerocache.end())   return ii->second;
+    }
     CustomDataStorage::const_iterator csft = mcustom.find(smbl);
     double rv;
     if (csft != mcustom.end())
@@ -50,6 +56,7 @@ double ScatteringFactorTable::lookup(const string& smbl, double q) const
     else {
         rv = this->standardLookup(smbl, q);
     }
+    if (0.0 == q)  mqzerocache[smbl] = rv;
     return rv;
 }
 
@@ -61,18 +68,21 @@ void ScatteringFactorTable::setCustomFrom(
     double fsrc = this->standardLookup(srcsmbl, q);
     double scale = value / fsrc;
     mcustom[smbl] = make_pair(srcsmbl, scale);
+    mqzerocache.erase(smbl);
 }
 
 
 void ScatteringFactorTable::resetCustom(const string& smbl)
 {
     mcustom.erase(smbl);
+    mqzerocache.erase(smbl);
 }
 
 
 void ScatteringFactorTable::resetAll()
 {
     mcustom.clear();
+    mqzerocache.clear();
 }
 
 

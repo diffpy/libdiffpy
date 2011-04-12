@@ -56,6 +56,7 @@ class ScatteringFactorTable :
 
         // data
         CustomDataStorage mcustom;
+        mutable boost::unordered_map<std::string, double> mqzerocache;
 
         // serialization helpers for accessing mcustom
         friend const CustomDataStorage& getsftcustomdata(const SharedPtr&);
