@@ -38,7 +38,7 @@ class AtomRadiiTable
     public:
 
         // destructor
-        ~AtomRadiiTable()  { }
+        virtual ~AtomRadiiTable()  { }
 
         // methods
         /// fast value lookup, which does not change the table.
