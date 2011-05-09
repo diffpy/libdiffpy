@@ -56,16 +56,17 @@ env['lib_sources'] = []
 # This SConscript updates lib_includes and lib_sources.
 SConscript('diffpy/SConscript')
 
-# Define targets related to testing.  Do so only when testing is requested.
-# This enables library build on machines without cxxtest.
-if 'test' in COMMAND_LINE_TARGETS or 'alltests' in COMMAND_LINE_TARGETS:
-    SConscript('tests/SConscript')
-
 # Top Level Targets ----------------------------------------------------------
 
 # lib -- shared library object
 libdiffpy = env.SharedLibrary('libdiffpy', env['lib_sources'])
+Export('libdiffpy')
 Alias('lib', libdiffpy)
+
+# Define targets related to testing.  Do so only when testing is requested.
+# This enables library build on machines without cxxtest.
+if set(('test', 'alltests')).intersection(COMMAND_LINE_TARGETS):
+    SConscript('tests/SConscript')
 
 # Installation targets.
 
