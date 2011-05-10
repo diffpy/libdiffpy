@@ -21,6 +21,29 @@
 #ifndef MATHUTILS_IPP_INCLUDED
 #define MATHUTILS_IPP_INCLUDED
 
+// define round and remainder when compiling with MSVC
+#ifdef _MSC_VER
+
+inline double round(double x)
+{
+    return floor(x + 0.5);
+}
+
+
+inline double remainder(double x, double y)
+{
+    return ((x > 0 && y > 0) || (x < 0 && y < 0)) ?
+        fmod(x, y) : (fmod(x, y) + y);
+}
+
+
+inline double log2(double x)
+{
+    return log(x) / log(2.0);
+}
+
+#endif  // _MSC_VER
+
 namespace diffpy {
 namespace mathutils {
 

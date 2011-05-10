@@ -133,7 +133,7 @@ int atomValence(const std::string& atomtype)
     int rv = 0;
     for (ci = atomtype.rbegin(); ci != atomtype.rend(); ++ci)
     {
-        if (isblank(*ci))   continue;
+        if (isspace(*ci))   continue;
         // read trailing sign
         if (rv == 0)
         {
