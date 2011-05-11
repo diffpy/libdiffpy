@@ -26,6 +26,7 @@
 #include <boost/serialization/export.hpp>
 
 #include <diffpy/srreal/AtomRadiiTable.hpp>
+#include <diffpy/serialization.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -134,6 +135,7 @@ string AtomRadiiTable::toString(string separator) const
 
 // Serialization -------------------------------------------------------------
 
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::AtomRadiiTable)
 BOOST_CLASS_EXPORT(diffpy::srreal::AtomRadiiTable)
 
 // End of file
