@@ -24,6 +24,7 @@
 
 #include <diffpy/mathutils.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
+#include <diffpy/srreal/VR3Structure.hpp>
 
 using namespace std;
 using diffpy::mathutils::eps_eq;
@@ -70,6 +71,14 @@ double StructureAdapter::siteOccupancy(int idx) const
 }
 
 // Routines ------------------------------------------------------------------
+
+StructureAdapterPtr emptyStructureAdapter()
+{
+    static StructureAdapterPtr stru(new VR3Adapter);
+    assert(stru.get() && stru->countSites() == 0);
+    return stru;
+}
+
 
 double meanSquareDisplacement(const R3::Matrix& Uijcartn,
         const R3::Vector& s, bool anisotropy)

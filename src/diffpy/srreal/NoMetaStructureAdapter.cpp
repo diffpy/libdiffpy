@@ -39,7 +39,8 @@ namespace srreal {
 NoMetaStructureAdapter::NoMetaStructureAdapter(
         StructureAdapterPtr srcstructure)
 {
-    msrcstructure = srcstructure;
+    msrcstructure = srcstructure.get() ?
+        srcstructure : emptyStructureAdapter();
 }
 
 // Public Methods ------------------------------------------------------------

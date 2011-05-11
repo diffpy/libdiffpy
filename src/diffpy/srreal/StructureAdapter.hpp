@@ -101,6 +101,9 @@ class StructureAdapter :
 
 // Routines ------------------------------------------------------------------
 
+/// Return a singleton instance of an empty StructureAdapter
+StructureAdapterPtr emptyStructureAdapter();
+
 /// Calculate MSD along specified direction in Cartesian space.
 double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
         bool anisotropy=true);

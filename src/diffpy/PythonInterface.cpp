@@ -48,8 +48,9 @@ python::object do_python_import(const string& modname, const string& item)
     ObjectCache::iterator ii = cacheditems.find(fullname);
     if (ii == cacheditems.end())
     {
-        cacheditems[fullname] =
-            python::import(modname.c_str()).attr(item.c_str());
+        python::object mod = python::import(modname.c_str());
+        python::object obj = mod.attr(item.c_str());
+        cacheditems[fullname] = obj;
         ii = cacheditems.find(fullname);
     }
     return ii->second;

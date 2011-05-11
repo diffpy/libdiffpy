@@ -23,7 +23,6 @@
 #include <sstream>
 
 #include <diffpy/srreal/PairQuantity.hpp>
-#include <diffpy/srreal/VR3Structure.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/serialization.hpp>
 
@@ -39,7 +38,7 @@ const string PairQuantity::ALLATOMSSTR = "all";
 
 // Constructor ---------------------------------------------------------------
 
-PairQuantity::PairQuantity() : mstructure(new VR3Adapter)
+PairQuantity::PairQuantity() : mstructure(emptyStructureAdapter())
 {
     this->setRmin(0.0);
     this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
@@ -62,7 +61,7 @@ const QuantityType& PairQuantity::eval()
 
 void PairQuantity::setStructure(StructureAdapterPtr stru)
 {
-    mstructure = stru;
+    mstructure = stru.get() ? stru : emptyStructureAdapter();
     mstructure->customPQConfig(this);
     this->updateMaskData();
     this->resetValue();

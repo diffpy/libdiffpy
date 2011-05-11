@@ -41,7 +41,8 @@ namespace srreal {
 NoSymmetryStructureAdapter::NoSymmetryStructureAdapter(
         StructureAdapterPtr srcstructure)
 {
-    msrcstructure = srcstructure;
+    msrcstructure = srcstructure.get() ?
+        srcstructure : emptyStructureAdapter();
 }
 
 // Public Methods ------------------------------------------------------------
