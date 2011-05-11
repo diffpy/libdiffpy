@@ -28,6 +28,7 @@
 #include <diffpy/serialization.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
+#include <diffpy/srreal/PointsInSphere.hpp>
 #include "python_helpers.hpp"
 
 using namespace std;
