@@ -94,8 +94,7 @@ class OverlapCalculator : public PairQuantity
 
         // types
         enum OverlapFlag {ALLVALUES, OVERLAPPING};
-        typedef std::vector< boost::shared_ptr< std::list<int> > >
-            NeighborIdsStorage;
+        typedef boost::unordered_map<int, std::list<int> > NeighborIdsStorage;
 
         // methods
         int count() const;
@@ -109,6 +108,7 @@ class OverlapCalculator : public PairQuantity
         // data
         AtomRadiiTablePtr matomradiitable;
         mutable NeighborIdsStorage mneighborids;
+        mutable bool mneighborids_cached;
         // cache
         struct {
             QuantityType siteradii;

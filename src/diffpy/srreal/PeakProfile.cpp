@@ -57,8 +57,4 @@ const double& PeakProfile::getPrecision() const
 }   // namespace srreal
 }   // namespace diffpy
 
-// Serialization -------------------------------------------------------------
-
-BOOST_CLASS_EXPORT(diffpy::srreal::PeakProfilePtr)
-
 // End of file

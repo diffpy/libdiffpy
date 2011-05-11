@@ -147,6 +147,5 @@ BVParametersTable::getStandardSetOfBVParam() const
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::BVParametersTable)
-BOOST_CLASS_EXPORT(diffpy::srreal::BVParametersTable)
 
 // End of file

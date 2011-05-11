@@ -132,9 +132,4 @@ void PDFEnvelopeOwner::clearEnvelopes()
 }   // namespace srreal
 }   // namespace diffpy
 
-// Serialization -------------------------------------------------------------
-
-BOOST_CLASS_EXPORT(diffpy::srreal::PDFEnvelopePtr)
-BOOST_CLASS_EXPORT(diffpy::srreal::PDFEnvelopeOwner)
-
 // End of file

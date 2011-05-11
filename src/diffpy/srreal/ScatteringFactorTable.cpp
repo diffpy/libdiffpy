@@ -137,9 +137,4 @@ const string& ScatteringFactorTableOwner::getRadiationType() const
 }   // namespace srreal
 }   // namespace diffpy
 
-// Serialization -------------------------------------------------------------
-
-BOOST_CLASS_EXPORT(diffpy::srreal::ScatteringFactorTablePtr)
-BOOST_CLASS_EXPORT(diffpy::srreal::ScatteringFactorTableOwner)
-
 // End of file

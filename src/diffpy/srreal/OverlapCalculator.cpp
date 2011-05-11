@@ -55,6 +55,7 @@ OverlapCalculator::OverlapCalculator()
     AtomRadiiTablePtr table(new AtomRadiiTable);
     this->setAtomRadiiTable(table);
     this->cacheStructureData();
+    mneighborids_cached = false;
     // attributes
     this->registerDoubleAttribute("rmaxused", this,
             &OverlapCalculator::getRmaxUsed);
@@ -380,6 +381,7 @@ void OverlapCalculator::resetValue()
 {
     mvalue.clear();
     mneighborids.clear();
+    mneighborids_cached = false;
     this->cacheStructureData();
     this->PairQuantity::resetValue();
 }
@@ -508,25 +510,30 @@ OverlapCalculator::getNeighborIds(int k) const
     typedef std::list<int> NbList;
     int cntsites = this->countSites();
     assert(0 <= k && k < cntsites);
-    if (mneighborids.empty())
+    if (!mneighborids_cached)
     {
-        mneighborids.resize(cntsites);
+        assert(mneighborids.empty());
         int n = this->count();
         for (int idx = 0; idx < n; ++idx)
         {
             int i = int(this->subvalue(SITE0_OFFSET, idx));
-            if (!mneighborids[i].get())  mneighborids[i].reset(new NbList);
-            mneighborids[i]->push_back(idx);
+            mneighborids[i].push_back(idx);
         }
+        mneighborids_cached = true;
     }
-    assert(cntsites == int(mneighborids.size()));
     static NbList noneighbors;
+    NeighborIdsStorage::const_iterator nbit = mneighborids.find(k);
     const NbList& rv =
-        mneighborids[k].get() ? *mneighborids[k] : noneighbors;
+        (nbit == mneighborids.end()) ?  noneighbors : nbit->second;
     return rv;
 }
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::OverlapCalculator)
+BOOST_CLASS_EXPORT(diffpy::srreal::OverlapCalculator)
 
 // End of file

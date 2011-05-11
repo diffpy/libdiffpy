@@ -26,8 +26,4 @@
 // Unique instantiation of the template registry base class.
 template class HasClassRegistry<diffpy::srreal::PDFBaseline>;
 
-// Serialization -------------------------------------------------------------
-
-BOOST_CLASS_EXPORT(diffpy::srreal::PDFBaselinePtr)
-
 // End of file

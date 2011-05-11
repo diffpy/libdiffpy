@@ -233,4 +233,9 @@ bool BondCalculator::checkConeFilters(const R3::Vector& ru01) const
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::BondCalculator)
+BOOST_CLASS_EXPORT(diffpy::srreal::BondCalculator)
+
 // End of file
