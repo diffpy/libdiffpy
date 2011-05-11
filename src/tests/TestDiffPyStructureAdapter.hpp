@@ -85,6 +85,7 @@ class TestDiffPyStructureAdapter : public CxxTest::TestSuite
 
         void setUp()
         {
+            CxxTest::setAbortTestOnFail(true);
             python::object stru;
             if (!m_ni.get())
             {
@@ -106,6 +107,7 @@ class TestDiffPyStructureAdapter : public CxxTest::TestSuite
                 stru = loadTestStructure("PbScW25TiO3.stru");
                 m_pswt = createStructureAdapter(stru);
             }
+            CxxTest::setAbortTestOnFail(false);
         }
 
 
@@ -266,6 +268,7 @@ class TestDiffPyStructureBondGenerator : public CxxTest::TestSuite
 
         void setUp()
         {
+            CxxTest::setAbortTestOnFail(true);
             if (!m_ni.get())
             {
                 python::object stru;
@@ -273,6 +276,7 @@ class TestDiffPyStructureBondGenerator : public CxxTest::TestSuite
                 m_ni.reset(new DiffPyStructureAdapter(stru));
             }
             m_nibnds = m_ni->createBondGenerator();
+            CxxTest::setAbortTestOnFail(false);
         }
 
 

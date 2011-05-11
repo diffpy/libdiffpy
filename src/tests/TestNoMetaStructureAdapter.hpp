@@ -47,6 +47,7 @@ class TestNoMetaStructureAdapter : public CxxTest::TestSuite
 
         void setUp()
         {
+            CxxTest::setAbortTestOnFail(true);
             if (!m_pswt.get())
             {
                 python::object stru;
@@ -54,6 +55,7 @@ class TestNoMetaStructureAdapter : public CxxTest::TestSuite
                 stru.attr("pdffit")["scale"] = 2.5;
                 m_pswt = createStructureAdapter(stru);
             }
+            CxxTest::setAbortTestOnFail(false);
         }
 
 

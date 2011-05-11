@@ -44,11 +44,13 @@ class TestBVSCalculator : public CxxTest::TestSuite
 
         void setUp()
         {
+            CxxTest::setAbortTestOnFail(true);
             if (mnacl.ptr() == Py_None)
             {
                 mnacl = loadTestStructure("NaCl.cif");
             }
             mbvc.reset(new BVSCalculator);
+            CxxTest::setAbortTestOnFail(false);
         }
 
 

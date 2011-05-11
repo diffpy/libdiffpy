@@ -42,12 +42,14 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 
         void setUp()
         {
+            CxxTest::setAbortTestOnFail(true);
             meps = diffpy::mathutils::SQRT_DOUBLE_EPS;
             molc.reset(new OverlapCalculator);
             molc->getAtomRadiiTable()->setCustom("", 1.0);
             molc->getAtomRadiiTable()->setCustom("Na1+", 1.5);
             molc->getAtomRadiiTable()->setCustom("Cl1-", 1.8);
             if (mnacl.ptr() == Py_None)  mnacl = loadTestStructure("NaCl.cif");
+            CxxTest::setAbortTestOnFail(true);
         }
 
 
