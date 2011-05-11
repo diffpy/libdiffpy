@@ -82,7 +82,8 @@ class BaseDebyeSum :
         double mqstep;
         double mdebyeprecision;
         struct {
-            std::vector< boost::shared_ptr<QuantityType> > sfsiteatkq;
+            std::vector<int> typeofsite;
+            std::vector<QuantityType> sftypeatkq;
             QuantityType sfaverageatkq;
             double totaloccupancy;
         } mstructure_cache;
@@ -99,7 +100,8 @@ class BaseDebyeSum :
             ar & mqmax;
             ar & mqstep;
             ar & mdebyeprecision;
-            ar & mstructure_cache.sfsiteatkq;
+            ar & mstructure_cache.typeofsite;
+            ar & mstructure_cache.sftypeatkq;
             ar & mstructure_cache.sfaverageatkq;
             ar & mstructure_cache.totaloccupancy;
         }

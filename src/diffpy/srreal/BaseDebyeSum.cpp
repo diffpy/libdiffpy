@@ -186,9 +186,10 @@ double BaseDebyeSum::sfSiteAtQ(int siteidx, const double& q) const
 
 double BaseDebyeSum::sfSiteAtkQ(int siteidx, int kq) const
 {
-    assert(siteidx < int(mstructure_cache.sfsiteatkq.size()));
-    assert(mstructure_cache.sfsiteatkq[siteidx].get());
-    const QuantityType& sfarray = *(mstructure_cache.sfsiteatkq[siteidx]);
+    assert(0 <= siteidx && siteidx < int(mstructure_cache.typeofsite.size()));
+    int typeidx = mstructure_cache.typeofsite[siteidx];
+    assert(typeidx < int(mstructure_cache.sftypeatkq.size()));
+    const QuantityType& sfarray = mstructure_cache.sftypeatkq[typeidx];
     assert(0 <= kq && kq < int(sfarray.size()));
     return sfarray[kq];
 }
@@ -206,54 +207,60 @@ void BaseDebyeSum::cacheStructureData()
     int cntsites = this->countSites();
     const int nqpts = pdfutils_qmaxSteps(this);
     QuantityType zeros(nqpts, 0.0);
-    map<string,int> atomtypeidx;
-    // sfsiteatkq
-    mstructure_cache.sfsiteatkq.clear();
+    boost::unordered_map<string,int> atomtypeidx;
+    // sftypeatkq
+    mstructure_cache.typeofsite.clear();
+    mstructure_cache.typeofsite.reserve(cntsites);
+    mstructure_cache.sftypeatkq.clear();
     for (int siteidx = 0; siteidx < cntsites; ++siteidx)
     {
         const string& smbl = mstructure->siteAtomType(siteidx);
-        if (!atomtypeidx.count(smbl))  atomtypeidx[smbl] = siteidx;
-        int idx = atomtypeidx[smbl];
-        assert(mstructure->siteAtomType(siteidx) ==
-                mstructure->siteAtomType(idx));
-        assert(idx <= int(mstructure_cache.sfsiteatkq.size()));
-        // link to an existing array
-        if (idx < int(mstructure_cache.sfsiteatkq.size()))
+        if (!atomtypeidx.count(smbl))
         {
-            assert(mstructure_cache.sfsiteatkq[idx].get());
-            mstructure_cache.sfsiteatkq.push_back(
-                    mstructure_cache.sfsiteatkq[idx]);
-            continue;
+            atomtypeidx.insert(make_pair(smbl, int(atomtypeidx.size())));
         }
+        int tpidx = atomtypeidx[smbl];
+        mstructure_cache.typeofsite.push_back(tpidx);
+        // do nothing if the type has been already cached
+        if (tpidx < int(mstructure_cache.sftypeatkq.size()))  continue;
+        assert(tpidx == int(mstructure_cache.sftypeatkq.size()));
         // here we need to build a new array
-        boost::shared_ptr<QuantityType> pa(new QuantityType(zeros));
-        mstructure_cache.sfsiteatkq.push_back(pa);
-        QuantityType& sfarray = *(mstructure_cache.sfsiteatkq.back());
+        mstructure_cache.sftypeatkq.push_back(zeros);
+        QuantityType& sfarray = mstructure_cache.sftypeatkq.back();
         for (int kq = pdfutils_qminSteps(this); kq < nqpts; ++kq)
         {
             double q = this->getQstep() * kq;
             sfarray[kq] = this->sfSiteAtQ(siteidx, q);
         }
     }
-    assert(cntsites == int(mstructure_cache.sfsiteatkq.size()));
+    assert(cntsites == int(mstructure_cache.typeofsite.size()));
+    assert(atomtypeidx.size() == mstructure_cache.sftypeatkq.size());
+    // totaloccupancy
+    mstructure_cache.totaloccupancy = mstructure->totalOccupancy();
     // sfaverageatkq
     QuantityType& sfak = mstructure_cache.sfaverageatkq;
     sfak = zeros;
+    int ntps = mstructure_cache.sftypeatkq.size();
+    vector<int> tpmultipl(ntps, 0);
     for (int siteidx = 0; siteidx < cntsites; ++siteidx)
     {
-        QuantityType& sfarray = *(mstructure_cache.sfsiteatkq[siteidx]);
-        const int multipl = mstructure->siteMultiplicity(siteidx);
+        int tpidx = mstructure_cache.typeofsite[siteidx];
+        assert(tpidx < ntps);
+        tpmultipl[tpidx] += mstructure->siteMultiplicity(siteidx);
+    }
+    for (int tpidx = 0; tpidx < ntps; ++tpidx)
+    {
+        QuantityType& sfarray = mstructure_cache.sftypeatkq[tpidx];
+        const int multipl = tpmultipl[tpidx];
         for (int kq = pdfutils_qminSteps(this); kq < nqpts; ++kq)
         {
             sfak[kq] += sfarray[kq] * multipl;
         }
     }
-    double tosc = eps_gt(mstructure->totalOccupancy(), 0.0) ?
-        (1.0 / mstructure->totalOccupancy()) : 1.0;
+    const double& totocc = mstructure_cache.totaloccupancy;
+    double tosc = eps_gt(totocc, 0.0) ? (1.0 / totocc) : 1.0;
     transform(sfak.begin(), sfak.end(), sfak.begin(),
             bind1st(multiplies<double>(), tosc));
-    // totaloccupancy
-    mstructure_cache.totaloccupancy = mstructure->totalOccupancy();
 }
 
 }   // namespace srreal
