@@ -44,6 +44,18 @@ enum {
     CHUNK_SIZE,
 };
 
+
+template <class T>
+vector<T> vectorconvert(const QuantityType& v)
+{
+    vector<T> rv;
+    rv.reserve(v.size());
+    QuantityType::const_iterator x = v.begin();
+    for (; x != v.end(); ++x)  rv.push_back(T(*x));
+    return rv;
+}
+
+
 }   // namespace
 
 // Constructor ---------------------------------------------------------------
@@ -100,16 +112,14 @@ vector<R3::Vector> OverlapCalculator::directions() const
 vector<int> OverlapCalculator::sites0() const
 {
     QuantityType rv0 = this->subvector(SITE0_OFFSET, OVERLAPPING);
-    vector<int> rv1(rv0.begin(), rv0.end());
-    return rv1;
+    return vectorconvert<int>(rv0);
 }
 
 
 vector<int> OverlapCalculator::sites1() const
 {
     QuantityType rv0 = this->subvector(SITE1_OFFSET, OVERLAPPING);
-    vector<int> rv1(rv0.begin(), rv0.end());
-    return rv1;
+    return vectorconvert<int>(rv0);
 }
 
 
