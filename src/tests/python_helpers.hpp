@@ -21,8 +21,8 @@
 #ifndef PYTHON_HELPERS_HPP_INCLUDED
 #define PYTHON_HELPERS_HPP_INCLUDED
 
+#include <boost/python/object.hpp>
 #include <string>
-#include <boost/python.hpp>
 
 boost::python::object loadTestStructure(const std::string& tailname);
 

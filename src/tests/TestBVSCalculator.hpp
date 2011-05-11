@@ -21,7 +21,6 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/serialization.hpp>
-#include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
 #include "python_helpers.hpp"
@@ -45,7 +44,6 @@ class TestBVSCalculator : public CxxTest::TestSuite
 
         void setUp()
         {
-            diffpy::initializePython();
             if (mnacl.ptr() == Py_None)
             {
                 mnacl = loadTestStructure("NaCl.cif");

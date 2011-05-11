@@ -28,7 +28,7 @@
 #ifndef OBJCRYSTSTRUCTUREADAPTER_HPP_INCLUDED
 #define OBJCRYSTSTRUCTUREADAPTER_HPP_INCLUDED
 
-#include <memory>
+#include <boost/scoped_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 
 #include <diffpy/srreal/R3linalg.hpp>
@@ -142,7 +142,7 @@ class ObjCrystBondGenerator : public BaseBondGenerator
         void updater1();
 
         // data
-        std::auto_ptr<PointsInSphere> msphere;
+        boost::scoped_ptr<PointsInSphere> msphere;
 };
 
 // Adapter for ObjCryst::Molecule

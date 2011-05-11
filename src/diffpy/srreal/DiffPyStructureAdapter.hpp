@@ -24,8 +24,8 @@
 #ifndef DIFFPYSTRUCTUREADAPTER_HPP_INCLUDED
 #define DIFFPYSTRUCTUREADAPTER_HPP_INCLUDED
 
-#include <memory>
-#include <boost/python.hpp>
+#include <boost/python/object.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 
 #include <diffpy/boostextensions/serialize_unordered_map.hpp>
@@ -134,7 +134,7 @@ class DiffPyStructurePeriodicBondGenerator : public DiffPyStructureBaseBondGener
         void updater1();
 
         // data
-        std::auto_ptr<PointsInSphere> msphere;
+        boost::scoped_ptr<PointsInSphere> msphere;
         std::vector<R3::Vector> mcartesian_positions_uc;
         R3::Vector mrcsphere;
 };

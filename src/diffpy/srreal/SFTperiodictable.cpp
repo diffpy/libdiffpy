@@ -29,12 +29,11 @@
 *
 *****************************************************************************/
 
+#include <diffpy/PythonInterface.hpp>
+
 #include <stdexcept>
-#include <string>
-#include <boost/python.hpp>
 
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
-#include <diffpy/PythonInterface.hpp>
 #include <diffpy/mathutils.hpp>
 
 using namespace std;

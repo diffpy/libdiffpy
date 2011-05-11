@@ -21,9 +21,8 @@
 #ifndef PYTHONINTERFACE_HPP_INCLUDED
 #define PYTHONINTERFACE_HPP_INCLUDED
 
-#include <string>
-
 #include <boost/python.hpp>
+#include <string>
 
 namespace diffpy {
 

@@ -25,12 +25,12 @@
 *
 *****************************************************************************/
 
-#include <cassert>
-#include <boost/python.hpp>
+#include <diffpy/PythonInterface.hpp>
 #include <boost/python/stl_iterator.hpp>
 
+#include <cassert>
+
 #include <diffpy/serialization.hpp>
-#include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>

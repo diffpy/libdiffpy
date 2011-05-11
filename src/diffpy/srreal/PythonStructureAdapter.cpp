@@ -19,12 +19,12 @@
 *
 *****************************************************************************/
 
+#include <diffpy/srreal/PythonStructureAdapter.hpp>
+
 #include <stdexcept>
 #include <sstream>
 #include <string>
 #include <set>
-
-#include <diffpy/srreal/PythonStructureAdapter.hpp>
 
 using namespace boost;
 using namespace std;

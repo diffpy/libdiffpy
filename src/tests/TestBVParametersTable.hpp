@@ -23,7 +23,6 @@
 
 #include <diffpy/serialization.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
-#include <diffpy/PythonInterface.hpp>
 
 using namespace std;
 using namespace diffpy::srreal;

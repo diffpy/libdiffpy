@@ -25,13 +25,14 @@
 *
 *****************************************************************************/
 
+#include <diffpy/PythonInterface.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <set>
 
 #include <diffpy/serialization.hpp>
-#include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
