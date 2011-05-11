@@ -518,8 +518,7 @@ const std::list<int>&
 OverlapCalculator::getNeighborIds(int k) const
 {
     typedef std::list<int> NbList;
-    int cntsites = this->countSites();
-    assert(0 <= k && k < cntsites);
+    assert(0 <= k && k < this->countSites());
     if (!mneighborids_cached)
     {
         assert(mneighborids.empty());
