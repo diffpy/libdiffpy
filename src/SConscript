@@ -59,7 +59,7 @@ SConscript('diffpy/SConscript')
 # Top Level Targets ----------------------------------------------------------
 
 # lib -- shared library object
-libdiffpy = env.SharedLibrary('libdiffpy', env['lib_sources'])
+libdiffpy = env.SharedLibrary('diffpy', env['lib_sources'])
 Export('libdiffpy')
 Alias('lib', libdiffpy)
 

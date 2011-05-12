@@ -6,6 +6,7 @@ Import('env', 'libdiffpy')
 env_test = env.Clone(CXXTEST_SUFFIX='.hpp')
 env_test.Tool('cxxtest')
 lib_dir = libdiffpy[0].dir.abspath
+env_test.Replace(LIBS='diffpy', LIBPATH=lib_dir)
 env_test.PrependENVPath('LD_LIBRARY_PATH', lib_dir)
 
 # Targets --------------------------------------------------------------------
@@ -40,8 +41,7 @@ tdcpp = env_test.Build_tests_dir_cpp(['tests_dir.cpp'],
 test_helpers = [tdcpp, 'python_helpers.cpp', 'objcryst_helpers.cpp']
 test_helpers = filter(srcsupported, test_helpers)
 
-alltests = env_test.CxxTest('alltests',
-        test_sources + test_helpers + libdiffpy)
+alltests = env_test.CxxTest('alltests', test_sources + test_helpers)
 Alias('alltests', alltests)
 
 # test -- alias for executing unit tests.
