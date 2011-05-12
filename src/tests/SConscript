@@ -6,7 +6,7 @@ Import('env', 'libdiffpy')
 env_test = env.Clone(CXXTEST_SUFFIX='.hpp')
 env_test.Tool('cxxtest')
 lib_dir = libdiffpy[0].dir.abspath
-env_test.Replace(LIBS='diffpy', LIBPATH=lib_dir)
+env_test.PrependUnique(LIBS='diffpy', LIBPATH=lib_dir)
 env_test.PrependENVPath('LD_LIBRARY_PATH', lib_dir)
 
 # Targets --------------------------------------------------------------------
