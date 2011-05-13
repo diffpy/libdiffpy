@@ -166,7 +166,7 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
         void test_siteCartesianUij()
         {
             // nickel should have all Uij equal zero.
-            const double* puij = m_ni->siteCartesianUij(0).data();
+            const double* puij = &(m_ni->siteCartesianUij(0).data()[0]);
             for (int i = 0; i < 9; ++i)
             {
                 TS_ASSERT_EQUALS(0.0, puij[i]);

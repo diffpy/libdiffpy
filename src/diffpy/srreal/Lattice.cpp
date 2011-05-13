@@ -22,10 +22,7 @@ using namespace diffpy::srreal;
 
 Lattice::Lattice()
 {
-    mbaserot =
-        1.0, 0.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 0.0, 1.0;
+    mbaserot = R3::identity();
     this->setLatPar(1.0, 1.0, 1.0, 90.0, 90.0, 90.0);
 }
 
@@ -33,10 +30,7 @@ Lattice::Lattice()
 Lattice::Lattice(double a0, double b0, double c0,
 	    double alpha0, double beta0, double gamma0)
 {
-    mbaserot =
-        1.0, 0.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 0.0, 1.0;
+    mbaserot = R3::identity();
     this->setLatPar(a0, b0, c0, alpha0, beta0, gamma0);
 }
 
@@ -78,22 +72,20 @@ void Lattice::setLatPar(double a0, double b0, double c0,
     // standard cartesian coordinates of lattice vectors
     this->updateStandardBase();
     // calculate unit cell rotation matrix baserot, base = stdbase * baserot
-    mbase = R3::product(mstdbase, mbaserot);
-    mva = mbase(0,0), mbase(0,1), mbase(0,2);
-    mvb = mbase(1,0), mbase(1,1), mbase(1,2);
-    mvc = mbase(2,0), mbase(2,1), mbase(2,2);
+    mbase = R3::prod(mstdbase, mbaserot);
+    mva = R3::row(mbase, 0);
+    mvb = R3::row(mbase, 1);
+    mvc = R3::row(mbase, 2);
     mrecbase = R3::inverse(mbase);
-    mvar = mrecbase(0,0), mrecbase(1,0), mrecbase(2,0);
-    mvbr = mrecbase(0,1), mrecbase(1,1), mrecbase(2,1);
-    mvcr = mrecbase(0,2), mrecbase(1,2), mrecbase(2,2);
-    mnormbase =
-        mbase(0,0)*mar,     mbase(0,1)*mar,     mbase(0,2)*mar,
-        mbase(1,0)*mbr,     mbase(1,1)*mbr,     mbase(1,2)*mbr,
-        mbase(2,0)*mcr,     mbase(2,1)*mcr,     mbase(2,2)*mcr;
-    mrecnormbase =
-        mrecbase(0,0)/mar,  mrecbase(0,1)/mbr,  mrecbase(0,2)/mcr,
-        mrecbase(1,0)/mar,  mrecbase(1,1)/mbr,  mrecbase(1,2)/mcr,
-        mrecbase(2,0)/mar,  mrecbase(2,1)/mbr,  mrecbase(2,2)/mcr;
+    mvar = R3::column(mrecbase, 0);
+    mvbr = R3::column(mrecbase, 1);
+    mvcr = R3::column(mrecbase, 2);
+    R3::row(mnormbase, 0) = R3::row(mbase, 0) * mar;
+    R3::row(mnormbase, 1) = R3::row(mbase, 1) * mbr;
+    R3::row(mnormbase, 2) = R3::row(mbase, 2) * mcr;
+    R3::column(mrecnormbase, 0) = R3::column(mrecbase, 0) / mar;
+    R3::column(mrecnormbase, 1) = R3::column(mrecbase, 1) / mbr;
+    R3::column(mrecnormbase, 2) = R3::column(mrecbase, 2) / mcr;
 }
 
 void Lattice::setLatBase(const R3::Vector& va0,
@@ -101,9 +93,9 @@ void Lattice::setLatBase(const R3::Vector& va0,
 	const R3::Vector& vc0)
 {
     using namespace diffpy::mathutils;
-    mbase = va0[0], va0[1], va0[2],
-            vb0[0], vb0[1], vb0[2],
-            vc0[0], vc0[1], vc0[2];
+    R3::row(mbase, 0) = va0;
+    R3::row(mbase, 1) = vb0;
+    R3::row(mbase, 2) = vc0;
     double detbase = R3::determinant(mbase);
     if (fabs(detbase) < 1.0e-8)
     {
@@ -146,20 +138,18 @@ void Lattice::setLatBase(const R3::Vector& va0,
     // standard orientation of lattice vectors
     this->updateStandardBase();
     // calculate unit cell rotation matrix,  base = stdbase*baserot
-    mbaserot = R3::product(R3::inverse(mstdbase), mbase);
+    mbaserot = R3::prod(R3::inverse(mstdbase), mbase);
     mrecbase = R3::inverse(mbase);
-    mvar = mrecbase(0,0), mrecbase(1,0), mrecbase(2,0);
-    mvbr = mrecbase(0,1), mrecbase(1,1), mrecbase(2,1);
-    mvcr = mrecbase(0,2), mrecbase(1,2), mrecbase(2,2);
+    mvar = R3::column(mrecbase, 0);
+    mvbr = R3::column(mrecbase, 1);
+    mvcr = R3::column(mrecbase, 2);
     // bases normalized to unit reciprocal vectors
-    mnormbase =
-        mbase(0,0)*mar,     mbase(0,1)*mar,     mbase(0,2)*mar,
-        mbase(1,0)*mbr,     mbase(1,1)*mbr,     mbase(1,2)*mbr,
-        mbase(2,0)*mcr,     mbase(2,1)*mcr,     mbase(2,2)*mcr;
-    mrecnormbase =
-        mrecbase(0,0)/mar,  mrecbase(0,1)/mbr,  mrecbase(0,2)/mcr,
-        mrecbase(1,0)/mar,  mrecbase(1,1)/mbr,  mrecbase(1,2)/mcr,
-        mrecbase(2,0)/mar,  mrecbase(2,1)/mbr,  mrecbase(2,2)/mcr;
+    R3::row(mnormbase, 0) = R3::row(mbase, 0) * mar;
+    R3::row(mnormbase, 1) = R3::row(mbase, 1) * mbr;
+    R3::row(mnormbase, 2) = R3::row(mbase, 2) * mcr;
+    R3::column(mrecnormbase, 0) = R3::column(mrecbase, 0) / mar;
+    R3::column(mrecnormbase, 1) = R3::column(mrecbase, 1) / mbr;
+    R3::column(mrecnormbase, 2) = R3::column(mrecbase, 2) / mcr;
     this->updateMetrics();
 }
 
@@ -211,18 +201,17 @@ const R3::Vector& Lattice::ucvFractional(const R3::Vector& lv) const
 
 const R3::Matrix& Lattice::cartesianMatrix(const R3::Matrix& Ml) const
 {
-    using R3::product;
     static R3::Matrix res0, res1;
-    res0 = product(Ml, mnormbase);
-    res1 = product(R3::transpose(mnormbase), res0);
+    res0 = prod(Ml, mnormbase);
+    res1 = prod(R3::trans(mnormbase), res0);
     return res1;
 }
 
 const R3::Matrix& Lattice::fractionalMatrix(const R3::Matrix& Mc) const
 {
     static R3::Matrix res0, res1;
-    res0 = product(Mc, mrecnormbase);
-    res1 = product(R3::transpose(mrecnormbase), res0);
+    res0 = prod(Mc, mrecnormbase);
+    res1 = prod(R3::trans(mrecnormbase), res0);
     return res1;
 }
 

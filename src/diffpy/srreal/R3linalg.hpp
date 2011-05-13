@@ -22,8 +22,9 @@
 
 #include <algorithm>
 #include <boost/serialization/base_object.hpp>
-#include <blitz/tinyvec-et.h>
-#include <blitz/tinymat.h>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <diffpy/mathutils.hpp>
 
 namespace diffpy {
@@ -32,24 +33,124 @@ namespace R3 {
 
 // Declarations --------------------------------------------------------------
 
+namespace ublas = boost::numeric::ublas;
+using ublas::prod;
+using ublas::row;
+using ublas::column;
+using ublas::trans;
+
 // Constants
 
 const int Ndim = 3;
-using blitz::product;
 using ::diffpy::mathutils::SQRT_DOUBLE_EPS;
+const ublas::zero_vector<double> zerovector(Ndim);
 
-// Types
+// Classes
 
-typedef blitz::TinyMatrix<double,Ndim,Ndim> Matrix;
-typedef blitz::TinyVector<double,Ndim> Vector;
+class Vector : public ublas::vector<double, ublas::bounded_array<double,3> >
+{
+        typedef ublas::vector<double, ublas::bounded_array<double,3> >
+            BaseVector;
+
+    public:
+
+	// constructors
+	Vector() : BaseVector(3)  { }
+
+	Vector(const double& x, const double& y, const double& z)
+            : BaseVector(3)
+        {
+            Vector::iterator xi = this->begin();
+            *(xi++) = x;
+            *(xi++) = y;
+            *(xi++) = z;
+        }
+
+	template <class T>
+            Vector(const ublas::vector_expression<T>& r) : BaseVector(r)
+        { }
+
+	template <class T>
+            void operator=(const ublas::vector_expression<T>& r)
+        {
+            BaseVector::operator=(r);
+        }
+
+	template <class T>
+            void operator=(const BaseVector& r)
+        {
+            BaseVector::operator=(r);
+        }
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<BaseVector>(*this);
+        }
+};
+
+
+class Matrix : public ublas::matrix<double,
+    ublas::row_major, ublas::bounded_array<double,9> >
+{
+    typedef ublas::matrix<double, ublas::row_major,
+        ublas::bounded_array<double,9> >  BaseMatrix;
+
+    public:
+
+	// constructors
+	Matrix() : BaseMatrix(3, 3)  { }
+
+	Matrix(const double& x0, const double& x1, const double& x2,
+               const double& x3, const double& x4, const double& x5,
+               const double& x6, const double& x7, const double& x8) :
+            BaseMatrix(3, 3)
+        {
+            Matrix::array_type::iterator xi = this->data().begin();
+            *(xi++) = x0; *(xi++) = x1; *(xi++) = x2;
+            *(xi++) = x3; *(xi++) = x4; *(xi++) = x5;
+            *(xi++) = x6; *(xi++) = x7; *(xi++) = x8;
+        }
+
+	template <class T>
+            Matrix(const ublas::matrix_expression<T>& r) : BaseMatrix(r)
+        { }
+
+	template <class T>
+            void operator=(const ublas::matrix_expression<T>& r)
+        {
+            BaseMatrix::operator=(r);
+        }
+
+	template <class T>
+            void operator=(const BaseMatrix& r)
+        {
+            BaseMatrix::operator=(r);
+        }
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<BaseMatrix>(*this);
+        }
+};
 
 // Functions
 
 const Matrix& identity();
-const Matrix& zeros();
+const Matrix& zeromatrix();
 double determinant(const Matrix& A);
-Matrix inverse(const Matrix& A);
-Matrix transpose(const Matrix& A);
+const Matrix& inverse(const Matrix& A);
 
 template <class V> double norm(const V&);
 template <class V> double distance(const V& u, const V& v);
@@ -124,6 +225,17 @@ const Vector& mxvecproduct(const V& u, const Matrix& M)
 namespace mathutils {
 
 // Template specializations --------------------------------------------------
+
+inline
+const Vector& floor(const Vector& v)
+{
+    static Vector res;
+    Vector::const_iterator xi = v.begin();
+    Vector::iterator xo = res.begin();
+    for (; xi != v.end(); ++xi, ++xo)  *xo = std::floor(*xi);
+    return res;
+}
+
 
 template<>
 bool EpsilonLess::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(

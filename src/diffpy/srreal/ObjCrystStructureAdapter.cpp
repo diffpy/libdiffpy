@@ -288,8 +288,7 @@ getUnitCell(const ObjCryst::Crystal& cryst)
             if (z < 0) z += 1.;
 
             // Record the position
-            R3::Vector xyz;
-            xyz = x, y, z;
+            R3::Vector xyz(x, y, z);
 
             // We use this to filter unique positions
             symset.insert(xyz);
@@ -309,9 +308,7 @@ getUnitCell(const ObjCryst::Crystal& cryst)
                 // Get the symmetry operation used to generate this position.
                 R3::Matrix M;
                 size_t k = j % symsize;
-                M = symops[k].mx[0], symops[k].mx[1], symops[k].mx[2],
-                    symops[k].mx[3], symops[k].mx[4], symops[k].mx[5],
-                    symops[k].mx[6], symops[k].mx[7], symops[k].mx[8];
+                std::copy(symops[k].mx, symops[k].mx + 9, M.data().begin());
 
                 // rotate the Uij matrix
                 R3::Matrix Utmp, Urot, UCart;
@@ -322,8 +319,8 @@ getUnitCell(const ObjCryst::Crystal& cryst)
                 }
                 else
                 {
-                    Utmp = R3::product(Uij, R3::transpose(M));
-                    Urot = R3::product(M, Utmp);
+                    Utmp = R3::prod(Uij, R3::trans(M));
+                    Urot = R3::prod(M, Utmp);
                     UCart = mlattice.cartesianMatrix(Urot);
                 }
                 uijvec.push_back(UCart);
@@ -494,8 +491,7 @@ ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule)
         matomtypes.push_back(sp->GetSymbol());
 
         // Store position
-        R3::Vector xyz;
-        xyz = atom.X(), atom.Y(), atom.Z();
+        R3::Vector xyz(atom.X(), atom.Y(), atom.Z());
         mvpos.push_back(xyz);
 
         // Store Uij

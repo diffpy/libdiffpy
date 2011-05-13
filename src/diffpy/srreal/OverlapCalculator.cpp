@@ -468,10 +468,9 @@ const double& OverlapCalculator::subvalue(int offset, int index) const
 const R3::Vector& OverlapCalculator::subdirection(int index) const
 {
     static R3::Vector rv;
-    double* p = rv.data();
-    *p++ = this->subvalue(DIRECTION0_OFFSET, index);
-    *p++ = this->subvalue(DIRECTION1_OFFSET, index);
-    *p++ = this->subvalue(DIRECTION2_OFFSET, index);
+    rv[0] = this->subvalue(DIRECTION0_OFFSET, index);
+    rv[1] = this->subvalue(DIRECTION1_OFFSET, index);
+    rv[2] = this->subvalue(DIRECTION2_OFFSET, index);
     return rv;
 }
 

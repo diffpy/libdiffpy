@@ -1,8 +1,8 @@
 /***********************************************************************
 * Short Title: linear algebra functions on R3
 *
-* Comments: defininitions of linear algebra functions for
-*     blitz::TinyVector  and  blitz::TinyMatrix
+* R3linalg -- vector and matrix types and linar algebra
+*     operations in R3 space
 *
 * <license text>
 ***********************************************************************/
@@ -17,24 +17,14 @@ namespace srreal {
 
 const R3::Matrix& R3::identity()
 {
-    static R3::Matrix mx;
-    static bool mx_ready = false;
-    if (!mx_ready)
-    {
-        mx = 1.0, 0.0, 0.0,
-             0.0, 1.0, 0.0,
-             0.0, 0.0, 1.0;
-        mx_ready = true;
-    }
+    static R3::Matrix mx = ublas::identity_matrix<double>(R3::Ndim);
     return mx;
 }
 
 
-const R3::Matrix& R3::zeros()
+const R3::Matrix& R3::zeromatrix()
 {
-    static R3::Matrix mx;
-    static bool mx_ready = false;
-    if (!mx_ready)  mx = 0.0;
+    static R3::Matrix mx = ublas::zero_matrix<double>(R3::Ndim, R3::Ndim);
     return mx;
 }
 
@@ -59,8 +49,9 @@ double R3::determinant(const R3::Matrix& A)
 }
 
 
-R3::Matrix R3::inverse(const R3::Matrix& A)
+const R3::Matrix& R3::inverse(const R3::Matrix& A)
 {
+    static R3::Matrix B;
     gsl_matrix* gA = gsl_matrix_alloc(R3::Ndim, R3::Ndim);
     for (int i = 0; i != R3::Ndim; ++i)
     {
@@ -72,22 +63,12 @@ R3::Matrix R3::inverse(const R3::Matrix& A)
     gsl_permutation* gP = gsl_permutation_alloc(R3::Ndim);
     int signum;
     gsl_linalg_LU_decomp(gA, gP, &signum);
-    R3::Matrix B;
-    gsl_matrix_view gB = gsl_matrix_view_array(B.data(), R3::Ndim, R3::Ndim);
+    double* bdata = &(B.data()[0]);
+    gsl_matrix_view gB = gsl_matrix_view_array(bdata, R3::Ndim, R3::Ndim);
     gsl_linalg_LU_invert(gA, gP, &gB.matrix);
     gsl_permutation_free(gP);
     gsl_matrix_free(gA);
     return B;
-}
-
-
-R3::Matrix R3::transpose(const R3::Matrix& A)
-{
-    R3::Matrix res;
-    res = A(0,0), A(1,0), A(2,0),
-          A(0,1), A(1,1), A(2,1),
-          A(0,2), A(1,2), A(2,2);
-    return res;
 }
 
 
