@@ -198,8 +198,10 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
             static python::object isotope = diffpy::importFromPyModule(
                     "periodictable", "elements").attr("isotope");
             double rv;
+            string::size_type pe = smbl.find_last_not_of("+-12345678 \t");
+            string smblnocharge = smbl.substr(0, pe + 1);
             try {
-                python::object el = isotope(smbl);
+                python::object el = isotope(smblnocharge);
                 python::object b_c = el.attr("neutron").attr("b_c");
                 rv = python::extract<double>(b_c);
             }
