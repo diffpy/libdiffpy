@@ -43,7 +43,8 @@ class ScatteringFactorTable :
         virtual const std::string& radiationType() const = 0;
         double lookup(const std::string& smbl, double q=0.0) const;
         virtual double standardLookup(const std::string&, double) const = 0;
-        void setCustomFrom(const std::string& smbl, const std::string& srcsmbl,
+        void setCustomAs(const std::string& smbl, const std::string& srcsmbl);
+        void setCustomAs(const std::string& smbl, const std::string& srcsmbl,
                 double value, double q=0.0);
         void resetCustom(const std::string& smbl);
         void resetAll();

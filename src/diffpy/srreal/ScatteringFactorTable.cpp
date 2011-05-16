@@ -45,8 +45,8 @@ double ScatteringFactorTable::lookup(const string& smbl, double q) const
             mqzerocache.find(smbl);
         if (ii != mqzerocache.end())   return ii->second;
     }
-    CustomDataStorage::const_iterator csft = mcustom.find(smbl);
     double rv;
+    CustomDataStorage::const_iterator csft = mcustom.find(smbl);
     if (csft != mcustom.end())
     {
         const string& srcsmbl = csft->second.first;
@@ -61,7 +61,16 @@ double ScatteringFactorTable::lookup(const string& smbl, double q) const
 }
 
 
-void ScatteringFactorTable::setCustomFrom(
+void ScatteringFactorTable::setCustomAs(
+        const string& smbl, const string& srcsmbl)
+{
+    const double scale = 1.0;
+    mcustom[smbl] = make_pair(srcsmbl, scale);
+    mqzerocache.erase(smbl);
+}
+
+
+void ScatteringFactorTable::setCustomAs(
         const string& smbl, const string& srcsmbl,
         double value, double q)
 {

@@ -69,16 +69,16 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
         }
 
 
-        void test_setCustom()
+        void test_setCustomAs()
         {
             msftb = ScatteringFactorTable::createByType("X");
             TS_ASSERT_DELTA(6.0, msftb->lookup("C"), 0.01);
-            msftb->setCustomFrom("C", "C", 6.3);
+            msftb->setCustomAs("C", "C", 6.3);
             TS_ASSERT_EQUALS(6.3, msftb->lookup("C"));
-            msftb->setCustomFrom("C", "C", 6.4);
+            msftb->setCustomAs("C", "C", 6.4);
             TS_ASSERT_DELTA(6.4, msftb->lookup("C"), meps);
             TS_ASSERT_THROWS(msftb->lookup("Ccustom"), invalid_argument);
-            msftb->setCustomFrom("Ccustom", "C", 6.5);
+            msftb->setCustomAs("Ccustom", "C", 6.5);
             TS_ASSERT_DELTA(6.5, msftb->lookup("Ccustom"), meps);
             msftb->resetCustom("C");
             TS_ASSERT_DELTA(6.5, msftb->lookup("Ccustom"), meps);
@@ -86,6 +86,11 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             msftb->resetAll();
             TS_ASSERT_THROWS(msftb->lookup("Ccustom"), invalid_argument);
             TS_ASSERT_DELTA(6.0, msftb->lookup("C"), 0.01);
+            msftb->setCustomAs("Calias", "C");
+            TS_ASSERT_EQUALS(msftb->lookup("C", 0),
+                    msftb->lookup("Calias", 0));
+            TS_ASSERT_EQUALS(msftb->lookup("C", 2.5),
+                    msftb->lookup("Calias", 2.5));
         }
 
 
@@ -93,10 +98,10 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
         {
             msftb = ScatteringFactorTable::createByType("X");
             TS_ASSERT(msftb->getCustomSymbols().empty());
-            msftb->setCustomFrom("C", "C", 6.1);
+            msftb->setCustomAs("C", "C", 6.1);
             TS_ASSERT_EQUALS(1u, msftb->getCustomSymbols().size());
             TS_ASSERT_EQUALS(1u, msftb->getCustomSymbols().count("C"));
-            msftb->setCustomFrom("C", "C", 6.3);
+            msftb->setCustomAs("C", "C", 6.3);
             TS_ASSERT_EQUALS(1u, msftb->getCustomSymbols().size());
             TS_ASSERT_EQUALS(1u, msftb->getCustomSymbols().count("C"));
             TS_ASSERT_EQUALS(6.3, msftb->lookup("C"));
@@ -167,7 +172,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
         {
             ScatteringFactorTablePtr sftb1;
             msftb = ScatteringFactorTable::createByType("electronnumber");
-            msftb->setCustomFrom("H", "H", 1.23);
+            msftb->setCustomAs("H", "H", 1.23);
             sftb1 = dumpandload(msftb);
             TS_ASSERT_EQUALS(string("electronnumber"), sftb1->type());
             TS_ASSERT_EQUALS(1.23, sftb1->lookup("H"));
