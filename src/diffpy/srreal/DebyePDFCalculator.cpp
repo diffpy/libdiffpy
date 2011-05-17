@@ -22,9 +22,6 @@
 #include <valarray>
 #include <stdexcept>
 
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_fft_complex.h>
-
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
 #include <diffpy/srreal/GaussianProfile.hpp>
