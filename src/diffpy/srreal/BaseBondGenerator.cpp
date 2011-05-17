@@ -69,15 +69,6 @@ void BaseBondGenerator::next()
 }
 
 
-void BaseBondGenerator::nextsite()
-{
-    msite_current += 1;
-    // avoid calling rewindSymmetry at an invalid site
-    if (this->finished())   return;
-    this->rewindSymmetry();
-}
-
-
 bool BaseBondGenerator::finished() const
 {
     return msite_current >= msite_last;
@@ -215,7 +206,9 @@ void BaseBondGenerator::rewindSymmetry()
 void BaseBondGenerator::getNextBond()
 {
     if (this->iterateSymmetry())  return;
-    this->nextsite();
+    msite_current += 1;
+    // avoid calling rewindSymmetry at an invalid site
+    if (!(this->finished()))  this->rewindSymmetry();
 }
 
 
