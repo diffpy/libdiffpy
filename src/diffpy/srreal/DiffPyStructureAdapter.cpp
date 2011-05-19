@@ -206,7 +206,7 @@ void DiffPyStructureAdapter::fetchPythonData(python::object dpstru)
         xyz_cartn = mlattice.cartesian(xyz_frac);
         mcartesian_positions.push_back(xyz_cartn);
         // moccupancies
-        double occupancy = python::extract<double>(ai.attr("occupancy"));
+        double occupancy = python::extract<double>(ai.attr("occupancy") + 0.0);
         moccupancies.push_back(occupancy);
         // manisotropies
         bool aniso = ai.attr("anisotropy");
