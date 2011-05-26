@@ -56,11 +56,11 @@ class TestPeakProfile : public CxxTest::TestSuite
         void test_y()
         {
             double Afwhm1 = 2 * sqrt(M_LN2 / M_PI);
-            TS_ASSERT_DELTA(Afwhm1, mpkgauss->yvalue(0, 1), mdigits);
+            TS_ASSERT_DELTA(Afwhm1, mpkgauss->yvalue(1, 1, 1), mdigits);
             TS_ASSERT_DELTA(Afwhm1 / 2,
-                    mpkgauss->yvalue(1, 1), mdigits);
+                    mpkgauss->yvalue(2, 1, 1), mdigits);
             TS_ASSERT_DELTA(Afwhm1 / 2,
-                    mpkgauss->yvalue(-1, 1), mdigits);
+                    mpkgauss->yvalue(0, 1, 1), mdigits);
         }
 
 
@@ -68,12 +68,12 @@ class TestPeakProfile : public CxxTest::TestSuite
         {
             double epsy = 1e-8;
             mpkgauss->setPrecision(epsy);
-            double xblo1 = mpkgauss->xboundlo(1);
-            double xblo3 = mpkgauss->xboundlo(3);
-            TS_ASSERT_DELTA(epsy, mpkgauss->yvalue(xblo1, 1), mdigits);
-            TS_ASSERT_DELTA(epsy, mpkgauss->yvalue(xblo3, 3), mdigits);
-            TS_ASSERT(xblo1 < 0);
-            TS_ASSERT(xblo3 < 0);
+            double xblo1 = mpkgauss->xboundlo(1, 5);
+            double xblo3 = mpkgauss->xboundlo(3, 5);
+            TS_ASSERT_DELTA(epsy, mpkgauss->yvalue(xblo1, 1, 5), mdigits);
+            TS_ASSERT_DELTA(epsy, mpkgauss->yvalue(xblo3, 3, 5), mdigits);
+            TS_ASSERT(xblo1 < 5);
+            TS_ASSERT(xblo3 < 5);
             mpkgauss->setPrecision(10);
             TS_ASSERT_EQUALS(0.0, mpkgauss->xboundlo(1));
             mpkgauss->setPrecision(0.1);
@@ -86,12 +86,12 @@ class TestPeakProfile : public CxxTest::TestSuite
         {
             double epsy = 1e-8;
             mpkgauss->setPrecision(epsy);
-            double xbhi1 = mpkgauss->xboundhi(1);
-            double xbhi3 = mpkgauss->xboundhi(3);
+            double xbhi1 = mpkgauss->xboundhi(1, 7);
+            double xbhi3 = mpkgauss->xboundhi(3, 7);
             TS_ASSERT_DELTA(epsy,
-                    mpkgauss->yvalue(xbhi1, 1), mdigits);
+                    mpkgauss->yvalue(xbhi1, 1, 7), mdigits);
             TS_ASSERT_DELTA(epsy,
-                    mpkgauss->yvalue(xbhi3, 3), mdigits);
+                    mpkgauss->yvalue(xbhi3, 3, 7), mdigits);
             TS_ASSERT(xbhi1 > 0);
             TS_ASSERT(xbhi3 > 0);
         }

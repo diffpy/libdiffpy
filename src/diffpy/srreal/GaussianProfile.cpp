@@ -57,24 +57,29 @@ const string& GaussianProfile::type() const
 }
 
 
-double GaussianProfile::yvalue(double x, double fwhm) const
+double GaussianProfile::yvalue(double x, double fwhm, double position) const
 {
     if ( fwhm <= 0 ) return 0.0;
-    double xrel = x / fwhm;
+    double xrel = (x - position) / fwhm;
     double rv = 2 * sqrt(M_LN2 / M_PI) / fwhm * exp(-4 * M_LN2 * xrel * xrel);
+    // Contributions in G(r) need to be normalized by pair distance,
+    // not by r as done in PDFfit or PDFfit2.  Here we rescale RDF
+    // in such way that division by x will give a correct result.
+    rv *= x / position;
     return rv;
 }
 
 
-double GaussianProfile::xboundlo(double fwhm) const
+double GaussianProfile::xboundlo(double fwhm, double position) const
 {
-    return -1 * this->GaussianProfile::xboundhi(fwhm);
+    return position - this->GaussianProfile::xboundhi(fwhm);
 }
 
 
-double GaussianProfile::xboundhi(double fwhm) const
+double GaussianProfile::xboundhi(double fwhm, double position) const
 {
     double rv = (fwhm <= 0.0) ? 0.0 : (mhalfboundrel * fwhm);
+    rv += position;
     return rv;
 }
 

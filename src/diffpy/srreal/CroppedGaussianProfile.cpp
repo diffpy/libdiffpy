@@ -61,12 +61,17 @@ const string& CroppedGaussianProfile::type() const
 }
 
 
-double CroppedGaussianProfile::yvalue(double x, double fwhm) const
+double CroppedGaussianProfile::yvalue(
+        double x, double fwhm, double position) const
 {
-    double xrel = x / fwhm;
+    double xrel = (x - position) / fwhm;
     double rv = (fabs(xrel) >= mhalfboundrel) ? 0.0 :
         2 * sqrt(M_LN2 / M_PI) / fwhm *
         mscale * exp(-4 * M_LN2 * xrel * xrel);
+    // Contributions in G(r) need to be normalized by pair distance,
+    // not by r as done in PDFfit or PDFfit2.  Here we rescale RDF
+    // in such way that division by x will give a correct result.
+    rv *= x / position;
     return rv;
 }
 

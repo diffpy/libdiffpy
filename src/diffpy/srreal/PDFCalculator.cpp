@@ -463,21 +463,17 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
     double fwhm = this->getPeakWidthModel()->calculate(bnds);
     const PeakProfile& pkf = *(this->getPeakProfile());
     double dist = bnds.distance();
-    double xlo = dist + pkf.xboundlo(fwhm);
-    double xhi = dist + pkf.xboundhi(fwhm);
+    double xlo = pkf.xboundlo(fwhm, dist);
+    double xhi = pkf.xboundhi(fwhm, dist);
     int i = max(0, this->calcIndex(xlo));
     int ilast = min(this->countCalcPoints(), this->calcIndex(xhi) + 1);
     assert(ilast <= int(mvalue.size()));
     assert(eps_gt(dist, 0.0));
     for (; i < ilast; ++i)
     {
-        double x = (this->rcalcloSteps() + i) * this->getRstep() - dist;
-        double y = pkf.yvalue(x, fwhm);
-        // Contributions in G(r) need to be normalized by pair distance,
-        // not by r as done in PDFfit or PDFfit2.  Here we rescale RDF
-        // in such way that division by r will give a correct result.
-        double yrdf = y * (x / dist + 1);
-        mvalue[i] += peakscale * yrdf;
+        double x = (this->rcalcloSteps() + i) * this->getRstep();
+        double y = pkf.yvalue(x, fwhm, dist);
+        mvalue[i] += peakscale * y;
     }
 }
 
