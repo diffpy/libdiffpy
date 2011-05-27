@@ -39,7 +39,7 @@ class CroppedGaussianProfile : public GaussianProfile
 
         // methods
         const std::string& type() const;
-        double yvalue(double x, double fwhm, double position) const;
+        double yvalue(double x, double fwhm) const;
         void setPrecision(double eps);
 
     private:
