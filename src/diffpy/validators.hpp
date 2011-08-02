@@ -56,6 +56,20 @@ void ensureEpsilonPositive(const std::string& vname, const T& value)
     }
 }
 
+/// Throw invalid_argument if the argument is not true.  For boost smart
+/// pointers this is equivalent to a truth check of p.get().
+
+template <class T>
+void ensureNonNull(const std::string& vname, const T& p)
+{
+    if (!p)
+    {
+        std::string emsg(vname);
+        emsg += " cannot be NULL.";
+        throw std::invalid_argument(emsg);
+    }
+}
+
 }   // namespace validators
 }   // namespace diffpy
 

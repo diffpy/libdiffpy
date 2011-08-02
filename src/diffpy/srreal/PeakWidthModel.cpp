@@ -22,9 +22,11 @@
 
 #include <diffpy/srreal/PeakWidthModel.hpp>
 #include <diffpy/HasClassRegistry.ipp>
+#include <diffpy/validators.hpp>
 
 using std::string;
 using diffpy::srreal::PeakWidthModel;
+using diffpy::validators::ensureNonNull;
 
 // Unique instantiation of the template registry base class.
 template class HasClassRegistry<PeakWidthModel>;
@@ -45,6 +47,7 @@ double PeakWidthModel::calculateFromMSD(double msdval) const
 
 void PeakWidthModelOwner::setPeakWidthModel(PeakWidthModelPtr pwm)
 {
+    ensureNonNull("PeakWidthModel", pwm);
     mpwmodel = pwm;
 }
 

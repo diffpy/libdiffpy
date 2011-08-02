@@ -103,6 +103,7 @@ double BVSCalculator::bvrmsdiff() const
 
 void BVSCalculator::setBVParamTable(BVParametersTablePtr bvtb)
 {
+    ensureNonNull("BVParametersTable", bvtb);
     mbvptable = bvtb;
 }
 

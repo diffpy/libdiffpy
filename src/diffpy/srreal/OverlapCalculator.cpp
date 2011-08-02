@@ -26,6 +26,7 @@
 #include <diffpy/serialization.hpp>
 
 using namespace std;
+using diffpy::validators::ensureNonNull;
 
 namespace diffpy {
 namespace srreal {
@@ -362,6 +363,7 @@ vector< boost::unordered_set<int> > OverlapCalculator::neighborhoods() const
 
 void OverlapCalculator::setAtomRadiiTable(AtomRadiiTablePtr table)
 {
+    ensureNonNull("AtomRadiiTable", table);
     matomradiitable = table;
 }
 

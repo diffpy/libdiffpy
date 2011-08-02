@@ -22,9 +22,11 @@
 
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 #include <diffpy/HasClassRegistry.ipp>
+#include <diffpy/validators.hpp>
 
 using namespace std;
 using diffpy::srreal::ScatteringFactorTable;
+using diffpy::validators::ensureNonNull;
 using boost::unordered_map;
 
 // Unique instantiation of the template registry base class.
@@ -111,6 +113,7 @@ boost::unordered_set<string> ScatteringFactorTable::getCustomSymbols() const
 void ScatteringFactorTableOwner::setScatteringFactorTable(
         ScatteringFactorTablePtr sft)
 {
+    ensureNonNull("ScatteringFactorTable", sft);
     msftable = sft;
 }
 

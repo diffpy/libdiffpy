@@ -24,9 +24,11 @@
 
 #include <diffpy/srreal/PDFEnvelope.hpp>
 #include <diffpy/HasClassRegistry.ipp>
+#include <diffpy/validators.hpp>
 
 using namespace std;
 using diffpy::srreal::PDFEnvelope;
+using diffpy::validators::ensureNonNull;
 
 // Unique instantiation of the template registry base class.
 template class HasClassRegistry<PDFEnvelope>;
@@ -60,7 +62,7 @@ QuantityType PDFEnvelopeOwner::applyEnvelopes(
 
 void PDFEnvelopeOwner::addEnvelope(PDFEnvelopePtr envlp)
 {
-    assert(envlp.get());
+    ensureNonNull("PDFEnvelope", envlp);
     menvelope[envlp->type()] = envlp;
 }
 
@@ -76,10 +78,11 @@ void PDFEnvelopeOwner::addEnvelopeByType(const string& tp)
 
 void PDFEnvelopeOwner::popEnvelope(PDFEnvelopePtr envlp)
 {
-    EnvelopeStorage::iterator evit = menvelope.find(envlp->type());
-    if (evit != menvelope.end() && evit->second.get() == envlp.get())
+    EnvelopeStorage::iterator evit = menvelope.begin();
+    for (; evit != menvelope.end();)
     {
-        menvelope.erase(evit);
+        if (evit->second.get() == envlp.get())  menvelope.erase(evit++);
+        else  ++evit;
     }
 }
 

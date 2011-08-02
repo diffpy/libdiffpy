@@ -318,7 +318,7 @@ double PDFCalculator::getExtendedRmax() const
 
 void PDFCalculator::setPeakProfile(PeakProfilePtr pkf)
 {
-    assert(pkf.get());
+    ensureNonNull("PeakProfile", pkf);
     mpeakprofile = pkf;
 }
 
@@ -367,7 +367,7 @@ QuantityType PDFCalculator::applyBaseline(
 
 void PDFCalculator::setBaseline(PDFBaselinePtr baseline)
 {
-    assert(baseline.get());
+    ensureNonNull("PDFBaseline", baseline);
     mbaseline = baseline;
 }
 
