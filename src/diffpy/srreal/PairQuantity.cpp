@@ -214,6 +214,7 @@ setTypeMask(string smbli, string smblj, bool mask)
         transform(upcaseall.begin(), upcaseall.end(),
                 upcaseall.begin(), ::toupper);
     }
+    // accept "ALL" (upper ALLATOMSSTR) for smbli and smblj
     if (upcaseall == smbli)  smbli = ALLATOMSSTR;
     if (upcaseall == smblj)  smblj = ALLATOMSSTR;
     pair<string,string> allall(ALLATOMSSTR, ALLATOMSSTR);
