@@ -23,10 +23,12 @@
 #include <sstream>
 #include <stdexcept>
 #include <vector>
-#include <boost/serialization/export.hpp>
 
 #include <diffpy/srreal/AtomRadiiTable.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/HasClassRegistry.ipp>
+
+// Unique instantiation of the template registry base class.
+template class HasClassRegistry<diffpy::srreal::AtomRadiiTable>;
 
 namespace diffpy {
 namespace srreal {
@@ -41,12 +43,6 @@ double AtomRadiiTable::lookup(const string& smbl) const
     tb = mcustomradius.find(smbl);
     if (tb != mcustomradius.end())  return tb->second;
     return this->tableLookup(smbl);
-}
-
-
-double AtomRadiiTable::tableLookup(const string& smbl) const
-{
-    return 0.0;
 }
 
 
@@ -132,10 +128,5 @@ string AtomRadiiTable::toString(string separator) const
 
 }   // srreal
 }   // diffpy
-
-// Serialization -------------------------------------------------------------
-
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::AtomRadiiTable)
-BOOST_CLASS_EXPORT(diffpy::srreal::AtomRadiiTable)
 
 // End of file

@@ -21,6 +21,7 @@
 #include <algorithm>
 
 #include <diffpy/srreal/OverlapCalculator.hpp>
+#include <diffpy/srreal/ZeroRadiiTable.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/serialization.hpp>
@@ -65,7 +66,7 @@ OverlapCalculator::OverlapCalculator()
 {
     mevaluator->useFullSum(true);
     // default configuration
-    AtomRadiiTablePtr table(new AtomRadiiTable);
+    AtomRadiiTablePtr table(new ZeroRadiiTable);
     this->setAtomRadiiTable(table);
     this->cacheStructureData();
     mneighborids_cached = false;

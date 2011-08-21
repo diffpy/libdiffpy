@@ -39,7 +39,7 @@ class TestAtomRadiiTable : public CxxTest::TestSuite
 
         void setUp()
         {
-            mrtb.reset(new AtomRadiiTable);
+            mrtb = AtomRadiiTable::createByType("zeroradii");
         }
 
 

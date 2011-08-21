@@ -13,6 +13,10 @@
 ******************************************************************************
 *
 * class AtomRadiiTable -- storage of empirical atomic radii
+*   This is an abstract base class that provides a createByType factory
+*   function for creating a registered concrete instances.
+*   The derived classes has to overload the tableLookup method and also
+*   create, clone and type methods from the HasClassRegistry base.
 *
 * $Id$
 *
@@ -27,24 +31,24 @@
 #include <boost/serialization/assume_abstract.hpp>
 
 #include <diffpy/boostextensions/serialize_unordered_map.hpp>
+#include <diffpy/HasClassRegistry.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-typedef boost::shared_ptr<class AtomRadiiTable> AtomRadiiTablePtr;
-
-class AtomRadiiTable
+class AtomRadiiTable :
+    public diffpy::HasClassRegistry<AtomRadiiTable>
 {
     public:
 
-        // destructor
-        virtual ~AtomRadiiTable()  { }
+        // types
+        typedef boost::unordered_map<std::string,double> CustomRadiiStorage;
 
         // methods
         /// fast value lookup, which does not change the table.
         double lookup(const std::string& smbl) const;
         /// overloadable lookup function that retrieved standard values
-        virtual double tableLookup(const std::string& smbl) const;
+        virtual double tableLookup(const std::string& smbl) const = 0;
         /// set custom radius for a specified atom symbol
         void setCustom(const std::string& smbl, double radius);
         /// set custom radii from a string in (A1:r1, A2:r2, ...) format
@@ -54,14 +58,14 @@ class AtomRadiiTable
         /// reset all custom values
         void resetAll();
         /// return all custom radii defined in this table
-        const boost::unordered_map<std::string,double>& getAllCustom() const;
+        const CustomRadiiStorage& getAllCustom() const;
         /// convert all custom radii to a string in (A1:r1,A2:r2,...) format
         std::string toString(std::string separator=",") const;
 
     private:
 
         // data
-        mutable boost::unordered_map<std::string,double> mcustomradius;
+        CustomRadiiStorage mcustomradius;
 
         // serialization
         friend class boost::serialization::access;
@@ -73,11 +77,54 @@ class AtomRadiiTable
 
 };
 
+typedef AtomRadiiTable::SharedPtr AtomRadiiTablePtr;
+
 }   // namespace srreal
 }   // namespace diffpy
 
 // Serialization -------------------------------------------------------------
 
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::AtomRadiiTable)
+namespace boost {
+namespace serialization {
+
+template<class Archive>
+void save(Archive& ar,
+        const diffpy::srreal::AtomRadiiTablePtr& ptr,
+        const unsigned int version)
+{
+    using namespace diffpy::srreal;
+    std::string tp;
+    AtomRadiiTable::CustomRadiiStorage dt;
+    if (ptr)
+    {
+        tp = ptr->type();
+        dt = ptr->getAllCustom();
+    }
+    ar & tp & dt;
+}
+
+
+template<class Archive>
+void load(Archive& ar,
+        diffpy::srreal::AtomRadiiTablePtr& ptr, const unsigned int version)
+{
+    using namespace diffpy::srreal;
+    std::string tp;
+    AtomRadiiTable::CustomRadiiStorage dt;
+    ar & tp & dt;
+    if (!tp.empty())
+    {
+        ptr = AtomRadiiTable::createByType(tp);
+        ptr->resetAll();
+        AtomRadiiTable::CustomRadiiStorage::const_iterator ii = dt.begin();
+        for (; ii != dt.end(); ++ii)    ptr->setCustom(ii->first, ii->second);
+    }
+    else  ptr.reset();
+}
+
+}   // namespace serialization
+}   // namespace boost
+
+BOOST_SERIALIZATION_SPLIT_FREE(diffpy::srreal::AtomRadiiTablePtr)
 
 #endif  // ATOMRADIITABLE_HPP_INCLUDED
