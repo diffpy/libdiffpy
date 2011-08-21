@@ -18,8 +18,6 @@
 *
 *****************************************************************************/
 
-#include <boost/serialization/export.hpp>
-
 #include <diffpy/srreal/PDFBaseline.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 
