@@ -49,8 +49,9 @@ struct vidxgroup
 
 bool operator<(const vidxgroup &x, const vidxgroup &y)
 {
-    return (x.vijk[0] < y.vijk[0] - eps) ||
-	    lexicographical_compare(x.vijk+1, x.vijk+4, y.vijk+1, y.vijk+4);
+    if (x.vijk[0] < y.vijk[0] - eps)  return true;
+    if (x.vijk[0] > y.vijk[0] + eps)  return false;
+    return lexicographical_compare(x.vijk, x.vijk + 4, y.vijk, y.vijk + 4);
 }
 
 bool operator==(const vidxgroup &x, const vidxgroup &y)
