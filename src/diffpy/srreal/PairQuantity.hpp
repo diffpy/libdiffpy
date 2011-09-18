@@ -24,13 +24,12 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/utility.hpp>
-#include <boost/serialization/vector.hpp>
 
 #include <diffpy/boostextensions/serialize_unordered_set.hpp>
 #include <diffpy/boostextensions/serialize_unordered_map.hpp>
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/PairQuantityUtils.hpp>
+#include <diffpy/srreal/QuantityType.hpp>
 #include <diffpy/Attributes.hpp>
 
 namespace diffpy {

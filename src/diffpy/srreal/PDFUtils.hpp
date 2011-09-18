@@ -28,7 +28,7 @@
 #include <valarray>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/PairQuantityUtils.hpp>
+#include <diffpy/srreal/QuantityType.hpp>
 
 namespace diffpy {
 namespace srreal {
