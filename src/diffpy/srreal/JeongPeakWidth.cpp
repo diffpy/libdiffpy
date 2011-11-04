@@ -69,18 +69,26 @@ const string& JeongPeakWidth::type() const
 
 double JeongPeakWidth::calculate(const BaseBondGenerator& bnds) const
 {
-    using diffpy::mathutils::DOUBLE_EPS;
     double r = bnds.distance();
-    // avoid division by zero
-    double corr = (r < DOUBLE_EPS) ? 0.0 :
-        (1.0 - this->getDelta1()/r - this->getDelta2()/pow(r, 2) +
-         pow(this->getQbroad()*r, 2));
+    double corr = this->msdSharpeningRatio(r);
     // avoid calculating square root of negative value
     double fwhm = (corr <= 0) ? 0.0 :
         (sqrt(corr) * this->DebyeWallerPeakWidth::calculate(bnds));
     return fwhm;
 }
 
+
+double JeongPeakWidth::maxWidth(StructureAdapterPtr stru,
+        double rmin, double rmax) const
+{
+    double maxwidth0 = this->DebyeWallerPeakWidth::maxWidth(stru, rmin, rmax);
+    double maxmsdsharp = max(
+            this->msdSharpeningRatio(rmin),
+            this->msdSharpeningRatio(rmax));
+    // if the sharpening factor is larger than 1 adjust the maximum width
+    double rv = maxwidth0 * sqrt(max(1.0, maxmsdsharp));
+    return rv;
+}
 
 const double& JeongPeakWidth::getDelta1() const
 {
@@ -115,6 +123,18 @@ const double& JeongPeakWidth::getQbroad() const
 void JeongPeakWidth::setQbroad(double qbroad)
 {
     mqbroad = qbroad;
+}
+
+// Private Methods -----------------------------------------------------------
+
+double JeongPeakWidth::msdSharpeningRatio(const double& r) const
+{
+    using diffpy::mathutils::DOUBLE_EPS;
+    // avoid division by zero
+    if (r < DOUBLE_EPS)  return 0.0;
+    double rv = 1.0 - this->getDelta1()/r - this->getDelta2()/pow(r, 2) +
+         pow(this->getQbroad()*r, 2);
+    return rv;
 }
 
 // Registration --------------------------------------------------------------

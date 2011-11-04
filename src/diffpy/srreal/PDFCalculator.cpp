@@ -516,8 +516,9 @@ double PDFCalculator::extFromTerminationRipples() const
 double PDFCalculator::extFromPeakTails() const
 {
     // assume uncorrelated neighbors with maxUii
-    double maxmsd = 2 * maxUii(mstructure);
-    double maxfwhm = this->getPeakWidthModel()->calculateFromMSD(maxmsd);
+    const PeakWidthModel& pwm = *(this->getPeakWidthModel());
+    double maxfwhm = pwm.maxWidth(
+            mstructure, this->getRmin(), this->getRmax());
     const PeakProfile& pkf = *(this->getPeakProfile());
     double xleft = fabs(pkf.xboundlo(maxfwhm));
     double xright = fabs(pkf.xboundhi(maxfwhm));

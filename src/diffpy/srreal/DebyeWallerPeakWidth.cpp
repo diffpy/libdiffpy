@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/DebyeWallerPeakWidth.hpp>
+#include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/serialization.hpp>
 
 namespace diffpy {
@@ -53,8 +54,20 @@ const string& DebyeWallerPeakWidth::type() const
 
 double DebyeWallerPeakWidth::calculate(const BaseBondGenerator& bnds) const
 {
+    using diffpy::mathutils::GAUSS_SIGMA_TO_FWHM;
     double msdval = bnds.msd();
-    return this->calculateFromMSD(msdval);
+    double rv = (msdval < 0.0) ? 0.0 : GAUSS_SIGMA_TO_FWHM * sqrt(msdval);
+    return rv;
+}
+
+
+double DebyeWallerPeakWidth::maxWidth(StructureAdapterPtr stru,
+                double rmin, double rmax) const
+{
+    using diffpy::mathutils::GAUSS_SIGMA_TO_FWHM;
+    double maxmsd = 2 * maxUii(stru);
+    double rv = (maxmsd <= 0.0) ? 0.0 : GAUSS_SIGMA_TO_FWHM * sqrt(maxmsd);
+    return rv;
 }
 
 // Registration --------------------------------------------------------------

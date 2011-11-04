@@ -295,8 +295,9 @@ double DebyePDFCalculator::extFromTerminationRipples() const
 
 double DebyePDFCalculator::extFromPeakTails() const
 {
-    double maxmsd = 2 * maxUii(mstructure);
-    double maxfwhm = this->getPeakWidthModel()->calculateFromMSD(maxmsd);
+    const PeakWidthModel& pwm = *(this->getPeakWidthModel());
+    double maxfwhm = pwm.maxWidth(
+            mstructure, this->getRmin(), this->getRmax());
     // assume Gaussian peak profile
     GaussianProfile pkf;
     pkf.setPrecision(DEFAULT_PEAKPRECISION);

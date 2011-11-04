@@ -64,7 +64,8 @@ double ConstantPeakWidth::calculate(const BaseBondGenerator& bnds) const
 }
 
 
-double ConstantPeakWidth::calculateFromMSD(double msdval) const
+double ConstantPeakWidth::maxWidth(
+        StructureAdapterPtr stru, double rmin, double rmax) const
 {
     return this->getWidth();
 }

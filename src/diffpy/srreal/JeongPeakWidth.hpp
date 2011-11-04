@@ -41,6 +41,8 @@ class JeongPeakWidth : public DebyeWallerPeakWidth
         // methods
         virtual const std::string& type() const;
         virtual double calculate(const BaseBondGenerator&) const;
+        virtual double maxWidth(StructureAdapterPtr,
+                double rmin, double rmax) const;
 
         // data access
         const double& getDelta1() const;
@@ -56,6 +58,9 @@ class JeongPeakWidth : public DebyeWallerPeakWidth
         double mdelta1;
         double mdelta2;
         double mqbroad;
+
+        // methods
+        double msdSharpeningRatio(const double& r) const;
 };
 
 

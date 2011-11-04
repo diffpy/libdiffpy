@@ -33,6 +33,7 @@ namespace mathutils {
 const double DOUBLE_MAX = std::numeric_limits<double>().max();
 const double DOUBLE_EPS = std::numeric_limits<double>().epsilon();
 const double SQRT_DOUBLE_EPS = (sqrt(DOUBLE_EPS) + 1.0) - 1.0;
+const double GAUSS_SIGMA_TO_FWHM = 2 * sqrt(2 * M_LN2);
 
 // trigonometric functions with more exact values at n*30 degrees
 
