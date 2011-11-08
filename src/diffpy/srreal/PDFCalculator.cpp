@@ -127,9 +127,8 @@ QuantityType PDFCalculator::getExtendedPDF() const
     assert(this->extendedRmaxSteps() <= int(pdf0.size()));
     QuantityType pdf1(pdf0.begin() + this->extendedRminSteps(),
             pdf0.begin() + this->extendedRmaxSteps());
-    QuantityType pdf2 = this->applyBaseline(rgrid_ext, pdf1);
-    QuantityType pdf3 = this->applyEnvelopes(rgrid_ext, pdf2);
-    return pdf3;
+    QuantityType pdf2 = this->applyEnvelopes(rgrid_ext, pdf1);
+    return pdf2;
 }
 
 
@@ -175,8 +174,10 @@ QuantityType PDFCalculator::getExtendedRDFperR() const
 QuantityType PDFCalculator::getExtendedF() const
 {
     QuantityType rdfperr_ext = this->getExtendedRDFperR();
-    const double rmin_ext = this->getRstep() * this->extendedRminSteps();
-    QuantityType rv = fftgtof(rdfperr_ext, this->getRstep(), rmin_ext);
+    QuantityType rgrid_ext = this->getExtendedRgrid();
+    QuantityType rdfperr_ext1 = this->applyBaseline(rgrid_ext, rdfperr_ext);
+    const double rmin_ext = this->getExtendedRmin();
+    QuantityType rv = fftgtof(rdfperr_ext1, this->getRstep(), rmin_ext);
     assert(rv.empty() || eps_eq(M_PI,
                 this->getQstep() * rv.size() * this->getRstep()));
     // zero all F points at Q < Qmin
