@@ -85,9 +85,13 @@ class SFTperiodictableXray : public ScatteringFactorTable
             diffpy::initializePython();
             static python::object fxrayatq = diffpy::importFromPyModule(
                     "periodictable.cromermann", "fxrayatq");
+            const string zp = "0+";
+            string::size_type pos = smbl.size() - zp.size();
+            string::size_type pe = smbl.rfind(zp, pos);
+            string smblnozp = smbl.substr(0, pe);
             double rv;
             try {
-                rv = python::extract<double>(fxrayatq(smbl, q) + 0.0);
+                rv = python::extract<double>(fxrayatq(smblnozp, q) + 0.0);
             }
             catch (python::error_already_set e) {
                 string emsg = diffpy::getPythonErrorString();
@@ -198,7 +202,7 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
             static python::object isotope = diffpy::importFromPyModule(
                     "periodictable", "elements").attr("isotope");
             double rv;
-            string::size_type pe = smbl.find_last_not_of("+-12345678 \t");
+            string::size_type pe = smbl.find_last_not_of("+-012345678 \t");
             string smblnocharge = smbl.substr(0, pe + 1);
             try {
                 python::object el = isotope(smblnocharge);

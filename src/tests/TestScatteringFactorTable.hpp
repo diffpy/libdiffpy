@@ -127,6 +127,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(msftb->lookup("Na+"), msftb->lookup("Na1+"));
             TS_ASSERT_DELTA(74.0, msftb->lookup("W"), 0.04);
             TS_ASSERT_DELTA(88.0, msftb->lookup("Ra"), 0.04);
+            TS_ASSERT_EQUALS(msftb->lookup("Si"), msftb->lookup("Si0+"));
         }
 
 
@@ -152,6 +153,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_DELTA(5.805, msftb->lookup("O"), mtol);
             TS_ASSERT_DELTA(6.6484, msftb->lookup("C"), mtol);
             TS_ASSERT_EQUALS(msftb->lookup("Na"), msftb->lookup("Na1+"));
+            TS_ASSERT_EQUALS(msftb->lookup("Ge"), msftb->lookup("Ge0+"));
         }
 
 
