@@ -158,8 +158,6 @@ void BondCalculator::addPairContribution(
         const BaseBondGenerator& bnds,
         int summationscale)
 {
-    using diffpy::mathutils::eps_eq;
-    if (eps_eq(0.0, bnds.distance()))    return;
     assert(summationscale == 1);
     static R3::Vector ru01;
     const R3::Vector& r01 = bnds.r01();

@@ -409,10 +409,8 @@ void OverlapCalculator::configureBondGenerator(BaseBondGenerator& bnds) const
 void OverlapCalculator::addPairContribution(
         const BaseBondGenerator& bnds, int summationscale)
 {
-    using diffpy::mathutils::eps_eq;
     assert(summationscale == 1);
     assert(bnds.distance() <= mstructure_cache.maxseparation);
-    if (eps_eq(0.0, bnds.distance()))    return;
     const R3::Vector& r01 = bnds.r01();
     int baseidx = mvalue.size();
     mvalue.insert(mvalue.end(), CHUNK_SIZE, 0.0);
