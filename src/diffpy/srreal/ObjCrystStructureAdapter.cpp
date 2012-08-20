@@ -96,17 +96,22 @@ ObjCrystStructureAdapter(const ObjCryst::Crystal& cryst)
                         rtod * cryst.GetLatticePar(3),
                         rtod * cryst.GetLatticePar(4),
                         rtod * cryst.GetLatticePar(5) );
-
     // The dynamic population correction in ObjCryst is used by its interal
     // calculators, but slows down the calculation of atom positions. This is
     // also required to get the proper ScatteringComponentList for aperiodic
     // structures. Since we're not using any ObjCryst calculators, we turn it
     // off momentarily.
-    int usepopcorr = cryst.GetUseDynPopCorr();
-    const_cast<Crystal&>(cryst).SetUseDynPopCorr(0);
+    //
+    // NOTE: 2012-08-20 Pavol - I have not seen this issue and want to use
+    // molecule rotations in a crystal structure of an organic compound.
+    // Code changed to leave the population correction alone.
+    // It can be set as desired using the pyobjcryst interface.
+    //
+    // int usepopcorr = cryst.GetUseDynPopCorr();
+    // const_cast<Crystal&>(cryst).SetUseDynPopCorr(0);
     this->getUnitCell(cryst);
     // Undo change
-    const_cast<Crystal&>(cryst).SetUseDynPopCorr(usepopcorr);
+    // const_cast<Crystal&>(cryst).SetUseDynPopCorr(usepopcorr);
 }
 
 
