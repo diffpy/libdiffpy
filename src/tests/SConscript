@@ -8,6 +8,7 @@ env_test.Tool('cxxtest')
 lib_dir = libdiffpy[0].dir.abspath
 env_test.PrependUnique(LIBS='diffpy', LIBPATH=lib_dir)
 env_test.PrependENVPath('LD_LIBRARY_PATH', lib_dir)
+env_test.PrependENVPath('DYLD_LIBRARY_PATH', lib_dir)
 
 # Targets --------------------------------------------------------------------
 

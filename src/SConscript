@@ -20,6 +20,14 @@ if icpc:
 env.ParseConfig("python-config --includes")
 env.ParseConfig("python-config --ldflags")
 env.ParseConfig("gsl-config --cflags --libs")
+
+# Platform specific intricacies.
+if env['PLATFORM'] == 'darwin':
+    fixmacflags = lambda x: (str(x) not in ('-u', '_PyMac_Error'))
+    env.Replace(CCFLAGS=filter(fixmacflags, env['CCFLAGS']))
+    env.Replace(LIBS=filter(fixmacflags, env['LIBS']))
+    env.AppendUnique(LIBFLAGS=['-u', '_PyMac_Error'])
+
 # configure version specific options.
 if not (GetOption('clean') or env.GetOption('help')):
     SConscript('SConscript.configure')
@@ -74,7 +82,11 @@ prefix = env['prefix']
 
 # install-lib
 libdir = env.get('libdir', os.path.join(prefix, 'lib'))
-Alias('install-lib', Install(libdir, libdiffpy))
+libinstall = Install(libdir, libdiffpy)
+if env['PLATFORM'] == 'darwin':
+    env.AddPostAction(libinstall,
+            'install_name_tool -id $TARGET.abspath $TARGET')
+Alias('install-lib', libinstall)
 
 # install-includes
 includedir = env.get('includedir', os.path.join(env['prefix'], 'include'))
