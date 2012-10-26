@@ -20,10 +20,10 @@
 
 #include <cxxtest/TestSuite.h>
 
-#include <diffpy/srreal/OverlapCalculator.hpp>
 #include <diffpy/srreal/VR3Structure.hpp>
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
+#include <diffpy/srreal/OverlapCalculator.hpp>
 #include "python_helpers.hpp"
 #include "serialization_helpers.hpp"
 

@@ -235,10 +235,10 @@ PointsInSphere::PointsInSphere(double rmin, double rmax, const L& lat) :
 template <class L>
 ReflectionsInQminQmax::ReflectionsInQminQmax(
         double _qmin, double _qmax, const L& lat) :
+	    _Qmin(_qmin), _Qmax(_qmax),
 	    latpar(lat.a(), lat.b(), lat.c(),
                     lat.alpha(), lat.beta(), lat.gamma()),
-	    sph(_qmin*M_1_PI/2.0, _qmax*M_1_PI/2.0, latpar.reciprocal()),
-	    _Qmin(_qmin), _Qmax(_qmax)
+	    sph(_qmin*M_1_PI/2.0, _qmax*M_1_PI/2.0, latpar.reciprocal())
 { }
 
 // Template Constructor for ReflectionsInDmaxDmin ----------------------------
@@ -247,7 +247,7 @@ template <class L>
 ReflectionsInDmaxDmin::ReflectionsInDmaxDmin(
         double dmax, double dmin, const L& lat) :
 	    ReflectionsInQminQmax(2.0*M_PI/dmax, 2.0*M_PI/dmin, lat),
-	    _Dmax(dmax), _Dmin(dmin)
+	    _Dmin(dmin), _Dmax(dmax)
 { }
 
 

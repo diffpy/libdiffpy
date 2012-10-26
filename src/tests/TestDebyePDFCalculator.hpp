@@ -20,11 +20,11 @@
 
 #include <cxxtest/TestSuite.h>
 
+#include <diffpy/srreal/VR3Structure.hpp>
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
 #include <diffpy/srreal/JeongPeakWidth.hpp>
 #include <diffpy/srreal/ConstantPeakWidth.hpp>
 #include <diffpy/srreal/QResolutionEnvelope.hpp>
-#include <diffpy/srreal/VR3Structure.hpp>
 #include <diffpy/serialization.hpp>
 
 using namespace std;

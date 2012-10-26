@@ -31,7 +31,7 @@ class TestR3linalg : public CxxTest::TestSuite
 
 private:
 
-    static const double precision = 1.0e-12;
+    const double precision = 1.0e-12;
 
 public:
 

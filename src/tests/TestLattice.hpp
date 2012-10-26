@@ -25,13 +25,14 @@ class TestLattice : public CxxTest::TestSuite
 private:
 
     Lattice* lattice;
-    static const double precision = 1.0e-8;
+    double precision;
 
 public:
 
     void setUp()
     {
 	lattice = new Lattice();
+        precision = 1.0e-8;
     }
 
     void tearDown()

@@ -20,8 +20,8 @@
 
 #include <cxxtest/TestSuite.h>
 
-#include <diffpy/srreal/PairCounter.hpp>
 #include <diffpy/srreal/VR3Structure.hpp>
+#include <diffpy/srreal/PairCounter.hpp>
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -92,7 +92,7 @@ public:
 
     void test_parallel()
     {
-        int ncpu = 7;
+        const int ncpu = 7;
         PairCounter pmaster;
         PairCounter pslave[ncpu];
         bool allequal = true;
