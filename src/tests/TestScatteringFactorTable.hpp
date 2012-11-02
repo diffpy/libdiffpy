@@ -36,7 +36,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
 
     private:
 
-        static const double mtol = 1.0e-4;
+        double mtol;
         double meps;
         ScatteringFactorTablePtr msftb;
 
@@ -44,6 +44,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
 
         void setUp()
         {
+            mtol = 1.0e-4;
             meps = 10 * diffpy::mathutils::DOUBLE_EPS;
         }
 
