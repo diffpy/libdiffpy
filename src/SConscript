@@ -26,7 +26,6 @@ if env['PLATFORM'] == 'darwin':
     fixmacflags = lambda x: (str(x) not in ('-u', '_PyMac_Error'))
     env.Replace(CCFLAGS=filter(fixmacflags, env['CCFLAGS']))
     env.Replace(LIBS=filter(fixmacflags, env['LIBS']))
-    env.AppendUnique(LIBFLAGS=['-u', '_PyMac_Error'])
 
 # configure version specific options.
 if not (GetOption('clean') or env.GetOption('help')):
