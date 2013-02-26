@@ -48,6 +48,16 @@ class ConstantRadiiTable : public AtomRadiiTable
         // data
         double mdefaultradius;
 
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<AtomRadiiTable>(*this);
+            ar & mdefaultradius;
+        }
+
 };
 
 }   // namespace srreal
