@@ -12,7 +12,8 @@
 *
 ******************************************************************************
 *
-* class ZeroRadiiTable -- this AtomRadiiTable returns zero for all elements
+* class ConstantRadiiTable -- this AtomRadiiTable returns same value
+*   for all elements unless redefined by the setCustom method.
 *
 * $Id$
 *
@@ -25,45 +26,62 @@
 #include <vector>
 #include <boost/smart_ptr/make_shared.hpp>
 
-#include <diffpy/srreal/ZeroRadiiTable.hpp>
+#include <diffpy/srreal/ConstantRadiiTable.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 using namespace std;
 
+// Constructors --------------------------------------------------------------
+
+ConstantRadiiTable::ConstantRadiiTable() : mdefaultradius(0.0)
+{ }
+
 // Public Methods ------------------------------------------------------------
 
 // HasClassRegistry methods
 
-AtomRadiiTablePtr ZeroRadiiTable::create() const
+AtomRadiiTablePtr ConstantRadiiTable::create() const
 {
-    return boost::make_shared<ZeroRadiiTable>();
+    return boost::make_shared<ConstantRadiiTable>();
 }
 
 
-AtomRadiiTablePtr ZeroRadiiTable::clone() const
+AtomRadiiTablePtr ConstantRadiiTable::clone() const
 {
-    return boost::make_shared<ZeroRadiiTable>(*this);
+    return boost::make_shared<ConstantRadiiTable>(*this);
 }
 
 
-const string& ZeroRadiiTable::type() const
+const string& ConstantRadiiTable::type() const
 {
-    static string rv = "zeroradii";
+    static string rv = "constant";
     return rv;
 }
 
 // own methods
 
-double ZeroRadiiTable::tableLookup(const string& smbl) const
+double ConstantRadiiTable::tableLookup(const string& smbl) const
 {
-    return 0.0;
+    return mdefaultradius;
+}
+
+
+void ConstantRadiiTable::setDefault(double value)
+{
+    mdefaultradius = value;
+}
+
+
+double ConstantRadiiTable::getDefault() const
+{
+    return mdefaultradius;
 }
 
 // Registration --------------------------------------------------------------
 
-bool reg_ZeroRadiiTable = ZeroRadiiTable().registerThisType();
+bool reg_ConstantRadiiTable = ConstantRadiiTable().registerThisType();
 
 }   // srreal
 }   // diffpy

@@ -12,33 +12,45 @@
 *
 ******************************************************************************
 *
-* class ZeroRadiiTable -- concrete AtomRadiiTable that always returns zero
+* class ConstantRadiiTable -- concrete AtomRadiiTable for a uniform radius
 *
 * $Id$
 *
 *****************************************************************************/
 
-#ifndef ZERORADIITABLE_HPP_INCLUDED
-#define ZERORADIITABLE_HPP_INCLUDED
+#ifndef CONSTANTRADIITABLE_HPP_INCLUDED
+#define CONSTANTRADIITABLE_HPP_INCLUDED
 
 #include <diffpy/srreal/AtomRadiiTable.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class ZeroRadiiTable : public AtomRadiiTable
+class ConstantRadiiTable : public AtomRadiiTable
 {
     public:
+
+        // constructor
+        ConstantRadiiTable();
 
         // methods - HasClassRegistry
         SharedPtr create() const;
         SharedPtr clone() const;
         const std::string& type() const;
-        // own methods
+        // method overloads
         double tableLookup(const std::string& smbl) const;
+        // methods specific for this class
+        void setDefault(double);
+        double getDefault() const;
+
+    private:
+
+        // data
+        double mdefaultradius;
+
 };
 
 }   // namespace srreal
 }   // namespace diffpy
 
-#endif  // ZERORADIITABLE_HPP_INCLUDED
+#endif  // CONSTANTRADIITABLE_HPP_INCLUDED

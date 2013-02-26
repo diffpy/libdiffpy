@@ -22,6 +22,7 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/AtomRadiiTable.hpp>
+#include <diffpy/srreal/ConstantRadiiTable.hpp>
 #include "serialization_helpers.hpp"
 
 using namespace std;
@@ -39,7 +40,7 @@ class TestAtomRadiiTable : public CxxTest::TestSuite
 
         void setUp()
         {
-            mrtb = AtomRadiiTable::createByType("zeroradii");
+            mrtb = AtomRadiiTable::createByType("constant");
         }
 
 
@@ -103,6 +104,17 @@ class TestAtomRadiiTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(string("A:1.1, B:1.2, C:1.3"), mrtb->toString(", "));
             mrtb->resetAll();
             TS_ASSERT(mrtb->toString().empty());
+        }
+
+
+        void test_setDefault()
+        {
+            ConstantRadiiTable* crtb =
+                dynamic_cast<ConstantRadiiTable*>(mrtb.get());
+            crtb->setDefault(7.1);
+            TS_ASSERT_EQUALS(7.1, mrtb->lookup("everything"));
+            crtb->setDefault(3.1);
+            TS_ASSERT_EQUALS(3.1, mrtb->lookup("Na"));
         }
 
 
