@@ -1,4 +1,5 @@
 import os
+from subprocess import Popen, PIPE
 
 # Do nothing if version.hpp already exists in the source tree.
 
@@ -11,31 +12,30 @@ if os.path.isfile(version_hpp):
 Import('env')
 Import('DIFFPY_VERSION_STR')
 
-version_sources = ['version.tpl']
-srcdir = env.Dir('#/src').srcnode()
+srcdir = str(env.Dir('#/src').srcnode())
+proc = Popen(['svnversion', '-c', srcdir], stdout=PIPE)
+svnrev = proc.stdout.read().strip().split(':')[-1]
 
 def build_VersionCode(target, source, env):
     import re
     import string
-    import subprocess
     flds = {
         'DIFFPY_VERSION' : 0,
         'DIFFPY_VERSION_STR' : DIFFPY_VERSION_STR,
         'DIFFPY_VERSION_DATE' : '2009-11-23 00:00:00Z',
     }
     major, minor = map(int, DIFFPY_VERSION_STR.split("."))
-    proc = subprocess.Popen(['svnversion', '-c', str(srcdir)],
-            stdout=subprocess.PIPE)
-    svnrev = proc.stdout.read().strip().split(':')[-1]
     rev = svnrev and int(svnrev.rstrip('MS')) or 0
     flds['DIFFPY_VERSION'] = 10000000 * major + 100000 * minor + rev
-    # FIXME
     if rev:
         flds['DIFFPY_VERSION_STR'] += "-r" + svnrev.rstrip('S')
-        cmd = 'TZ=0 svn info -r %i .' % rev
-        svninfo = os.popen(cmd).read()
-        mx = re.search('^Last Changed Date: (\S+ \S+)', svninfo, re.M)
-        if mx:  flds['DIFFPY_VERSION_DATE'] = mx.group(1) + "Z"
+        cmdenv = env['ENV'].copy()
+        cmdenv['TZ'] = '0'
+        proc = Popen(['svn', 'info', '-r', str(rev), srcdir],
+                stdout=PIPE, env=cmdenv)
+        svninfo = proc.stdout.read()
+        mx = re.search('^Last Changed Date: (\S+ \S+ \S+)', svninfo, re.M)
+        if mx:  flds['DIFFPY_VERSION_DATE'] = mx.group(1)
     templatecode = open(str(source[0])).read()
     versiontemplate = string.Template(templatecode)
     versioncode = versiontemplate.safe_substitute(flds)
@@ -47,10 +47,9 @@ env.Append(BUILDERS={'BuildVersionCode' :
 
 # Targets --------------------------------------------------------------------
 
-ver = env.BuildVersionCode(['version.hpp'], version_sources)
-env.Depends(ver, env.Value(DIFFPY_VERSION_STR))
-env.Depends(ver, [f for f in (env['lib_sources'] + env['lib_includes'])
-    if not str(f).endswith('version.hpp')])
+ver = env.BuildVersionCode(['version.hpp'], ['version.tpl'])
+env.Depends(ver, env.Value([DIFFPY_VERSION_STR, svnrev]))
+
 env['lib_includes'] += ver
 
 # vim: ft=python
