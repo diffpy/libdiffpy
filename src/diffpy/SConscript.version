@@ -12,22 +12,24 @@ Import('env')
 Import('DIFFPY_VERSION_STR')
 
 version_sources = ['version.tpl']
-svnentries = env.File('#/src/.svn/entries').srcnode()
+srcdir = env.Dir('#/src').srcnode()
 
 def build_VersionCode(target, source, env):
     import re
     import string
+    import subprocess
     flds = {
         'DIFFPY_VERSION' : 0,
         'DIFFPY_VERSION_STR' : DIFFPY_VERSION_STR,
         'DIFFPY_VERSION_DATE' : '2009-11-23 00:00:00Z',
     }
     major, minor = map(int, DIFFPY_VERSION_STR.split("."))
-    srcdir = os.path.dirname(os.path.dirname(str(svnentries)))
-    svnrev = (os.path.isfile(str(svnentries)) and
-        os.popen('svnversion -c %s' % srcdir).read().strip().split(':')[-1])
+    proc = subprocess.Popen(['svnversion', '-c', str(srcdir)],
+            stdout=subprocess.PIPE)
+    svnrev = proc.stdout.read().strip().split(':')[-1]
     rev = svnrev and int(svnrev.rstrip('MS')) or 0
     flds['DIFFPY_VERSION'] = 10000000 * major + 100000 * minor + rev
+    # FIXME
     if rev:
         flds['DIFFPY_VERSION_STR'] += "-r" + svnrev.rstrip('S')
         cmd = 'TZ=0 svn info -r %i .' % rev
@@ -47,8 +49,8 @@ env.Append(BUILDERS={'BuildVersionCode' :
 
 ver = env.BuildVersionCode(['version.hpp'], version_sources)
 env.Depends(ver, env.Value(DIFFPY_VERSION_STR))
-if os.path.isfile(str(svnentries)):  env.Depends(ver, svnentries)
-
+env.Depends(ver, [f for f in (env['lib_sources'] + env['lib_includes'])
+    if not str(f).endswith('version.hpp')])
 env['lib_includes'] += ver
 
 # vim: ft=python
