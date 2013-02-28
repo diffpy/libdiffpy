@@ -85,7 +85,8 @@ QuantityType OverlapCalculator::overlaps() const
     for (int idx = 0; idx < n; ++idx)
     {
         double olp = this->suboverlap(idx);
-        if (olp >= 0.0)  rv.push_back(olp);
+        if (olp <= 0.0)  continue;
+        rv.push_back(olp);
     }
     return rv;
 }
