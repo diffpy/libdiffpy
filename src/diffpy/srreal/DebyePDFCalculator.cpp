@@ -128,6 +128,7 @@ void DebyePDFCalculator::setQstep(double qstep)
 {
     moptimumqstep = false;
     this->BaseDebyeSum::setQstep(qstep);
+    this->updateQstep();
 }
 
 
@@ -258,13 +259,15 @@ double DebyePDFCalculator::sfSiteAtQ(int siteidx, const double& Q) const
 
 void DebyePDFCalculator::updateQstep()
 {
-    if (!moptimumqstep)  return;
     double rmaxext = this->rcalchi();
     // Use at least 4 steps to Qmax even for tiny rmaxext.
     // Avoid division by zero.
-    double qstep = (this->getQmax() * rmaxext / M_PI > 4) ?
+    double oqstep = (this->getQmax() * rmaxext / M_PI > 4) ?
         (M_PI / rmaxext) : (this->getQmax() / 4);
-    this->BaseDebyeSum::setQstep(qstep);
+    // if custom qstep is higher than the optimum one,
+    // force adjustment to the optimum value.
+    if (this->getQstep() > oqstep)  moptimumqstep = true;
+    if (moptimumqstep)  this->BaseDebyeSum::setQstep(oqstep);
 }
 
 
