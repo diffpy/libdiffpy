@@ -29,19 +29,23 @@
 
 using namespace std;
 
+namespace {
+
+void NoMessages(const string&)  { }
+
+}   // namespace
+
 
 ObjCryst::Crystal* loadTestCrystal(const string& tailname)
 {
     string fp = prepend_testdata_dir(tailname);
     ifstream in(fp.c_str());
+    // suppress the chatty output from CreateCrystalFromCIF
+    void (*OCMessages)(const string&) = ObjCryst::fpObjCrystInformUser;
+    ObjCryst::fpObjCrystInformUser = NoMessages;
     ObjCryst::CIF cif(in);
-    // redirect cout to hide the CreateCrystalFromCIF chatty output
-    streambuf* cout_sb = cout.rdbuf();
-    ostringstream cifout;
-    cout.rdbuf(cifout.rdbuf());
     ObjCryst::Crystal* crst = ObjCryst::CreateCrystalFromCIF(cif, false);
-    // restore cout
-    cout.rdbuf(cout_sb);
+    ObjCryst::fpObjCrystInformUser = OCMessages;
     return crst;
 }
 
