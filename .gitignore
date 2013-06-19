@@ -13,6 +13,9 @@
 *.a.sconf_temp
 
 # SCons build files
+.sconf_temp/
 .sconsign.dblite
 build
 config.log
+errors.err
+tags
