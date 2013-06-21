@@ -69,6 +69,15 @@ class HasClassRegistry
         /// Return a set of all registered string types
         static std::set<std::string> getRegisteredTypes();
 
+    protected:
+
+        /// Optional setup for the registered object.
+        ///
+        /// This is used for increasing reference count on Python-extended
+        /// classes, so they are not destroyed before destroying the C++
+        /// object registry.
+        virtual void setupRegisteredObject(SharedPtr p) const  { }
+
     private:
 
         typedef std::map<std::string, SharedPtr> RegistryStorage;

@@ -46,7 +46,9 @@ bool HasClassRegistry<TBase>::registerThisType() const
             "' is already registered.";
         throw logic_error(emsg.str());
     }
-    reg[this->type()] = this->create();
+    SharedPtr p = this->create();
+    this->setupRegisteredObject(p);
+    reg[this->type()] = p;
     return true;
 }
 
