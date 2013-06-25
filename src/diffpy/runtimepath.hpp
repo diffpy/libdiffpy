@@ -16,8 +16,8 @@
 *
 *****************************************************************************/
 
-#ifndef RUNTIMEPATHS_HPP_INCLUDED
-#define RUNTIMEPATHS_HPP_INCLUDED
+#ifndef RUNTIMEPATH_HPP_INCLUDED
+#define RUNTIMEPATH_HPP_INCLUDED
 
 #include <string>
 
@@ -40,4 +40,4 @@ std::string datapath(const std::string& f);
 }   // namespace runtimepaths
 }   // namespace diffpy
 
-#endif  // RUNTIMEPATHS_HPP_INCLUDED
+#endif  // RUNTIMEPATH_HPP_INCLUDED
