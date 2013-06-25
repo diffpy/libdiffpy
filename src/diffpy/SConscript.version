@@ -7,35 +7,28 @@ version_hpp = str(File('version.hpp').srcnode())
 if os.path.isfile(version_hpp):
     Return()
 
-# Otherwise build version.hpp from the svn data.
+# Otherwise build version.hpp from the git log data.
 
 Import('env')
 Import('DIFFPY_VERSION_STR')
 
-srcdir = str(env.Dir('#/src').srcnode())
-proc = Popen(['svnversion', '-c', srcdir], stdout=PIPE)
-svnrev = proc.stdout.read().strip().split(':')[-1]
+proc = Popen(['git', 'log', '-1', '--format=%h %at %ai'], stdout=PIPE)
+gitlog = proc.stdout.read().strip()
 
 def build_VersionCode(target, source, env):
     import re
     import string
+    gsha, gepoch, gisodate = gitlog.split(None, 2)
     flds = {
         'DIFFPY_VERSION' : 0,
         'DIFFPY_VERSION_STR' : DIFFPY_VERSION_STR,
-        'DIFFPY_VERSION_DATE' : '2009-11-23 00:00:00Z',
+        'DIFFPY_VERSION_DATE' : gisodate,
+        'DIFFPY_GITSHA' : gsha,
     }
     major, minor = map(int, DIFFPY_VERSION_STR.split("."))
-    rev = svnrev and int(svnrev.rstrip('MS')) or 0
-    flds['DIFFPY_VERSION'] = 10000000 * major + 100000 * minor + rev
-    if rev:
-        flds['DIFFPY_VERSION_STR'] += "-r" + svnrev.rstrip('S')
-        cmdenv = env['ENV'].copy()
-        cmdenv['TZ'] = '0'
-        proc = Popen(['svn', 'info', '-r', str(rev), srcdir],
-                stdout=PIPE, env=cmdenv)
-        svninfo = proc.stdout.read()
-        mx = re.search('^Last Changed Date: (\S+ \S+ \S+)', svninfo, re.M)
-        if mx:  flds['DIFFPY_VERSION_DATE'] = mx.group(1)
+    revnum = int(gepoch) // 86400
+    flds['DIFFPY_VERSION'] = 10000000 * major + 100000 * minor + revnum
+    flds['DIFFPY_VERSION_STR'] += "-t" + str(revnum)
     templatecode = open(str(source[0])).read()
     versiontemplate = string.Template(templatecode)
     versioncode = versiontemplate.safe_substitute(flds)
@@ -48,7 +41,7 @@ env.Append(BUILDERS={'BuildVersionCode' :
 # Targets --------------------------------------------------------------------
 
 ver = env.BuildVersionCode(['version.hpp'], ['version.tpl'])
-env.Depends(ver, env.Value([DIFFPY_VERSION_STR, svnrev]))
+env.Depends(ver, env.Value([DIFFPY_VERSION_STR, gitlog]))
 
 env['lib_includes'] += ver
 

@@ -16,15 +16,14 @@
 *   DIFFPY_VERSION,
 *   DIFFPY_VERSION_STR,
 *   DIFFPY_VERSION_DATE
-*
-* $Id$
+*   DIFFPY_GITSHA
 *
 *****************************************************************************/
 
 #ifndef VERSION_HPP_INCLUDED
 #define VERSION_HPP_INCLUDED
 
-// DIFFPY_VERSION % 100000 is the subversion revision number
+// DIFFPY_VERSION % 100000 is a version age in days since Unix time epoch
 // DIFFPY_VERSION / 100000 % 100 is the minor version
 // DIFFPY_VERSION / 10000000 is the major version
 
@@ -37,6 +36,10 @@
 // DIFFPY_VERSION_DATE is the subversion date of DIFFPY_VERSION
 
 #define DIFFPY_VERSION_DATE "${DIFFPY_VERSION_DATE}"
+
+// DIFFPY_GITSHA is an abbreviated git commit hash for the current version
+
+#define DIFFPY_GITSHA "${DIFFPY_GITSHA}"
 
 #endif  // VERSION_HPP_INCLUDED
 
