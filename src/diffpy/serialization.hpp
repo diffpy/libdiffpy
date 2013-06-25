@@ -16,8 +16,6 @@
 *   diffpy::serialization::iarchive
 *   diffpy::serialization::oarchive
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef SERIALIZATION_HPP_INCLUDED

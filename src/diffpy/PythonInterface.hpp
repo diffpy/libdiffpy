@@ -14,8 +14,6 @@
 *
 * Common functions for interfacing with Python interpreter.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef PYTHONINTERFACE_HPP_INCLUDED

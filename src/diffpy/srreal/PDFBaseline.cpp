@@ -14,8 +14,6 @@
 *
 * class PDFBaseline -- abstract base class for PDF baseline functions
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/srreal/PDFBaseline.hpp>

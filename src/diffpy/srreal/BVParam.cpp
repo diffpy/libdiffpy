@@ -14,8 +14,6 @@
 *
 * class BVParam -- bond valence parameters for a cation-anion pair
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cmath>

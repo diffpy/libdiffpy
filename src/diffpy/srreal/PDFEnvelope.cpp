@@ -14,8 +14,6 @@
 *
 * class PDFEnvelope -- abstract base class for PDF envelope functions
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <sstream>

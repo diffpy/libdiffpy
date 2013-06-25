@@ -17,8 +17,6 @@
 *   template class HasClassRegistry<ConcreteBase>;
 *   This ensure there is just one instance of the RegistryStorage
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef HASCLASSREGISTRY_IPP_INCLUDED

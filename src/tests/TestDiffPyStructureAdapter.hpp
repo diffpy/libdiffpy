@@ -17,8 +17,6 @@
 *
 * class TestDiffPyStructureBondGenerator -- unit tests for bond generator
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <typeinfo>

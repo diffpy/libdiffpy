@@ -14,8 +14,6 @@
 *
 * class TestSphericalShapeEnvelope -- unit tests for SphericalShapeEnvelope
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>

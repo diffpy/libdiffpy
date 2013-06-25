@@ -14,8 +14,6 @@
 *
 * class TestBVSCalculator -- unit tests suite
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>

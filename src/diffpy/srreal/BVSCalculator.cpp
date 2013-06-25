@@ -14,8 +14,6 @@
 *
 * class BVSCalculator -- concrete counter of pairs in a structure.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cmath>

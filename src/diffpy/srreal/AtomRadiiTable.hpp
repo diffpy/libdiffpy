@@ -18,8 +18,6 @@
 *   The derived classes has to overload the tableLookup method and also
 *   create, clone and type methods from the HasClassRegistry base.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef ATOMRADIITABLE_HPP_INCLUDED

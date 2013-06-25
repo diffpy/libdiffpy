@@ -17,8 +17,6 @@
 * ScatteringFactorTable implementation where scattering power equals number
 * of valence electrons and is constant with Q.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <stdexcept>

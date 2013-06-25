@@ -15,8 +15,6 @@
 * class DebyeWallerPeakWidth -- peak width calculated assuming independent
 *     thermal vibrations of atoms forming a pair.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/srreal/DebyeWallerPeakWidth.hpp>

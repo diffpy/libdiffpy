@@ -14,8 +14,6 @@
 *
 * class OverlapCalculator -- calculator of atom radii overlaps
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <algorithm>

@@ -15,8 +15,6 @@
 * Boost serialization support for unordered_set and unordered_multiset.
 * Workaround with conversion to STL list.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef SERIALIZE_UNORDERED_SET_HPP_INCLUDED

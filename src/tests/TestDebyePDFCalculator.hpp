@@ -14,8 +14,6 @@
 *
 * class TestDebyePDFCalculator -- unit tests for DebyePDFCalculator class
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>

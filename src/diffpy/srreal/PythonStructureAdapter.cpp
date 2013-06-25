@@ -15,8 +15,6 @@
 * createStructureAdapter - a factory for creating StructureAdapter
 *     for recognized Python objects
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/srreal/PythonStructureAdapter.hpp>

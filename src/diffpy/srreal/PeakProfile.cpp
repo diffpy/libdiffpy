@@ -14,8 +14,6 @@
 *
 * class PeakProfile -- base class for calculation of peak profiles.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <boost/serialization/export.hpp>

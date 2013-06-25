@@ -15,8 +15,6 @@
 * Boost serialization support for unordered_map and unordered_multimap.
 * Workaround with conversion to STL list.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef SERIALIZE_UNORDERED_MAP_HPP_INCLUDED

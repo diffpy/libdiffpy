@@ -22,8 +22,6 @@
 * nosymmetry -- factory function that creates a NoSymmetryStructureAdapter
 *     instance inside StructureAdapterPtr
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/serialization.hpp>

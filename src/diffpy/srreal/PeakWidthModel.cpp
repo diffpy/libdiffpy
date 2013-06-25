@@ -14,8 +14,6 @@
 *
 * class PeakWidthModel -- base class for calculation of peak widths.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <boost/serialization/export.hpp>

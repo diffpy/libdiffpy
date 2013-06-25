@@ -14,8 +14,6 @@
 *
 * class ScatteringFactorTable -- base class for looking up scattering factors
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <boost/serialization/export.hpp>

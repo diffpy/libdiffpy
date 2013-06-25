@@ -14,8 +14,6 @@
 *
 * class QResolutionEnvelope -- Gaussian envelope due to limited Q resolution
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cmath>

@@ -14,8 +14,6 @@
 *
 * class TestAtomRadiiTable -- unit tests for the AtomRadiiTable class
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <stdexcept>

@@ -15,8 +15,6 @@
 * class Attributes - interface for calling setter and getter methods using
 *   their string names.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef ATTRIBUTES_IPP_INCLUDED

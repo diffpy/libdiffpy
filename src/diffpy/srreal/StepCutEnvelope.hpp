@@ -14,8 +14,6 @@
 *
 * class StepCutEnvelope -- empirical step-function PDF envelope.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef STEPCUTENVELOPE_HPP_INCLUDED

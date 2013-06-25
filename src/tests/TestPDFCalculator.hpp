@@ -14,8 +14,6 @@
 *
 * class TestPDFCalculator -- unit tests for PDFCalculator class
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>

@@ -14,8 +14,6 @@
 *
 * class SphericalShapeEnvelope -- PDF envelope due to spherical shape factor
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cmath>

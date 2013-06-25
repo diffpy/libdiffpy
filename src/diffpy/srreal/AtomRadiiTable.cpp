@@ -14,8 +14,6 @@
 *
 * class AtomRadiiTable -- storage of empirical atomic radii
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <algorithm>

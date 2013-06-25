@@ -17,8 +17,6 @@
 *     maxUii
 *     fftftog  and  fftgtof
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef PDFUTILS_HPP_INCLUDED

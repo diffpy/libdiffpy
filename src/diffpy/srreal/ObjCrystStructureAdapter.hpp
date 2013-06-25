@@ -21,8 +21,6 @@
 * class ObjCrystMoleculeBondGenerator
 *   -- Generate bonds from ObjCrystMoleculeAdapter
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef OBJCRYSTSTRUCTUREADAPTER_HPP_INCLUDED

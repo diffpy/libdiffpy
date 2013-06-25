@@ -3,8 +3,6 @@
 *
 * Comments: class for general coordinate system
 *
-* $Id$
-*
 * <license text>
 *****************************************************************************/
 

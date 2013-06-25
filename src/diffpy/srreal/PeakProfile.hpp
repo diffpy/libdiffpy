@@ -19,8 +19,6 @@
 *     where amplitude relative to the maximum becomes smaller than precision
 *     set by setPrecision().
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef PEAKPROFILE_HPP_INCLUDED

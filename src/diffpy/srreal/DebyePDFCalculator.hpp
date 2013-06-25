@@ -14,8 +14,6 @@
 *
 * class DebyePDFCalculator -- calculate PDF from the Debye equation.
 *
-* $Id$
-*
 *****************************************************************************/
 
 // Comments from Chris Farrow's sources for PDFNanoProfile:

@@ -14,8 +14,6 @@
 *
 * class BondCalculator -- bond distance calculator
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef BONDCALCULATOR_HPP_INCLUDED

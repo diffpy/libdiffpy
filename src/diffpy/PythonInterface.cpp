@@ -14,8 +14,6 @@
 *
 * Common functions for interfacing with Python interpreter.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/PythonInterface.hpp>

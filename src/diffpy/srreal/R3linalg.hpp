@@ -15,8 +15,6 @@
 * R3linalg -- vector and matrix types and linar algebra
 *     operations in R3 space
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef R3LINALG_HPP_INCLUDED

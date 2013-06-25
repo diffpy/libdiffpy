@@ -14,8 +14,6 @@
 *
 * class StepCutEnvelope -- empirical step-function PDF envelope.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/srreal/StepCutEnvelope.hpp>

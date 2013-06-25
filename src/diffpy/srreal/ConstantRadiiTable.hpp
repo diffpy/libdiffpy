@@ -14,8 +14,6 @@
 *
 * class ConstantRadiiTable -- concrete AtomRadiiTable for a uniform radius
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef CONSTANTRADIITABLE_HPP_INCLUDED

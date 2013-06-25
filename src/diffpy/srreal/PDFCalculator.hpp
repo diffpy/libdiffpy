@@ -14,8 +14,6 @@
 *
 * class PDFCalculator -- real space PDF calculator
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef PDFCALCULATOR_HPP_INCLUDED

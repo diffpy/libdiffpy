@@ -15,8 +15,6 @@
 * class TestBVSObjCryst -- unit tests for BVS calculation for an ObjCryst
 *   crystal structure
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>

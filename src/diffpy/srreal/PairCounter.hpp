@@ -14,8 +14,6 @@
 *
 * class PairCounter -- concrete counter of pairs in a structure.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef PAIRCOUNTER_HPP_INCLUDED

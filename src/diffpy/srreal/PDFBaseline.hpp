@@ -17,8 +17,6 @@
 *     baseline value at a given pair distance r.  The baseline is added to
 *     (R(r) * r) before multiplication by any envelope functions.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef PDFBASELINE_HPP_INCLUDED

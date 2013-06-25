@@ -18,8 +18,6 @@
 *   It is a unique derived class from vector<double> to avoid conflicts with
 *   boost_python convertors in cctbx.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef QUANTITYTYPE_HPP_INCLUDED

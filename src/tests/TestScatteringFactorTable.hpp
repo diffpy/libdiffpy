@@ -15,8 +15,6 @@
 * class TestScatteringFactorTable -- unit tests for implementations
 *     of the ScatteringFactorTable class
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <typeinfo>

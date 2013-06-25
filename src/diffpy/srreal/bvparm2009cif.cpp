@@ -22,8 +22,6 @@
 *       The original bvparm2009.cif file was retrieved on 2010-01-27 from
 *        http://www.ccp14.ac.uk/ccp/web-mirrors/i_d_brown/bond_valence_param/bvparm2009.cif
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cstdlib>

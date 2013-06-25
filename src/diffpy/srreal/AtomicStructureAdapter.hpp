@@ -14,10 +14,8 @@
 *
 * class AtomicStructureAdapter -- universal structure adapter for
 *     a non-periodic set of atoms.
-
-* class AtomicStructureBondGenerator -- bond generator
 *
-* $Id$
+* class AtomicStructureBondGenerator -- bond generator
 *
 *****************************************************************************/
 

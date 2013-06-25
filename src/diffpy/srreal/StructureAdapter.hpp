@@ -15,8 +15,6 @@
 * class StructureAdapter -- abstract base class for interfacing general
 *     structure objects with srreal classes such as PairQuantity
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef STRUCTUREADAPTER_HPP_INCLUDED

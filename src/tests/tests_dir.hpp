@@ -14,8 +14,6 @@
 *
 * Path definitions of datafiles that are used in testing.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef TESTS_DIR_HPP_INCLUDED

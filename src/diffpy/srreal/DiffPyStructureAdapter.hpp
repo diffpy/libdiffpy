@@ -17,8 +17,6 @@
 * class DiffPyStructureBondGenerator -- bond generator
 *
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef DIFFPYSTRUCTUREADAPTER_HPP_INCLUDED

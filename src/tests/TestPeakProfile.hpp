@@ -14,8 +14,6 @@
 *
 * class TestPeakProfile -- unit tests for various PeakProfile classes
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cmath>

@@ -20,8 +20,6 @@
 * nometa -- factory function that returns a NoMetaStructureAdapter
 *     instance wrapped in StructureAdapterPtr
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/serialization.hpp>

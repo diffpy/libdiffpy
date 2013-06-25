@@ -14,8 +14,6 @@
 *
 * shared helpers for loading diffpy structure objects.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/PythonInterface.hpp>

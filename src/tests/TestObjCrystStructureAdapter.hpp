@@ -17,8 +17,6 @@
 *
 * class TestObjCrystStructureBondGenerator -- unit tests for bond generator
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <typeinfo>

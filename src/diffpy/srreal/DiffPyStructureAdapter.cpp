@@ -21,8 +21,6 @@
 * class DiffPyStructurePeriodicBondGenerator -- bond generator for
 *     periodic structures
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/PythonInterface.hpp>

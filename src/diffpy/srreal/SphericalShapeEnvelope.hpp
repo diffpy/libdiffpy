@@ -13,8 +13,6 @@
 *
 * class SphericalShapeEnvelope -- PDF envelope due to spherical shape factor
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef SPHERICALSHAPEENVELOPE_HPP_INCLUDED

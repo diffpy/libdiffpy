@@ -14,8 +14,6 @@
 *
 * Convenience functions for argument checking.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef VALIDATORS_HPP_INCLUDED

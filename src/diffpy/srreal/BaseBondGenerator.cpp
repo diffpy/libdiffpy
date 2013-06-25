@@ -15,8 +15,6 @@
 * class BaseBondGenerator -- semi-abstract class for generation
 *     of all atom pairs containing specified anchor atom.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/srreal/BaseBondGenerator.hpp>

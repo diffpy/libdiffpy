@@ -14,8 +14,6 @@
 *
 * class BVParametersTable -- table of bond valence sum parameters
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cassert>

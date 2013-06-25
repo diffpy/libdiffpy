@@ -14,8 +14,6 @@
 *
 * class ConstantPeakWidth -- constant peak width model for testing
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/srreal/ConstantPeakWidth.hpp>

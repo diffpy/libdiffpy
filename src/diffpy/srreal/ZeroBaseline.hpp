@@ -14,8 +14,6 @@
 *
 * class ZeroBaseline -- linear PDF baseline
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef ZEROBASELINE_HPP_INCLUDED

@@ -15,8 +15,6 @@
 * Various common routines useful for PDF calculation.
 * Implementation of template functions.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef PDFUTILS_IPP_INCLUDED

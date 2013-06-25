@@ -14,8 +14,6 @@
 *
 * class TestBVParametersTable -- unit tests for BVParametersTable class
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <stdexcept>

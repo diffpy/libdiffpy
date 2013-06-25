@@ -14,8 +14,6 @@
 *
 * class BaseDebyeSum -- base class for concrete Debye sum calculators
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef BASEDEBYESUM_HPP_INCLUDED

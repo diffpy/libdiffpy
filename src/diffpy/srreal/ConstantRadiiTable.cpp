@@ -15,8 +15,6 @@
 * class ConstantRadiiTable -- this AtomRadiiTable returns same value
 *   for all elements unless redefined by the setCustom method.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <algorithm>

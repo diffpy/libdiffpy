@@ -14,8 +14,6 @@
 *
 * class ScaleEnvelope -- constant scaling factor
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef SCALEENVELOPE_HPP_INCLUDED

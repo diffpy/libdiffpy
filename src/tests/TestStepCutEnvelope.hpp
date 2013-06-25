@@ -14,8 +14,6 @@
 *
 * class TestStepCutEnvelope -- unit tests for StepCutEnvelope class
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>

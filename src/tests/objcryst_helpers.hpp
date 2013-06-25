@@ -14,8 +14,6 @@
 *
 * shared helpers for loading diffpy structure objects.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef OBJCRYST_HELPERS_HPP_INCLUDED

@@ -14,8 +14,6 @@
 *
 * class VR3Adapter -- serialization support
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/srreal/VR3Structure.hpp>

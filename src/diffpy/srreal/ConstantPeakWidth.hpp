@@ -14,8 +14,6 @@
 *
 * class ConstantPeakWidth -- constant peak width
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef CONSTANTPEAKWIDTH_HPP_INCLUDED

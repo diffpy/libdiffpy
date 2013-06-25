@@ -14,11 +14,9 @@
 *
 * class PQEvaluatorBasic -- robust PairQuantity evaluator, the result
 *     is always calculated from scratch.
-
+*
 * class PQEvaluatorOptimized -- optimized PairQuantity evaluator with fast
 *     quantity updates
-*
-* $Id$
 *
 *****************************************************************************/
 

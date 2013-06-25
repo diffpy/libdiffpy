@@ -46,8 +46,6 @@
 *
 * Tip: add epsilon to Rmax to avoid roundoff issues
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef POINTSINSPHERE_HPP_INCLUDED

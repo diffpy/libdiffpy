@@ -14,8 +14,6 @@
 *
 * class TestVR3Adapter -- unit tests for an adapter to the VR3Structure class
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <typeinfo>

@@ -25,8 +25,6 @@
 * the formula in International Tables Volume C, page 224.
 * The formula diverges at Q = 0, where SFTElectron returns DOUBLE_MAX.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/PythonInterface.hpp>

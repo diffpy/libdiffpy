@@ -14,8 +14,6 @@
 *
 * Various common routines useful for PDF calculation.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <stdexcept>

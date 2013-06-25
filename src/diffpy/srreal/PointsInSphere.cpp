@@ -16,8 +16,6 @@
 *
 * Comments: sequencers for lattice points insided 3D sphere
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <algorithm>

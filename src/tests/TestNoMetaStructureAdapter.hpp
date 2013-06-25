@@ -15,8 +15,6 @@
 * class TestNoMetaStructureAdapter -- unit tests for an adapter that
 *     avoids metadata forwarding from the diffpy.Structure classes.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <typeinfo>

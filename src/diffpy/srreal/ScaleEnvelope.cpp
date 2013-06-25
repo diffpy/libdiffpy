@@ -14,8 +14,6 @@
 *
 * class ScaleEnvelope -- constant scaling factor
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/srreal/ScaleEnvelope.hpp>

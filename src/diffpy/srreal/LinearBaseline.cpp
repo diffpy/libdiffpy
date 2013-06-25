@@ -14,8 +14,6 @@
 *
 * class LinearBaseline -- linear PDF baseline
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/srreal/LinearBaseline.hpp>

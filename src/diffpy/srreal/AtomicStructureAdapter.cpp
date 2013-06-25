@@ -17,8 +17,6 @@
 
 * class AtomicStructureBondGenerator -- bond generator
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cassert>

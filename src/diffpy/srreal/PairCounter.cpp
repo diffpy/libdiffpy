@@ -14,8 +14,6 @@
 *
 * class PairCounter -- concrete counter of pairs in a structure.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/srreal/PairCounter.hpp>

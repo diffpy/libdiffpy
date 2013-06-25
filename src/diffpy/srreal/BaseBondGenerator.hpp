@@ -15,8 +15,6 @@
 * class BaseBondGenerator -- semi-abstract class for a generation
 *     of all atom pairs containing specified anchor atom.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef BASEBONDGENERATOR_HPP_INCLUDED

@@ -13,11 +13,9 @@
 ******************************************************************************
 *
 * class ScatteringFactorTable -- base class for looking up scattering factors
-
+*
 * class ScatteringFactorTableOwner -- to be used as a base class for classes
 *     that own ScatteringFactorTable
-*
-* $Id$
 *
 *****************************************************************************/
 

@@ -15,8 +15,6 @@
 * class GaussianProfile -- concrete implementation of the PeakProfile class.
 *     GaussianProfile is registered as "gaussian".
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef GAUSSIANPROFILE_HPP_INCLUDED

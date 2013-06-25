@@ -14,8 +14,6 @@
 *
 * class PairQuantity -- general implementation of pair quantity calculator
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef PAIRQUANTITY_HPP_INCLUDED

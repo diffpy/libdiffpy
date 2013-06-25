@@ -14,8 +14,6 @@
 *
 * class TestOverlapCalculator -- unit tests for the OverlapCalculator class
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>

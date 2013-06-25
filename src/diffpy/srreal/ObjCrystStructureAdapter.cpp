@@ -21,8 +21,6 @@
 * class ObjCrystMoleculeBondGenerator
 *   -- Generate bonds from ObjCrystMoleculeAdapter
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <diffpy/PythonInterface.hpp>

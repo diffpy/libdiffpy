@@ -14,8 +14,6 @@
 *
 * class BondCalculator -- bond distance calculator
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cassert>

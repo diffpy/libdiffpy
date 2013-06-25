@@ -14,8 +14,6 @@
 *
 * helper template function for testing of serialization.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef SERIALIZATION_HELPERS_HPP_INCLUDED

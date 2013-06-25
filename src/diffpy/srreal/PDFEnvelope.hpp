@@ -17,8 +17,6 @@
 *     PDF scaling coefficients at a given pair distance r.  Several functors
 *     can be defined and applied in PDFCalculator.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef PDFENVELOPE_HPP_INCLUDED

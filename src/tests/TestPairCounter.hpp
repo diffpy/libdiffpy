@@ -14,8 +14,6 @@
 *
 * class TestPairCounter -- unit tests for PairCounter class
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>

@@ -14,8 +14,6 @@
 *
 * class BVSCalculator -- bond valence sums calculator
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef BVSCALCULATOR_HPP_INCLUDED

@@ -16,8 +16,6 @@
 * class VR3Adapter -- concrete StructureAdapter for VR3Structure
 * class VR3BondGenerator -- concrete BaseBondGenerator for VR3Structure
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef VR3STRUCTURE_HPP_INCLUDED

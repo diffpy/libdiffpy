@@ -14,8 +14,6 @@
 *
 * class BVParametersTable -- table of bond valence sum parameters
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef BVPARAMETERSTABLE_HPP_INCLUDED

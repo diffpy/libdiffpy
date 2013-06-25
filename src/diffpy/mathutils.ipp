@@ -14,8 +14,6 @@
 *
 * Various common mathematical constants and functions.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef MATHUTILS_IPP_INCLUDED

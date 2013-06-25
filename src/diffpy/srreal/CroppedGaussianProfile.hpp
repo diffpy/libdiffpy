@@ -16,8 +16,6 @@
 *     xboundhi and scaled so that its integrated area equals 1.
 *     Registered as "croppedgaussian".
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef CROPPEDGAUSSIANPROFILE_HPP_INCLUDED

@@ -20,8 +20,6 @@
 * class PeakWidthModelOwner -- to be used as a base class for classes
 *     that own PeakWidthModel
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef PEAKWIDTHMODEL_HPP_INCLUDED

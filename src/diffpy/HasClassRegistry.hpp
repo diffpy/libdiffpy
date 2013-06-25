@@ -22,8 +22,6 @@
 *     class Base : public HasClassRegistry<Base>
 *   The derived classes need to implement create, clone and type methods.
 *
-* $Id$
-*
 *****************************************************************************/
 
 #ifndef HASCLASSREGISTRY_HPP_INCLUDED

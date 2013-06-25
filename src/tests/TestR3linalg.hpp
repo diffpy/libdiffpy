@@ -14,8 +14,6 @@
 *
 * class TestR3linalg -- unit test suite for the R3linalg module
 *
-* $Id$
-*
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>
