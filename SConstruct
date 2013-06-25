@@ -8,10 +8,6 @@
 import os
 import platform
 
-# Version string must be in the form "MAJOR.MINOR",
-# src/diffpy/SConscript.version adds "-rSVNREV".
-DIFFPY_VERSION_STR = "1.0"
-
 def subdictionary(d, keyset):
     return dict([kv for kv in d.items() if kv[0] in keyset])
 
@@ -57,7 +53,6 @@ env.Help(vars.GenerateHelpText(env))
 builddir = env.Dir('build/%s-%s' % (env['build'], platform.machine()))
 
 Export('env')
-Export('DIFFPY_VERSION_STR')
 
 env.SConscript('src/SConscript', variant_dir=builddir)
 

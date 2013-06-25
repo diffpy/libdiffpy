@@ -7,10 +7,9 @@ version_hpp = str(File('version.hpp').srcnode())
 if os.path.isfile(version_hpp):
     Return()
 
-# Otherwise build version.hpp from the git log data.
+# Otherwise build version.hpp from version.tpl the git log data.
 
 Import('env')
-Import('DIFFPY_VERSION_STR')
 
 proc = Popen(['git', 'log', '-1', '--format=%h %at %ai'], stdout=PIPE)
 gitlog = proc.stdout.read().strip()
@@ -18,19 +17,20 @@ gitlog = proc.stdout.read().strip()
 def build_VersionCode(target, source, env):
     import re
     import string
+    tplcode = open(str(source[0])).read()
+    mx = re.search(r'(?m)^#define *DIFFPY_VERSION_MAJOR *(\d+)', tplcode)
+    major = int(mx.group(1))
+    mx = re.search(r'(?m)^#define *DIFFPY_VERSION_MINOR *(\d+)', tplcode)
+    minor = int(mx.group(1))
     gsha, gepoch, gisodate = gitlog.split(None, 2)
+    daydate = int(gepoch) // 86400
     flds = {
-        'DIFFPY_VERSION' : 0,
-        'DIFFPY_VERSION_STR' : DIFFPY_VERSION_STR,
+        'DIFFPY_VERSION' : 10000000 * major + 100000 * minor + daydate,
+        'DIFFPY_VERSION_STR' : "%i.%i-t%i" % (major, minor, daydate),
         'DIFFPY_VERSION_DATE' : gisodate,
         'DIFFPY_GITSHA' : gsha,
     }
-    major, minor = map(int, DIFFPY_VERSION_STR.split("."))
-    revnum = int(gepoch) // 86400
-    flds['DIFFPY_VERSION'] = 10000000 * major + 100000 * minor + revnum
-    flds['DIFFPY_VERSION_STR'] += "-t" + str(revnum)
-    templatecode = open(str(source[0])).read()
-    versiontemplate = string.Template(templatecode)
+    versiontemplate = string.Template(tplcode)
     versioncode = versiontemplate.safe_substitute(flds)
     open(str(target[0]), 'w').write(versioncode)
     return None
@@ -41,7 +41,7 @@ env.Append(BUILDERS={'BuildVersionCode' :
 # Targets --------------------------------------------------------------------
 
 ver = env.BuildVersionCode(['version.hpp'], ['version.tpl'])
-env.Depends(ver, env.Value([DIFFPY_VERSION_STR, gitlog]))
+env.Depends(ver, env.Value(gitlog))
 
 env['lib_includes'] += ver
 

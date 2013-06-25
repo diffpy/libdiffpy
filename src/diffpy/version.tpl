@@ -14,6 +14,8 @@
 *
 * Macro definitions for
 *   DIFFPY_VERSION,
+*   DIFFPY_VERSION_MAJOR,
+*   DIFFPY_VERSION_MINOR,
 *   DIFFPY_VERSION_STR,
 *   DIFFPY_VERSION_DATE
 *   DIFFPY_GITSHA
@@ -22,6 +24,9 @@
 
 #ifndef VERSION_HPP_INCLUDED
 #define VERSION_HPP_INCLUDED
+
+#define DIFFPY_VERSION_MAJOR 1
+#define DIFFPY_VERSION_MINOR 0
 
 // DIFFPY_VERSION % 100000 is a version age in days since Unix time epoch
 // DIFFPY_VERSION / 100000 % 100 is the minor version
