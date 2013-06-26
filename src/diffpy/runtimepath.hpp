@@ -22,7 +22,7 @@
 #include <string>
 
 namespace diffpy {
-namespace runtimepaths {
+namespace runtimepath {
 
 /// Return full path to a data file included with DiffPy library.
 ///
@@ -37,7 +37,7 @@ namespace runtimepaths {
 std::string datapath(const std::string& f);
 
 
-}   // namespace runtimepaths
+}   // namespace runtimepath
 }   // namespace diffpy
 
 #endif  // RUNTIMEPATH_HPP_INCLUDED
