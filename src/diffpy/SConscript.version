@@ -1,27 +1,23 @@
 import os
 from subprocess import Popen, PIPE
 
-# Do nothing if version.hpp already exists in the source tree.
-
-version_hpp = str(File('version.hpp').srcnode())
-if os.path.isfile(version_hpp):
-    Return()
-
-# Otherwise build version.hpp from version.tpl the git log data.
-
 Import('env')
 
-proc = Popen(['git', 'log', '-1', '--format=%h %at %ai'], stdout=PIPE)
-gitlog = proc.stdout.read().strip()
+
+def parsemajorminor(hcode):
+    'Extract major and minor version from a C++ header file.'
+    import re
+    mx = re.search(r'(?m)^#define *DIFFPY_VERSION_MAJOR *(\d+)', hcode)
+    major = int(mx.group(1))
+    mx = re.search(r'(?m)^#define *DIFFPY_VERSION_MINOR *(\d+)', hcode)
+    minor = int(mx.group(1))
+    return (major, minor)
+
 
 def build_VersionCode(target, source, env):
-    import re
     import string
-    tplcode = open(str(source[0])).read()
-    mx = re.search(r'(?m)^#define *DIFFPY_VERSION_MAJOR *(\d+)', tplcode)
-    major = int(mx.group(1))
-    mx = re.search(r'(?m)^#define *DIFFPY_VERSION_MINOR *(\d+)', tplcode)
-    minor = int(mx.group(1))
+    tplcode = source[0].get_contents()
+    major, minor = parsemajorminor(tplcode)
     gsha, gepoch, gisodate = gitlog.split(None, 2)
     daydate = int(gepoch) // 86400
     flds = {
@@ -40,9 +36,20 @@ env.Append(BUILDERS={'BuildVersionCode' :
 
 # Targets --------------------------------------------------------------------
 
-ver = env.BuildVersionCode(['version.hpp'], ['version.tpl'])
-env.Depends(ver, env.Value(gitlog))
+vhpp = File('version.hpp')
 
-env['lib_includes'] += ver
+# If version.hpp exists do not use git
+if os.path.isfile(str(vhpp.srcnode())):
+    majorminor = parsemajorminor(vhpp.srcnode().get_contents())
+else:
+    vtpl = File('version.tpl')
+    proc = Popen(['git', 'log', '-1', '--format=%h %at %ai'], stdout=PIPE)
+    gitlog = proc.stdout.read().strip()
+    vhpp, = env.BuildVersionCode(['version.hpp'], vtpl)
+    env.Depends(vhpp, env.Value(gitlog))
+    majorminor = parsemajorminor(vtpl.get_contents())
+
+env['lib_includes'] += [vhpp]
+env['majorminor'] = majorminor
 
 # vim: ft=python
