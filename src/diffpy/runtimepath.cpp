@@ -60,12 +60,15 @@ const string& diffpyruntime()
     char fpb[PATH_MAX];
     static string rv;
     static bool didruntime = false;
-    if (didruntime)  return rv;
+    static string dprt;
     // check the DIFFPYRUNTIME environment variable.
     char* pe = getenv("DIFFPYRUNTIME");
+    if (pe)  didruntime = didruntime && pe && dprt == pe;
+    if (didruntime)  return rv;
     if (pe)
     {
-        rv = pe;
+        dprt = pe;
+        rv = dprt;
         size_t pt = rv.find_last_not_of('/');
         if (pt == string::npos)  rv.clear();
         else  rv.erase(pt + 1);
@@ -89,7 +92,7 @@ const string& diffpyruntime()
     // second candidate is resolved with respect to physical libary location
     // according to the source tree layout
     string d2 = dirname(realpath(i.dli_fname, fpb));
-    d2 += "../../src/runtime";
+    d2 += "/../../src/runtime";
     if (isdir(d2))
     {
         rv = realpath(d2.c_str(), fpb);
