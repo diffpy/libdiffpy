@@ -3,7 +3,6 @@ Import('env')
 env['lib_includes'] += Glob('*.[hi]pp')
 env['lib_sources'] += Glob('*.cpp')
 
-SConscript('SConscript.version')
 SConscript('boostextensions/SConscript')
 SConscript('srreal/SConscript')
 

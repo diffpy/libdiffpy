@@ -1,0 +1,5 @@
+Import('env')
+
+env['lib_datafiles'] += Glob('*.dat')
+
+# vim: ft=python

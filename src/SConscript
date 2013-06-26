@@ -57,10 +57,19 @@ if env['profile']:
 # Define lists for storing library source and include files.
 env['lib_includes'] = []
 env['lib_sources'] = []
+env['lib_datafiles'] = []
 
 # Subsidiary SConscripts -----------------------------------------------------
 
-# This SConscript updates lib_includes and lib_sources.
+# Load the version script first to resolve the majorminor tuple
+SConscript('diffpy/SConscript.version')
+
+# Path where datafiles should be installed
+env['runtimepath'] = os.path.join(
+        env['datadir'], 'diffpy%i%i' % env['majorminor'])
+SConscript('runtime/SConscript')
+
+# Load all other sconscripts that update lib_includes and lib_sources
 SConscript('diffpy/SConscript')
 
 # Top Level Targets ----------------------------------------------------------
