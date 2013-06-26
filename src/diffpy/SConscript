@@ -1,7 +1,15 @@
+import os
+
 Import('env')
 
 env['lib_includes'] += Glob('*.[hi]pp')
-env['lib_sources'] += Glob('*.cpp')
+env['lib_sources'] += [f for f in Glob('*.cpp') if str(f) != 'runtimepath.cpp']
+
+rtrp = os.path.relpath(env['runtimepath'], env['libdir'])
+env_rt = env.Clone()
+env_rt.AppendUnique(CPPDEFINES=dict(DIFFPYRUNTIMERELPATH=rtrp))
+rtso = env_rt.SharedObject('runtimepath', 'runtimepath.cpp')
+env['lib_sources'] += rtso
 
 SConscript('boostextensions/SConscript')
 SConscript('srreal/SConscript')
