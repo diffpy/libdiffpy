@@ -89,26 +89,25 @@ if set(('test', 'alltests')).intersection(COMMAND_LINE_TARGETS):
 prefix = env['prefix']
 
 # install-lib
-libdir = env.get('libdir', os.path.join(prefix, 'lib'))
-libinstall = Install(libdir, libdiffpy)
+libinstall = Install(env['libdir'], libdiffpy)
 if env['PLATFORM'] == 'darwin':
     env.AddPostAction(libinstall,
             'install_name_tool -id $TARGET.abspath $TARGET')
 Alias('install-lib', libinstall)
 
 # install-includes
-includedir = env.get('includedir', os.path.join(env['prefix'], 'include'))
-srcdir = Dir('.').path
-def get_target_path(f):
-    cutleft = len(srcdir) + 1
-    frelsrc = f.path[cutleft:]
-    rv = os.path.join(includedir, frelsrc)
-    return rv
-include_targets = map(get_target_path, env['lib_includes'])
-
+ninc = len(Dir('.').path) + 1
+inc_target_path = lambda f: os.path.join(env['includedir'], f.path[ninc:])
+include_targets = map(inc_target_path, env['lib_includes'])
 Alias('install-include', InstallAs(include_targets, env['lib_includes']))
 
+# install-data
+nrt = len(Dir('runtime').path) + 1
+data_target_path = lambda f: os.path.join(env['runtimepath'], f.path[nrt:])
+data_targets = map(data_target_path, env['lib_datafiles'])
+Alias('install-data', InstallAs(data_targets, env['lib_datafiles']))
+
 # install
-Alias('install', ['install-include', 'install-lib'])
+Alias('install', ['install-include', 'install-lib', 'install-data'])
 
 # vim: ft=python
