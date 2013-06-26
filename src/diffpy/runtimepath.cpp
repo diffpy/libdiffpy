@@ -24,19 +24,24 @@
 
 #include <diffpy/version.hpp>
 #include <diffpy/runtimepath.hpp>
-
-#ifndef DIFFPYRUNTIMERELPATH
-#define TMPSTR(a) TMPSTR2(a)
-#define TMPSTR2(a) #a
-#define DIFFPYRUNTIMERELPATH "../share/diffpy/diffpy" \
-    TMPSTR(DIFFPY_VERSION_MAJOR) TMPSTR(DIFFPY_VERSION_MINOR)
-#endif
+#define STRINGIFY(m) STRINGIFY_BRAIN_DAMAGE(m)
+#define STRINGIFY_BRAIN_DAMAGE(m) #m
 
 using namespace std;
 
 // Helper Functions ----------------------------------------------------------
 
 namespace {
+
+const char* runtimerelpath =
+#ifdef DIFFPYRUNTIMERELPATH
+    STRINGIFY(DIFFPYRUNTIMERELPATH)
+#else
+    "../share/diffpy/diffpy"
+    STRINGIFY(DIFFPY_VERSION_MAJOR)
+    STRINGIFY(DIFFPY_VERSION_MINOR)
+#endif
+;
 
 bool isdir(const string& d)
 {
@@ -82,7 +87,7 @@ const string& diffpyruntime()
     dladdr(reinterpret_cast<void*>(diffpyruntime), &i);
     // first candidate is resolved in relative data path
     strncpy(fpb, i.dli_fname, PATH_MAX);
-    string d1 = string(dirname(fpb)) + "/" + DIFFPYRUNTIMERELPATH;
+    string d1 = string(dirname(fpb)) + "/" + runtimerelpath;
     if (isdir(d1))
     {
         rv = realpath(d1.c_str(), fpb);
