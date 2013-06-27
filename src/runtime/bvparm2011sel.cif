@@ -7,12 +7,13 @@
 #
 #***************************************************************
 #
-# Selected records from bvparm2011.cif maintained by I. D. Brown. 
-# In case of duplicate entries
-# the preference was given to the data from references 'b', 'a', then
-# entries with parameter b == 0.37 and after that entries that were not
-# 'unchecked'.  If this was still not enough one of the remaining
-# entries was selected more less randomly.
+# Selected records from bvparm2011.cif maintained by I. D. Brown.
+#
+# In case of duplicate entries the preference was given to the
+# data from references 'b', 'a', then entries with parameter
+# b == 0.37 and after that entries that were not 'unchecked'.
+# If this was still not enough one of the remaining entries was
+# selected more less randomly.
 #
 # The original bvparm2011.cif file was retrieved on 2013-06-27 from
 #  http://www.iucr.org/__data/assets/file/0018/59004/bvparm2011.cif
