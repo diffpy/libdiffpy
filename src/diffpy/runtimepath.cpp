@@ -37,7 +37,7 @@ const char* runtimerelpath =
 #ifdef DIFFPYRUNTIMERELPATH
     STRINGIFY(DIFFPYRUNTIMERELPATH)
 #else
-    "../share/diffpy/diffpy"
+    "../share/diffpy/libdiffpy"
     STRINGIFY(DIFFPY_VERSION_MAJOR)
     STRINGIFY(DIFFPY_VERSION_MINOR)
 #endif
