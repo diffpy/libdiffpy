@@ -68,6 +68,19 @@ void ensureNonNull(const std::string& vname, const T& p)
     }
 }
 
+/// Throw runtime_error if a file argument is not true.
+
+template <class T>
+void ensureFileOK(const std::string& fname, const T& fp)
+{
+    if (!fp)
+    {
+        std::string emsg = "Cannot open '";
+        emsg += fname + "'.";
+        throw std::runtime_error(emsg);
+    }
+}
+
 }   // namespace validators
 }   // namespace diffpy
 
