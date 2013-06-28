@@ -17,19 +17,18 @@
 *****************************************************************************/
 
 #include <cassert>
+#include <fstream>
 #include <boost/serialization/export.hpp>
 
 #include <diffpy/serialization.hpp>
+#include <diffpy/runtimepath.hpp>
+#include <diffpy/validators.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
 
 using namespace std;
 
 namespace diffpy {
 namespace srreal {
-
-// Declarations --------------------------------------------------------------
-
-extern const char* bvparm2009cif_lines[];
 
 // Static Methods ------------------------------------------------------------
 
@@ -121,22 +120,61 @@ BVParametersTable::getAll() const
 
 // Private Methods -----------------------------------------------------------
 
+// local helper class
+
+namespace {
+
+class LineReader
+{
+    public:
+        ifstream& operator()(ifstream& fp)
+        {
+            getline(fp, line);
+            string w;
+            words.clear();
+            for (istringstream wfp(line); wfp >> w;)  words.push_back(w);
+            return fp;
+        }
+
+        size_t wcount() const  { return words.size(); }
+
+        string line;
+        vector<string> words;
+};
+
+}   // namespace
+
 const BVParametersTable::SetOfBVParam&
 BVParametersTable::getStandardSetOfBVParam() const
 {
-    static SetOfBVParam the_set;
-    if (the_set.empty())
+    using diffpy::runtimepath::datapath;
+    using diffpy::validators::ensureFileOK;
+    static boost::scoped_ptr<SetOfBVParam> the_set;
+    if (!the_set)
     {
-        const char** cifline;
-        for (cifline = bvparm2009cif_lines; *cifline != NULL; ++cifline)
+        the_set.reset(new SetOfBVParam);
+        string bvparmfile = datapath("bvparm2011sel.cif");
+        ifstream fp(bvparmfile.c_str());
+        ensureFileOK(bvparmfile, fp);
+        // read the header up to _valence_param_B and then up to an empty line.
+        LineReader lnrd;
+        while (lnrd(fp))
         {
+            if (lnrd.wcount() && lnrd.words[0] == "_valence_param_B")  break;
+        }
+        // skip to an empty line
+        while (lnrd(fp) && lnrd.wcount())  { }
+        // load data lines skipping the empty or commented entries
+        while (lnrd(fp))
+        {
+            if (!lnrd.wcount() || lnrd.words[0][0] == '#')  continue;
             BVParam bp;
-            bp.setFromCifLine(*cifline);
-            assert(!the_set.count(bp));
-            the_set.insert(bp);
+            bp.setFromCifLine(lnrd.line);
+            assert(!the_set->count(bp));
+            the_set->insert(bp);
         }
     }
-    return the_set;
+    return *the_set;
 }
 
 }   // namespace srreal
