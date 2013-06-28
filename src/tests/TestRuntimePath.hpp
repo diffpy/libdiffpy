@@ -17,6 +17,7 @@
 *****************************************************************************/
 
 #include <string>
+#include <cstdlib>
 #include <fstream>
 #include <stdexcept>
 #include <cxxtest/TestSuite.h>
