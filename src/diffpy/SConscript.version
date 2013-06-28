@@ -28,7 +28,7 @@ def build_VersionCode(target, source, env):
     }
     versiontemplate = string.Template(tplcode)
     versioncode = versiontemplate.safe_substitute(flds)
-    open(str(target[0]), 'w').write(versioncode)
+    open(target[0].path, 'w').write(versioncode)
     return None
 
 env.Append(BUILDERS={'BuildVersionCode' :
@@ -49,7 +49,6 @@ else:
     env.Depends(vhpp, env.Value(gitlog))
     majorminor = parsemajorminor(vtpl.get_contents())
 
-env['lib_includes'] += [vhpp]
 env['majorminor'] = majorminor
 
 # vim: ft=python
