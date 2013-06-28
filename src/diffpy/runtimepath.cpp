@@ -17,6 +17,8 @@
 *****************************************************************************/
 
 #include <cstdlib>
+#include <climits>
+#include <cstring>
 #include <stdexcept>
 #include <sys/stat.h>
 #include <dlfcn.h>
