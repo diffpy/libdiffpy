@@ -102,9 +102,6 @@ class SFTElectronNumber : public ScatteringFactorTable
 
     private:
 
-        // data
-        static const char* mendata_lines[];
-
         // methods
 
         const boost::unordered_map<string,int>& getElectronNumberTable() const
