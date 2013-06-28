@@ -18,7 +18,7 @@
 *   DIFFPY_VERSION_MINOR,
 *   DIFFPY_VERSION_STR,
 *   DIFFPY_VERSION_DATE
-*   DIFFPY_GITSHA
+*   DIFFPY_GIT_SHA
 *
 *****************************************************************************/
 
@@ -42,9 +42,9 @@
 
 #define DIFFPY_VERSION_DATE "${DIFFPY_VERSION_DATE}"
 
-// DIFFPY_GITSHA is an abbreviated git commit hash for the current version
+// DIFFPY_GIT_SHA is an abbreviated git commit hash for the current version
 
-#define DIFFPY_GITSHA "${DIFFPY_GITSHA}"
+#define DIFFPY_GIT_SHA "${DIFFPY_GIT_SHA}"
 
 #endif  // VERSION_HPP_INCLUDED
 

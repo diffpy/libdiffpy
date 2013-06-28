@@ -24,7 +24,7 @@ def build_VersionCode(target, source, env):
         'DIFFPY_VERSION' : 10000000 * major + 100000 * minor + daydate,
         'DIFFPY_VERSION_STR' : "%i.%i-t%i" % (major, minor, daydate),
         'DIFFPY_VERSION_DATE' : gisodate,
-        'DIFFPY_GITSHA' : gsha,
+        'DIFFPY_GIT_SHA' : gsha,
     }
     versiontemplate = string.Template(tplcode)
     versioncode = versiontemplate.safe_substitute(flds)
