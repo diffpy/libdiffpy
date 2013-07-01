@@ -157,12 +157,13 @@ size_t LineReader::wcount() const
 
 // Non-member operators
 
-istream& operator>>(istream& fp, LineReader& lnrd)
+istream& operator>> (istream& fp, LineReader& line)
 {
-    getline(fp, lnrd.line);
-    string w;
-    lnrd.words.clear();
-    for (istringstream wfp(lnrd.line); wfp >> w;)  lnrd.words.push_back(w);
+    getline(fp, line.line);
+    line.linestream.str(line.line);
+    line.linestream.clear();
+    line.words.clear();
+    for (string w; line.linestream >> w;)  line.words.push_back(w);
     return fp;
 }
 

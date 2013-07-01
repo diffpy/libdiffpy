@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <istream>
+#include <sstream>
 
 namespace diffpy {
 namespace runtimepath {
@@ -51,11 +52,12 @@ class LineReader
         // data
         std::string commentmark;
         std::string line;
+        std::istringstream linestream;
         std::vector<std::string> words;
 };
 
 // non-member functions for the LineReader class
-std::istream& operator>>(std::istream&, LineReader&);
+std::istream& operator>> (std::istream&, LineReader&);
 
 }   // namespace runtimepath
 }   // namespace diffpy
