@@ -31,14 +31,14 @@ namespace diffpy {
 namespace srreal {
 
 /// X-ray scattering factor of an element or ion a given Q
-double fxrayatq(std::string& symbol, double Q);
+double fxrayatq(std::string& smbl, double q);
 
 
 /// X-ray scattering factor of an element or ion a given sin(theta)/lambda
-double fxrayatstol(std::string& symbol, double stol);
+double fxrayatstol(std::string& smbl, double stol);
 
 /// Electron scattering factor of an element or ion a given Q
-double felectronatq(std::string& symbol, double Q);
+double felectronatq(std::string& smbl, double q);
 
 }   // namespace srreal
 }   // namespace diffpy
