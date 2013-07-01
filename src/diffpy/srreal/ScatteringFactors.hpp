@@ -1,0 +1,46 @@
+/*****************************************************************************
+*
+* diffpy.srreal     Complex Modeling Initiative
+*                   Pavol Juhas
+*                   (c) 2013 Brookhaven National Laboratory,
+*                   Upton, New York.  All rights reserved.
+*
+* File coded by:    Pavol Juhas
+*
+* See AUTHORS.txt for a list of people who contributed.
+* See LICENSE.txt for license information.
+*
+******************************************************************************
+*
+* X-ray scattering factors for ions and neutral atoms obtained from
+* f0_WaasKirf.dat and the associated reference
+* D. Waasmaier, A. Kirfel, Acta Cryst. (1995). A51, 416-413
+* http://dx.doi.org/10.1107/S0108767394013292
+*
+* Electron scattering factors approximated from the X-rays
+# Reference: International Tables Volume C, page 224.
+*
+*****************************************************************************/
+
+#ifndef SCATTERINGFACTORS_HPP_INCLUDED
+#define SCATTERINGFACTORS_HPP_INCLUDED
+
+#include <string>
+
+namespace diffpy {
+namespace srreal {
+
+/// X-ray scattering factor of an element or ion a given Q
+double fxrayatq(std::string& symbol, double Q);
+
+
+/// X-ray scattering factor of an element or ion a given sin(theta)/lambda
+double fxrayatstol(std::string& symbol, double stol);
+
+/// Electron scattering factor of an element or ion a given Q
+double felectronatq(std::string& symbol, double Q);
+
+}   // namespace srreal
+}   // namespace diffpy
+
+#endif  // SCATTERINGFACTORS_HPP_INCLUDED
