@@ -18,8 +18,6 @@
 
 #include <cassert>
 #include <fstream>
-#include <sstream>
-#include <vector>
 #include <boost/serialization/export.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -123,34 +121,10 @@ BVParametersTable::getAll() const
 
 // Private Methods -----------------------------------------------------------
 
-// local helper class
-
-namespace {
-
-class LineReader
-{
-    public:
-        ifstream& operator()(ifstream& fp)
-        {
-            getline(fp, line);
-            string w;
-            words.clear();
-            for (istringstream wfp(line); wfp >> w;)  words.push_back(w);
-            return fp;
-        }
-
-        size_t wcount() const  { return words.size(); }
-
-        string line;
-        vector<string> words;
-};
-
-}   // namespace
-
 const BVParametersTable::SetOfBVParam&
 BVParametersTable::getStandardSetOfBVParam() const
 {
-    using diffpy::runtimepath::datapath;
+    using namespace diffpy::runtimepath;
     using diffpy::validators::ensureFileOK;
     static boost::scoped_ptr<SetOfBVParam> the_set;
     if (!the_set)
@@ -161,16 +135,17 @@ BVParametersTable::getStandardSetOfBVParam() const
         ensureFileOK(bvparmfile, fp);
         // read the header up to _valence_param_B and then up to an empty line.
         LineReader lnrd;
-        while (lnrd(fp))
+        lnrd.commentmark = '#';
+        while (fp >> lnrd)
         {
             if (lnrd.wcount() && lnrd.words[0] == "_valence_param_B")  break;
         }
         // skip to an empty line
-        while (lnrd(fp) && lnrd.wcount())  { }
+        while (fp >> lnrd && !lnrd.isblank())  { }
         // load data lines skipping the empty or commented entries
-        while (lnrd(fp))
+        while (fp >> lnrd)
         {
-            if (!lnrd.wcount() || lnrd.words[0][0] == '#')  continue;
+            if (lnrd.isignored())  continue;
             BVParam bp;
             bp.setFromCifLine(lnrd.line);
             assert(!the_set->count(bp));

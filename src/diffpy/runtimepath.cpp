@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <climits>
 #include <cstring>
+#include <sstream>
 #include <stdexcept>
 #include <sys/stat.h>
 #include <dlfcn.h>
@@ -125,6 +126,45 @@ string datapath(const std::string& f)
     return rv;
 }
 
+// class LineReader ----------------------------------------------------------
+
+// Methods
+
+bool LineReader::isignored() const
+{
+    return words.empty() || this->iscomment();
+}
+
+
+bool LineReader::iscomment() const
+{
+    bool rv = !commentmark.empty() && !words.empty() &&
+            (0 == words[0].compare(0, commentmark.size(), commentmark));
+    return rv;
+}
+
+
+bool LineReader::isblank() const
+{
+    return words.empty();
+}
+
+
+size_t LineReader::wcount() const
+{
+    return words.size();
+}
+
+// Non-member operators
+
+istream& operator>>(istream& fp, LineReader& lnrd)
+{
+    getline(fp, lnrd.line);
+    string w;
+    lnrd.words.clear();
+    for (istringstream wfp(lnrd.line); wfp >> w;)  lnrd.words.push_back(w);
+    return fp;
+}
 
 }   // namespace runtimepath
 }   // namespace diffpy

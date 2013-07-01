@@ -20,6 +20,8 @@
 #define RUNTIMEPATH_HPP_INCLUDED
 
 #include <string>
+#include <vector>
+#include <istream>
 
 namespace diffpy {
 namespace runtimepath {
@@ -36,6 +38,24 @@ namespace runtimepath {
 /// Throw runtime_error if the base directory cannot be found.
 std::string datapath(const std::string& f);
 
+
+class LineReader
+{
+    public:
+        // methods
+        bool isignored() const;
+        bool iscomment() const;
+        bool isblank() const;
+        size_t wcount() const;
+
+        // data
+        std::string commentmark;
+        std::string line;
+        std::vector<std::string> words;
+};
+
+// non-member functions for the LineReader class
+std::istream& operator>>(std::istream&, LineReader&);
 
 }   // namespace runtimepath
 }   // namespace diffpy
