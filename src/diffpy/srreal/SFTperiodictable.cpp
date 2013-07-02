@@ -12,7 +12,6 @@
 *
 ******************************************************************************
 *
-* class SFTperiodictableXray
 * class SFTElectron
 * class SFTperiodictableNeutron
 *
@@ -41,71 +40,10 @@ namespace diffpy {
 namespace srreal {
 
 //////////////////////////////////////////////////////////////////////////////
-// class SFTperiodictableXray
-//////////////////////////////////////////////////////////////////////////////
-
-class SFTperiodictableXray : public ScatteringFactorTable
-{
-    public:
-
-        // HasClassRegistry methods
-
-        ScatteringFactorTablePtr create() const
-        {
-            ScatteringFactorTablePtr rv(new SFTperiodictableXray());
-            return rv;
-        }
-
-
-        ScatteringFactorTablePtr clone() const
-        {
-            ScatteringFactorTablePtr rv(new SFTperiodictableXray(*this));
-            return rv;
-        }
-
-        const string& type() const
-        {
-            static string rv = "periodictablexray";
-            return rv;
-        }
-
-        // own methods
-
-        const string& radiationType() const
-        {
-            static string rv = "X";
-            return rv;
-        }
-
-
-        double standardLookup(const string& smbl, double q) const
-        {
-            diffpy::initializePython();
-            static python::object fxrayatq = diffpy::importFromPyModule(
-                    "periodictable.cromermann", "fxrayatq");
-            const string zp = "0+";
-            string::size_type pos = smbl.size() - zp.size();
-            string::size_type pe = smbl.rfind(zp, pos);
-            string smblnozp = smbl.substr(0, pe);
-            double rv;
-            try {
-                rv = python::extract<double>(fxrayatq(smblnozp, q) + 0.0);
-            }
-            catch (python::error_already_set e) {
-                string emsg = diffpy::getPythonErrorString();
-                PyErr_Clear();
-                throw invalid_argument(emsg);
-            }
-            return rv;
-        }
-
-};  // class SFTperiodictableXray
-
-//////////////////////////////////////////////////////////////////////////////
 // class SFTElectron
 //////////////////////////////////////////////////////////////////////////////
 
-class SFTElectron : public SFTperiodictableXray
+class SFTElectron : public ScatteringFactorTable
 {
     public:
 
@@ -141,6 +79,8 @@ class SFTElectron : public SFTperiodictableXray
 
         double standardLookup(const string& smbl, double q) const
         {
+            return 0.0;
+            /*
             using namespace diffpy::mathutils;
             // resolve Z first so that invalid symbol can throw an exception
             double Z = round(
@@ -151,6 +91,7 @@ class SFTElectron : public SFTperiodictableXray
                 (Z - this->SFTperiodictableXray::standardLookup(smbl, q)) /
                 (stol * stol);
             return rv;
+            */
         }
 
 };  // class SFTElectron
@@ -218,11 +159,6 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
 };  // class SFTperiodictableNeutron
 
 // Registration --------------------------------------------------------------
-
-bool reg_SFTperiodictableXray = (
-        SFTperiodictableXray().registerThisType() &&
-        ScatteringFactorTable::aliasType("periodictablexray", "X")
-        );
 
 bool reg_SFTElectron = (
         SFTElectron().registerThisType() &&

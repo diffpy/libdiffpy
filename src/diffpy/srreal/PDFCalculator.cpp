@@ -45,7 +45,7 @@ PDFCalculator::PDFCalculator()
     this->setPeakProfileByType("gaussian");
     this->getPeakProfile()->setPrecision(DEFAULT_PEAKPRECISION);
     this->setBaselineByType("linear");
-    this->setScatteringFactorTableByType("periodictablexray");
+    this->setScatteringFactorTableByType("xray");
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
     this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
     this->setQmin(0.0);
