@@ -127,7 +127,7 @@ std::string atomBareSymbol(const std::string& atomtype)
 {
     string::size_type pb, pe;
     pb = atomtype.find_first_not_of("0123456789- \t");
-    pe = atomtype.find_last_not_of("+-12345678 \t");
+    pe = atomtype.find_last_not_of("+-012345678 \t");
     string rv = atomtype.substr(pb, pe - pb + 1);
     return rv;
 }
@@ -157,7 +157,7 @@ int atomValence(const std::string& atomtype)
             break;
         }
         // allow one [1-8] digit before the +/- sign
-        if (rv && '1' <= *ci && *ci <= '8')
+        if (rv && '0' <= *ci && *ci <= '8')
         {
             rv *= (*ci - '0');
         }
