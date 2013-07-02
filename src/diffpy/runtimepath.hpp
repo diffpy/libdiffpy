@@ -52,7 +52,6 @@ class LineReader
         // data
         std::string commentmark;
         std::string line;
-        std::istringstream linestream;
         std::vector<std::string> words;
 };
 

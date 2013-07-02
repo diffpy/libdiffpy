@@ -114,14 +114,14 @@ const SetOfWKFormulas& getWKFormulasSet()
         if (line.iscomment() && (0 == line.words[0].compare(0, 2, "#L")))
         {
             assert(!wk.symbol.empty());
-            assert(fp >> line);
+            fp >> line;
+            assert(fp);
             assert(11 == line.wcount());
-            line.linestream.clear();
-            line.linestream.seekg(0);
-            line.linestream >>
+            istringstream fpline(line.line);
+            fpline >>
                 wk.a[0] >> wk.a[1] >> wk.a[2] >> wk.a[3] >> wk.a[4] >>
                 wk.c >> wk.b[0] >> wk.b[1] >> wk.b[2] >> wk.b[3] >> wk.b[4];
-            assert(line.linestream);
+            assert(fpline);
             assert(!the_set->count(wk));
             the_set->insert(wk);
             wk.symbol.clear();

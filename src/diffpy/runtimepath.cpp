@@ -165,10 +165,9 @@ size_t LineReader::wcount() const
 istream& operator>> (istream& fp, LineReader& line)
 {
     getline(fp, line.line);
-    line.linestream.str(line.line);
-    line.linestream.clear();
+    istringstream fpline(line.line);
     line.words.clear();
-    for (string w; line.linestream >> w;)  line.words.push_back(w);
+    for (string w; fpline >> w;)  line.words.push_back(w);
     return fp;
 }
 
