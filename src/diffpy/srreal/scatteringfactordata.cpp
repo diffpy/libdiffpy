@@ -116,6 +116,7 @@ const SetOfWKFormulas& getWKFormulasSet()
             assert(!wk.symbol.empty());
             assert(fp >> line);
             assert(11 == line.wcount());
+            line.linestream.clear();
             line.linestream.seekg(0);
             line.linestream >>
                 wk.a[0] >> wk.a[1] >> wk.a[2] >> wk.a[3] >> wk.a[4] >>
@@ -137,7 +138,7 @@ namespace diffpy {
 namespace srreal {
 
 /// X-ray scattering factor of an element or ion a given Q
-double fxrayatq(string& smbl, double q)
+double fxrayatq(const string& smbl, double q)
 {
     double stol = q / (4 * M_PI);
     return fxrayatstol(smbl, stol);
@@ -145,7 +146,7 @@ double fxrayatq(string& smbl, double q)
 
 
 /// X-ray scattering factor of an element or ion a given sin(theta)/lambda
-double fxrayatstol(string& smbl, double stol)
+double fxrayatstol(const string& smbl, double stol)
 {
     WaasKirfFormula wk;
     wk.symbol = smbl;
@@ -158,7 +159,7 @@ double fxrayatstol(string& smbl, double stol)
         if (v == 0)  wkit = swk.find(wk);
         if (abs(v) == 1)
         {
-            wk.symbol += "1" + ((v > 0) ? '+' : '-');
+            wk.symbol += ((v > 0) ? "1+" : "1-");
             wkit = swk.find(wk);
         }
     }
@@ -175,7 +176,7 @@ double fxrayatstol(string& smbl, double stol)
 
 
 /// Electron scattering factor of an element or ion a given Q
-double felectronatq(string& smbl, double q)
+double felectronatq(const string& smbl, double q)
 {
     using namespace diffpy::mathutils;
     // resolve Z first so that invalid symbol can throw an exception
