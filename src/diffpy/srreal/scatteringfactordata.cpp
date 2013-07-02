@@ -1,4 +1,3 @@
-#include "/Users/pjuhas/arch/x86_64/include/dbprint.h"
 /*****************************************************************************
 *
 * diffpy.srreal     Complex Modeling Initiative
@@ -29,7 +28,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <blitz/tinyvec-et.h>
 
-#include <diffpy/srreal/ScatteringFactors.hpp>
+#include <diffpy/srreal/scatteringfactordata.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/runtimepath.hpp>
 #include <diffpy/validators.hpp>
