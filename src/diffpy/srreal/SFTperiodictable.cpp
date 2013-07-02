@@ -12,17 +12,12 @@
 *
 ******************************************************************************
 *
-* class SFTElectron
 * class SFTperiodictableNeutron
 *
 * Implementations of x-ray and neutron ScatteringFactorTable using Paul
 * Kienzle periodictable library for Python.  The instances can be created
 * using the createByType factory method, see the end of this file for
 * available type strings.
-*
-* SFTElectron gives Q-dependent electron scattering factor according to
-* the formula in International Tables Volume C, page 224.
-* The formula diverges at Q = 0, where SFTElectron returns DOUBLE_MAX.
 *
 *****************************************************************************/
 
@@ -38,63 +33,6 @@ namespace python = boost::python;
 
 namespace diffpy {
 namespace srreal {
-
-//////////////////////////////////////////////////////////////////////////////
-// class SFTElectron
-//////////////////////////////////////////////////////////////////////////////
-
-class SFTElectron : public ScatteringFactorTable
-{
-    public:
-
-        // HasClassRegistry methods
-
-        ScatteringFactorTablePtr create() const
-        {
-            ScatteringFactorTablePtr rv(new SFTElectron());
-            return rv;
-        }
-
-
-        ScatteringFactorTablePtr clone() const
-        {
-            ScatteringFactorTablePtr rv(new SFTElectron(*this));
-            return rv;
-        }
-
-        const string& type() const
-        {
-            static string rv = "electron";
-            return rv;
-        }
-
-        // own methods
-
-        const string& radiationType() const
-        {
-            static string rv = "E";
-            return rv;
-        }
-
-
-        double standardLookup(const string& smbl, double q) const
-        {
-            return 0.0;
-            /*
-            using namespace diffpy::mathutils;
-            // resolve Z first so that invalid symbol can throw an exception
-            double Z = round(
-                this->SFTperiodictableXray::standardLookup(smbl, 0.0));
-            if (eps_eq(q, 0.0))     return DOUBLE_MAX;
-            double stol = q / (4 * M_PI);
-            double rv = 0.023934 *
-                (Z - this->SFTperiodictableXray::standardLookup(smbl, q)) /
-                (stol * stol);
-            return rv;
-            */
-        }
-
-};  // class SFTElectron
 
 //////////////////////////////////////////////////////////////////////////////
 // class SFTperiodictableNeutron
@@ -159,11 +97,6 @@ class SFTperiodictableNeutron : public ScatteringFactorTable
 };  // class SFTperiodictableNeutron
 
 // Registration --------------------------------------------------------------
-
-bool reg_SFTElectron = (
-        SFTElectron().registerThisType() &&
-        ScatteringFactorTable::aliasType("electron", "E")
-        );
 
 bool reg_SFTperiodictableNeutron = (
         SFTperiodictableNeutron().registerThisType() &&
