@@ -165,7 +165,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(18.0, msftb->lookup("K1+"));
             TS_ASSERT_EQUALS(68.0, msftb->lookup("W6+"));
             TS_ASSERT_THROWS(msftb->lookup("H4+"), invalid_argument);
-            TS_ASSERT_THROWS(msftb->lookup("O0+"), invalid_argument);
+            TS_ASSERT_THROWS(msftb->lookup("O3+"), invalid_argument);
         }
 
 
