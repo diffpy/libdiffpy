@@ -66,26 +66,31 @@ void ensureIsDir(const std::string& d)
 const string& diffpyruntime()
 {
     char fpb[PATH_MAX];
-    static string rv;
-    static bool didruntime = false;
-    static string dprt;
+    static string librt;
+    static bool did_librt = false;
+    static string envrt;
+    static bool did_envrt = false;
     // check the DIFFPYRUNTIME environment variable.
     char* pe = getenv("DIFFPYRUNTIME");
-    if (pe)  didruntime = didruntime && pe && dprt == pe;
-    if (didruntime)  return rv;
-    if (pe)
+    if (pe && *pe != '\0')
     {
-        dprt = pe;
-        rv = dprt;
-        size_t pt = rv.find_last_not_of('/');
-        if (pt == string::npos)  rv.clear();
-        else  rv.erase(pt + 1);
-        ensureIsDir(rv);
-        rv = realpath(rv.c_str(), fpb);
-        didruntime = true;
-        return rv;
+        static string dprt;
+        did_envrt = did_envrt && (dprt == pe);
+        if (!did_envrt)
+        {
+            dprt = pe;
+            envrt = pe;
+            size_t pt = envrt.find_last_not_of('/');
+            if (pt == string::npos)  envrt = envrt.substr(0, 1);
+            else  envrt.erase(pt + 1);
+            ensureIsDir(envrt);
+            envrt = realpath(envrt.c_str(), fpb);
+            did_envrt = true;
+        }
+        return envrt;
     }
-    // resolve path of the libdiffpy shared library file
+    if (did_librt)  return librt;
+    // here we need to resolve path of the libdiffpy shared library
     Dl_info i;
     dladdr(reinterpret_cast<void*>(diffpyruntime), &i);
     // first candidate is resolved in relative data path
@@ -93,9 +98,9 @@ const string& diffpyruntime()
     string d1 = string(dirname(fpb)) + "/" + runtimerelpath;
     if (isdir(d1))
     {
-        rv = realpath(d1.c_str(), fpb);
-        didruntime = true;
-        return rv;
+        librt = realpath(d1.c_str(), fpb);
+        did_librt = true;
+        return librt;
     }
     // second candidate is resolved with respect to physical libary location
     // according to the source tree layout
@@ -103,13 +108,13 @@ const string& diffpyruntime()
     d2 += "/../../src/runtime";
     if (isdir(d2))
     {
-        rv = realpath(d2.c_str(), fpb);
-        didruntime = true;
-        return rv;
+        librt = realpath(d2.c_str(), fpb);
+        did_librt = true;
+        return librt;
     }
     // nothing worked - throw exception about the first candidate path.
     ensureIsDir(d1);
-    return rv;
+    return librt;
 }
 
 }   // namespace
