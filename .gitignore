@@ -14,6 +14,7 @@
 
 # SCons build files
 *.pyc
+.gdb_history
 .sconf_temp/
 .sconsign.dblite
 build
