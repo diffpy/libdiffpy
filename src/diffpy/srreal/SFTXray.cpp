@@ -14,7 +14,7 @@
 *
 * class SFTXray
 *
-* Implementations of x-ray ScatteringFactorTable using Waasmaier and Kirfel
+* Implementation of x-ray ScatteringFactorTable using Waasmaier and Kirfel
 * approximation.  The instance can be also created by calling the
 * createByType("xray") factory.
 *
