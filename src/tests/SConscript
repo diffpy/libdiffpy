@@ -12,18 +12,16 @@ env_test.PrependENVPath('DYLD_LIBRARY_PATH', lib_dir)
 
 # Targets --------------------------------------------------------------------
 
-def srcsupported(f):
-    rv = env.get('has_objcryst') or 'objcryst' not in str(f).lower()
+def srcincluded(f):
+    fl = str(f).lower()
+    rv = env.get('has_objcryst') or 'objcryst' not in fl
+    if env_test.get('tests') is not None:
+        rv = rv and any(t.lower() in fl
+                for t in Split(env_test['tests']))
     return rv
 
-# alltests -- the unit test driver
-test_sources = []
-
-# add all unit test modules when variable tests was not set.
-if env_test.get('tests') is None:
-    test_sources += filter(srcsupported, Glob('Test*.hpp'))
-else:
-    test_sources = Split(env_test['tests'])
+# alltests -- the unit test driver source files
+test_sources = filter(srcincluded, Glob('Test*.hpp'))
 
 # special builder for tests_dir.cpp
 def build_tests_dir(target, source, env):
