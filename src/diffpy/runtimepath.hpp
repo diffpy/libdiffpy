@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 #include <istream>
-#include <sstream>
+#include <stdexcept>
 
 namespace diffpy {
 namespace runtimepath {
@@ -39,17 +39,22 @@ namespace runtimepath {
 /// Throw runtime_error if the base directory cannot be found.
 std::string datapath(const std::string& f);
 
-
+/// Helper class for loading text data
 class LineReader
 {
     public:
+        // constructor
+        LineReader();
+
         // methods
         bool isignored() const;
         bool iscomment() const;
         bool isblank() const;
         size_t wcount() const;
+        std::runtime_error format_error(const std::string& filename);
 
         // data
+        int lineno;
         std::string commentmark;
         std::string separator;
         std::string line;

@@ -134,6 +134,13 @@ string datapath(const std::string& f)
 
 // class LineReader ----------------------------------------------------------
 
+// Constructor
+
+LineReader::LineReader() :
+    lineno(0),
+    commentmark("#")
+{ }
+
 // Methods
 
 bool LineReader::isignored() const
@@ -161,11 +168,21 @@ size_t LineReader::wcount() const
     return words.size();
 }
 
+
+std::runtime_error LineReader::format_error(const string& filename)
+{
+    ostringstream emsg;
+    emsg << "Invalid data format in " <<
+        filename << " line " << this->lineno << '.';
+    return runtime_error(emsg.str());
+}
+
 // Non-member operators
 
 istream& operator>> (istream& fp, LineReader& line)
 {
     getline(fp, line.line);
+    line.lineno++;
     istringstream fpline(line.line);
     line.words.clear();
     string w;
