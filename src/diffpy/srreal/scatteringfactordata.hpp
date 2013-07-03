@@ -40,6 +40,9 @@ double fxrayatstol(const std::string& smbl, double stol);
 /// Electron scattering factor of an element or ion a given Q
 double felectronatq(const std::string& smbl, double q);
 
+/// Coherent scattering length of an element or isotope in fm
+double bcneutron(const std::string& smbl);
+
 }   // namespace srreal
 }   // namespace diffpy
 

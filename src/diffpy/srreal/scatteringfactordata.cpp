@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <fstream>
 #include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <blitz/tinyvec-et.h>
 
@@ -130,6 +131,67 @@ const SetOfWKFormulas& getWKFormulasSet()
     return getWKFormulasSet();
 }
 
+
+typedef boost::unordered_map<string,double> NeutronBCStorage;
+
+const NeutronBCStorage& getNeutronBCTable()
+{
+    using namespace diffpy::runtimepath;
+    using diffpy::validators::ensureFileOK;
+    typedef NeutronBCStorage::value_type BCPair;
+    static boost::scoped_ptr<NeutronBCStorage> bctable;
+    if (bctable)  return *bctable;
+    bctable.reset(new NeutronBCStorage);
+    string nsffile = datapath("nsftable.dat");
+    ifstream fp(nsffile.c_str());
+    ensureFileOK(nsffile, fp);
+    LineReader line;
+    line.commentmark = '#';
+    line.separator = ',';
+    while (fp >> line)
+    {
+        if (line.isignored())  continue;
+        assert(line.wcount() == 11);
+        if (line.words[3].empty())  continue;
+        string smbl = line.words[0];
+        size_t p0 = smbl.find_first_not_of("0123456789-");
+        assert(p0 != string::npos);
+        smbl.erase(0, p0);
+        size_t p1 = smbl.find_last_of('-');
+        if (p1 != string::npos)
+        {
+            smbl = smbl.substr(p1 + 1) + "-" + smbl.substr(0, p1);
+        }
+        istringstream fpbc(line.words[3]);
+        double bc;
+        fpbc >> bc;
+        assert(fpbc);
+        assert(!bctable->count(smbl));
+        bctable->insert(BCPair(smbl, bc));
+        // elements are not explicitly included if there is just one isotope
+        // or if all isotopes are unstable
+        size_t p2 = smbl.find_first_of('-');
+        if (p2 != string::npos)
+        {
+            string el = smbl.substr(p2 + 1);
+            // there is just one isotope
+            const string& chlf = line.words[1];
+            bool addel = (chlf == "100") ||
+                (!bctable->count(el) && *chlf.rbegin() == 'Y');
+            if (addel)
+            {
+                assert(!bctable->count(el));
+                bctable->insert(BCPair(el, bc));
+            }
+        }
+    }
+    // define aliases for neutron, deuterium and tritium
+    bctable->insert(BCPair("n", bctable->at("1-n")));
+    bctable->insert(BCPair("D", bctable->at("2-H")));
+    bctable->insert(BCPair("T", bctable->at("3-H")));
+    return getNeutronBCTable();
+}
+
 }   // namespace
 
 // Implementation ------------------------------------------------------------
@@ -185,6 +247,26 @@ double felectronatq(const string& smbl, double q)
     double stol = q / (4 * M_PI);
     double rv = 0.023934 * (Z - fxrayatstol(smbl, stol)) / (stol * stol);
     return rv;
+}
+
+
+/// Coherent scattering length of an element or isotope in fm
+double bcneutron(const string& smbl)
+{
+    const NeutronBCStorage& bctable = getNeutronBCTable();
+    NeutronBCStorage::const_iterator it = bctable.find(smbl);
+    if (it != bctable.end())  return it->second;
+    size_t pe = smbl.find_last_not_of("+-012345678 \t");
+    assert(pe != string::npos);
+    string smblnocharge = smbl.substr(0, pe + 1);
+    it = bctable.find(smblnocharge);
+    if (it == bctable.end())
+    {
+        string emsg("Unknown atom or isotope symbol '");
+        emsg += smbl + "'.";
+        throw invalid_argument(emsg);
+    }
+    return it->second;
 }
 
 }   // namespace srreal
