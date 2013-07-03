@@ -58,8 +58,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT(sfx1.get());
             TS_ASSERT_EQUALS(sfx0->type(), sfx1->type());
             TS_ASSERT(typeid(*sfx0) == typeid(*sfx1));
-            sfn0 = ScatteringFactorTable::createByType(
-                    "periodictableneutron");
+            sfn0 = ScatteringFactorTable::createByType("neutron");
             sfn1 = ScatteringFactorTable::createByType("N");
             TS_ASSERT(sfn0.get());
             TS_ASSERT(sfn1.get());
@@ -179,7 +178,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(1.23, sftb1->lookup("H"));
             TS_ASSERT_EQUALS(1u, sftb1->getCustomSymbols().size());
             sftb1 = dumpandload(ScatteringFactorTable::createByType("N"));
-            TS_ASSERT_EQUALS(string("periodictableneutron"), sftb1->type());
+            TS_ASSERT_EQUALS(string("neutron"), sftb1->type());
             sftb1 = dumpandload(ScatteringFactorTable::createByType("X"));
             TS_ASSERT_EQUALS(string("xray"), sftb1->type());
         }
