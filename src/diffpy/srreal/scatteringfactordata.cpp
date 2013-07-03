@@ -40,6 +40,8 @@ using namespace std;
 
 namespace {
 
+// X-ray scattering factors
+
 const int WKTerms = 5;
 
 class WaasKirfFormula
@@ -131,6 +133,49 @@ const SetOfWKFormulas& getWKFormulasSet()
     return getWKFormulasSet();
 }
 
+// Electron numbers for elements and ions
+
+typedef boost::unordered_map<string,int> ElectronNumberStorage;
+
+ElectronNumberStorage& getElectronNumberTable()
+{
+    using namespace diffpy::runtimepath;
+    using diffpy::validators::ensureFileOK;
+    static boost::scoped_ptr<ElectronNumberStorage> entable;
+    typedef ElectronNumberStorage::value_type ENPair;
+    if (!entable)
+    {
+        entable.reset(new ElectronNumberStorage);
+        string ionfile = datapath("ionlist.dat");
+        ifstream fp0(ionfile.c_str());
+        ensureFileOK(ionfile, fp0);
+        LineReader line;
+        while (fp0 >> line)
+        {
+            if (line.isignored())  continue;
+            istringstream fpline(line.line);
+            string element;
+            int z = 0;
+            fpline >> element >> z;
+            if (!fpline)
+            {
+                throw line.format_error(
+                        "Expected at least 2 columns for (symbol, Z).");
+            }
+            entable->insert(ENPair(element, z));
+            for (int v; fpline >> v;)
+            {
+                ostringstream smbl;
+                smbl << element << abs(v) << ((v > 0) ? '+' : '-');
+                entable->insert(ENPair(smbl.str(), z - v));
+            }
+        }
+        assert(436 <= entable->size());
+    }
+    return *entable;
+}
+
+// Neutron scattering lengths
 
 typedef boost::unordered_map<string,double> NeutronBCStorage;
 
@@ -247,6 +292,32 @@ double felectronatq(const string& smbl, double q)
     double stol = q / (4 * M_PI);
     double rv = 0.023934 * (Z - fxrayatstol(smbl, stol)) / (stol * stol);
     return rv;
+}
+
+
+/// Number of electrons for an element or ion
+int electronnumber(const string& smbl)
+{
+    const ElectronNumberStorage& entable = getElectronNumberTable();
+    ElectronNumberStorage::const_iterator it;
+    it = entable.find(smbl);
+    // try to build standard symbol when not found
+    if (it == entable.end())
+    {
+        ostringstream smbl1;
+        smbl1 << atomBareSymbol(smbl);
+        int v = atomValence(smbl);
+        if (v)  smbl1 << abs(v) << ((v > 0) ? '+' : '-');
+        it = entable.find(smbl1.str());
+    }
+    // throw exception if still not found
+    if (it == entable.end())
+    {
+        ostringstream emsg;
+        emsg << "Unknown atom symbol '" << smbl << "'.";
+        throw invalid_argument(emsg.str());
+    }
+    return it->second;
 }
 
 
