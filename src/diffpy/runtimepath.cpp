@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <climits>
 #include <cstring>
+#include <cassert>
 #include <sstream>
 #include <stdexcept>
 #include <sys/stat.h>
@@ -167,7 +168,15 @@ istream& operator>> (istream& fp, LineReader& line)
     getline(fp, line.line);
     istringstream fpline(line.line);
     line.words.clear();
-    for (string w; fpline >> w;)  line.words.push_back(w);
+    string w;
+    if (line.separator.empty()) {
+        while (fpline >> w)  line.words.push_back(w);
+    }
+    else {
+        assert(line.separator.size() == 1);
+        const char& sep = line.separator[0];
+        while (getline(fpline, w, sep))  line.words.push_back(w);
+    }
     return fp;
 }
 
