@@ -129,7 +129,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
         }
 
 
-        void test_periodictableElectron()
+        void test_SFTElectron()
         {
             using diffpy::mathutils::DOUBLE_MAX;
             msftb = ScatteringFactorTable::createByType("E");
@@ -143,7 +143,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
         }
 
 
-        void test_periodictableNeutron()
+        void test_SFTNeutron()
         {
             msftb = ScatteringFactorTable::createByType("N");
             TS_ASSERT_DELTA(3.63, msftb->lookup("Na"), mtol);
