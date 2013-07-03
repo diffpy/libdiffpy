@@ -50,7 +50,7 @@ const string& SFTXray::type() const
     return rv;
 }
 
-// own methods
+// own methods - overloads
 
 const string& SFTXray::radiationType() const
 {
@@ -58,7 +58,6 @@ const string& SFTXray::radiationType() const
     return rv;
 }
 
-// overloads
 
 double SFTXray::standardLookup(const string& smbl, double q) const
 {

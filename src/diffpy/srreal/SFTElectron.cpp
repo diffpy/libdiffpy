@@ -51,7 +51,7 @@ const string& SFTElectron::type() const
     return rv;
 }
 
-// own methods
+// own methods - overloads
 
 const string& SFTElectron::radiationType() const
 {
@@ -59,7 +59,6 @@ const string& SFTElectron::radiationType() const
     return rv;
 }
 
-// overloads
 
 double SFTElectron::standardLookup(const string& smbl, double q) const
 {

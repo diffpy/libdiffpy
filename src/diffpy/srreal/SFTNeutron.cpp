@@ -51,7 +51,7 @@ const string& SFTNeutron::type() const
     return rv;
 }
 
-// own methods
+// own methods - overloads
 
 const string& SFTNeutron::radiationType() const
 {
@@ -59,7 +59,6 @@ const string& SFTNeutron::radiationType() const
     return rv;
 }
 
-// overloads
 
 double SFTNeutron::standardLookup(const string& smbl, double q) const
 {
