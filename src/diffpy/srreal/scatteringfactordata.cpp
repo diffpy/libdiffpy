@@ -110,7 +110,11 @@ const SetOfWKFormulas& getWKFormulasSet()
     {
         if (line.iscomment() && (0 == line.words[0].compare(0, 2, "#S")))
         {
-            assert(line.wcount() >= 3);
+            if (line.wcount() < 3)
+            {
+                throw line.format_error(wkfile,
+                        "Expected at least 3 columns of data.");
+            }
             wk.symbol = line.words[2];
             continue;
         }
@@ -118,8 +122,10 @@ const SetOfWKFormulas& getWKFormulasSet()
         {
             assert(!wk.symbol.empty());
             fp >> line;
-            assert(fp);
-            assert(11 == line.wcount());
+            if (line.wcount() != 11)
+            {
+                throw line.format_error("Expected 11 values.");
+            }
             istringstream fpline(line.line);
             fpline >>
                 wk.a[0] >> wk.a[1] >> wk.a[2] >> wk.a[3] >> wk.a[4] >>
