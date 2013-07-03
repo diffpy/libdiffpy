@@ -12,9 +12,13 @@ env_test.PrependENVPath('DYLD_LIBRARY_PATH', lib_dir)
 
 # Targets --------------------------------------------------------------------
 
+def srcsupported(f):
+    rv = env.get('has_objcryst') or 'objcryst' not in str(f).lower()
+    return rv
+
 def srcincluded(f):
     fl = str(f).lower()
-    rv = env.get('has_objcryst') or 'objcryst' not in fl
+    rv = srcsupported(f)
     if env_test.get('tests') is not None:
         rv = rv and any(t.lower() in fl
                 for t in Split(env_test['tests']))
