@@ -20,4 +20,5 @@
 build
 config.log
 errors.err
+sconscript.local
 tags
