@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include <cassert>
+#include <boost/functional/hash.hpp>
 
 #include <diffpy/serialization.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
@@ -28,6 +29,34 @@ using std::string;
 
 namespace diffpy {
 namespace srreal {
+
+//////////////////////////////////////////////////////////////////////////////
+// class Atom
+//////////////////////////////////////////////////////////////////////////////
+
+bool operator==(const Atom& a0, const Atom& a1)
+{
+    bool rv = (&a0 == &a1) || (
+            a0.atomtype == a1.atomtype &&
+            (a0.cartesianposition == a1.cartesianposition) &&
+            a0.occupancy == a1.occupancy &&
+            a0.anisotropy == a1.anisotropy &&
+            a0.cartesianuij == a1.cartesianuij
+            );
+    return rv;
+}
+
+
+size_t hash_value(const Atom& a)
+{
+    size_t seed = 0;
+    boost::hash_combine(seed, a.atomtype);
+    boost::hash_combine(seed, a.cartesianposition);
+    boost::hash_combine(seed, a.occupancy);
+    boost::hash_combine(seed, a.anisotropy);
+    boost::hash_combine(seed, a.cartesianuij);
+    return seed;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // class AtomicStructureAdapter

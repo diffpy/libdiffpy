@@ -64,6 +64,11 @@ class Atom
 
 };
 
+// Functions related to class Atom
+
+bool operator==(const Atom&, const Atom&);
+size_t hash_value(const Atom&);
+
 
 class AtomicStructureAdapter : public StructureAdapter
 {
