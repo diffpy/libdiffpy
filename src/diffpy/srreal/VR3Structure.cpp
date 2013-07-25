@@ -74,19 +74,6 @@ VR3BondGenerator::VR3BondGenerator(StructureAdapterConstPtr adpt) :
     mvr3structure(dynamic_cast<const VR3Adapter*>(adpt.get())->mvr3structure)
 { }
 
-// Public Methods ------------------------------------------------------------
-
-const R3::Vector& VR3BondGenerator::r0() const
-{
-    return mvr3structure.at(this->site0());
-}
-
-
-const R3::Vector& VR3BondGenerator::r1() const
-{
-    return mvr3structure.at(this->site1());
-}
-
 }   // namespace srreal
 }   // namespace diffpy
 

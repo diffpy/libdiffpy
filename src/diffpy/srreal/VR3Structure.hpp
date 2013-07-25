@@ -74,10 +74,6 @@ class VR3BondGenerator : public BaseBondGenerator
         // constructors
         VR3BondGenerator(StructureAdapterConstPtr);
 
-        // methods
-        virtual const R3::Vector& r0() const;
-        virtual const R3::Vector& r1() const;
-
     private:
         // data
         const VR3Structure& mvr3structure;
