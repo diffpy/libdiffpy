@@ -164,6 +164,43 @@ bool EpsEqual(const T& A, const T& B, double eps)
 }   // namespace srreal
 }   // namespace diffpy
 
+namespace blitz {
+
+// Equality ------------------------------------------------------------------
+
+inline
+bool operator==(const diffpy::srreal::R3::Vector& u,
+        const diffpy::srreal::R3::Vector& v)
+{
+    diffpy::srreal::R3::Vector::const_iterator pu = u.begin();
+    diffpy::srreal::R3::Vector::const_iterator pv = v.begin();
+    bool rv = (pu == pv) || (
+            *pu++ == *pv++ && 
+            *pu++ == *pv++ && 
+            *pu++ == *pv++
+            );
+    return rv;
+}
+
+
+inline
+bool operator==(const diffpy::srreal::R3::Matrix& A,
+        const diffpy::srreal::R3::Matrix& B)
+{
+    using diffpy::srreal::R3::Ndim;
+    const size_t sz = Ndim * Ndim;
+    bool rv = (&A == &B) || std::equal(A.data(), A.data() + sz, B.data());
+    return rv;
+}
+
+
+// Hashing -------------------------------------------------------------------
+
+size_t hash_value(const diffpy::srreal::R3::Vector& v);
+size_t hash_value(const diffpy::srreal::R3::Matrix& A);
+
+}
+
 // Serialization -------------------------------------------------------------
 
 namespace boost {

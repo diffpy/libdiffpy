@@ -7,6 +7,7 @@
 * <license text>
 ***********************************************************************/
 
+#include <boost/functional/hash.hpp>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_matrix.h>
 #include <diffpy/srreal/R3linalg.hpp>
@@ -92,5 +93,23 @@ R3::Matrix R3::transpose(const R3::Matrix& A)
 
 }   // namespace srreal
 }   // namespace diffpy
+
+namespace blitz {
+
+using namespace diffpy::srreal;
+
+size_t hash_value(const R3::Vector& v)
+{
+    return boost::hash_range(v.begin(), v.end());
+}
+
+
+size_t hash_value(const R3::Matrix& A)
+{
+    const size_t sz = R3::Ndim * R3::Ndim;
+    return boost::hash_range(A.data(), A.data() + sz);
+}
+
+}   // namespace blitz
 
 // End of file
