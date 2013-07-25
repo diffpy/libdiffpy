@@ -29,12 +29,12 @@
 namespace diffpy {
 namespace srreal {
 
-class AtomAdapter
+class Atom
 {
     public:
         
         // constructor
-        AtomAdapter() :
+        Atom() :
             cartesianposition(0.0, 0.0, 0.0),
             occupancy(1.0),
             anisotropy(false),
@@ -79,14 +79,14 @@ class AtomicStructureAdapter : public StructureAdapter
         virtual const std::string& siteAtomType(int idx) const;
 
         // methods - own
-        void insert(int, const AtomAdapter&);
-        void append(const AtomAdapter&);
+        void insert(int, const Atom&);
+        void append(const Atom&);
         void remove(int);
 
     private:
 
         // data
-        std::vector<AtomAdapter> matoms;
+        std::vector<Atom> matoms;
 
         // serialization
         friend class boost::serialization::access;

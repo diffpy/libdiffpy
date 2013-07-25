@@ -37,8 +37,6 @@ namespace srreal {
 
 BaseBondGeneratorPtr AtomicStructureAdapter::createBondGenerator() const
 {
-    // FIXME: hack for handling non-periodic structures
-    // should diffpy.Structure get an isPeriodic method?
     BaseBondGeneratorPtr bnds(
             new AtomicStructureBondGenerator(shared_from_this()));
     return bnds;
@@ -86,14 +84,14 @@ const string& AtomicStructureAdapter::siteAtomType(int idx) const
 }
 
 
-void AtomicStructureAdapter::insert(int idx, const AtomAdapter& atom)
+void AtomicStructureAdapter::insert(int idx, const Atom& atom)
 {
     assert(0 <= idx && idx <= this->countSites());
     matoms.insert(matoms.begin() + idx, atom);
 }
 
 
-void AtomicStructureAdapter::append(const AtomAdapter& atom)
+void AtomicStructureAdapter::append(const Atom& atom)
 {
     matoms.push_back(atom);
 }
