@@ -82,6 +82,8 @@ class AtomicStructureAdapter : public StructureAdapter
         void insert(int, const Atom&);
         void append(const Atom&);
         void remove(int);
+        Atom& operator[](int);
+        const Atom& operator[](int) const;
 
     private:
 

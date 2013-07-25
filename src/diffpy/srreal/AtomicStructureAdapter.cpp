@@ -103,6 +103,20 @@ void AtomicStructureAdapter::remove(int idx)
     matoms.erase(matoms.begin() + idx);
 }
 
+
+Atom& AtomicStructureAdapter::operator[](int idx)
+{
+    assert(0 <= idx && idx < this->countSites());
+    return matoms[idx];
+}
+
+
+const Atom& AtomicStructureAdapter::operator[](int idx) const
+{
+    assert(0 <= idx && idx < this->countSites());
+    return matoms[idx];
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // class AtomicStructureBondGenerator
 //////////////////////////////////////////////////////////////////////////////
