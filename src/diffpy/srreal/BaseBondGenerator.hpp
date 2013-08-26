@@ -20,19 +20,14 @@
 #ifndef BASEBONDGENERATOR_HPP_INCLUDED
 #define BASEBONDGENERATOR_HPP_INCLUDED
 
-#include <boost/shared_ptr.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
+#include <diffpy/srreal/forwardtypes.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 /// Default rmax is very large, but still within the integer type limits.
 const double DEFAULT_BONDGENERATOR_RMAX = 1.0e6;
-
-/// shared pointers to structure adapter and bond generator related objects
-typedef boost::shared_ptr<class BaseBondGenerator> BaseBondGeneratorPtr;
-typedef boost::shared_ptr<class StructureAdapter> StructureAdapterPtr;
-typedef boost::shared_ptr<const class StructureAdapter> StructureAdapterConstPtr;
 
 class BaseBondGenerator
 {
