@@ -113,8 +113,21 @@ PQEvaluatorType PQEvaluatorOptimized::typeint() const
 }
 
 
+void PQEvaluatorOptimized::reset()
+{
+    mstructure0.reset();
+    mvalue0.clear();
+}
+
+// FIXME
+class StructureDiff {
+    public:
+        StructureDiff(StructureAdapterConstPtr s0, StructureAdapterConstPtr s1) { }
+};
+
 void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
 {
+    StructureDiff sd(mstructure0, pq.getStructure());
 }
 
 // Factory for PairQuantity evaluators ---------------------------------------

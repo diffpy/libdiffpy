@@ -30,6 +30,9 @@
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/export.hpp>
 
+#include <diffpy/srreal/QuantityType.hpp>
+#include <diffpy/srreal/forwardtypes.hpp>
+
 namespace diffpy {
 namespace srreal {
 
@@ -51,6 +54,7 @@ class PQEvaluatorBasic
 
         // methods
         virtual PQEvaluatorType typeint() const;
+        virtual void reset()  { }
         virtual void updateValue(PairQuantity& pq);
         void useFullSum(bool flag);
         void setupParallelRun(int cpuindex, int ncpu);
@@ -83,7 +87,17 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
 
         // methods
         virtual PQEvaluatorType typeint() const;
+        virtual void reset();
         virtual void updateValue(PairQuantity& pq);
+
+    private:
+
+        // data
+        /// last structure used for evaluation
+        StructureAdapterPtr mstructure0;
+        /// last evaluated value
+        QuantityType mvalue0;
+
 
 };
 
