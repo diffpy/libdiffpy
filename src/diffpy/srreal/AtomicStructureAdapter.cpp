@@ -34,6 +34,33 @@ namespace srreal {
 // class Atom
 //////////////////////////////////////////////////////////////////////////////
 
+bool operator< (const Atom& a0, const Atom& a1)
+{
+    if (a0.atomtype < a1.atomtype)  return true;
+    if (a0.atomtype > a1.atomtype)  return false;
+    R3::Vector::const_iterator p0 = a0.cartesianposition.begin();
+    R3::Vector::const_iterator p1 = a1.cartesianposition.begin();
+    for (; p0 != a0.cartesianposition.end(); ++p0, ++p1)
+    {
+        if (*p0 < *p1)  return true;
+        if (*p0 > *p1)  return false;
+    }
+    if (a0.occupancy < a1.occupancy)  return true;
+    if (a0.occupancy > a1.occupancy)  return false;
+    if (a0.anisotropy < a1.anisotropy)  return true;
+    if (a0.anisotropy > a1.anisotropy)  return false;
+    const double* u0 = a0.cartesianposition.dataFirst();
+    const double* u0last = u0 + R3::Ndim * R3::Ndim;
+    const double* u1 = a1.cartesianposition.dataFirst();
+    for (; u0 != u0last; ++u0, ++u1)
+    {
+        if (*u0 < *u1)  return true;
+        if (*u0 > *u1)  return false;
+    }
+    return false;
+}
+
+
 bool operator==(const Atom& a0, const Atom& a1)
 {
     bool rv = (&a0 == &a1) || (

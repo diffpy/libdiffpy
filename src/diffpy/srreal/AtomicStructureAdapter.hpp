@@ -32,7 +32,7 @@ namespace srreal {
 class Atom
 {
     public:
-        
+
         // constructor
         Atom() :
             cartesianposition(0.0, 0.0, 0.0),
@@ -66,6 +66,7 @@ class Atom
 
 // Functions related to class Atom
 
+bool operator<(const Atom&, const Atom&);
 bool operator==(const Atom&, const Atom&);
 size_t hash_value(const Atom&);
 
