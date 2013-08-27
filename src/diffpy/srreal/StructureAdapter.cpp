@@ -23,6 +23,7 @@
 #include <diffpy/mathutils.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/VR3Structure.hpp>
+#include <diffpy/srreal/StructureDifference.hpp>
 
 using namespace std;
 using diffpy::mathutils::eps_eq;
@@ -66,6 +67,14 @@ int StructureAdapter::siteMultiplicity(int idx) const
 double StructureAdapter::siteOccupancy(int idx) const
 {
     return 1.0;
+}
+
+
+StructureDifference
+StructureAdapter::diff(StructureAdapterConstPtr other) const
+{
+    StructureDifference sd;
+    return sd;
 }
 
 // Routines ------------------------------------------------------------------

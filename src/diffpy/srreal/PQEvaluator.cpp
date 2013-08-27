@@ -28,6 +28,7 @@
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
+#include <diffpy/srreal/StructureDifference.hpp>
 
 using namespace std;
 
@@ -119,15 +120,15 @@ void PQEvaluatorOptimized::reset()
     mvalue0.clear();
 }
 
-// FIXME
-class StructureDiff {
-    public:
-        StructureDiff(StructureAdapterConstPtr s0, StructureAdapterConstPtr s1) { }
-};
 
 void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
 {
-    StructureDiff sd(mstructure0, pq.getStructure());
+    StructureDifference sdiff = mstructure0->diff(pq.getStructure());
+    if (!sdiff.allowsfastupdate())
+    {
+        this->PQEvaluatorBasic::updateValue(pq);
+        return;
+    }
 }
 
 // Factory for PairQuantity evaluators ---------------------------------------

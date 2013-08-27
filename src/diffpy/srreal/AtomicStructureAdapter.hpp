@@ -83,6 +83,7 @@ class AtomicStructureAdapter : public StructureAdapter
         virtual double siteOccupancy(int idx) const;
         virtual bool siteAnisotropy(int idx) const;
         virtual const R3::Matrix& siteCartesianUij(int idx) const;
+        virtual StructureDifference diff(StructureAdapterConstPtr other) const;
 
         // methods - own
         void insert(int, const Atom&);

@@ -24,6 +24,7 @@
 
 #include <diffpy/serialization.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
+#include <diffpy/srreal/StructureDifference.hpp>
 
 using std::string;
 
@@ -137,6 +138,13 @@ const R3::Matrix& AtomicStructureAdapter::siteCartesianUij(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
     return matoms[idx].cartesianuij;
+}
+
+StructureDifference
+AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
+{
+    StructureDifference sd(this->shared_from_this(), other);
+    return sd;
 }
 
 

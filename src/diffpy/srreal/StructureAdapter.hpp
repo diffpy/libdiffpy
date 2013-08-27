@@ -35,6 +35,7 @@ namespace diffpy {
 namespace srreal {
 
 class PairQuantity;
+class StructureDifference;
 
 
 /// @class StructureAdapter
@@ -87,6 +88,9 @@ class StructureAdapter :
         /// this method allows custom special configuration for a concrete
         /// pair of StructureAdapter and PairQuantity objects.
         virtual void customPQConfig(PairQuantity* pq) const  { }
+
+        /// Return difference from the other StructureAdapter
+        virtual StructureDifference diff(StructureAdapterConstPtr) const;
 
     private:
 
