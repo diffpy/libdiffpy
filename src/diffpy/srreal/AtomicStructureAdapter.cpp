@@ -105,6 +105,13 @@ int AtomicStructureAdapter::countSites() const
 }
 
 
+const string& AtomicStructureAdapter::siteAtomType(int idx) const
+{
+    assert(0 <= idx && idx < this->countSites());
+    return matoms[idx].atomtype;
+}
+
+
 const R3::Vector& AtomicStructureAdapter::siteCartesianPosition(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
@@ -130,13 +137,6 @@ const R3::Matrix& AtomicStructureAdapter::siteCartesianUij(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
     return matoms[idx].cartesianuij;
-}
-
-
-const string& AtomicStructureAdapter::siteAtomType(int idx) const
-{
-    assert(0 <= idx && idx < this->countSites());
-    return matoms[idx].atomtype;
 }
 
 

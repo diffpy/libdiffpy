@@ -78,11 +78,11 @@ class AtomicStructureAdapter : public StructureAdapter
         // methods - overloaded
         virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int countSites() const;
+        virtual const std::string& siteAtomType(int idx) const;
         virtual const R3::Vector& siteCartesianPosition(int idx) const;
         virtual double siteOccupancy(int idx) const;
         virtual bool siteAnisotropy(int idx) const;
         virtual const R3::Matrix& siteCartesianUij(int idx) const;
-        virtual const std::string& siteAtomType(int idx) const;
 
         // methods - own
         void insert(int, const Atom&);
