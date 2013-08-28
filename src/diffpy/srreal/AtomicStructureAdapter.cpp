@@ -51,9 +51,9 @@ bool operator< (const Atom& a0, const Atom& a1)
     if (a0.occupancy > a1.occupancy)  return false;
     if (a0.anisotropy < a1.anisotropy)  return true;
     if (a0.anisotropy > a1.anisotropy)  return false;
-    const double* u0 = a0.cartesianposition.dataFirst();
+    const double* u0 = a0.cartesianuij.dataFirst();
     const double* u0last = u0 + R3::Ndim * R3::Ndim;
-    const double* u1 = a1.cartesianposition.dataFirst();
+    const double* u1 = a1.cartesianuij.dataFirst();
     for (; u0 != u0last; ++u0, ++u1)
     {
         if (*u0 < *u1)  return true;
