@@ -84,6 +84,7 @@ class PairQuantity : public diffpy::Attributes
         virtual void executeParallelMerge(const std::string& pdata);
         virtual void finishValue() { }
         int countSites() const;
+        bool hasMask() const;
 
         // data
         typedef boost::unordered_map<

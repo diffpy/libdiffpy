@@ -123,8 +123,15 @@ void PQEvaluatorOptimized::reset()
 
 void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
 {
-    StructureDifference sdiff = mstructure0->diff(pq.getStructure());
-    if (!sdiff.allowsfastupdate())
+    // allow fast updates only when there is no mask on the pairs
+    if (pq.hasMask())
+    {
+        this->PQEvaluatorBasic::updateValue(pq);
+        return;
+    }
+    // do not do fast updates if they take more work
+    StructureDifference sd = mstructure0->diff(pq.getStructure());
+    if (!sd.allowsfastupdate())
     {
         this->PQEvaluatorBasic::updateValue(pq);
         return;

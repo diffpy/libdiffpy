@@ -297,6 +297,13 @@ int PairQuantity::countSites() const
     return rv;
 }
 
+
+bool PairQuantity::hasMask() const
+{
+    bool rv = !(mdefaultpairmask && minvertpairmask.empty());
+    return rv;
+}
+
 // Private Methods -----------------------------------------------------------
 
 void PairQuantity::updateMaskData()
