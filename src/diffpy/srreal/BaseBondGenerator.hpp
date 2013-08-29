@@ -20,6 +20,7 @@
 #ifndef BASEBONDGENERATOR_HPP_INCLUDED
 #define BASEBONDGENERATOR_HPP_INCLUDED
 
+#include <vector>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/forwardtypes.hpp>
 
@@ -46,6 +47,7 @@ class BaseBondGenerator
         // configuration
         void selectAnchorSite(int);
         void selectSiteRange(int first, int last);
+        void skipSite(int);
         virtual void setRmin(double);
         virtual void setRmax(double);
 
@@ -77,6 +79,7 @@ class BaseBondGenerator
         R3::Vector mr1;
         R3::Vector mr01;
         double mdistance;
+        std::vector<bool> msite_selected;
 
         // methods
         virtual bool iterateSymmetry();
@@ -87,6 +90,7 @@ class BaseBondGenerator
     private:
 
         // methods
+        void advanceIfSkippedSite();
         void advanceWhileInvalid();
         bool bondOutOfRange() const;
         bool atSelfPair() const;

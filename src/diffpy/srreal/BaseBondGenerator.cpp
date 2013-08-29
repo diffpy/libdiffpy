@@ -17,6 +17,7 @@
 *
 *****************************************************************************/
 
+#include <algorithm>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/mathutils.hpp>
@@ -39,6 +40,7 @@ BaseBondGenerator::BaseBondGenerator(StructureAdapterConstPtr stru)
     mstructure = stru;
     this->setRmin(0.0);
     this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
+    msite_selected.resize(mstructure->countSites(), true);
     if (mstructure->countSites())
     {
         this->selectAnchorSite(0);
@@ -53,6 +55,7 @@ BaseBondGenerator::BaseBondGenerator(StructureAdapterConstPtr stru)
 void BaseBondGenerator::rewind()
 {
     msite_current = msite_first;
+    this->advanceIfSkippedSite();
     // avoid calling rewindSymmetry at an invalid site
     if (this->finished())   return;
     this->rewindSymmetry();
@@ -89,9 +92,16 @@ void BaseBondGenerator::selectSiteRange(int first, int last)
     assert(last <= mstructure->countSites());
     msite_first = first;
     msite_last = last;
+    std::fill(msite_selected.begin() + first,
+            msite_selected.begin() + last, true);
     this->setFinishedFlag();
 }
 
+
+void BaseBondGenerator::skipSite(int skipindex)
+{
+    msite_selected[skipindex] = false;
+}
 
 void BaseBondGenerator::setRmin(double rmin)
 {
@@ -205,6 +215,7 @@ void BaseBondGenerator::getNextBond()
 {
     if (this->iterateSymmetry())  return;
     msite_current += 1;
+    this->advanceIfSkippedSite();
     // avoid calling rewindSymmetry at an invalid site
     if (!(this->finished()))  this->rewindSymmetry();
 }
@@ -219,6 +230,15 @@ void BaseBondGenerator::updateDistance()
 }
 
 // Private Methods -----------------------------------------------------------
+
+void BaseBondGenerator::advanceIfSkippedSite()
+{
+    while (!this->finished() && !msite_selected[msite_current])
+    {
+        ++msite_current;
+    }
+}
+
 
 void BaseBondGenerator::advanceWhileInvalid()
 {
