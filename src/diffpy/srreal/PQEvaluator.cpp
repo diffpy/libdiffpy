@@ -123,19 +123,68 @@ void PQEvaluatorOptimized::reset()
 
 void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
 {
+    // revert to normal calculation if there is no structure
+    if (!mstructure0)  return this->PQEvaluatorBasic::updateValue(pq);
     // allow fast updates only when there is no mask on the pairs
-    if (pq.hasMask())
-    {
-        this->PQEvaluatorBasic::updateValue(pq);
-        return;
-    }
+    if (pq.hasMask())  return this->PQEvaluatorBasic::updateValue(pq);
     // do not do fast updates if they take more work
     StructureDifference sd = mstructure0->diff(pq.getStructure());
-    if (!sd.allowsfastupdate())
+    if (!sd.allowsfastupdate())  return this->PQEvaluatorBasic::updateValue(pq);
+    // Remove contributions from the extra sites in the old structure
+    pq.setStructure(sd.stru0);
+    assert(sd.stru0 == pq.mstructure);
+    assert(mvalue0.size() == pq.value().size());
+    pq.mvalue = mvalue0;
+    int cntsites0 = sd.stru0->countSites();
+    BaseBondGeneratorPtr bnds0 = sd.stru0->createBondGenerator();
+    // loop counter
+    long n = mcpuindex;
+    // the loop is adjusted to always perform a full sum and to split the
+    // inner loop in case of parallel calculation.
+    bnds0->selectSiteRange(0, cntsites0);
+    std::vector<int>::const_iterator ii0;
+    for (ii0 = sd.pop0.begin(); ii0 != sd.pop0.end(); ++ii0)
     {
-        this->PQEvaluatorBasic::updateValue(pq);
-        return;
+        const int& i0 = *ii0;
+        bnds0->selectAnchorSite(i0);
+        for (bnds0->rewind(); !bnds0->finished(); bnds0->next())
+        {
+            if (n++ % mncpu)    continue;
+            int i1 = bnds0->site1();
+            assert(pq.getPairMask(i0, i1));
+            const int summationscale = -1;
+            pq.addPairContribution(*bnds0, summationscale);
+        }
+        bnds0->selectSite(i0, false);
     }
+    // Add contributions from the new atoms in the updated structure
+    // use direct assignment to avoid the resetValue call from setStructure
+    assert(sd.stru1);
+    pq.mstructure = sd.stru1;
+    int cntsites1 = sd.stru1->countSites();
+    BaseBondGeneratorPtr bnds1 = sd.stru1->createBondGenerator();
+    bnds1->selectSiteRange(0, cntsites1);
+    std::vector<int>::const_iterator ii1;
+    for (ii1 = sd.add1.begin(); ii1 != sd.add1.end(); ++ii1)
+    {
+        bnds1->selectSite(*ii1, false);
+    }
+    for (ii1 = sd.add1.begin(); ii1 != sd.add1.end(); ++ii1)
+    {
+        const int& i0 = *ii1;
+        bnds1->selectAnchorSite(i0);
+        bnds1->selectSite(i0, true);
+        for (bnds1->rewind(); !bnds1->finished(); bnds1->next())
+        {
+            if (n++ % mncpu)    continue;
+            int i1 = bnds1->site1();
+            assert(pq.getPairMask(i0, i1));
+            const int summationscale = +1;
+            pq.addPairContribution(*bnds1, summationscale);
+        }
+    }
+    mvalue0 = pq.value();
+    mstructure0 = pq.mstructure;
 }
 
 // Factory for PairQuantity evaluators ---------------------------------------

@@ -97,15 +97,12 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
         StructureAdapterPtr mstructure0;
         /// last evaluated value
         QuantityType mvalue0;
-
-
 };
 
 
 // Factory function for PairQuantity evaluators ------------------------------
 
 PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp);
-
 
 }   // namespace srreal
 }   // namespace diffpy

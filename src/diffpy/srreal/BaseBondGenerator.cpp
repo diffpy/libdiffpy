@@ -98,9 +98,9 @@ void BaseBondGenerator::selectSiteRange(int first, int last)
 }
 
 
-void BaseBondGenerator::skipSite(int skipindex)
+void BaseBondGenerator::selectSite(int siteindex, bool select)
 {
-    msite_selected[skipindex] = false;
+    msite_selected[siteindex] = select;
 }
 
 void BaseBondGenerator::setRmin(double rmin)

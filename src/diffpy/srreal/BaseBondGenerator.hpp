@@ -47,7 +47,7 @@ class BaseBondGenerator
         // configuration
         void selectAnchorSite(int);
         void selectSiteRange(int first, int last);
-        void skipSite(int);
+        void selectSite(int, bool);
         virtual void setRmin(double);
         virtual void setRmax(double);
 
