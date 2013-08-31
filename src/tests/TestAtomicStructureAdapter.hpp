@@ -22,8 +22,10 @@
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
 
+namespace diffpy {
+namespace srreal {
+
 using namespace std;
-using namespace diffpy::srreal;
 
 //////////////////////////////////////////////////////////////////////////////
 // class TestAtomicStructureAdapter
@@ -49,11 +51,16 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
 
         void test_diff()
         {
+            typedef AtomicStructureAdapter::DifferenceMethod DM;
+            const DM& NONE = AtomicStructureAdapter::NONE;
+            const DM& SIDEBYSIDE = AtomicStructureAdapter::SIDEBYSIDE;
+            const DM& SORTED = AtomicStructureAdapter::SORTED;
             StructureDifference sd;
             sd = mstru->diff(emptyStructureAdapter());
             TS_ASSERT(sd.add1.empty());
             TS_ASSERT(!sd.allowsfastupdate());
             sd = mstru->diff(StructureAdapterPtr());
+            TS_ASSERT_EQUALS(NONE, mpstru->mtdiffmethod);
             TS_ASSERT(!sd.allowsfastupdate());
             Atom ai;
             ai.atomtype = "C";
@@ -68,13 +75,21 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
             sd = mstru->diff(mstru);
             TS_ASSERT(sd.allowsfastupdate())
             sd = mstru->diff(cpstru);
+            TS_ASSERT_EQUALS(SIDEBYSIDE, mpstru->mtdiffmethod);
             TS_ASSERT(sd.allowsfastupdate())
             TS_ASSERT(sd.pop0.empty());
             TS_ASSERT(sd.add1.empty());
+            (*cpstru)[0].atomtype = "N";
+            sd = mstru->diff(cpstru);
+            TS_ASSERT_EQUALS(SIDEBYSIDE, mpstru->mtdiffmethod);
+            TS_ASSERT(sd.allowsfastupdate())
+            TS_ASSERT_EQUALS(1u, sd.pop0.size());
+            TS_ASSERT_EQUALS(1u, sd.add1.size());
             for (int i = 1; i < (1 - sqrt(0.5)) * SZ; ++i)
             {
                 cpstru->remove(0);
                 sd = mstru->diff(cpstru);
+                TS_ASSERT_EQUALS(SORTED, mpstru->mtdiffmethod);
                 TS_ASSERT(sd.allowsfastupdate());
                 TS_ASSERT_EQUALS(i, int(sd.pop0.size()));
                 TS_ASSERT(sd.add1.empty());
@@ -96,5 +111,10 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
         { }
 
 };  // class TestAtomicStructureAdapter
+
+}   // namespace srreal
+}   // namespace diffpy
+
+using diffpy::srreal::TestAtomicStructureAdapter;
 
 // End of file

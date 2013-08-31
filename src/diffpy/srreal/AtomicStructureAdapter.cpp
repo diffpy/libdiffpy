@@ -76,6 +76,12 @@ bool operator==(const Atom& a0, const Atom& a1)
 }
 
 
+bool operator!=(const Atom& a0, const Atom& a1)
+{
+    return !(a0 == a1);
+}
+
+
 size_t hash_value(const Atom& a)
 {
     size_t seed = 0;
@@ -158,6 +164,7 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
     using std::min;
     typedef boost::shared_ptr<const class AtomicStructureAdapter> Ptr;
+    mtdiffmethod = NONE;
     StructureDifference sd(this->shared_from_this(), other);
     if (sd.stru0 == sd.stru1)  return sd;
     Ptr pstru0 = boost::static_pointer_cast<Ptr::element_type>(sd.stru0);
@@ -167,7 +174,27 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
     assert(pstru1);
     const AtomicStructureAdapter& astru0 = *pstru0;
     const AtomicStructureAdapter& astru1 = *pstru1;
-    // build sorted vectors of atoms in stru0 and stru1
+    // try fast side-by-side comparison for equal length structures
+    if (astru0.countSites() == astru1.countSites())
+    {
+        mtdiffmethod = SIDEBYSIDE;
+        std::vector<Atom>::const_iterator ai0 = astru0.matoms.begin();
+        std::vector<Atom>::const_iterator ai1 = astru1.matoms.begin();
+        for (int i = 0; ai0 != astru0.matoms.end(); ++i, ++ai0, ++ai1)
+        {
+            if (*ai0 != *ai1)
+            {
+                sd.pop0.push_back(i);
+                sd.add1.push_back(i);
+            }
+            if (!sd.allowsfastupdate())  break;
+        }
+        if (sd.allowsfastupdate())  return sd;
+    }
+    // here the structures are either of different length or differ too much
+    // when compared side by side.
+    // let's build sorted vectors of atoms in stru0 and stru1
+    mtdiffmethod = SORTED;
     std::vector<atomindex> satoms0, satoms1;
     satoms0.reserve(astru0.countSites());
     std::vector<Atom>::const_iterator ai = astru0.matoms.begin();

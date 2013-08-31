@@ -68,6 +68,7 @@ class Atom
 
 bool operator<(const Atom&, const Atom&);
 bool operator==(const Atom&, const Atom&);
+bool operator!=(const Atom&, const Atom&);
 size_t hash_value(const Atom&);
 
 
@@ -96,6 +97,11 @@ class AtomicStructureAdapter : public StructureAdapter
 
         // data
         std::vector<Atom> matoms;
+
+        // testing
+        friend class TestAtomicStructureAdapter;
+        enum DifferenceMethod {NONE, SIDEBYSIDE, SORTED};
+        mutable DifferenceMethod mtdiffmethod;
 
         // serialization
         friend class boost::serialization::access;
