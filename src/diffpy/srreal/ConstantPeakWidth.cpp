@@ -63,7 +63,7 @@ double ConstantPeakWidth::calculate(const BaseBondGenerator& bnds) const
 
 
 double ConstantPeakWidth::maxWidth(
-        StructureAdapterPtr stru, double rmin, double rmax) const
+        StructureAdapterConstPtr stru, double rmin, double rmax) const
 {
     return this->getWidth();
 }

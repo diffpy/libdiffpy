@@ -57,7 +57,8 @@ class PairQuantity : public diffpy::Attributes
         // configuration
         template <class T> void setStructure(const T&);
         void setStructure(StructureAdapterPtr);
-        const StructureAdapterPtr& getStructure() const;
+        void setStructure(StructureAdapterConstPtr);
+        const StructureAdapterConstPtr& getStructure() const;
         virtual void setRmin(double);
         const double& getRmin() const;
         virtual void setRmax(double);
@@ -90,7 +91,7 @@ class PairQuantity : public diffpy::Attributes
         typedef boost::unordered_map<
             std::pair<std::string,std::string>, bool> TypeMaskStorage;
         QuantityType mvalue;
-        StructureAdapterPtr mstructure;
+        StructureAdapterConstPtr mstructure;
         double mrmin;
         double mrmax;
         PQEvaluatorPtr mevaluator;

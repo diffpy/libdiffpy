@@ -111,7 +111,7 @@ double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
         bool anisotropy=true);
 
 /// Maximum diagonal Uii element from all atoms in the structure.
-double maxUii(StructureAdapterPtr stru);
+double maxUii(StructureAdapterConstPtr stru);
 
 /// Return bare element symbol from atom symbol that may be isotope or ion,
 /// for example "Ca2+" or "12-C".
@@ -123,7 +123,7 @@ int atomValence(const std::string& atomtype);
 /// Translate an index container to a vector of string symbols
 template <class T>
 std::vector<std::string>
-siteIndicesToTypes(const StructureAdapterPtr& stru, const T& indices)
+siteIndicesToTypes(const StructureAdapterConstPtr& stru, const T& indices)
 {
     std::vector<std::string> rv;
     rv.reserve(stru->countSites());

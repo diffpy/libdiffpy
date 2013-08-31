@@ -94,11 +94,10 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
 
         // data
         /// last structure used for evaluation
-        StructureAdapterPtr mstructure0;
+        StructureAdapterConstPtr mstructure0;
         /// last evaluated value
         QuantityType mvalue0;
 };
-
 
 // Factory function for PairQuantity evaluators ------------------------------
 

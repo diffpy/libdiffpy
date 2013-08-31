@@ -57,7 +57,7 @@ const QuantityType& PairQuantity::eval()
 }
 
 
-void PairQuantity::setStructure(StructureAdapterPtr stru)
+void PairQuantity::setStructure(StructureAdapterConstPtr stru)
 {
     mstructure = stru.get() ? stru : emptyStructureAdapter();
     mstructure->customPQConfig(this);
@@ -66,7 +66,14 @@ void PairQuantity::setStructure(StructureAdapterPtr stru)
 }
 
 
-const StructureAdapterPtr& PairQuantity::getStructure() const
+void PairQuantity::setStructure(StructureAdapterPtr stru)
+{
+    StructureAdapterConstPtr cstru = stru;
+    this->setStructure(cstru);
+}
+
+
+const StructureAdapterConstPtr& PairQuantity::getStructure() const
 {
     return mstructure;
 }
