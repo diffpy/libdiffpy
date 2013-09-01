@@ -97,6 +97,9 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
 
     private:
 
+        // method
+        void storeResults(const PairQuantity&);
+
         // data
         /// last structure used for evaluation
         StructureAdapterConstPtr mstructure0;

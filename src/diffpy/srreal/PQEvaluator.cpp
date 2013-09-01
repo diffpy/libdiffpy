@@ -125,13 +125,22 @@ void PQEvaluatorOptimized::reset()
 void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
 {
     mtypeused = OPTIMIZED;
-    // revert to normal calculation if there is no structure
-    if (!mstructure0)  return this->PQEvaluatorBasic::updateValue(pq);
-    // allow fast updates only when there is no mask on the pairs
-    if (pq.hasMask())  return this->PQEvaluatorBasic::updateValue(pq);
+    // revert to normal calculation if there is no structure or
+    // if PairQuantity uses mask
+    if (!mstructure0 || pq.hasMask())
+    {
+        this->PQEvaluatorBasic::updateValue(pq);
+        this->storeResults(pq);
+        return;
+    }
     // do not do fast updates if they take more work
     StructureDifference sd = mstructure0->diff(pq.getStructure());
-    if (!sd.allowsfastupdate())  return this->PQEvaluatorBasic::updateValue(pq);
+    if (!sd.allowsfastupdate())
+    {
+        this->PQEvaluatorBasic::updateValue(pq);
+        this->storeResults(pq);
+        return;
+    }
     // Remove contributions from the extra sites in the old structure
     pq.setStructure(sd.stru0);
     assert(sd.stru0 == pq.mstructure);
@@ -185,6 +194,12 @@ void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
             pq.addPairContribution(*bnds1, summationscale);
         }
     }
+    this->storeResults(pq);
+}
+
+
+void PQEvaluatorOptimized::storeResults(const PairQuantity& pq)
+{
     mvalue0 = pq.value();
     mstructure0 = pq.mstructure;
 }
