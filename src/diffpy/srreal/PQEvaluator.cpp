@@ -60,6 +60,7 @@ PQEvaluatorType PQEvaluatorBasic::typeint() const
 
 void PQEvaluatorBasic::updateValue(PairQuantity& pq)
 {
+    mevaluatortypeused = BASIC;
     BaseBondGeneratorPtr bnds = pq.mstructure->createBondGenerator();
     pq.configureBondGenerator(*bnds);
     int cntsites = pq.mstructure->countSites();
@@ -123,6 +124,7 @@ void PQEvaluatorOptimized::reset()
 
 void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
 {
+    mevaluatortypeused = OPTIMIZED;
     // revert to normal calculation if there is no structure
     if (!mstructure0)  return this->PQEvaluatorBasic::updateValue(pq);
     // allow fast updates only when there is no mask on the pairs

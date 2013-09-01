@@ -68,6 +68,9 @@ class PQEvaluatorBasic
         int mcpuindex;
         /// total number of the CPU units
         int mncpu;
+        // testing
+        /// type of PQEvaluator that was actually used
+        PQEvaluatorType mevaluatortypeused;
 
     private:
 
