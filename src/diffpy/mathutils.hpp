@@ -22,6 +22,7 @@
 #include <limits>
 #include <cmath>
 #include <functional>
+#include <algorithm>
 
 namespace diffpy {
 namespace mathutils {
@@ -67,6 +68,15 @@ class EpsilonCompare : public std::binary_function<double, double, bool>
         double meps;
 };
 
+// compare if all elements in 2 containers are close.
+
+template<class Seq0, class Seq1>
+    bool allclose(const Seq0& v0, const Seq1& v1, double eps=SQRT_DOUBLE_EPS)
+{
+    bool rv = (v0.size() == v1.size()) &&
+        std::equal(v0.begin(), v0.end(), v1.begin(), EpsilonCompare(eps));
+    return rv;
+}
 
 }   // namespace mathutils
 }   // namespace diffpy
