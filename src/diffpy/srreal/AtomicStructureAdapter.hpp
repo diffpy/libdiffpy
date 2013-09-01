@@ -92,6 +92,22 @@ class AtomicStructureAdapter : public StructureAdapter
         void remove(int);
         Atom& operator[](int);
         const Atom& operator[](int) const;
+        template <class Iter>
+            void assign (Iter first, Iter last)  { matoms.assign(first, last); }
+        void assign (size_t n, const Atom& a)  { matoms.assign(n, a); }
+        // iterator forwarding
+        typedef std::vector<Atom>::iterator iterator;
+        typedef std::vector<Atom>::const_iterator const_iterator;
+        typedef std::vector<Atom>::reverse_iterator reverse_iterator;
+        typedef std::vector<Atom>::const_reverse_iterator const_reverse_iterator;
+        iterator begin()  { return matoms.begin(); }
+        iterator end()  { return matoms.end(); }
+        const_iterator begin() const  { return matoms.begin(); }
+        const_iterator end() const  { return matoms.end(); }
+        reverse_iterator rbegin()  { return matoms.rbegin(); }
+        reverse_iterator rend()  { return matoms.rend(); }
+        const_reverse_iterator rbegin() const  { return matoms.rbegin(); }
+        const_reverse_iterator rend() const  { return matoms.rend(); }
 
     private:
 
