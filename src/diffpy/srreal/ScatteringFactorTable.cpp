@@ -23,14 +23,13 @@
 #include <diffpy/validators.hpp>
 
 using namespace std;
-using diffpy::srreal::ScatteringFactorTable;
 using diffpy::validators::ensureNonNull;
-using boost::unordered_map;
-
-// Unique instantiation of the template registry base class.
-template class HasClassRegistry<ScatteringFactorTable>;
 
 namespace diffpy {
+
+// Unique instantiation of the template registry base class.
+template class HasClassRegistry<srreal::ScatteringFactorTable>;
+
 namespace srreal {
 
 // class ScatteringFactorTable -----------------------------------------------

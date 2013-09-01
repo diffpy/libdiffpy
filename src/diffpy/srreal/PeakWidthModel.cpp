@@ -23,13 +23,13 @@
 #include <diffpy/validators.hpp>
 
 using std::string;
-using diffpy::srreal::PeakWidthModel;
 using diffpy::validators::ensureNonNull;
 
-// Unique instantiation of the template registry base class.
-template class HasClassRegistry<PeakWidthModel>;
-
 namespace diffpy {
+
+// Unique instantiation of the template registry base class.
+template class HasClassRegistry<srreal::PeakWidthModel>;
+
 namespace srreal {
 
 // class PeakWidthModelOwner -------------------------------------------------

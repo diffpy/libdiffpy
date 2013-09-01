@@ -25,10 +25,11 @@
 #include <diffpy/srreal/AtomRadiiTable.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 
-// Unique instantiation of the template registry base class.
-template class HasClassRegistry<diffpy::srreal::AtomRadiiTable>;
-
 namespace diffpy {
+
+// Unique instantiation of the template registry base class.
+template class HasClassRegistry<srreal::AtomRadiiTable>;
+
 namespace srreal {
 
 using namespace std;

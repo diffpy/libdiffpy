@@ -19,7 +19,11 @@
 #include <diffpy/srreal/PDFBaseline.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 
+namespace diffpy {
+
 // Unique instantiation of the template registry base class.
-template class HasClassRegistry<diffpy::srreal::PDFBaseline>;
+template class HasClassRegistry<srreal::PDFBaseline>;
+
+}   // namespace diffpy
 
 // End of file

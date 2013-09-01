@@ -21,10 +21,11 @@
 #include <diffpy/srreal/PeakProfile.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 
-// Unique instantiation of the template registry base class.
-template class HasClassRegistry<diffpy::srreal::PeakProfile>;
-
 namespace diffpy {
+
+// Unique instantiation of the template registry base class.
+template class HasClassRegistry<srreal::PeakProfile>;
+
 namespace srreal {
 
 //////////////////////////////////////////////////////////////////////////////

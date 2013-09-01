@@ -25,13 +25,13 @@
 #include <diffpy/validators.hpp>
 
 using namespace std;
-using diffpy::srreal::PDFEnvelope;
 using diffpy::validators::ensureNonNull;
 
-// Unique instantiation of the template registry base class.
-template class HasClassRegistry<PDFEnvelope>;
-
 namespace diffpy {
+
+// Unique instantiation of the template registry base class.
+template class HasClassRegistry<srreal::PDFEnvelope>;
+
 namespace srreal {
 
 // class PDFEnvelopeOwner ----------------------------------------------------
