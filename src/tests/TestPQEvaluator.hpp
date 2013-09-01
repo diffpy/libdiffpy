@@ -29,6 +29,7 @@ namespace diffpy {
 namespace srreal {
 
 using namespace std;
+using diffpy::mathutils::allclose;
 
 //////////////////////////////////////////////////////////////////////////////
 // class TestPQEvaluator
@@ -93,6 +94,14 @@ class TestPQEvaluator : public CxxTest::TestSuite
             go = pdfco.getPDF();
             TS_ASSERT_EQUALS(gb, go);
             TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
+            // test structure with one different atom
+            pdfcb.eval(mstru10d1);
+            pdfco.eval(mstru10d1);
+            QuantityType gb1d = pdfcb.getPDF();
+            QuantityType go1d = pdfco.getPDF();
+            TS_ASSERT(!allclose(gb, gb1d));
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
+            TS_ASSERT(allclose(gb1d, go1d));
         }
 
 };  // class TestPQEvaluator
