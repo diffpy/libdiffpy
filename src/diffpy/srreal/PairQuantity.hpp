@@ -56,6 +56,7 @@ class PairQuantity : public diffpy::Attributes
 
         // configuration
         template <class T> void setStructure(const T&);
+        template <class T> void setStructure(boost::shared_ptr<T>);
         void setStructure(StructureAdapterPtr);
         void setStructure(StructureAdapterConstPtr);
         const StructureAdapterConstPtr& getStructure() const;
@@ -142,6 +143,16 @@ template <class T>
 void PairQuantity::setStructure(const T& stru)
 {
     StructureAdapterPtr bstru = createStructureAdapter(stru);
+    this->setStructure(bstru);
+}
+
+
+template <class T>
+void PairQuantity::setStructure(boost::shared_ptr<T> stru)
+{
+    StructureAdapterPtr bstru =
+        boost::dynamic_pointer_cast<StructureAdapterPtr::element_type>(stru);
+    assert(bstru);
     this->setStructure(bstru);
 }
 
