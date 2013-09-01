@@ -77,6 +77,7 @@ class PairQuantity : public diffpy::Attributes
 
         friend class PQEvaluatorBasic;
         friend class PQEvaluatorOptimized;
+        friend class TestPQEvaluator;
 
         // methods
         virtual void resizeValue(size_t);
