@@ -174,6 +174,8 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
     assert(pstru1);
     const AtomicStructureAdapter& astru0 = *pstru0;
     const AtomicStructureAdapter& astru1 = *pstru1;
+    sd.pop0.reserve(astru0.countSites());
+    sd.add1.reserve(astru1.countSites());
     // try fast side-by-side comparison for equal length structures
     if (astru0.countSites() == astru1.countSites())
     {
@@ -192,7 +194,9 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
         if (sd.allowsfastupdate())  return sd;
     }
     // here the structures are either of different length or differ too much
-    // when compared side by side.
+    // when compared side by side.  Let's start from a blank slate.
+    sd.pop0.clear();
+    sd.add1.clear();
     // let's build sorted vectors of atoms in stru0 and stru1
     mtdiffmethod = SORTED;
     std::vector<atomindex> satoms0, satoms1;
@@ -218,8 +222,6 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
             satoms1.begin(), satoms1.end(),
             symdiffatoms.begin(), cmpatomindex);
     symdiffatoms.erase(ii, symdiffatoms.end());
-    sd.pop0.reserve(min(satoms0.size(), symdiffatoms.size()));
-    sd.add1.reserve(min(satoms1.size(), symdiffatoms.size()));
     for (ii = symdiffatoms.begin(); ii != symdiffatoms.end(); ++ii)
     {
         if (ii->second >= 0)  sd.pop0.push_back(ii->second);
