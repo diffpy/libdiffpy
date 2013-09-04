@@ -54,8 +54,8 @@ class PQEvaluatorBasic
 
         // methods
         virtual PQEvaluatorType typeint() const;
-        virtual void reset()  { }
-        virtual void updateValue(PairQuantity& pq);
+        virtual void uncache()  { }
+        virtual void updateValue(PairQuantity&, StructureAdapterConstPtr);
         void useFullSum(bool flag);
         void setupParallelRun(int cpuindex, int ncpu);
 
@@ -90,21 +90,19 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
 {
     public:
 
+        // constructor
+        PQEvaluatorOptimized();
+
         // methods
         virtual PQEvaluatorType typeint() const;
-        virtual void reset();
-        virtual void updateValue(PairQuantity& pq);
+        virtual void uncache();
+        virtual void updateValue(PairQuantity&, StructureAdapterConstPtr);
 
     private:
 
-        // method
-        void storeResults(const PairQuantity&);
-
         // data
-        /// last structure used for evaluation
-        StructureAdapterConstPtr mstructure0;
-        /// last evaluated value
-        QuantityType mvalue0;
+        /// flag for having an updatable value in PairQuantity
+        bool mvalue_cached;
 };
 
 // Factory function for PairQuantity evaluators ------------------------------

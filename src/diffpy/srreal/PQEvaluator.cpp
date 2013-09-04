@@ -58,9 +58,11 @@ PQEvaluatorType PQEvaluatorBasic::typeint() const
 }
 
 
-void PQEvaluatorBasic::updateValue(PairQuantity& pq)
+void PQEvaluatorBasic::updateValue(
+        PairQuantity& pq, StructureAdapterConstPtr stru)
 {
     mtypeused = BASIC;
+    pq.setStructure(stru);
     BaseBondGeneratorPtr bnds = pq.mstructure->createBondGenerator();
     pq.configureBondGenerator(*bnds);
     int cntsites = pq.mstructure->countSites();
@@ -109,43 +111,46 @@ void PQEvaluatorBasic::setupParallelRun(int cpuindex, int ncpu)
 // class PQEvaluatorOptimized
 //////////////////////////////////////////////////////////////////////////////
 
+PQEvaluatorOptimized::PQEvaluatorOptimized() :
+    PQEvaluatorBasic(),
+    mvalue_cached(false)
+{ }
+
+
 PQEvaluatorType PQEvaluatorOptimized::typeint() const
 {
     return OPTIMIZED;
 }
 
 
-void PQEvaluatorOptimized::reset()
+void PQEvaluatorOptimized::uncache()
 {
-    mstructure0.reset();
-    mvalue0.clear();
+    mvalue_cached = false;
 }
 
 
-void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
+void PQEvaluatorOptimized::updateValue(
+        PairQuantity& pq, StructureAdapterConstPtr stru)
 {
     mtypeused = OPTIMIZED;
     // revert to normal calculation if there is no structure or
     // if PairQuantity uses mask
-    if (!mstructure0 || pq.hasMask())
+    if (!mvalue_cached || !pq.getStructure() || pq.hasMask())
     {
-        this->PQEvaluatorBasic::updateValue(pq);
-        this->storeResults(pq);
+        this->PQEvaluatorBasic::updateValue(pq, stru);
+        mvalue_cached = true;
         return;
     }
     // do not do fast updates if they take more work
-    StructureDifference sd = mstructure0->diff(pq.getStructure());
+    StructureDifference sd = pq.getStructure()->diff(stru);
     if (!sd.allowsfastupdate())
     {
-        this->PQEvaluatorBasic::updateValue(pq);
-        this->storeResults(pq);
+        this->PQEvaluatorBasic::updateValue(pq, stru);
+        mvalue_cached = true;
         return;
     }
     // Remove contributions from the extra sites in the old structure
-    pq.setStructure(sd.stru0);
     assert(sd.stru0 == pq.mstructure);
-    assert(mvalue0.size() == pq.value().size());
-    pq.mvalue = mvalue0;
     int cntsites0 = sd.stru0->countSites();
     BaseBondGeneratorPtr bnds0 = sd.stru0->createBondGenerator();
     // loop counter
@@ -163,15 +168,18 @@ void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
             if (n++ % mncpu)    continue;
             int i1 = bnds0->site1();
             assert(pq.getPairMask(i0, i1));
-            const int summationscale = -1;
+            const int summationscale = (i0 == i1) ? -1 : -2;
             pq.addPairContribution(*bnds0, summationscale);
         }
         bnds0->selectSite(i0, false);
     }
     // Add contributions from the new atoms in the updated structure
-    // use direct assignment to avoid the resetValue call from setStructure
+    // save current value to override the resetValue call from setStructure
     assert(sd.stru1);
-    pq.mstructure = sd.stru1;
+    QuantityType pq_value_partial = pq.value();
+    pq.setStructure(sd.stru1);
+    assert(pq.value().size() == pq_value_partial.size());
+    pq.mvalue = pq_value_partial;
     int cntsites1 = sd.stru1->countSites();
     BaseBondGeneratorPtr bnds1 = sd.stru1->createBondGenerator();
     bnds1->selectSiteRange(0, cntsites1);
@@ -190,18 +198,11 @@ void PQEvaluatorOptimized::updateValue(PairQuantity& pq)
             if (n++ % mncpu)    continue;
             int i1 = bnds1->site1();
             assert(pq.getPairMask(i0, i1));
-            const int summationscale = +1;
+            const int summationscale = (i0 == i1) ? +1 : +2;
             pq.addPairContribution(*bnds1, summationscale);
         }
     }
-    this->storeResults(pq);
-}
-
-
-void PQEvaluatorOptimized::storeResults(const PairQuantity& pq)
-{
-    mvalue0 = pq.value();
-    mstructure0 = pq.mstructure;
+    mvalue_cached = true;
 }
 
 // Factory for PairQuantity evaluators ---------------------------------------

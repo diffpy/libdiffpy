@@ -50,14 +50,13 @@ class PairQuantity : public diffpy::Attributes
         // methods
         const QuantityType& eval();
         template <class T> const QuantityType& eval(const T&);
+        const QuantityType& eval(StructureAdapterConstPtr);
         const QuantityType& value() const;
         void mergeParallelData(const std::string& pdata, int ncpu);
         virtual std::string getParallelData() const;
 
         // configuration
         template <class T> void setStructure(const T&);
-        template <class T> void setStructure(boost::shared_ptr<T>);
-        void setStructure(StructureAdapterPtr);
         void setStructure(StructureAdapterConstPtr);
         const StructureAdapterConstPtr& getStructure() const;
         virtual void setRmin(double);
@@ -137,30 +136,17 @@ class PairQuantity : public diffpy::Attributes
 template <class T>
 const QuantityType& PairQuantity::eval(const T& stru)
 {
-    this->setStructure(stru);
-    mevaluator->updateValue(*this);
-    this->finishValue();
-    return this->value();
+    StructureAdapterConstPtr pstru = convertToStructureAdapter(stru);
+    return this->eval(pstru);
 }
 
 
 template <class T>
 void PairQuantity::setStructure(const T& stru)
 {
-    StructureAdapterPtr bstru = createStructureAdapter(stru);
-    this->setStructure(bstru);
+    StructureAdapterConstPtr pstru = convertToStructureAdapter(stru);
+    this->setStructure(pstru);
 }
-
-
-template <class T>
-void PairQuantity::setStructure(boost::shared_ptr<T> stru)
-{
-    StructureAdapterPtr bstru =
-        boost::dynamic_pointer_cast<StructureAdapterPtr::element_type>(stru);
-    assert(bstru);
-    this->setStructure(bstru);
-}
-
 
 }   // namespace srreal
 }   // namespace diffpy

@@ -57,19 +57,20 @@ const QuantityType& PairQuantity::eval()
 }
 
 
+const QuantityType& PairQuantity::eval(StructureAdapterConstPtr stru)
+{
+    mevaluator->updateValue(*this, stru);
+    this->finishValue();
+    return this->value();
+}
+
+
 void PairQuantity::setStructure(StructureAdapterConstPtr stru)
 {
     mstructure = stru.get() ? stru : emptyStructureAdapter();
     mstructure->customPQConfig(this);
     this->updateMaskData();
     this->resetValue();
-}
-
-
-void PairQuantity::setStructure(StructureAdapterPtr stru)
-{
-    StructureAdapterConstPtr cstru = stru;
-    this->setStructure(cstru);
 }
 
 

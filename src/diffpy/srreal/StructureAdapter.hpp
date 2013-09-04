@@ -136,6 +136,29 @@ siteIndicesToTypes(const StructureAdapterConstPtr& stru, const T& indices)
     return rv;
 }
 
+/// Convert arbitrary type to StructureAdapterPtr
+template <class T>
+StructureAdapterPtr convertToStructureAdapter(const T& stru)
+{
+    StructureAdapterPtr rv = createStructureAdapter(stru);
+    return rv;
+}
+
+template <class T>
+StructureAdapterPtr convertToStructureAdapter(const boost::shared_ptr<T>& stru)
+{
+    StructureAdapterPtr rv =
+        boost::dynamic_pointer_cast<StructureAdapterPtr::element_type>(stru);
+    assert(rv);
+    return rv;
+}
+
+inline
+StructureAdapterPtr convertToStructureAdapter(StructureAdapterPtr stru)
+{
+    return stru;
+}
+
 }   // namespace srreal
 }   // namespace diffpy
 
