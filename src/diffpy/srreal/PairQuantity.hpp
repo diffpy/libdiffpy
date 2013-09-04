@@ -114,8 +114,12 @@ class PairQuantity : public diffpy::Attributes
         template<class Archive>
             void serialize(Archive& ar, const unsigned int version)
         {
+            // Some boost versions cannot load StructureAdapterConstPtr.
+            // Let's recast as regular pointer when saving or loading.
+            StructureAdapterPtr stru = boost::const_pointer_cast<
+                StructureAdapterPtr::element_type>(mstructure);
             ar & mvalue;
-            ar & mstructure;
+            ar & stru; mstructure = stru;
             ar & mrmin;
             ar & mrmax;
             ar & mevaluator;
