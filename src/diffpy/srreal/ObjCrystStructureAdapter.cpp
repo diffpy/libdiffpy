@@ -235,7 +235,8 @@ getUnitCell(const ObjCryst::Crystal& cryst)
     mvsym.reserve(nbComponent);
     mvuij.reserve(nbComponent);
 
-    typedef std::set<R3::Vector, R3::EpsCompare> SymPosSet;
+    using diffpy::mathutils::EpsilonLess;
+    typedef std::set<R3::Vector, EpsilonLess> SymPosSet;
 
     // Get the symmetry operations
     const std::vector<ObjCryst::SpaceGroup::SMx>& symops =
@@ -258,7 +259,7 @@ getUnitCell(const ObjCryst::Crystal& cryst)
         moccupancies.push_back(sc.mOccupancy);
         manisotropies.push_back(!(sp->IsIsotropic()));
         matomtypes.push_back(sp->GetSymbol());
-        SymPosSet symset = SymPosSet(R3::EpsCompare(mtoler));
+        SymPosSet symset = SymPosSet(EpsilonLess(mtoler));
         SymPosVec symvec = SymPosVec();
         SymUijVec uijvec = SymUijVec();
         size_t numsym = 0;

@@ -58,10 +58,6 @@ template <class V> Vector cross(const V& u, const V& v);
 template <class V> const Vector& mxvecproduct(const Matrix&, const V&);
 template <class V> const Vector& mxvecproduct(const V&, const Matrix&);
 
-class EpsCompare;
-
-template <class T>
-    bool EpsEqual(const T& A, const T& B, double eps=SQRT_DOUBLE_EPS);
 
 // Template functions --------------------------------------------------------
 
@@ -122,46 +118,26 @@ const Vector& mxvecproduct(const V& u, const Matrix& M)
     return res;
 }
 
-
-class EpsCompare
-{
-    public:
-
-        // constructor
-        EpsCompare(double eps) : mepscmp(eps)  { }
-
-        bool operator()(const Vector& u, const Vector& v) const
-        {
-            bool rv = std::lexicographical_compare(
-                    &(u[0]), &(u[0]) + Ndim,
-                    &(v[0]), &(v[0]) + Ndim, mepscmp);
-            return rv;
-        }
-
-        bool operator()(const Matrix& A, const Matrix& B) const
-        {
-            bool rv = std::lexicographical_compare(
-                    A.data(), A.data() + Ndim * Ndim,
-                    B.data(), B.data() + Ndim * Ndim, mepscmp);
-            return rv;
-        }
-
-    private:
-
-        diffpy::mathutils::EpsilonCompare mepscmp;
-};
-
-
-template <class T>
-bool EpsEqual(const T& A, const T& B, double eps)
-{
-    EpsCompare epscmp(eps);
-    return !epscmp(A, B) && !epscmp(B, A);
-}
-
-
 }   // namespace R3
 }   // namespace srreal
+
+namespace mathutils {
+
+// Template specializations --------------------------------------------------
+
+template<>
+bool EpsilonLess::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
+        const srreal::R3::Matrix& A, const srreal::R3::Matrix& B) const;
+
+template<>
+bool EpsilonEqual::operator()<srreal::R3::Vector, srreal::R3::Vector>(
+        const srreal::R3::Vector& u, const srreal::R3::Vector& v) const;
+
+template<>
+bool EpsilonEqual::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
+        const srreal::R3::Matrix& A, const srreal::R3::Matrix& B) const;
+
+}   // namespace mathutils
 }   // namespace diffpy
 
 namespace blitz {
@@ -175,8 +151,8 @@ bool operator==(const diffpy::srreal::R3::Vector& u,
     diffpy::srreal::R3::Vector::const_iterator pu = u.begin();
     diffpy::srreal::R3::Vector::const_iterator pv = v.begin();
     bool rv = (pu == pv) || (
-            *pu++ == *pv++ && 
-            *pu++ == *pv++ && 
+            *pu++ == *pv++ &&
+            *pu++ == *pv++ &&
             *pu++ == *pv++
             );
     return rv;
@@ -199,7 +175,7 @@ bool operator==(const diffpy::srreal::R3::Matrix& A,
 size_t hash_value(const diffpy::srreal::R3::Vector& v);
 size_t hash_value(const diffpy::srreal::R3::Matrix& A);
 
-}
+}   // namespace blitz
 
 // Serialization -------------------------------------------------------------
 

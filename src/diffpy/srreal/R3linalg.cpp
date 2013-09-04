@@ -92,6 +92,43 @@ R3::Matrix R3::transpose(const R3::Matrix& A)
 
 
 }   // namespace srreal
+
+namespace mathutils {
+
+// EpsilonLess specialization ------------------------------------------------
+
+template<>
+bool EpsilonLess::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
+        const srreal::R3::Matrix& A, const srreal::R3::Matrix& B) const
+{
+    using srreal::R3::Ndim;
+    bool rv = std::lexicographical_compare(
+            A.data(), A.data() + Ndim * Ndim,
+            B.data(), B.data() + Ndim * Ndim, *this);
+    return rv;
+}
+
+// EpsilonEqual specializations ----------------------------------------------
+
+template<>
+bool EpsilonEqual::operator()<srreal::R3::Vector, srreal::R3::Vector>(
+        const srreal::R3::Vector& u, const srreal::R3::Vector& v) const
+{
+    bool rv = std::equal(u.begin(), u.end(), v.begin(), *this);
+    return rv;
+}
+
+
+template<>
+bool EpsilonEqual::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
+        const srreal::R3::Matrix& A, const srreal::R3::Matrix& B) const
+{
+    using srreal::R3::Ndim;
+    bool rv = std::equal(A.data(), A.data() + Ndim * Ndim, B.data(), *this);
+    return rv;
+}
+
+}   // namespace mathutils
 }   // namespace diffpy
 
 namespace blitz {

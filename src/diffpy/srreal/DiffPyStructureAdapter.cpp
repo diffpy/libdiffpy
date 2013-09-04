@@ -252,8 +252,9 @@ void DiffPyStructureAdapter::fetchPythonData(python::object dpstru)
 
 bool DiffPyStructureAdapter::isPeriodic() const
 {
+    const diffpy::mathutils::EpsilonEqual allclose;
     const Lattice& L = this->getLattice();
-    bool rv = !(R3::EpsEqual(R3::identity(), L.base()));
+    bool rv = !allclose(R3::identity(), L.base());
     return rv;
 }
 

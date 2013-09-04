@@ -29,7 +29,7 @@ namespace diffpy {
 namespace srreal {
 
 using namespace std;
-using diffpy::mathutils::allclose;
+using diffpy::mathutils::EpsilonEqual;
 
 //////////////////////////////////////////////////////////////////////////////
 // class TestPQEvaluator
@@ -39,6 +39,7 @@ class TestPQEvaluator : public CxxTest::TestSuite
 {
     private:
 
+        EpsilonEqual allclose;
         typedef boost::shared_ptr<AtomicStructureAdapter> AtomicAdapterPtr;
         AtomicAdapterPtr mstru10;
         AtomicAdapterPtr mstru10d1;

@@ -47,20 +47,27 @@ bool eps_eq(const double& x, const double& y, double eps=SQRT_DOUBLE_EPS);
 bool eps_gt(const double& x, const double& y, double eps=SQRT_DOUBLE_EPS);
 bool eps_lt(const double& x, const double& y, double eps=SQRT_DOUBLE_EPS);
 
-// binary functor for round-off aware comparison
+// binary functor for round-off aware less-than comparison
 
-class EpsilonCompare : public std::binary_function<double, double, bool>
+class EpsilonLess : public std::binary_function<double, double, bool>
 {
     public:
 
         // constructor
-        EpsilonCompare(double eps=SQRT_DOUBLE_EPS) : meps(eps)  { }
+        EpsilonLess(double eps=SQRT_DOUBLE_EPS) : meps(eps)  { }
 
         // comparison method
-        template <class T1, class T2>
-        bool operator()(const T1& x, const T2& y)
+        bool operator()(const double& x, const double& y) const
         {
             return eps_lt(x, y, meps);
+        }
+        template<class Seq0, class Seq1>
+        bool operator()(const Seq0& v0, const Seq1& v1) const
+        {
+            bool rv = std::lexicographical_compare(
+                    v0.begin(), v0.end(),
+                    v1.begin(), v1.end(), *this);
+            return rv;
         }
 
     private:
@@ -68,15 +75,33 @@ class EpsilonCompare : public std::binary_function<double, double, bool>
         double meps;
 };
 
-// compare if all elements in 2 containers are close.
+// binary functor for round-off aware equality comparison
 
-template<class Seq0, class Seq1>
-    bool allclose(const Seq0& v0, const Seq1& v1, double eps=SQRT_DOUBLE_EPS)
+class EpsilonEqual : public std::binary_function<double, double, bool>
 {
-    bool rv = (v0.size() == v1.size()) &&
-        std::equal(v0.begin(), v0.end(), v1.begin(), EpsilonCompare(eps));
-    return rv;
-}
+    public:
+
+        // constructor
+        EpsilonEqual(double eps=SQRT_DOUBLE_EPS) : meps(eps)  { }
+
+        // comparison method
+        bool operator()(const double& x, const double& y) const
+        {
+            return eps_eq(x, y, meps);
+        }
+        template<class Seq0, class Seq1>
+        bool operator()(const Seq0& v0, const Seq1& v1) const
+        {
+            bool rv = (v0.size() == v1.size()) &&
+                std::equal(v0.begin(), v0.end(), v1.begin(), *this);
+                return rv;
+        }
+
+    private:
+
+        double meps;
+};
+
 
 }   // namespace mathutils
 }   // namespace diffpy

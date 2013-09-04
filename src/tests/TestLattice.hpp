@@ -16,6 +16,7 @@
 
 using namespace std;
 using namespace diffpy::srreal;
+using diffpy::mathutils::EpsilonEqual;
 
 class TestLattice : public CxxTest::TestSuite
 {
@@ -24,6 +25,7 @@ private:
 
     Lattice* lattice;
     double precision;
+    EpsilonEqual allclose;
 
 public:
 
@@ -31,6 +33,7 @@ public:
     {
 	lattice = new Lattice();
         precision = 1.0e-8;
+        allclose = EpsilonEqual(precision);
     }
 
     void tearDown()
@@ -41,7 +44,7 @@ public:
     void test_Lattice()
     {
 	// default lattice should be cartesian
-	TS_ASSERT(R3::EpsEqual(lattice->base(), R3::identity()));
+	TS_ASSERT(allclose(lattice->base(), R3::identity()));
 	// lattice parameters constructor
 	Lattice lattice1(1.0, 2.0, 3.0, 90, 90, 120);
 	R3::Vector va = lattice1.va();
@@ -78,14 +81,12 @@ public:
 	base_check = sqrt(0.75),    -0.5,      0.0,
 		     0.0,           +2.0,      0.0,
 		     0.0,           +0.0,      3.0;
-	TS_ASSERT(R3::EpsEqual(base_check,
-		    lattice->base(), precision) );
+	TS_ASSERT(allclose(base_check, lattice->base()));
 	R3::Matrix recbase_check;
         recbase_check = sqrt(4.0/3),    sqrt(1.0/12),   0.0,
                         0.0,            0.5,            0.0,
                         0.0,            0.0,            1.0/3.0;
-	TS_ASSERT(R3::EpsEqual(recbase_check,
-		    lattice->recbase(), precision) );
+	TS_ASSERT(allclose(recbase_check, lattice->recbase()));
     }
 
     void test_setLatBase()
@@ -109,26 +110,20 @@ public:
 	base_check = va[0], va[1], va[2],
 		     vb[0], vb[1], vb[2],
 		     vc[0], vc[1], vc[2];
-	TS_ASSERT(R3::EpsEqual(base_check,
-		    lattice->base(), precision) );
+	TS_ASSERT(allclose(base_check, lattice->base()));
 	R3::Matrix recbase_check;
 	recbase_check = 0.5,   -0.5,	0.5,
 			0.5,    0.5,   -0.5,
 		       -0.5,	0.5,	0.5;
-	TS_ASSERT(R3::EpsEqual(recbase_check,
-		    lattice->recbase(), precision) );
+	TS_ASSERT(allclose(recbase_check, lattice->recbase()));
         lattice->setLatPar( lattice->a(), lattice->b(), lattice->c(),
 		44.0, 66.0, 88.0 );
-	TS_ASSERT(!R3::EpsEqual(base_check,
-		    lattice->base(), precision) );
-	TS_ASSERT(!R3::EpsEqual(recbase_check,
-		    lattice->recbase(), precision) );
+	TS_ASSERT(!allclose(base_check, lattice->base()));
+	TS_ASSERT(!allclose(recbase_check, lattice->recbase()));
         lattice->setLatPar( lattice->a(), lattice->b(), lattice->c(),
 		60.0, 60.0, 60.0 );
-	TS_ASSERT(R3::EpsEqual(base_check,
-		    lattice->base(), precision) );
-	TS_ASSERT(R3::EpsEqual(recbase_check,
-		    lattice->recbase(), precision) );
+	TS_ASSERT(allclose(base_check, lattice->base()));
+	TS_ASSERT(allclose(recbase_check, lattice->recbase()));
     }
 
     void test_dist()
@@ -160,16 +155,16 @@ public:
         R3::Vector ucv, ucv_check;
         ucv = lattice->ucvCartesian(R3::Vector(0.1, 0.2, 0.3));
         ucv_check = 0.1, 0.2, 0.3;
-        TS_ASSERT(R3::EpsEqual(ucv_check, ucv, precision));
+        TS_ASSERT(allclose(ucv_check, ucv));
         ucv = lattice->ucvCartesian(R3::Vector(1.1, 13.2, -0.7));
-        TS_ASSERT(R3::EpsEqual(ucv_check, ucv, precision));
+        TS_ASSERT(allclose(ucv_check, ucv));
         ucv = lattice->ucvCartesian(R3::Vector(0.5, 0.5, 0.5));
         ucv_check = 0.5, 0.5, 0.5;
-        TS_ASSERT(R3::EpsEqual(ucv_check, ucv, precision));
+        TS_ASSERT(allclose(ucv_check, ucv));
         lattice->setLatPar(13, 17, 19, 37, 41, 47);
         ucv = lattice->ucvCartesian(R3::Vector(100.0, 100.0, 100.0));
         ucv_check = 8.09338442077, 9.55056747225, 30.0389043325;
-        TS_ASSERT(R3::EpsEqual(ucv_check, ucv, precision));
+        TS_ASSERT(allclose(ucv_check, ucv));
     }
 
 };  // class TestLattice
