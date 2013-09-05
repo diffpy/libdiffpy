@@ -70,7 +70,7 @@ class TestPQEvaluator : public CxxTest::TestSuite
             mstru9->remove(9);
         }
 
-        void test_PDFCalculator()
+        void test_PDF_change_atom()
         {
             PDFCalculator pdfcb;
             PDFCalculator pdfco;
@@ -98,11 +98,53 @@ class TestPQEvaluator : public CxxTest::TestSuite
             // test structure with one different atom
             pdfcb.eval(mstru10d1);
             pdfco.eval(mstru10d1);
-            QuantityType gb1d = pdfcb.getPDF();
-            QuantityType go1d = pdfco.getPDF();
-            TS_ASSERT(!allclose(gb, gb1d));
+            QuantityType gb1 = pdfcb.getPDF();
+            QuantityType go1 = pdfco.getPDF();
+            TS_ASSERT(!allclose(gb, gb1));
             TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
-            TS_ASSERT(allclose(gb1d, go1d));
+            TS_ASSERT(allclose(gb1, go1));
+            // change position of 1 atom
+            AtomicAdapterPtr stru10d1s(new AtomicStructureAdapter(*mstru10d1));
+            (*stru10d1s)[0].cartesianposition[1] = 0.5;
+            pdfcb.eval(stru10d1s);
+            pdfco.eval(stru10d1s);
+            QuantityType gb2 = pdfcb.getPDF();
+            QuantityType go2 = pdfco.getPDF();
+            TS_ASSERT(!allclose(gb1, gb2));
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
+            TS_ASSERT(allclose(gb2, go2));
+        }
+
+
+        void test_PDF_reverse_atoms()
+        {
+            PDFCalculator pdfcb;
+            PDFCalculator pdfco;
+            pdfcb.setEvaluator(BASIC);
+            pdfco.setEvaluator(OPTIMIZED);
+            pdfcb.eval(mstru10);
+            pdfco.eval(mstru10);
+            pdfco.eval(mstru10r);
+            QuantityType gb = pdfcb.getPDF();
+            QuantityType go = pdfco.getPDF();
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
+            TS_ASSERT(allclose(gb, go));
+        }
+
+
+        void test_PDF_remove_atom()
+        {
+            PDFCalculator pdfcb;
+            PDFCalculator pdfco;
+            pdfcb.setEvaluator(BASIC);
+            pdfco.setEvaluator(OPTIMIZED);
+            pdfcb.eval(mstru9);
+            pdfco.eval(mstru10);
+            pdfco.eval(mstru9);
+            QuantityType gb = pdfcb.getPDF();
+            QuantityType go = pdfco.getPDF();
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
+            TS_ASSERT(allclose(gb, go));
         }
 
 };  // class TestPQEvaluator
