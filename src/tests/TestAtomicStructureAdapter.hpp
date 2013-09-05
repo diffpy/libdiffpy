@@ -19,6 +19,8 @@
 
 #include <cxxtest/TestSuite.h>
 
+#include <boost/make_shared.hpp>
+
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
 
@@ -35,9 +37,8 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
 {
     private:
 
-        typedef boost::shared_ptr<AtomicStructureAdapter> AtomicAdapterPtr;
         StructureAdapterPtr mstru;
-        AtomicAdapterPtr mpstru;
+        AtomicStructureAdapterPtr mpstru;
 
     public:
 
@@ -70,8 +71,8 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
                 ai.cartesianposition[0] = i;
                 mpstru->append(ai);
             }
-            AtomicAdapterPtr cpstru =
-                AtomicAdapterPtr(new AtomicStructureAdapter(*mpstru));
+            AtomicStructureAdapterPtr cpstru =
+                boost::make_shared<AtomicStructureAdapter>(*mpstru);
             sd = mstru->diff(mstru);
             TS_ASSERT(sd.allowsfastupdate())
             sd = mstru->diff(cpstru);

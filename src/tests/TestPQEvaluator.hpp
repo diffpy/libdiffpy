@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <boost/make_shared.hpp>
 
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
@@ -40,18 +41,17 @@ class TestPQEvaluator : public CxxTest::TestSuite
     private:
 
         EpsilonEqual allclose;
-        typedef boost::shared_ptr<AtomicStructureAdapter> AtomicAdapterPtr;
-        AtomicAdapterPtr mstru10;
-        AtomicAdapterPtr mstru10d1;
-        AtomicAdapterPtr mstru10r;
-        AtomicAdapterPtr mstru9;
+        AtomicStructureAdapterPtr mstru10;
+        AtomicStructureAdapterPtr mstru10d1;
+        AtomicStructureAdapterPtr mstru10r;
+        AtomicStructureAdapterPtr mstru9;
 
      public:
 
         void setUp()
         {
             const int SZ = 10;
-            mstru10.reset(new AtomicStructureAdapter);
+            mstru10 = boost::make_shared<AtomicStructureAdapter>();
             Atom ai;
             ai.atomtype = "C";
             ai.cartesianuij = R3::identity();
@@ -62,11 +62,11 @@ class TestPQEvaluator : public CxxTest::TestSuite
                 ai.cartesianposition[0] = i;
                 mstru10->append(ai);
             }
-            mstru10d1.reset(new AtomicStructureAdapter(*mstru10));
+            mstru10d1 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
             (*mstru10d1)[0].atomtype = "Au";
-            mstru10r.reset(new AtomicStructureAdapter);
+            mstru10r = boost::make_shared<AtomicStructureAdapter>();
             mstru10r->assign(mstru10->rbegin(), mstru10->rend());
-            mstru9.reset(new AtomicStructureAdapter(*mstru10));
+            mstru9 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
             mstru9->remove(9);
         }
 
@@ -104,7 +104,8 @@ class TestPQEvaluator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
             TS_ASSERT(allclose(gb1, go1));
             // change position of 1 atom
-            AtomicAdapterPtr stru10d1s(new AtomicStructureAdapter(*mstru10d1));
+            AtomicStructureAdapterPtr stru10d1s =
+                boost::make_shared<AtomicStructureAdapter>(*mstru10d1);
             (*stru10d1s)[0].cartesianposition[1] = 0.5;
             pdfcb.eval(stru10d1s);
             pdfco.eval(stru10d1s);
