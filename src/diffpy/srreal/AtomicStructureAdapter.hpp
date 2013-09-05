@@ -130,6 +130,8 @@ class AtomicStructureAdapter : public StructureAdapter
 
 };
 
+typedef boost::shared_ptr<AtomicStructureAdapter> AtomicStructureAdapterPtr;
+
 
 class AtomicStructureBondGenerator : public BaseBondGenerator
 {
