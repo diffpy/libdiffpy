@@ -85,8 +85,8 @@ class TestPQEvaluator : public CxxTest::TestSuite
             int cnonzero = count_if(gb.begin(), gb.end(),
                     bind1st(not_equal_to<double>(), 0.0));
             TS_ASSERT(cnonzero);
-            TS_ASSERT_EQUALS(BASIC, pdfcb.mevaluator->typeint());
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->typeint());
+            TS_ASSERT_EQUALS(BASIC, pdfcb.getEvaluatorType());
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorType());
             // first call of pdfco should use the BASIC evaluation
             TS_ASSERT_EQUALS(BASIC, pdfcb.mevaluator->mtypeused);
             TS_ASSERT_EQUALS(BASIC, pdfco.mevaluator->mtypeused);

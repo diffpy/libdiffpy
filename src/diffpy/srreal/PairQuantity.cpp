@@ -140,6 +140,12 @@ void PairQuantity::setEvaluatorType(PQEvaluatorType evtp)
 }
 
 
+PQEvaluatorType PairQuantity::getEvaluatorType() const
+{
+    return mevaluator->typeint();
+}
+
+
 void PairQuantity::setupParallelRun(int cpuindex, int ncpu)
 {
     mevaluator->setupParallelRun(cpuindex, ncpu);
