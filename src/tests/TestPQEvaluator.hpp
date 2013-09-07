@@ -74,8 +74,8 @@ class TestPQEvaluator : public CxxTest::TestSuite
         {
             PDFCalculator pdfcb;
             PDFCalculator pdfco;
-            pdfcb.setEvaluator(BASIC);
-            pdfco.setEvaluator(OPTIMIZED);
+            pdfcb.setEvaluatorType(BASIC);
+            pdfco.setEvaluatorType(OPTIMIZED);
             pdfcb.eval(mstru10);
             pdfco.eval(mstru10);
             QuantityType gb = pdfcb.getPDF();
@@ -121,8 +121,8 @@ class TestPQEvaluator : public CxxTest::TestSuite
         {
             PDFCalculator pdfcb;
             PDFCalculator pdfco;
-            pdfcb.setEvaluator(BASIC);
-            pdfco.setEvaluator(OPTIMIZED);
+            pdfcb.setEvaluatorType(BASIC);
+            pdfco.setEvaluatorType(OPTIMIZED);
             pdfcb.eval(mstru10);
             pdfco.eval(mstru10);
             pdfco.eval(mstru10r);
@@ -137,8 +137,8 @@ class TestPQEvaluator : public CxxTest::TestSuite
         {
             PDFCalculator pdfcb;
             PDFCalculator pdfco;
-            pdfcb.setEvaluator(BASIC);
-            pdfco.setEvaluator(OPTIMIZED);
+            pdfcb.setEvaluatorType(BASIC);
+            pdfco.setEvaluatorType(OPTIMIZED);
             pdfcb.eval(mstru9);
             pdfco.eval(mstru10);
             pdfco.eval(mstru9);

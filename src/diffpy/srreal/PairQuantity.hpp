@@ -63,7 +63,7 @@ class PairQuantity : public diffpy::Attributes
         const double& getRmin() const;
         virtual void setRmax(double);
         const double& getRmax() const;
-        void setEvaluator(PQEvaluatorType evtp);
+        void setEvaluatorType(PQEvaluatorType evtp);
         void setupParallelRun(int cpuindex, int ncpu);
         void maskAllPairs(bool mask);
         void invertMask();

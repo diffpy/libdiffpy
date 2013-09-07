@@ -40,7 +40,7 @@ PairQuantity::PairQuantity() : mstructure(emptyStructureAdapter())
 {
     this->setRmin(0.0);
     this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
-    this->setEvaluator(BASIC);
+    this->setEvaluatorType(BASIC);
     this->maskAllPairs(true);
     // attributes
     this->registerDoubleAttribute("rmin", this,
@@ -132,7 +132,7 @@ const double& PairQuantity::getRmax() const
 }
 
 
-void PairQuantity::setEvaluator(PQEvaluatorType evtp)
+void PairQuantity::setEvaluatorType(PQEvaluatorType evtp)
 {
     if (mevaluator.get() && mevaluator->typeint() == evtp)  return;
     mevaluator = createPQEvaluator(evtp);
