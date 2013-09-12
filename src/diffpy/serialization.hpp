@@ -24,7 +24,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
-/// this macro provides to explicit template instantiation of the serialize
+/// this macro provides explicit template instantiation of the serialize
 /// method for a specified class.
 #define DIFFPY_INSTANTIATE_SERIALIZE(C) \
     template void C::serialize( \
