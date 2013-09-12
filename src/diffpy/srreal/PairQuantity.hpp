@@ -87,7 +87,10 @@ class PairQuantity : public diffpy::Attributes
         virtual void executeParallelMerge(const std::string& pdata);
         virtual void finishValue() { }
         int countSites() const;
+        // support methods for PQEvaluatorOptimized
         bool hasMask() const;
+        virtual void stashPartialValue();
+        virtual void restorePartialValue();
 
         // data
         typedef boost::unordered_map<

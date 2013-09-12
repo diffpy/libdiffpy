@@ -318,6 +318,22 @@ bool PairQuantity::hasMask() const
     return rv;
 }
 
+
+void PairQuantity::stashPartialValue()
+{
+    const char* emsg =
+        "stashPartialValue() is not defined in the calculator class.";
+    throw logic_error(emsg);
+}
+
+
+void PairQuantity::restorePartialValue()
+{
+    const char* emsg =
+        "restorePartialValue() is not defined in the calculator class.";
+    throw logic_error(emsg);
+}
+
 // Private Methods -----------------------------------------------------------
 
 void PairQuantity::updateMaskData()

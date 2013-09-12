@@ -482,6 +482,32 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
     }
 }
 
+
+void PDFCalculator::stashPartialValue()
+{
+    mstashedvalue.value = this->value();
+    mstashedvalue.rclosteps = this->rcalcloSteps();
+}
+
+
+void PDFCalculator::restorePartialValue()
+{
+    assert(!mstashedvalue.value.empty());
+    assert(!mvalue.empty());
+    assert(!count_if(mvalue.begin(), mvalue.end(),
+                bind1st(not_equal_to<double>(), 0.0)));
+    QuantityType::const_iterator si = mstashedvalue.value.begin();
+    QuantityType::const_iterator slast = mstashedvalue.value.end();
+    QuantityType::iterator ti = mvalue.begin();
+    QuantityType::iterator tlast = mvalue.end();
+    int leftshift = this->rcalcloSteps() - mstashedvalue.rclosteps;
+    int sz = mstashedvalue.value.size();
+    if (leftshift >= 0)  si += min(leftshift, sz);
+    else  ti += min(-leftshift, int(mvalue.size()));
+    for (; si != slast && ti != tlast; ++si, ++ti)  *ti = *si;
+    mstashedvalue.value.clear();
+}
+
 // calculation specific
 
 double PDFCalculator::rcalclo() const

@@ -176,10 +176,9 @@ void PQEvaluatorOptimized::updateValue(
     // Add contributions from the new atoms in the updated structure
     // save current value to override the resetValue call from setStructure
     assert(sd.stru1);
-    QuantityType pq_value_partial = pq.value();
+    pq.stashPartialValue();
     pq.setStructure(sd.stru1);
-    assert(pq.value().size() == pq_value_partial.size());
-    pq.mvalue = pq_value_partial;
+    pq.restorePartialValue();
     int cntsites1 = sd.stru1->countSites();
     BaseBondGeneratorPtr bnds1 = sd.stru1->createBondGenerator();
     bnds1->selectSiteRange(0, cntsites1);

@@ -108,6 +108,9 @@ class PDFCalculator :
         virtual void resetValue();
         virtual void configureBondGenerator(BaseBondGenerator&) const;
         virtual void addPairContribution(const BaseBondGenerator&, int);
+        // support for PQEvaluatorOptimized
+        virtual void stashPartialValue();
+        virtual void restorePartialValue();
 
     private:
 
@@ -166,7 +169,11 @@ class PDFCalculator :
             int rcalclosteps;
             int rcalchisteps;
         } mrlimits_cache;
-
+        // support for PQEvaluatorOptimized
+        struct {
+            QuantityType value;
+            int rclosteps;
+        } mstashedvalue;
         // serialization
         friend class boost::serialization::access;
         template<class Archive>
