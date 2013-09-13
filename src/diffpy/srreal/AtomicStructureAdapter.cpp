@@ -14,7 +14,7 @@
 *
 * class AtomicStructureAdapter -- universal structure adapter for
 *     a non-periodic set of atoms.
-
+*
 *****************************************************************************/
 
 #include <cassert>

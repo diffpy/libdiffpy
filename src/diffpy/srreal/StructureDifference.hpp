@@ -14,7 +14,7 @@
 *
 * class StructureDifference for storing differences between two
 * instances of the StructureAdapter class.
-
+*
 * StructureDifference is returned by the StructureAdapter::diff method.
 *
 *****************************************************************************/
