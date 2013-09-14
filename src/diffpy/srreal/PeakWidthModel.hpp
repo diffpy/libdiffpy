@@ -31,6 +31,7 @@
 
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
+#include <diffpy/EventTicker.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 
 namespace diffpy {
@@ -46,6 +47,10 @@ class PeakWidthModel :
         virtual double calculate(const BaseBondGenerator&) const = 0;
         virtual double maxWidth(StructureAdapterConstPtr,
                 double rmin, double rmax) const = 0;
+
+        // data
+        eventticker::EventTicker mticker;
+
 };
 
 

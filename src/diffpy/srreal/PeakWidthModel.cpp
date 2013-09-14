@@ -37,6 +37,7 @@ namespace srreal {
 void PeakWidthModelOwner::setPeakWidthModel(PeakWidthModelPtr pwm)
 {
     ensureNonNull("PeakWidthModel", pwm);
+    if (mpwmodel != pwm)  pwm->mticker.click();
     mpwmodel = pwm;
 }
 
@@ -44,6 +45,7 @@ void PeakWidthModelOwner::setPeakWidthModel(PeakWidthModelPtr pwm)
 void PeakWidthModelOwner::setPeakWidthModelByType(const string& tp)
 {
     mpwmodel = PeakWidthModel::createByType(tp);
+    mpwmodel->mticker.click();
 }
 
 

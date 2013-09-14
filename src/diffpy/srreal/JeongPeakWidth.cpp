@@ -29,11 +29,9 @@ using namespace std;
 
 // Constructors --------------------------------------------------------------
 
-JeongPeakWidth::JeongPeakWidth()
+JeongPeakWidth::JeongPeakWidth() :
+    mdelta1(0.0), mdelta2(0.0), mqbroad(0.0)
 {
-    this->setDelta1(0.0);
-    this->setDelta2(0.0);
-    this->setQbroad(0.0);
     this->registerDoubleAttribute("delta1",
             this, &JeongPeakWidth::getDelta1, &JeongPeakWidth::setDelta1);
     this->registerDoubleAttribute("delta2",
@@ -96,6 +94,7 @@ const double& JeongPeakWidth::getDelta1() const
 
 void JeongPeakWidth::setDelta1(double delta1)
 {
+    if (mdelta1 != delta1)  mticker.click();
     mdelta1 = delta1;
 }
 
@@ -108,6 +107,7 @@ const double& JeongPeakWidth::getDelta2() const
 
 void JeongPeakWidth::setDelta2(double delta2)
 {
+    if (mdelta2 != delta2)  mticker.click();
     mdelta2 = delta2;
 }
 
@@ -120,6 +120,7 @@ const double& JeongPeakWidth::getQbroad() const
 
 void JeongPeakWidth::setQbroad(double qbroad)
 {
+    if (mqbroad != qbroad)  mticker.click();
     mqbroad = qbroad;
 }
 

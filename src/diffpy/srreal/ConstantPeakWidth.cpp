@@ -26,9 +26,8 @@ using namespace std;
 
 // Constructors --------------------------------------------------------------
 
-ConstantPeakWidth::ConstantPeakWidth()
+ConstantPeakWidth::ConstantPeakWidth() : mwidth(0.0)
 {
-    this->setWidth(0.0);
     this->registerDoubleAttribute("width", this,
             &ConstantPeakWidth::getWidth, &ConstantPeakWidth::setWidth);
 }
@@ -78,6 +77,7 @@ const double& ConstantPeakWidth::getWidth() const
 
 void ConstantPeakWidth::setWidth(double width)
 {
+    if (mwidth != width)  mticker.click();
     mwidth = width;
 }
 
