@@ -136,6 +136,7 @@ class PairQuantity : public diffpy::Attributes
             ar & msiteallmask;
             ar & mtypemask;
             ar & mmergedvaluescount;
+            ar & mticker;
         }
 
 };

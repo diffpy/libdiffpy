@@ -126,12 +126,14 @@ void save(Archive& ar,
     using namespace diffpy::srreal;
     std::string tp;
     ScatteringFactorTable::CustomDataStorage dt;
+    diffpy::eventticker::EventTicker tc;
     if (ptr.get())
     {
         tp = ptr->type();
         dt = getsftcustomdata(ptr);
+        tc = ptr->ticker();
     }
-    ar & tp & dt;
+    ar & tp & dt & tc;
 }
 
 
@@ -143,11 +145,13 @@ void load(Archive& ar,
     using namespace diffpy::srreal;
     std::string tp;
     ScatteringFactorTable::CustomDataStorage dt;
-    ar & tp & dt;
+    diffpy::eventticker::EventTicker tc;
+    ar & tp & dt & tc;
     if (!tp.empty())
     {
         ptr = ScatteringFactorTable::createByType(tp);
         setsftcustomdata(ptr, dt);
+        ptr->ticker() = tc;
     }
     else  ptr.reset();
 }

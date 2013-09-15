@@ -82,12 +82,14 @@ void save(Archive& ar,
     using namespace diffpy::attributes;
     std::string tp;
     AttributesDataMap dt;
+    diffpy::eventticker::EventTicker tc;
     if (ptr.get())
     {
         tp = ptr->type();
         dt = saveAttributesData(*ptr);
+        tc = ptr->ticker();
     }
-    ar & tp & dt;
+    ar & tp & dt & tc;
 }
 
 
@@ -100,11 +102,13 @@ void load(Archive& ar,
     using namespace diffpy::srreal;
     std::string tp;
     AttributesDataMap dt;
-    ar & tp & dt;
+    diffpy::eventticker::EventTicker tc;
+    ar & tp & dt & tc;
     if (!tp.empty())
     {
         ptr = PeakProfile::createByType(tp);
         loadAttributesData(*ptr, dt);
+        ptr->ticker() = tc;
     }
     else  ptr.reset();
 }
