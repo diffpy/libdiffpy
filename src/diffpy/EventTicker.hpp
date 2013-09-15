@@ -23,7 +23,8 @@
 #ifndef EVENTTICKER_HPP_INCLUDED
 #define EVENTTICKER_HPP_INCLUDED
 
-#include <utility>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/split_member.hpp>
 
 namespace diffpy {
 namespace eventticker {
@@ -50,10 +51,33 @@ class EventTicker
     private:
 
         // global counter
-        static std::pair<unsigned long,unsigned long> gtick;
+        static std::pair<long, long> gtick;
 
         // data
-        std::pair<unsigned long,unsigned long> mtick;
+        std::pair<long, long> mtick;
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void save(Archive& ar, const unsigned int version) const
+        {
+            ar << mtick << gtick;
+        }
+
+        template<class Archive>
+            void load(Archive& ar, const unsigned int version)
+        {
+            std::pair<long, long> ga;
+            ar >> mtick >> ga;
+            if (ga > gtick)
+            {
+                if (ga.first != gtick.first)  mtick.first = mtick.second = 0;
+                else  mtick.second += gtick.second - ga.second;
+            }
+        }
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
+
 };
 
 }   // namespace eventticker

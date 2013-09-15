@@ -21,6 +21,7 @@
 *****************************************************************************/
 
 #include <diffpy/EventTicker.hpp>
+#include <diffpy/serialization.hpp>
 
 namespace diffpy {
 namespace eventticker {
@@ -79,7 +80,13 @@ bool EventTicker::operator>=(const EventTicker& other) const
 
 // Static Global Data --------------------------------------------------------
 
-std::pair<unsigned long, unsigned long> EventTicker::gtick(0, 0);
+std::pair<long, long> EventTicker::gtick(0, 0);
 
 }   // namespace eventticker
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::eventticker::EventTicker)
+
+// End of file

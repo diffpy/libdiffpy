@@ -124,7 +124,7 @@ void PQEvaluatorOptimized::updateValue(
     mtypeused = OPTIMIZED;
     // revert to normal calculation if there is no structure or
     // if PairQuantity uses mask
-    if (pq.ticker() > mvalue_ticker || !pq.getStructure() || pq.hasMask())
+    if (pq.ticker() >= mvalue_ticker || !pq.getStructure() || pq.hasMask())
     {
         this->PQEvaluatorBasic::updateValue(pq, stru);
         return;
