@@ -30,6 +30,7 @@
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/export.hpp>
 
+#include <diffpy/EventTicker.hpp>
 #include <diffpy/srreal/QuantityType.hpp>
 #include <diffpy/srreal/forwardtypes.hpp>
 
@@ -54,7 +55,6 @@ class PQEvaluatorBasic
 
         // methods
         virtual PQEvaluatorType typeint() const;
-        virtual void uncache()  { }
         virtual void updateValue(PairQuantity&, StructureAdapterConstPtr);
         void useFullSum(bool flag);
         void setupParallelRun(int cpuindex, int ncpu);
@@ -68,6 +68,8 @@ class PQEvaluatorBasic
         int mcpuindex;
         /// total number of the CPU units
         int mncpu;
+        /// ticker for recording when was the value updated
+        eventticker::EventTicker mvalue_ticker;
 
         // testing
         friend class TestPQEvaluator;
@@ -90,19 +92,10 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
 {
     public:
 
-        // constructor
-        PQEvaluatorOptimized();
-
         // methods
         virtual PQEvaluatorType typeint() const;
-        virtual void uncache();
         virtual void updateValue(PairQuantity&, StructureAdapterConstPtr);
 
-    private:
-
-        // data
-        /// flag for having an updatable value in PairQuantity
-        bool mvalue_cached;
 };
 
 // Factory function for PairQuantity evaluators ------------------------------

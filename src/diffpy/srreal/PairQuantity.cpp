@@ -321,12 +321,6 @@ bool PairQuantity::hasMask() const
 }
 
 
-void PairQuantity::clearEvaluatorCache()
-{
-    mevaluator->uncache();
-}
-
-
 void PairQuantity::stashPartialValue()
 {
     const char* emsg =

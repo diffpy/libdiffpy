@@ -86,6 +86,7 @@ void PQEvaluatorBasic::updateValue(
             pq.addPairContribution(*bnds, summationscale);
         }
     }
+    mvalue_ticker.click();
 }
 
 
@@ -111,21 +112,9 @@ void PQEvaluatorBasic::setupParallelRun(int cpuindex, int ncpu)
 // class PQEvaluatorOptimized
 //////////////////////////////////////////////////////////////////////////////
 
-PQEvaluatorOptimized::PQEvaluatorOptimized() :
-    PQEvaluatorBasic(),
-    mvalue_cached(false)
-{ }
-
-
 PQEvaluatorType PQEvaluatorOptimized::typeint() const
 {
     return OPTIMIZED;
-}
-
-
-void PQEvaluatorOptimized::uncache()
-{
-    mvalue_cached = false;
 }
 
 
@@ -135,10 +124,9 @@ void PQEvaluatorOptimized::updateValue(
     mtypeused = OPTIMIZED;
     // revert to normal calculation if there is no structure or
     // if PairQuantity uses mask
-    if (!mvalue_cached || !pq.getStructure() || pq.hasMask())
+    if (pq.ticker() > mvalue_ticker || !pq.getStructure() || pq.hasMask())
     {
         this->PQEvaluatorBasic::updateValue(pq, stru);
-        mvalue_cached = true;
         return;
     }
     // do not do fast updates if they take more work
@@ -146,7 +134,6 @@ void PQEvaluatorOptimized::updateValue(
     if (!sd.allowsfastupdate())
     {
         this->PQEvaluatorBasic::updateValue(pq, stru);
-        mvalue_cached = true;
         return;
     }
     // Remove contributions from the extra sites in the old structure
@@ -201,7 +188,7 @@ void PQEvaluatorOptimized::updateValue(
             pq.addPairContribution(*bnds1, summationscale);
         }
     }
-    mvalue_cached = true;
+    mvalue_ticker.click();
 }
 
 // Factory for PairQuantity evaluators ---------------------------------------

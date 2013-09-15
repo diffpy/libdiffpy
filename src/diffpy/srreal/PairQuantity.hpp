@@ -93,7 +93,6 @@ class PairQuantity : public diffpy::Attributes
         int countSites() const;
         // support methods for PQEvaluatorOptimized
         bool hasMask() const;
-        void clearEvaluatorCache();
         virtual void stashPartialValue();
         virtual void restorePartialValue();
 
