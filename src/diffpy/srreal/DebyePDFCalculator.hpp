@@ -65,6 +65,9 @@ class DebyePDFCalculator :
         // constructor
         DebyePDFCalculator();
 
+        // PairQuantity overloads
+        virtual eventticker::EventTicker& ticker() const;
+
         // results
         /// PDF on the specified r-grid
         QuantityType getPDF() const;
@@ -72,8 +75,8 @@ class DebyePDFCalculator :
         QuantityType getRDFperR() const;
 
         // Q-range configuration
-        virtual void setQmin(double);
-        virtual const double& getQmin() const;
+        void setQmin(double);
+        const double& getQmin() const;
         virtual void setQstep(double);
         void setOptimumQstep();
         bool isOptimumQstep() const;

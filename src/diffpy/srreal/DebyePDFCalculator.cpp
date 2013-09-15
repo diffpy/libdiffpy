@@ -81,6 +81,20 @@ DebyePDFCalculator::DebyePDFCalculator()
 
 // Public Methods ------------------------------------------------------------
 
+// PairQuantity overloads
+
+eventticker::EventTicker& DebyePDFCalculator::ticker() const
+{
+    // collect composite tickers for the BaseDebyeSum parent class
+    eventticker::EventTicker& tic = this->BaseDebyeSum::ticker();
+    assert(&mticker == &tic);
+    const ScatteringFactorTablePtr& sftb = this->getScatteringFactorTable();
+    if (sftb)  mticker.updateFrom(sftb->ticker());
+    return mticker;
+}
+
+// results
+
 QuantityType DebyePDFCalculator::getPDF() const
 {
     QuantityType rgrid = this->getRgrid();
@@ -110,6 +124,8 @@ QuantityType DebyePDFCalculator::getRDFperR() const
 
 void DebyePDFCalculator::setQmin(double qmin)
 {
+    // NOTE: do not update ticker here, because the actual
+    // Debye summation is always conducted from Qmin=0.
     ensureNonNegative("Qmin", qmin);
     this->BaseDebyeSum::setQmin(0.0);
     mqminpdf = qmin;
@@ -168,6 +184,8 @@ void DebyePDFCalculator::setRmax(double rmax)
 
 void DebyePDFCalculator::setRstep(double rstep)
 {
+    // NOTE: do not update ticker here, rstep is only used in the FFT
+    // and not in the Debye summation.
     ensureEpsilonPositive("Rstep", rstep);
     mrstep = rstep;
 }
@@ -182,6 +200,7 @@ const double& DebyePDFCalculator::getRstep() const
 void DebyePDFCalculator::setMaxExtension(double maxextension)
 {
     ensureNonNegative("maxextension", maxextension);
+    if (mmaxextension != maxextension)  mticker.click();
     mmaxextension = maxextension;
 }
 
