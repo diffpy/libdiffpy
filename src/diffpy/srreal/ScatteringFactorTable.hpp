@@ -28,6 +28,7 @@
 
 #include <diffpy/boostextensions/serialize_unordered_map.hpp>
 #include <diffpy/HasClassRegistry.hpp>
+#include <diffpy/EventTicker.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -50,12 +51,14 @@ class ScatteringFactorTable :
 
         typedef boost::unordered_map<std::string,
                 std::pair<std::string, double> > CustomDataStorage;
+        virtual eventticker::EventTicker& ticker() const  { return mticker; }
 
     protected:
 
         // data
         CustomDataStorage mcustom;
         mutable boost::unordered_map<std::string, double> mqzerocache;
+        mutable eventticker::EventTicker mticker;
 
         // serialization helpers for accessing mcustom
         friend const CustomDataStorage& getsftcustomdata(const SharedPtr&);

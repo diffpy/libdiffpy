@@ -66,6 +66,7 @@ void ScatteringFactorTable::setCustomAs(
     const double scale = 1.0;
     mcustom[smbl] = make_pair(srcsmbl, scale);
     mqzerocache.erase(smbl);
+    mticker.click();
 }
 
 
@@ -77,11 +78,13 @@ void ScatteringFactorTable::setCustomAs(
     double scale = value / fsrc;
     mcustom[smbl] = make_pair(srcsmbl, scale);
     mqzerocache.erase(smbl);
+    mticker.click();
 }
 
 
 void ScatteringFactorTable::resetCustom(const string& smbl)
 {
+    if (mcustom.count(smbl))  mticker.click();
     mcustom.erase(smbl);
     mqzerocache.erase(smbl);
 }
@@ -89,6 +92,7 @@ void ScatteringFactorTable::resetCustom(const string& smbl)
 
 void ScatteringFactorTable::resetAll()
 {
+    if (!mcustom.empty())  mticker.click();
     mcustom.clear();
     mqzerocache.clear();
 }
@@ -111,6 +115,7 @@ void ScatteringFactorTableOwner::setScatteringFactorTable(
         ScatteringFactorTablePtr sft)
 {
     ensureNonNull("ScatteringFactorTable", sft);
+    if (msftable != sft)  sft->ticker().click();
     msftable = sft;
 }
 
@@ -119,6 +124,7 @@ void ScatteringFactorTableOwner::setScatteringFactorTableByType(
         const string& tp)
 {
     msftable = ScatteringFactorTable::createByType(tp);
+    msftable->ticker().click();
 }
 
 
