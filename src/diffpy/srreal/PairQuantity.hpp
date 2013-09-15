@@ -29,6 +29,7 @@
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/QuantityType.hpp>
 #include <diffpy/Attributes.hpp>
+#include <diffpy/EventTicker.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -73,6 +74,9 @@ class PairQuantity : public diffpy::Attributes
         void setTypeMask(std::string, std::string, bool mask);
         bool getTypeMask(const std::string&, const std::string&) const;
 
+        // ticker for any updates in configuration
+        virtual eventticker::EventTicker& ticker() const  { return mticker; }
+
     protected:
 
         friend class PQEvaluatorBasic;
@@ -106,6 +110,7 @@ class PairQuantity : public diffpy::Attributes
         boost::unordered_map<int, bool> msiteallmask;
         TypeMaskStorage mtypemask;
         int mmergedvaluescount;
+        mutable eventticker::EventTicker mticker;
 
     private:
 

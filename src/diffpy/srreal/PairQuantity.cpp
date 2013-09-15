@@ -110,6 +110,7 @@ string PairQuantity::getParallelData() const
 
 void PairQuantity::setRmin(double rmin)
 {
+    if (mrmin != rmin)  mticker.click();
     mrmin = rmin;
 }
 
@@ -122,6 +123,7 @@ const double& PairQuantity::getRmin() const
 
 void PairQuantity::setRmax(double rmax)
 {
+    if (mrmax != rmax)  mticker.click();
     mrmax = rmax;
 }
 
