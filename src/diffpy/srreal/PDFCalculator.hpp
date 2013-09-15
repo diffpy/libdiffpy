@@ -40,6 +40,9 @@ class PDFCalculator :
         // constructor
         PDFCalculator();
 
+        // PairQuantity overloads
+        virtual eventticker::EventTicker& ticker() const;
+
         // results
         QuantityType getPDF() const;
         QuantityType getRDF() const;

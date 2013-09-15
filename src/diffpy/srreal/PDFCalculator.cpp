@@ -80,6 +80,19 @@ PDFCalculator::PDFCalculator()
 
 // Public Methods ------------------------------------------------------------
 
+// PairQuantity overloads
+
+eventticker::EventTicker& PDFCalculator::ticker() const
+{
+    const PeakWidthModelPtr& pwm = this->getPeakWidthModel();
+    if (pwm)  mticker.updateFrom(pwm->ticker());
+    const ScatteringFactorTablePtr& sftb = this->getScatteringFactorTable();
+    if (sftb)  mticker.updateFrom(sftb->ticker());
+    const PeakProfilePtr& ppkf = this->getPeakProfile();
+    if (ppkf)  mticker.updateFrom(ppkf->ticker());
+    return mticker;
+}
+
 // results
 
 QuantityType PDFCalculator::getPDF() const
@@ -229,7 +242,9 @@ const double& PDFCalculator::getQmin() const
 void PDFCalculator::setQmax(double qmax)
 {
     ensureNonNegative("Qmax", qmax);
-    mqmax = (qmax > 0.0) ? qmax : DOUBLE_MAX;
+    double qmax1 = (qmax > 0.0) ? qmax : DOUBLE_MAX;
+    if (qmax1 < mqmax)  mticker.click();
+    mqmax = qmax1;
 }
 
 
@@ -277,6 +292,7 @@ void PDFCalculator::setRmax(double rmax)
 void PDFCalculator::setRstep(double rstep)
 {
     ensureEpsilonPositive("Rstep", rstep);
+    if (mrstep != rstep)  mticker.click();
     mrstep = rstep;
 }
 
@@ -290,6 +306,7 @@ const double& PDFCalculator::getRstep() const
 void PDFCalculator::setMaxExtension(double maxextension)
 {
     ensureNonNegative("maxextension", maxextension);
+    if (mmaxextension != maxextension)  mticker.click();
     mmaxextension = maxextension;
 }
 
@@ -318,6 +335,7 @@ double PDFCalculator::getExtendedRmax() const
 void PDFCalculator::setPeakProfile(PeakProfilePtr pkf)
 {
     ensureNonNull("PeakProfile", pkf);
+    if (mpeakprofile != pkf)  pkf->ticker().click();
     mpeakprofile = pkf;
 }
 
@@ -329,7 +347,7 @@ void PDFCalculator::setPeakProfileByType(const string& tp)
     {
         pkf->setPrecision(mpeakprofile->getPrecision());
     }
-    mpeakprofile = pkf;
+    this->setPeakProfile(pkf);
 }
 
 
