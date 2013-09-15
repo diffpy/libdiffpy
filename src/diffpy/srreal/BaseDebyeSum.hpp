@@ -35,6 +35,9 @@ class BaseDebyeSum :
         // constructor
         BaseDebyeSum();
 
+        // PairQuantity overloads
+        virtual eventticker::EventTicker& ticker() const;
+
         // results
         /// F values on a full Q-grid starting at 0
         QuantityType getF() const;

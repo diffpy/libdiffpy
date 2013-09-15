@@ -62,6 +62,15 @@ BaseDebyeSum::BaseDebyeSum()
 
 // Public Methods ------------------------------------------------------------
 
+// PairQuantity overloads
+
+eventticker::EventTicker& BaseDebyeSum::ticker() const
+{
+    const PeakWidthModelPtr& pwm = this->getPeakWidthModel();
+    if (pwm)  mticker.updateFrom(pwm->ticker());
+    return mticker;
+}
+
 // results
 
 QuantityType BaseDebyeSum::getF() const
@@ -91,6 +100,7 @@ QuantityType BaseDebyeSum::getQgrid() const
 void BaseDebyeSum::setQmin(double qmin)
 {
     ensureNonNegative("Qmin", qmin);
+    if (mqmin != qmin)  mticker.click();
     mqmin = qmin;
 }
 
@@ -104,6 +114,7 @@ const double& BaseDebyeSum::getQmin() const
 void BaseDebyeSum::setQmax(double qmax)
 {
     ensureNonNegative("Qmax", qmax);
+    if (mqmax != qmax)  mticker.click();
     mqmax = qmax;
 }
 
@@ -117,6 +128,7 @@ const double& BaseDebyeSum::getQmax() const
 void BaseDebyeSum::setQstep(double qstep)
 {
     ensureEpsilonPositive("Qstep", qstep);
+    if (mqstep != qstep)  mticker.click();
     mqstep = qstep;
 }
 
@@ -129,6 +141,7 @@ const double& BaseDebyeSum::getQstep() const
 
 void BaseDebyeSum::setDebyePrecision(double precision)
 {
+    if (mdebyeprecision != precision)  mticker.click();
     mdebyeprecision = precision;
 }
 
