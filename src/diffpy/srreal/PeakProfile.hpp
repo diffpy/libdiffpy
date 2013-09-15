@@ -30,6 +30,7 @@
 
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
+#include <diffpy/EventTicker.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -48,6 +49,12 @@ class PeakProfile :
         virtual double xboundhi(double fwhm) const = 0;
         virtual void setPrecision(double eps);
         const double& getPrecision() const;
+        virtual eventticker::EventTicker& ticker() const  { return mticker; }
+
+    protected:
+
+        // data
+        mutable eventticker::EventTicker mticker;
 
     private:
 

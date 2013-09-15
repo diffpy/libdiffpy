@@ -44,6 +44,7 @@ PeakProfile::PeakProfile() : mprecision(0.0)
 
 void PeakProfile::setPrecision(double eps)
 {
+    if (mprecision != eps)  mticker.click();
     mprecision = eps;
 }
 
