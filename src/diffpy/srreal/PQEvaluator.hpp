@@ -27,8 +27,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/export.hpp>
 
 #include <diffpy/EventTicker.hpp>
 #include <diffpy/srreal/QuantityType.hpp>
@@ -83,7 +81,7 @@ class PQEvaluatorBasic
         template<class Archive>
             void serialize(Archive& ar, const unsigned int version)
         {
-            ar & musefullsum & mcpuindex & mncpu;
+            ar & musefullsum & mcpuindex & mncpu & mvalue_ticker;
         }
 };
 
@@ -96,6 +94,16 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
         virtual PQEvaluatorType typeint() const;
         virtual void updateValue(PairQuantity&, StructureAdapterConstPtr);
 
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<PQEvaluatorBasic>(*this);
+        }
 };
 
 // Factory function for PairQuantity evaluators ------------------------------

@@ -222,5 +222,7 @@ PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp)
 
 DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::PQEvaluatorBasic)
 BOOST_CLASS_EXPORT(diffpy::srreal::PQEvaluatorBasic)
+DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::PQEvaluatorOptimized)
+BOOST_CLASS_EXPORT(diffpy::srreal::PQEvaluatorOptimized)
 
 // End of file
