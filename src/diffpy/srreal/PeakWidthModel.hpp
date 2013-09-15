@@ -47,9 +47,12 @@ class PeakWidthModel :
         virtual double calculate(const BaseBondGenerator&) const = 0;
         virtual double maxWidth(StructureAdapterConstPtr,
                 double rmin, double rmax) const = 0;
+        virtual eventticker::EventTicker& ticker() const  { return mticker; }
+
+    protected:
 
         // data
-        eventticker::EventTicker mticker;
+        mutable eventticker::EventTicker mticker;
 
 };
 
