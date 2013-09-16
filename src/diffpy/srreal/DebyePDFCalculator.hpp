@@ -72,6 +72,8 @@ class DebyePDFCalculator :
         QuantityType getRDFperR() const;
 
         // Q-range configuration
+        virtual void setQmin(double);
+        virtual const double& getQmin() const;
         virtual void setQstep(double);
         void setOptimumQstep();
         bool isOptimumQstep() const;
@@ -104,6 +106,7 @@ class DebyePDFCalculator :
     private:
 
         // methods
+        QuantityType getPDFAtQmin(double qmin) const;
         void updateQstep();
         /// complete lower bound extension of the calculated grid
         double rcalclo() const;
@@ -116,6 +119,7 @@ class DebyePDFCalculator :
         void cacheRlimitsData();
 
         // data
+        double mqminpdf;
         bool moptimumqstep;
         double mrstep;
         double mmaxextension;
@@ -131,6 +135,7 @@ class DebyePDFCalculator :
             ar & base_object<BaseDebyeSum>(*this);
             ar & base_object<ScatteringFactorTableOwner>(*this);
             ar & base_object<PDFEnvelopeOwner>(*this);
+            ar & mqminpdf;
             ar & moptimumqstep;
             ar & mrstep;
             ar & mmaxextension;

@@ -49,6 +49,7 @@ DebyePDFCalculator::DebyePDFCalculator()
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
     this->setMaxExtension(DEFAULT_PDFCALCULATOR_MAXEXTENSION);
     this->setOptimumQstep();
+    this->setQmin(0.0);
     this->setQmax(DEFAULT_DEBYEPDFCALCULATOR_QMAX);
     // envelopes
     this->addEnvelopeByType("scale");
@@ -82,26 +83,8 @@ DebyePDFCalculator::DebyePDFCalculator()
 
 QuantityType DebyePDFCalculator::getPDF() const
 {
-    // build a zero padded F vector that gives dr <= rstep
-    QuantityType fpad = this->getF();
-    int nfromdr = int(ceil(M_PI / this->getRstep() / this->getQstep()));
-    if (nfromdr > int(fpad.size()))  fpad.resize(nfromdr, 0.0);
-    QuantityType gpad = fftftog(fpad, this->getQstep());
-    const double drpad = M_PI / (gpad.size() * this->getQstep());
     QuantityType rgrid = this->getRgrid();
-    QuantityType pdf0(rgrid.size());
-    QuantityType::const_iterator ri = rgrid.begin();
-    QuantityType::iterator pdfi = pdf0.begin();
-    for (; ri != rgrid.end(); ++ri, ++pdfi)
-    {
-        double xdrp = *ri / drpad;
-        int iplo = int(xdrp);
-        int iphi = iplo + 1;
-        double wphi = xdrp - iplo;
-        double wplo = 1.0 - wphi;
-        assert(iphi < int(gpad.size()));
-        *pdfi = wplo * gpad[iplo] + wphi * gpad[iphi];
-    }
+    QuantityType pdf0 = this->getPDFAtQmin(this->getQmin());
     QuantityType pdf1 = this->applyEnvelopes(rgrid, pdf0);
     return pdf1;
 }
@@ -109,18 +92,35 @@ QuantityType DebyePDFCalculator::getPDF() const
 
 QuantityType DebyePDFCalculator::getRDF() const
 {
-    // FIXME
-    return QuantityType();
+    QuantityType rgrid = this->getRgrid();
+    QuantityType rv = this->getRDFperR();
+    assert(rv.size() == rgrid.size());
+    transform(rgrid.begin(), rgrid.end(), rv.begin(), rv.begin(),
+            multiplies<double>());
+    return rv;
 }
 
 
 QuantityType DebyePDFCalculator::getRDFperR() const
 {
-    // FIXME
-    return QuantityType();
+    return this->getPDFAtQmin(0.0);
 }
 
 // Q-range configuration
+
+void DebyePDFCalculator::setQmin(double qmin)
+{
+    ensureNonNegative("Qmin", qmin);
+    this->BaseDebyeSum::setQmin(0.0);
+    mqminpdf = qmin;
+}
+
+
+const double& DebyePDFCalculator::getQmin() const
+{
+    return mqminpdf;
+}
+
 
 void DebyePDFCalculator::setQstep(double qstep)
 {
@@ -254,6 +254,36 @@ double DebyePDFCalculator::sfSiteAtQ(int siteidx, const double& Q) const
 }
 
 // Private Methods -----------------------------------------------------------
+
+QuantityType DebyePDFCalculator::getPDFAtQmin(double qmin) const
+{
+    // build a zero padded F vector that gives dr <= rstep
+    QuantityType fpad = this->getF();
+    // zero all F values below qmin
+    int nqmin = pdfutils_qminSteps(qmin, this->getQstep());
+    if (nqmin > int(fpad.size()))  nqmin = fpad.size();
+    fill(fpad.begin(), fpad.begin() + nqmin, 0.0);
+    int nfromdr = int(ceil(M_PI / this->getRstep() / this->getQstep()));
+    if (nfromdr > int(fpad.size()))  fpad.resize(nfromdr, 0.0);
+    QuantityType gpad = fftftog(fpad, this->getQstep());
+    const double drpad = M_PI / (gpad.size() * this->getQstep());
+    QuantityType rgrid = this->getRgrid();
+    QuantityType pdf0(rgrid.size());
+    QuantityType::const_iterator ri = rgrid.begin();
+    QuantityType::iterator pdfi = pdf0.begin();
+    for (; ri != rgrid.end(); ++ri, ++pdfi)
+    {
+        double xdrp = *ri / drpad;
+        int iplo = int(xdrp);
+        int iphi = iplo + 1;
+        double wphi = xdrp - iplo;
+        double wplo = 1.0 - wphi;
+        assert(iphi < int(gpad.size()));
+        *pdfi = wplo * gpad[iplo] + wphi * gpad[iphi];
+    }
+    return pdf0;
+}
+
 
 void DebyePDFCalculator::updateQstep()
 {

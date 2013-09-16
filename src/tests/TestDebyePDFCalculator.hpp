@@ -86,8 +86,9 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
         {
             // getRDF is not yet implemented and just returns empty array.
             QuantityType rdf = mpdfc->getRDF();
-            TS_ASSERT(rdf.empty());
-
+            TS_ASSERT_EQUALS(1000u, rdf.size());
+            TS_ASSERT_EQUALS(0.0, *std::min_element(rdf.begin(), rdf.end()));
+            TS_ASSERT_EQUALS(0.0, *std::max_element(rdf.begin(), rdf.end()));
         }
 
 
@@ -109,6 +110,10 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
         void test_getQmin()
         {
             TS_ASSERT_EQUALS(0.0, mpdfc->getQmin());
+            mpdfc->setQmin(1.0);
+            const DebyePDFCalculator& dpc = *mpdfc;
+            TS_ASSERT_EQUALS(1.0, dpc.getQmin());
+            TS_ASSERT_EQUALS(0.0, dpc.BaseDebyeSum::getQmin());
         }
 
 

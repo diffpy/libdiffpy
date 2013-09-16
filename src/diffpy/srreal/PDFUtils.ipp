@@ -37,15 +37,23 @@ QuantityType pdfutils_getQgrid(const T* pdfc)
 }
 
 
+inline
+int pdfutils_qminSteps(const double& qmin, const double& qstep)
+{
+    using diffpy::mathutils::eps_eq;
+    if (qstep <= 0.0)  return 0;
+    int rv = int(ceil(qmin / qstep));
+    if (eps_eq(qmin, (rv - 1) * qstep))  rv -= 1;
+    return rv;
+}
+
+
 template <class T>
 int pdfutils_qminSteps(const T* pdfc)
 {
-    using diffpy::mathutils::eps_eq;
     const double qmin = pdfc->getQmin();
-    const double dq = pdfc->getQstep();
-    if (dq <= 0.0)  return 0;
-    int rv = int(ceil(qmin / dq));
-    if (eps_eq(qmin, (rv - 1) * dq))  rv -= 1;
+    const double qstep = pdfc->getQstep();
+    int rv = pdfutils_qminSteps(qmin, qstep);
     return rv;
 }
 
