@@ -18,7 +18,9 @@
 
 #include <cxxtest/TestSuite.h>
 
-#include <diffpy/srreal/VR3Structure.hpp>
+#include <boost/make_shared.hpp>
+
+#include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
 #include <diffpy/srreal/JeongPeakWidth.hpp>
 #include <diffpy/srreal/ConstantPeakWidth.hpp>
@@ -33,15 +35,39 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
     private:
 
         boost::shared_ptr<DebyePDFCalculator> mpdfc;
-        VR3Structure memptystru;
+        AtomicStructureAdapterPtr memptystru;
+        AtomicStructureAdapterPtr mstru10;
+        AtomicStructureAdapterPtr mstru10d1;
+        AtomicStructureAdapterPtr mstru10r;
+        AtomicStructureAdapterPtr mstru9;
+        diffpy::mathutils::EpsilonEqual allclose;
         double meps;
 
     public:
 
         void setUp()
         {
+            const int SZ = 10;
             meps = diffpy::mathutils::SQRT_DOUBLE_EPS;
             mpdfc.reset(new DebyePDFCalculator);
+            memptystru = boost::make_shared<AtomicStructureAdapter>();
+            mstru10 = boost::make_shared<AtomicStructureAdapter>();
+            Atom ai;
+            ai.atomtype = "C";
+            ai.cartesianuij = R3::identity();
+            ai.cartesianuij(0, 0) = ai.cartesianuij(1, 1) =
+                ai.cartesianuij(2, 2) = 0.004;
+            for (int i = 0; i < SZ; ++i)
+            {
+                ai.cartesianposition[0] = i;
+                mstru10->append(ai);
+            }
+            mstru10d1 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
+            (*mstru10d1)[0].atomtype = "Au";
+            mstru10r = boost::make_shared<AtomicStructureAdapter>();
+            mstru10r->assign(mstru10->rbegin(), mstru10->rend());
+            mstru9 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
+            mstru9->remove(9);
         }
 
 
@@ -165,6 +191,134 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
                     pdfc1->getScatteringFactorTable()->type());
             TS_ASSERT_EQUALS(1.1,
                     pdfc1->getScatteringFactorTable()->lookup("H"));
+        }
+
+
+        void test_DBPDF_change_atom()
+        {
+            mpdfc->setQmin(1.0);
+            DebyePDFCalculator pdfcb = *mpdfc;
+            DebyePDFCalculator pdfco = *mpdfc;
+            TS_ASSERT_EQUALS(1.0, pdfcb.getQmin());
+            pdfcb.setEvaluatorType(BASIC);
+            pdfco.setEvaluatorType(OPTIMIZED);
+            TS_ASSERT_EQUALS(NONE, pdfcb.getEvaluatorTypeUsed());
+            TS_ASSERT_EQUALS(NONE, pdfco.getEvaluatorTypeUsed());
+            pdfcb.eval(mstru10);
+            pdfco.eval(mstru10);
+            QuantityType gb = pdfcb.getPDF();
+            QuantityType go = pdfco.getPDF();
+            TS_ASSERT(!gb.empty());
+            TS_ASSERT_EQUALS(gb, go);
+            int cnonzero = count_if(gb.begin(), gb.end(),
+                    bind1st(not_equal_to<double>(), 0.0));
+            TS_ASSERT(cnonzero);
+            TS_ASSERT_EQUALS(BASIC, pdfcb.getEvaluatorType());
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorType());
+            // first call of pdfco should use the BASIC evaluation
+            TS_ASSERT_EQUALS(BASIC, pdfcb.getEvaluatorTypeUsed());
+            TS_ASSERT_EQUALS(BASIC, pdfco.getEvaluatorTypeUsed());
+            // test second call on the same structure
+            pdfco.eval(mstru10);
+            go = pdfco.getPDF();
+            TS_ASSERT_EQUALS(gb, go);
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
+            // test structure with one different atom
+            pdfcb.eval(mstru10d1);
+            pdfco.eval(mstru10d1);
+            QuantityType gb1 = pdfcb.getPDF();
+            QuantityType go1 = pdfco.getPDF();
+            TS_ASSERT(!allclose(gb, gb1));
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
+            TS_ASSERT(allclose(gb1, go1));
+            // change position of 1 atom
+            AtomicStructureAdapterPtr stru10d1s =
+                boost::make_shared<AtomicStructureAdapter>(*mstru10d1);
+            (*stru10d1s)[0].cartesianposition[1] = 0.5;
+            pdfcb.eval(stru10d1s);
+            pdfco.eval(stru10d1s);
+            QuantityType gb2 = pdfcb.getPDF();
+            QuantityType go2 = pdfco.getPDF();
+            TS_ASSERT(!allclose(gb1, gb2));
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
+            TS_ASSERT(allclose(gb2, go2));
+        }
+
+
+        void test_DBPDF_reverse_atoms()
+        {
+            mpdfc->setQmin(1.1);
+            DebyePDFCalculator pdfcb = *mpdfc;
+            DebyePDFCalculator pdfco = *mpdfc;
+            pdfcb.setEvaluatorType(BASIC);
+            pdfco.setEvaluatorType(OPTIMIZED);
+            pdfcb.eval(mstru10);
+            pdfco.eval(mstru10);
+            pdfco.eval(mstru10r);
+            QuantityType gb = pdfcb.getPDF();
+            QuantityType go = pdfco.getPDF();
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
+            TS_ASSERT(allclose(gb, go));
+        }
+
+
+        void test_DBPDF_remove_atom()
+        {
+            mpdfc->setQmin(1.2);
+            DebyePDFCalculator pdfcb = *mpdfc;
+            DebyePDFCalculator pdfco = *mpdfc;
+            pdfcb.setEvaluatorType(BASIC);
+            pdfco.setEvaluatorType(OPTIMIZED);
+            pdfcb.eval(mstru9);
+            pdfco.eval(mstru10);
+            pdfco.eval(mstru9);
+            QuantityType gb = pdfcb.getPDF();
+            QuantityType go = pdfco.getPDF();
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
+            TS_ASSERT(allclose(gb, go));
+        }
+
+
+        void test_DBPDF_qmin_click()
+        {
+            mpdfc->setEvaluatorType(OPTIMIZED);
+            TS_ASSERT_EQUALS(NONE, mpdfc->getEvaluatorTypeUsed());
+            mpdfc->eval(mstru10);
+            mpdfc->eval(mstru10);
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfc->getEvaluatorTypeUsed());
+            mpdfc->setQmin(4);
+            mpdfc->eval(mstru10);
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfc->getEvaluatorTypeUsed());
+            mpdfc->setQmin(0);
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfc->getEvaluatorTypeUsed());
+        }
+
+
+        void test_DBPDF_qmax_click()
+        {
+            mpdfc->setEvaluatorType(OPTIMIZED);
+            mpdfc->eval(mstru10);
+            mpdfc->eval(mstru10);
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfc->getEvaluatorTypeUsed());
+            mpdfc->setQmax(mpdfc->getQmax());
+            mpdfc->eval(mstru10);
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfc->getEvaluatorTypeUsed());
+            mpdfc->setQmax(mpdfc->getQmax() - 1.0);
+            mpdfc->eval(mstru10);
+            TS_ASSERT_EQUALS(BASIC, mpdfc->getEvaluatorTypeUsed());
+        }
+
+
+        void test_DBPDF_SFTB_click()
+        {
+            mpdfc->setEvaluatorType(OPTIMIZED);
+            mpdfc->eval(mstru10);
+            mpdfc->setScatteringFactorTable(mpdfc->getScatteringFactorTable());
+            mpdfc->eval(mstru10);
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfc->getEvaluatorTypeUsed());
+            mpdfc->setScatteringFactorTableByType("neutron");
+            mpdfc->eval(mstru10);
+            TS_ASSERT_EQUALS(BASIC, mpdfc->getEvaluatorTypeUsed());
         }
 
 };  // class TestDebyePDFCalculator

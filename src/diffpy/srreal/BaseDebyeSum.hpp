@@ -64,6 +64,9 @@ class BaseDebyeSum :
         // PairQuantity overloads
         virtual void resetValue();
         virtual void addPairContribution(const BaseBondGenerator&, int);
+        // support for PQEvaluatorOptimized
+        virtual void stashPartialValue();
+        virtual void restorePartialValue();
 
         // own methods
         virtual double sfSiteAtQ(int, const double& Q) const;
@@ -88,6 +91,7 @@ class BaseDebyeSum :
             QuantityType sfaverageatkq;
             double totaloccupancy;
         } mstructure_cache;
+        QuantityType mdbsumstash;
 
         // serialization
         friend class boost::serialization::access;

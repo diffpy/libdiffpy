@@ -188,6 +188,20 @@ void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds,
 }
 
 
+void BaseDebyeSum::stashPartialValue()
+{
+    mdbsumstash = this->value();
+}
+
+
+void BaseDebyeSum::restorePartialValue()
+{
+    assert(mdbsumstash.size() == mvalue.size());
+    mvalue = mdbsumstash;
+    mdbsumstash.clear();
+}
+
+
 double BaseDebyeSum::sfSiteAtQ(int siteidx, const double& q) const
 {
     return 1.0;
