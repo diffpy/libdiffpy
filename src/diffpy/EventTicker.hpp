@@ -47,6 +47,7 @@ class EventTicker
         bool operator<=(const EventTicker&) const;
         bool operator>(const EventTicker&) const;
         bool operator>=(const EventTicker&) const;
+        bool operator==(const EventTicker&) const;
 
     private:
 

@@ -78,6 +78,12 @@ bool EventTicker::operator>=(const EventTicker& other) const
     return mtick >= other.mtick;
 }
 
+
+bool EventTicker::operator==(const EventTicker& other) const
+{
+    return mtick == other.mtick;
+}
+
 // Static Global Data --------------------------------------------------------
 
 std::pair<long, long> EventTicker::gtick(0, 0);
