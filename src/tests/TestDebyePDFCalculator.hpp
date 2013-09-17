@@ -309,6 +309,24 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
         }
 
 
+        void test_DBPDF_delta12_click()
+        {
+            mpdfc->setEvaluatorType(OPTIMIZED);
+            mpdfc->eval(mstru10);
+            mpdfc->setDoubleAttr("delta1", mpdfc->getDoubleAttr("delta1"));
+            mpdfc->setDoubleAttr("delta2", mpdfc->getDoubleAttr("delta2"));
+            mpdfc->eval(mstru10);
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfc->getEvaluatorTypeUsed());
+            mpdfc->setDoubleAttr("delta1", 0.5 + mpdfc->getDoubleAttr("delta1"));
+            mpdfc->eval(mstru10);
+            TS_ASSERT_EQUALS(BASIC, mpdfc->getEvaluatorTypeUsed());
+            mpdfc->eval(mstru10);
+            mpdfc->setDoubleAttr("delta2", 0.5 + mpdfc->getDoubleAttr("delta2"));
+            mpdfc->eval(mstru10);
+            TS_ASSERT_EQUALS(BASIC, mpdfc->getEvaluatorTypeUsed());
+        }
+
+
         void test_DBPDF_SFTB_click()
         {
             mpdfc->setEvaluatorType(OPTIMIZED);
@@ -320,6 +338,7 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
             mpdfc->eval(mstru10);
             TS_ASSERT_EQUALS(BASIC, mpdfc->getEvaluatorTypeUsed());
         }
+
 
 };  // class TestDebyePDFCalculator
 
