@@ -36,11 +36,16 @@ class EventTicker
         // constructor
         EventTicker();
 
+        // types
+        typedef std::pair<long, long> value_type;
+
         // methods
         /// record an event and advance the global ticker.
         void click();
         /// advance internal ticker if the other ticker is newer.
         void updateFrom(const EventTicker& other);
+        /// return the internal ticker value
+        value_type value() const;
 
         // comparison
         bool operator<(const EventTicker&) const;
@@ -52,10 +57,10 @@ class EventTicker
     private:
 
         // global counter
-        static std::pair<long, long> gtick;
+        static value_type gtick;
 
         // data
-        std::pair<long, long> mtick;
+        value_type mtick;
 
         // serialization
         friend class boost::serialization::access;
@@ -68,7 +73,7 @@ class EventTicker
         template<class Archive>
             void load(Archive& ar, const unsigned int version)
         {
-            std::pair<long, long> ga;
+            value_type ga;
             ar >> mtick >> ga;
             if (ga > gtick)
             {

@@ -55,6 +55,12 @@ void EventTicker::updateFrom(const EventTicker& other)
 }
 
 
+EventTicker::value_type EventTicker::value() const
+{
+    return mtick;
+}
+
+
 bool EventTicker::operator<(const EventTicker& other) const
 {
     return mtick < other.mtick;
@@ -86,7 +92,7 @@ bool EventTicker::operator==(const EventTicker& other) const
 
 // Static Global Data --------------------------------------------------------
 
-std::pair<long, long> EventTicker::gtick(0, 0);
+EventTicker::value_type EventTicker::gtick(0, 0);
 
 }   // namespace eventticker
 }   // namespace diffpy
