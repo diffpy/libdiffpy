@@ -76,6 +76,8 @@ class TestPQEvaluator : public CxxTest::TestSuite
             PDFCalculator pdfco;
             pdfcb.setEvaluatorType(BASIC);
             pdfco.setEvaluatorType(OPTIMIZED);
+            TS_ASSERT_EQUALS(NONE, pdfcb.getEvaluatorTypeUsed());
+            TS_ASSERT_EQUALS(NONE, pdfco.getEvaluatorTypeUsed());
             pdfcb.eval(mstru10);
             pdfco.eval(mstru10);
             QuantityType gb = pdfcb.getPDF();
@@ -88,20 +90,20 @@ class TestPQEvaluator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(BASIC, pdfcb.getEvaluatorType());
             TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorType());
             // first call of pdfco should use the BASIC evaluation
-            TS_ASSERT_EQUALS(BASIC, pdfcb.mevaluator->mtypeused);
-            TS_ASSERT_EQUALS(BASIC, pdfco.mevaluator->mtypeused);
+            TS_ASSERT_EQUALS(BASIC, pdfcb.getEvaluatorTypeUsed());
+            TS_ASSERT_EQUALS(BASIC, pdfco.getEvaluatorTypeUsed());
             // test second call on the same structure
             pdfco.eval(mstru10);
             go = pdfco.getPDF();
             TS_ASSERT_EQUALS(gb, go);
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
             // test structure with one different atom
             pdfcb.eval(mstru10d1);
             pdfco.eval(mstru10d1);
             QuantityType gb1 = pdfcb.getPDF();
             QuantityType go1 = pdfco.getPDF();
             TS_ASSERT(!allclose(gb, gb1));
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
             TS_ASSERT(allclose(gb1, go1));
             // change position of 1 atom
             AtomicStructureAdapterPtr stru10d1s =
@@ -112,7 +114,7 @@ class TestPQEvaluator : public CxxTest::TestSuite
             QuantityType gb2 = pdfcb.getPDF();
             QuantityType go2 = pdfco.getPDF();
             TS_ASSERT(!allclose(gb1, gb2));
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
             TS_ASSERT(allclose(gb2, go2));
         }
 
@@ -128,7 +130,7 @@ class TestPQEvaluator : public CxxTest::TestSuite
             pdfco.eval(mstru10r);
             QuantityType gb = pdfcb.getPDF();
             QuantityType go = pdfco.getPDF();
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
             TS_ASSERT(allclose(gb, go));
         }
 
@@ -144,7 +146,7 @@ class TestPQEvaluator : public CxxTest::TestSuite
             pdfco.eval(mstru9);
             QuantityType gb = pdfcb.getPDF();
             QuantityType go = pdfco.getPDF();
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.mevaluator->mtypeused);
+            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
             TS_ASSERT(allclose(gb, go));
         }
 

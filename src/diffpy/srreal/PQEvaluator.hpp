@@ -41,7 +41,7 @@ class PairQuantity;
 
 typedef boost::shared_ptr<class PQEvaluatorBasic> PQEvaluatorPtr;
 
-enum PQEvaluatorType {BASIC, OPTIMIZED};
+enum PQEvaluatorType {NONE, BASIC, OPTIMIZED};
 
 class PQEvaluatorBasic
 {
@@ -53,6 +53,7 @@ class PQEvaluatorBasic
 
         // methods
         virtual PQEvaluatorType typeint() const;
+        PQEvaluatorType typeintused() const;
         virtual void updateValue(PairQuantity&, StructureAdapterConstPtr);
         void useFullSum(bool flag);
         void setupParallelRun(int cpuindex, int ncpu);
@@ -68,9 +69,6 @@ class PQEvaluatorBasic
         int mncpu;
         /// ticker for recording when was the value updated
         eventticker::EventTicker mvalue_ticker;
-
-        // testing
-        friend class TestPQEvaluator;
         /// type of PQEvaluator that was actually used
         PQEvaluatorType mtypeused;
 

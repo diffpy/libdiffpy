@@ -66,6 +66,7 @@ class PairQuantity : public diffpy::Attributes
         const double& getRmax() const;
         void setEvaluatorType(PQEvaluatorType evtp);
         PQEvaluatorType getEvaluatorType() const;
+        PQEvaluatorType getEvaluatorTypeUsed() const;
         void setupParallelRun(int cpuindex, int ncpu);
         void maskAllPairs(bool mask);
         void invertMask();
@@ -81,7 +82,6 @@ class PairQuantity : public diffpy::Attributes
 
         friend class PQEvaluatorBasic;
         friend class PQEvaluatorOptimized;
-        friend class TestPQEvaluator;
 
         // methods
         virtual void resizeValue(size_t);

@@ -48,13 +48,19 @@ namespace srreal {
 
 PQEvaluatorBasic::PQEvaluatorBasic() :
     musefullsum(false),
-    mcpuindex(0), mncpu(1)
+    mcpuindex(0), mncpu(1), mtypeused(NONE)
 { }
 
 
 PQEvaluatorType PQEvaluatorBasic::typeint() const
 {
     return BASIC;
+}
+
+
+PQEvaluatorType PQEvaluatorBasic::typeintused() const
+{
+    return mtypeused;
 }
 
 
