@@ -114,11 +114,6 @@ class AtomicStructureAdapter : public StructureAdapter
         // data
         std::vector<Atom> matoms;
 
-        // testing
-        friend class TestAtomicStructureAdapter;
-        enum DifferenceMethod {NONE, SIDEBYSIDE, SORTED};
-        mutable DifferenceMethod mtdiffmethod;
-
         // serialization
         friend class boost::serialization::access;
         template<class Archive>

@@ -52,16 +52,16 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
 
         void test_diff()
         {
-            typedef AtomicStructureAdapter::DifferenceMethod DM;
-            const DM& NONE = AtomicStructureAdapter::NONE;
-            const DM& SIDEBYSIDE = AtomicStructureAdapter::SIDEBYSIDE;
-            const DM& SORTED = AtomicStructureAdapter::SORTED;
+            typedef StructureDifference::Method DM;
+            const DM::Type& NONE = DM::NONE;
+            const DM::Type& SIDEBYSIDE = DM::SIDEBYSIDE;
+            const DM::Type& SORTED = DM::SORTED;
             StructureDifference sd;
             sd = mstru->diff(emptyStructureAdapter());
             TS_ASSERT(sd.add1.empty());
             TS_ASSERT(!sd.allowsfastupdate());
             sd = mstru->diff(StructureAdapterPtr());
-            TS_ASSERT_EQUALS(NONE, mpstru->mtdiffmethod);
+            TS_ASSERT_EQUALS(NONE, sd.diffmethod);
             TS_ASSERT(!sd.allowsfastupdate());
             Atom ai;
             ai.atomtype = "C";
@@ -76,13 +76,13 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
             sd = mstru->diff(mstru);
             TS_ASSERT(sd.allowsfastupdate())
             sd = mstru->diff(cpstru);
-            TS_ASSERT_EQUALS(SIDEBYSIDE, mpstru->mtdiffmethod);
+            TS_ASSERT_EQUALS(SIDEBYSIDE, sd.diffmethod);
             TS_ASSERT(sd.allowsfastupdate())
             TS_ASSERT(sd.pop0.empty());
             TS_ASSERT(sd.add1.empty());
             (*cpstru)[0].atomtype = "N";
             sd = mstru->diff(cpstru);
-            TS_ASSERT_EQUALS(SIDEBYSIDE, mpstru->mtdiffmethod);
+            TS_ASSERT_EQUALS(SIDEBYSIDE, sd.diffmethod);
             TS_ASSERT(sd.allowsfastupdate())
             TS_ASSERT_EQUALS(1u, sd.pop0.size());
             TS_ASSERT_EQUALS(1u, sd.add1.size());
@@ -90,7 +90,7 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
             {
                 cpstru->remove(0);
                 sd = mstru->diff(cpstru);
-                TS_ASSERT_EQUALS(SORTED, mpstru->mtdiffmethod);
+                TS_ASSERT_EQUALS(SORTED, sd.diffmethod);
                 TS_ASSERT(sd.allowsfastupdate());
                 TS_ASSERT_EQUALS(i, int(sd.pop0.size()));
                 TS_ASSERT(sd.add1.empty());

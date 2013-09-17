@@ -164,7 +164,6 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
     using std::min;
     typedef boost::shared_ptr<const class AtomicStructureAdapter> Ptr;
-    mtdiffmethod = NONE;
     StructureDifference sd(this->shared_from_this(), other);
     if (sd.stru0 == sd.stru1)  return sd;
     Ptr pstru0 = boost::static_pointer_cast<Ptr::element_type>(sd.stru0);
@@ -179,7 +178,7 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
     // try fast side-by-side comparison for equal length structures
     if (astru0.countSites() == astru1.countSites())
     {
-        mtdiffmethod = SIDEBYSIDE;
+        sd.diffmethod = StructureDifference::Method::SIDEBYSIDE;
         std::vector<Atom>::const_iterator ai0 = astru0.matoms.begin();
         std::vector<Atom>::const_iterator ai1 = astru1.matoms.begin();
         for (int i = 0; ai0 != astru0.matoms.end(); ++i, ++ai0, ++ai1)
@@ -198,7 +197,7 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
     sd.pop0.clear();
     sd.add1.clear();
     // let's build sorted vectors of atoms in stru0 and stru1
-    mtdiffmethod = SORTED;
+    sd.diffmethod = StructureDifference::Method::SORTED;
     std::vector<atomindex> satoms0, satoms1;
     satoms0.reserve(astru0.countSites());
     std::vector<Atom>::const_iterator ai = astru0.matoms.begin();

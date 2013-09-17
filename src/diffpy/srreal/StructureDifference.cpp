@@ -31,9 +31,15 @@ namespace srreal {
 
 // Constructors --------------------------------------------------------------
 
+StructureDifference::StructureDifference() : diffmethod(Method::NONE)
+{ }
+
+
 StructureDifference::StructureDifference(
         StructureAdapterConstPtr oldstru,
-        StructureAdapterConstPtr newstru) : stru0(oldstru), stru1(newstru)
+        StructureAdapterConstPtr newstru)
+    :
+    stru0(oldstru), stru1(newstru), diffmethod(Method::NONE)
 { }
 
 // Public Methods ------------------------------------------------------------

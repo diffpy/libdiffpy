@@ -33,8 +33,13 @@ class StructureDifference {
     public:
 
         // constructors
-        StructureDifference()  { }
+        StructureDifference();
         StructureDifference(StructureAdapterConstPtr, StructureAdapterConstPtr);
+
+        // enumeration type for difference methods
+        struct Method {
+            enum Type {NONE, SIDEBYSIDE, SORTED};
+        };
 
         // data
 
@@ -48,6 +53,8 @@ class StructureDifference {
         /// indices of atoms in stru1 that are not in stru0
         /// These atoms need to be added in a fast update of PairQuantity.
         std::vector<int> add1;
+        /// type of comparison used in obtaining this difference
+        Method::Type diffmethod;
 
         // methods
 
