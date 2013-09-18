@@ -41,7 +41,7 @@ double AtomRadiiTable::lookup(const string& smbl) const
     boost::unordered_map<string,double>::const_iterator tb;
     tb = mcustomradius.find(smbl);
     if (tb != mcustomradius.end())  return tb->second;
-    return this->tableLookup(smbl);
+    return this->standardLookup(smbl);
 }
 
 

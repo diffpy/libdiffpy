@@ -36,7 +36,7 @@ class ConstantRadiiTable : public AtomRadiiTable
         SharedPtr clone() const;
         const std::string& type() const;
         // method overloads
-        double tableLookup(const std::string& smbl) const;
+        double standardLookup(const std::string& smbl) const;
         // methods specific for this class
         void setDefault(double);
         double getDefault() const;

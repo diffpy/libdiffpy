@@ -60,7 +60,7 @@ const string& ConstantRadiiTable::type() const
 
 // own methods
 
-double ConstantRadiiTable::tableLookup(const string& smbl) const
+double ConstantRadiiTable::standardLookup(const string& smbl) const
 {
     return mdefaultradius;
 }

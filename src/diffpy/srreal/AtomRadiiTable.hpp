@@ -15,7 +15,7 @@
 * class AtomRadiiTable -- storage of empirical atomic radii
 *   This is an abstract base class that provides a createByType factory
 *   function for creating a registered concrete instances.
-*   The derived classes has to overload the tableLookup method and also
+*   The derived classes has to overload the standardLookup method and also
 *   create, clone and type methods from the HasClassRegistry base.
 *
 *****************************************************************************/
@@ -46,7 +46,7 @@ class AtomRadiiTable :
         /// fast value lookup, which does not change the table.
         double lookup(const std::string& smbl) const;
         /// overloadable lookup function that retrieved standard values
-        virtual double tableLookup(const std::string& smbl) const = 0;
+        virtual double standardLookup(const std::string& smbl) const = 0;
         /// set custom radius for a specified atom symbol
         void setCustom(const std::string& smbl, double radius);
         /// set custom radii from a string in (A1:r1, A2:r2, ...) format
