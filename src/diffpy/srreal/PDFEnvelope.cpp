@@ -77,10 +77,9 @@ void PDFEnvelopeOwner::addEnvelopeByType(const string& tp)
 void PDFEnvelopeOwner::popEnvelope(PDFEnvelopePtr envlp)
 {
     EnvelopeStorage::iterator evit = menvelope.begin();
-    for (; evit != menvelope.end();)
+    for (; evit != menvelope.end(); ++evit)
     {
-        if (evit->second.get() == envlp.get())  menvelope.erase(evit++);
-        else  ++evit;
+        if (evit->second == envlp)  menvelope.erase(evit);
     }
 }
 
