@@ -82,47 +82,7 @@ typedef AtomRadiiTable::SharedPtr AtomRadiiTablePtr;
 
 // Serialization -------------------------------------------------------------
 
-namespace boost {
-namespace serialization {
 
-template<class Archive>
-void save(Archive& ar,
-        const diffpy::srreal::AtomRadiiTablePtr& ptr,
-        const unsigned int version)
-{
-    using namespace diffpy::srreal;
-    std::string tp;
-    AtomRadiiTable::CustomRadiiStorage dt;
-    if (ptr)
-    {
-        tp = ptr->type();
-        dt = ptr->getAllCustom();
-    }
-    ar & tp & dt;
-}
-
-
-template<class Archive>
-void load(Archive& ar,
-        diffpy::srreal::AtomRadiiTablePtr& ptr, const unsigned int version)
-{
-    using namespace diffpy::srreal;
-    std::string tp;
-    AtomRadiiTable::CustomRadiiStorage dt;
-    ar & tp & dt;
-    if (!tp.empty())
-    {
-        ptr = AtomRadiiTable::createByType(tp);
-        ptr->resetAll();
-        AtomRadiiTable::CustomRadiiStorage::const_iterator ii = dt.begin();
-        for (; ii != dt.end(); ++ii)    ptr->setCustom(ii->first, ii->second);
-    }
-    else  ptr.reset();
-}
-
-}   // namespace serialization
-}   // namespace boost
-
-BOOST_SERIALIZATION_SPLIT_FREE(diffpy::srreal::AtomRadiiTablePtr)
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::AtomRadiiTable)
 
 #endif  // ATOMRADIITABLE_HPP_INCLUDED

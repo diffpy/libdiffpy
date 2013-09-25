@@ -368,6 +368,12 @@ void OverlapCalculator::setAtomRadiiTable(AtomRadiiTablePtr table)
 }
 
 
+void OverlapCalculator::setAtomRadiiTableByType(const std::string& tp)
+{
+    matomradiitable = AtomRadiiTable::createByType(tp);
+}
+
+
 AtomRadiiTablePtr& OverlapCalculator::getAtomRadiiTable()
 {
     return matomradiitable;

@@ -73,6 +73,7 @@ class OverlapCalculator : public PairQuantity
 
         // access and configuration of the atom radii
         void setAtomRadiiTable(AtomRadiiTablePtr);
+        void setAtomRadiiTableByType(const std::string& tp);
         AtomRadiiTablePtr& getAtomRadiiTable();
         const AtomRadiiTablePtr& getAtomRadiiTable() const;
 
