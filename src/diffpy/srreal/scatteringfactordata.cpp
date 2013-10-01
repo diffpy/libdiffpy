@@ -27,7 +27,7 @@
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <blitz/tinyvec-et.h>
+#include <blitz/array.h>
 
 #include <diffpy/srreal/scatteringfactordata.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>

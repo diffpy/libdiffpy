@@ -14,10 +14,11 @@
 
 namespace diffpy {
 namespace srreal {
+namespace R3 {
 
-const R3::Matrix& R3::identity()
+const Matrix& identity()
 {
-    static R3::Matrix mx;
+    static Matrix mx;
     static bool mx_ready = false;
     if (!mx_ready)
     {
@@ -30,26 +31,26 @@ const R3::Matrix& R3::identity()
 }
 
 
-const R3::Matrix& R3::zeros()
+const Matrix& zeros()
 {
-    static R3::Matrix mx;
+    static Matrix mx;
     static bool mx_ready = false;
     if (!mx_ready)  mx = 0.0;
     return mx;
 }
 
 
-double R3::determinant(const R3::Matrix& A)
+double determinant(const Matrix& A)
 {
-    gsl_matrix* gA = gsl_matrix_alloc(R3::Ndim, R3::Ndim);
-    for (int i = 0; i != R3::Ndim; ++i)
+    gsl_matrix* gA = gsl_matrix_alloc(Ndim, Ndim);
+    for (int i = 0; i != Ndim; ++i)
     {
-	for (int j = 0; j != R3::Ndim; ++j)
+	for (int j = 0; j != Ndim; ++j)
 	{
 	    gsl_matrix_set(gA, i, j, A(i,j));
 	}
     }
-    gsl_permutation* gP = gsl_permutation_alloc(R3::Ndim);
+    gsl_permutation* gP = gsl_permutation_alloc(Ndim);
     int signum;
     gsl_linalg_LU_decomp(gA, gP, &signum);
     double det = gsl_linalg_LU_det(gA, signum);
@@ -59,21 +60,21 @@ double R3::determinant(const R3::Matrix& A)
 }
 
 
-R3::Matrix R3::inverse(const R3::Matrix& A)
+Matrix inverse(const Matrix& A)
 {
-    gsl_matrix* gA = gsl_matrix_alloc(R3::Ndim, R3::Ndim);
-    for (int i = 0; i != R3::Ndim; ++i)
+    gsl_matrix* gA = gsl_matrix_alloc(Ndim, Ndim);
+    for (int i = 0; i != Ndim; ++i)
     {
-	for (int j = 0; j != R3::Ndim; ++j)
+	for (int j = 0; j != Ndim; ++j)
 	{
 	    gsl_matrix_set(gA, i, j, A(i,j));
 	}
     }
-    gsl_permutation* gP = gsl_permutation_alloc(R3::Ndim);
+    gsl_permutation* gP = gsl_permutation_alloc(Ndim);
     int signum;
     gsl_linalg_LU_decomp(gA, gP, &signum);
-    R3::Matrix B;
-    gsl_matrix_view gB = gsl_matrix_view_array(B.data(), R3::Ndim, R3::Ndim);
+    Matrix B;
+    gsl_matrix_view gB = gsl_matrix_view_array(B.data(), Ndim, Ndim);
     gsl_linalg_LU_invert(gA, gP, &gB.matrix);
     gsl_permutation_free(gP);
     gsl_matrix_free(gA);
@@ -81,9 +82,9 @@ R3::Matrix R3::inverse(const R3::Matrix& A)
 }
 
 
-R3::Matrix R3::transpose(const R3::Matrix& A)
+Matrix transpose(const Matrix& A)
 {
-    R3::Matrix res;
+    Matrix res;
     res = A(0,0), A(1,0), A(2,0),
           A(0,1), A(1,1), A(2,1),
           A(0,2), A(1,2), A(2,2);
@@ -91,6 +92,22 @@ R3::Matrix R3::transpose(const R3::Matrix& A)
 }
 
 
+const Matrix& product(const Matrix& A, const Matrix& B)
+{
+    static Matrix C;
+    C = 0.0;
+    for (int i = 0; i < Ndim; ++i) {
+        for (int j = 0; j < Ndim; ++j) {
+            double& cij = C(i, j);
+            for (int k = 0; k < Ndim; ++k) {
+                C(i, j) += A(i, k) * B(k, j);
+            }
+        }
+    }
+    return C;
+}
+
+}   // namespace R3
 }   // namespace srreal
 
 namespace mathutils {

@@ -221,8 +221,8 @@ const R3::Matrix& Lattice::cartesianMatrix(const R3::Matrix& Ml) const
 const R3::Matrix& Lattice::fractionalMatrix(const R3::Matrix& Mc) const
 {
     static R3::Matrix res0, res1;
-    res0 = product(Mc, mrecnormbase);
-    res1 = product(R3::transpose(mrecnormbase), res0);
+    res0 = R3::product(Mc, mrecnormbase);
+    res1 = R3::product(R3::transpose(mrecnormbase), res0);
     return res1;
 }
 

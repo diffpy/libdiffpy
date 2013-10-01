@@ -22,8 +22,7 @@
 
 #include <algorithm>
 #include <boost/serialization/base_object.hpp>
-#include <blitz/tinyvec-et.h>
-#include <blitz/tinymat.h>
+#include <blitz/array.h>
 #include <diffpy/mathutils.hpp>
 
 namespace diffpy {
@@ -35,7 +34,6 @@ namespace R3 {
 // Constants
 
 const int Ndim = 3;
-using blitz::product;
 using ::diffpy::mathutils::SQRT_DOUBLE_EPS;
 
 // Types
@@ -50,6 +48,7 @@ const Matrix& zeros();
 double determinant(const Matrix& A);
 Matrix inverse(const Matrix& A);
 Matrix transpose(const Matrix& A);
+const Matrix& product(const Matrix&, const Matrix&);
 
 template <class V> double norm(const V&);
 template <class V> double distance(const V& u, const V& v);
@@ -57,7 +56,6 @@ template <class V> double dot(const V& u, const V& v);
 template <class V> Vector cross(const V& u, const V& v);
 template <class V> const Vector& mxvecproduct(const Matrix&, const V&);
 template <class V> const Vector& mxvecproduct(const V&, const Matrix&);
-
 
 // Template functions --------------------------------------------------------
 
