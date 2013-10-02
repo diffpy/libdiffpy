@@ -152,6 +152,7 @@ const Matrix& zeromatrix();
 double determinant(const Matrix& A);
 const Matrix& inverse(const Matrix& A);
 
+const Vector& floor(const Vector&);
 template <class V> double norm(const V&);
 template <class V> double distance(const V& u, const V& v);
 template <class V> double dot(const V& u, const V& v);
@@ -159,6 +160,40 @@ template <class V> Vector cross(const V& u, const V& v);
 template <class V> const Vector& mxvecproduct(const Matrix&, const V&);
 template <class V> const Vector& mxvecproduct(const V&, const Matrix&);
 
+// Equality ------------------------------------------------------------------
+
+inline
+bool operator==(const Vector& u, const Vector& v)
+{
+    bool rv = std::equal(u.begin(), u.end(), v.begin());
+    return rv;
+}
+
+
+inline
+bool operator==(const Matrix& A, const Matrix& B)
+{
+    bool rv = (&A == &B) ||
+        std::equal(A.data().begin(), A.data().end(), B.data().begin());
+    return rv;
+}
+
+// Hashing -------------------------------------------------------------------
+
+size_t hash_value(const Vector& v);
+size_t hash_value(const Matrix& A);
+
+// Inlined functions ---------------------------------------------------------
+
+inline
+const Vector& floor(const Vector& v)
+{
+    static Vector res;
+    Vector::const_iterator xi = v.begin();
+    Vector::iterator xo = res.begin();
+    for (; xi != v.end(); ++xi, ++xo)  *xo = std::floor(*xi);
+    return res;
+}
 
 // Template functions --------------------------------------------------------
 
@@ -226,16 +261,6 @@ namespace mathutils {
 
 // Template specializations --------------------------------------------------
 
-inline
-const Vector& floor(const Vector& v)
-{
-    static Vector res;
-    Vector::const_iterator xi = v.begin();
-    Vector::iterator xo = res.begin();
-    for (; xi != v.end(); ++xi, ++xo)  *xo = std::floor(*xi);
-    return res;
-}
-
 
 template<>
 bool EpsilonLess::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
@@ -251,70 +276,5 @@ bool EpsilonEqual::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
 
 }   // namespace mathutils
 }   // namespace diffpy
-
-namespace blitz {
-
-// Equality ------------------------------------------------------------------
-
-inline
-bool operator==(const diffpy::srreal::R3::Vector& u,
-        const diffpy::srreal::R3::Vector& v)
-{
-    diffpy::srreal::R3::Vector::const_iterator pu = u.begin();
-    diffpy::srreal::R3::Vector::const_iterator pv = v.begin();
-    bool rv = (pu == pv) || (
-            *pu++ == *pv++ &&
-            *pu++ == *pv++ &&
-            *pu++ == *pv++
-            );
-    return rv;
-}
-
-
-inline
-bool operator==(const diffpy::srreal::R3::Matrix& A,
-        const diffpy::srreal::R3::Matrix& B)
-{
-    using diffpy::srreal::R3::Ndim;
-    const size_t sz = Ndim * Ndim;
-    bool rv = (&A == &B) || std::equal(A.data(), A.data() + sz, B.data());
-    return rv;
-}
-
-
-// Hashing -------------------------------------------------------------------
-
-size_t hash_value(const diffpy::srreal::R3::Vector& v);
-size_t hash_value(const diffpy::srreal::R3::Matrix& A);
-
-}   // namespace blitz
-
-// Serialization -------------------------------------------------------------
-
-namespace boost {
-namespace serialization {
-
-template<class Archive>
-void serialize(Archive& ar,
-        diffpy::srreal::R3::Vector& v, const unsigned int version)
-{
-    ar & v[0] & v[1] & v[2];
-}
-
-
-template<class Archive>
-void serialize(Archive& ar,
-        diffpy::srreal::R3::Matrix& A, const unsigned int version)
-{
-    using namespace diffpy::srreal;
-    R3::Matrix::T_numtype* p = A.data();
-    R3::Matrix::T_numtype* plast = p + R3::Ndim * R3::Ndim;
-    for (; p != plast; ++p)     ar & (*p);
-}
-
-
-} // namespace serialization
-} // namespace boost
-
 
 #endif  // R3LINALG_HPP_INCLUDED

@@ -14,32 +14,33 @@
 
 namespace diffpy {
 namespace srreal {
+namespace R3 {
 
-const R3::Matrix& R3::identity()
+const Matrix& identity()
 {
-    static R3::Matrix mx = ublas::identity_matrix<double>(R3::Ndim);
+    static Matrix mx = ublas::identity_matrix<double>(Ndim);
     return mx;
 }
 
 
-const R3::Matrix& R3::zeromatrix()
+const Matrix& zeromatrix()
 {
-    static R3::Matrix mx = ublas::zero_matrix<double>(R3::Ndim, R3::Ndim);
+    static Matrix mx = ublas::zero_matrix<double>(Ndim, Ndim);
     return mx;
 }
 
 
-double R3::determinant(const R3::Matrix& A)
+double determinant(const Matrix& A)
 {
-    gsl_matrix* gA = gsl_matrix_alloc(R3::Ndim, R3::Ndim);
-    for (int i = 0; i != R3::Ndim; ++i)
+    gsl_matrix* gA = gsl_matrix_alloc(Ndim, Ndim);
+    for (int i = 0; i != Ndim; ++i)
     {
-	for (int j = 0; j != R3::Ndim; ++j)
+	for (int j = 0; j != Ndim; ++j)
 	{
 	    gsl_matrix_set(gA, i, j, A(i,j));
 	}
     }
-    gsl_permutation* gP = gsl_permutation_alloc(R3::Ndim);
+    gsl_permutation* gP = gsl_permutation_alloc(Ndim);
     int signum;
     gsl_linalg_LU_decomp(gA, gP, &signum);
     double det = gsl_linalg_LU_det(gA, signum);
@@ -49,22 +50,22 @@ double R3::determinant(const R3::Matrix& A)
 }
 
 
-const R3::Matrix& R3::inverse(const R3::Matrix& A)
+const Matrix& inverse(const Matrix& A)
 {
-    static R3::Matrix B;
-    gsl_matrix* gA = gsl_matrix_alloc(R3::Ndim, R3::Ndim);
-    for (int i = 0; i != R3::Ndim; ++i)
+    static Matrix B;
+    gsl_matrix* gA = gsl_matrix_alloc(Ndim, Ndim);
+    for (int i = 0; i != Ndim; ++i)
     {
-	for (int j = 0; j != R3::Ndim; ++j)
+	for (int j = 0; j != Ndim; ++j)
 	{
 	    gsl_matrix_set(gA, i, j, A(i,j));
 	}
     }
-    gsl_permutation* gP = gsl_permutation_alloc(R3::Ndim);
+    gsl_permutation* gP = gsl_permutation_alloc(Ndim);
     int signum;
     gsl_linalg_LU_decomp(gA, gP, &signum);
     double* bdata = &(B.data()[0]);
-    gsl_matrix_view gB = gsl_matrix_view_array(bdata, R3::Ndim, R3::Ndim);
+    gsl_matrix_view gB = gsl_matrix_view_array(bdata, Ndim, Ndim);
     gsl_linalg_LU_invert(gA, gP, &gB.matrix);
     gsl_permutation_free(gP);
     gsl_matrix_free(gA);
@@ -72,6 +73,18 @@ const R3::Matrix& R3::inverse(const R3::Matrix& A)
 }
 
 
+size_t hash_value(const Vector& v)
+{
+    return boost::hash_range(v.begin(), v.end());
+}
+
+
+size_t hash_value(const Matrix& A)
+{
+    return boost::hash_range(A.data().begin(), A.data().end());
+}
+
+}   // namespace R3
 }   // namespace srreal
 
 namespace mathutils {
@@ -82,10 +95,9 @@ template<>
 bool EpsilonLess::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
         const srreal::R3::Matrix& A, const srreal::R3::Matrix& B) const
 {
-    using srreal::R3::Ndim;
     bool rv = std::lexicographical_compare(
-            A.data(), A.data() + Ndim * Ndim,
-            B.data(), B.data() + Ndim * Ndim, *this);
+            A.data().begin(), A.data().end(),
+            B.data().begin(), B.data().end(), *this);
     return rv;
 }
 
@@ -104,30 +116,12 @@ template<>
 bool EpsilonEqual::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
         const srreal::R3::Matrix& A, const srreal::R3::Matrix& B) const
 {
-    using srreal::R3::Ndim;
-    bool rv = std::equal(A.data(), A.data() + Ndim * Ndim, B.data(), *this);
+    bool rv = std::equal(A.data().begin(), A.data().end(),
+            B.data().begin(), *this);
     return rv;
 }
 
 }   // namespace mathutils
 }   // namespace diffpy
-
-namespace blitz {
-
-using namespace diffpy::srreal;
-
-size_t hash_value(const R3::Vector& v)
-{
-    return boost::hash_range(v.begin(), v.end());
-}
-
-
-size_t hash_value(const R3::Matrix& A)
-{
-    const size_t sz = R3::Ndim * R3::Ndim;
-    return boost::hash_range(A.data(), A.data() + sz);
-}
-
-}   // namespace blitz
 
 // End of file

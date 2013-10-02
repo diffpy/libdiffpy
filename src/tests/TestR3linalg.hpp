@@ -83,7 +83,7 @@ public:
 	    0.5359, -0.0053, -0.8926,
            -0.5904, 0.7559, 0.9424,
             0.8670, 0.2692, 0.9692);
-	TS_ASSERT_EQUALS(Atrans, R3::transpose(A));
+	TS_ASSERT_EQUALS(Atrans, R3::trans(A));
     }
 
 
