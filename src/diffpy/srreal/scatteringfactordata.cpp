@@ -27,7 +27,6 @@
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/numeric/ublas/storage.hpp>
 
 #include <diffpy/srreal/scatteringfactordata.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -43,33 +42,42 @@ namespace {
 // X-ray scattering factors
 
 const int WKTerms = 5;
-typedef boost::numeric::ublas::bounded_array<double, WKTerms> CoeffArray;
 
 class WaasKirfFormula
 {
     public:
 
         // Constructor
-        WaasKirfFormula() : a(WKTerms, 0.0), b(WKTerms, 0.0), c(0.0)
-        { }
+        WaasKirfFormula()
+        {
+            fill(a, a + WKTerms, 0.0);
+            fill(b, b + WKTerms, 0.0);
+            c = 0.0;
+        }
+
+        WaasKirfFormula(const WaasKirfFormula& wk0)
+        {
+            symbol = wk0.symbol;
+            copy(wk0.a, wk0.a + WKTerms, a);
+            copy(wk0.b, wk0.b + WKTerms, b);
+            c = wk0.c;
+        }
 
         // methods
         double atstol(double stol) const
         {
             double rv = c;
-            CoeffArray::const_iterator ai = a.begin();
-            CoeffArray::const_iterator bi = b.begin();
-            for (; ai != a.end(); ++ai, ++bi)
+            for (int i = 0; i < WKTerms; ++i)
             {
-                rv += *ai * exp(-(*bi) * stol * stol);
+                rv += a[i] * exp(-b[i] * stol * stol);
             }
             return rv;
         }
 
         // data
         string symbol;
-        CoeffArray a;
-        CoeffArray b;
+        double a[WKTerms];
+        double b[WKTerms];
         double c;
 };
 
