@@ -131,7 +131,11 @@ const SetOfWKFormulas& getWKFormulasSet()
         }
         if (line.iscomment() && (0 == line.words[0].compare(0, 2, "#L")))
         {
-            assert(!wk.symbol.empty());
+            if (wk.symbol.empty())
+            {
+                throw line.format_error(wkfile,
+                        "Missing \"#S\" line with atom symbol definition.");
+            }
             fp >> line;
             if (line.wcount() != 11)
             {
@@ -141,8 +145,17 @@ const SetOfWKFormulas& getWKFormulasSet()
             fpline >>
                 wk.a[0] >> wk.a[1] >> wk.a[2] >> wk.a[3] >> wk.a[4] >>
                 wk.c >> wk.b[0] >> wk.b[1] >> wk.b[2] >> wk.b[3] >> wk.b[4];
-            assert(fpline);
-            assert(!the_set->count(wk));
+            if (!fpline)
+            {
+                throw line.format_error(wkfile,
+                        "Line should contain 11 floating point values.");
+            }
+            if (the_set->count(wk))
+            {
+                string emsg = "Duplicate atom symbol \"";
+                emsg += wk.symbol + "\".";
+                throw line.format_error(wkfile, emsg);
+            }
             the_set->insert(wk);
             wk.symbol.clear();
         }
@@ -187,7 +200,14 @@ ElectronNumberStorage& getElectronNumberTable()
                 entable->insert(ENPair(smbl.str(), z - v));
             }
         }
-        assert(436 <= entable->size());
+        const size_t mintablesize = 436;
+        if (entable->size() < mintablesize)
+        {
+            ostringstream emsg;
+            emsg << "Incomplete file, expected " << mintablesize <<
+                " items, loaded " << entable->size() << ".";
+            throw line.format_error(emsg.str());
+        }
     }
     return *entable;
 }
@@ -213,11 +233,18 @@ const NeutronBCStorage& getNeutronBCTable()
     while (fp >> line)
     {
         if (line.isignored())  continue;
-        assert(line.wcount() == 11);
+        if (line.wcount() != 11)
+        {
+            throw line.format_error(nsffile,
+                    "Expected 11 comma-separated items.");
+        }
         if (line.words[3].empty())  continue;
         string smbl = line.words[0];
         size_t p0 = smbl.find_first_not_of("0123456789-");
-        assert(p0 != string::npos);
+        if (p0 == string::npos)
+        {
+            throw line.format_error(nsffile, "Missing or invalid atom symbol.");
+        }
         smbl.erase(0, p0);
         size_t p1 = smbl.find_last_of('-');
         if (p1 != string::npos)
@@ -227,8 +254,16 @@ const NeutronBCStorage& getNeutronBCTable()
         istringstream fpbc(line.words[3]);
         double bc;
         fpbc >> bc;
-        assert(fpbc);
-        assert(!bctable->count(smbl));
+        if (!fpbc)
+        {
+            throw line.format_error(nsffile, "Invalid b_c value.");
+        }
+        if (bctable->count(smbl))
+        {
+            string emsg = "Duplicate atom symbol \"";
+            emsg += smbl + "\".";
+            throw line.format_error(nsffile, emsg);
+        }
         bctable->insert(BCPair(smbl, bc));
         // elements are not explicitly included if there is just one isotope
         // or if all isotopes are unstable
@@ -242,7 +277,12 @@ const NeutronBCStorage& getNeutronBCTable()
                 (!bctable->count(el) && *chlf.rbegin() == 'Y');
             if (addel)
             {
-                assert(!bctable->count(el));
+                if (bctable->count(el))
+                {
+                    string emsg = "Duplicate element entry for \"";
+                    emsg += el + "\".";
+                    throw line.format_error(nsffile, emsg);;
+                }
                 bctable->insert(BCPair(el, bc));
             }
         }
@@ -345,8 +385,8 @@ double bcneutron(const string& smbl)
     NeutronBCStorage::const_iterator it = bctable.find(smbl);
     if (it != bctable.end())  return it->second;
     size_t pe = smbl.find_last_not_of("+-012345678 \t");
-    assert(pe != string::npos);
-    string smblnocharge = smbl.substr(0, pe + 1);
+    string smblnocharge =
+        (pe != string::npos) ? smbl.substr(0, pe + 1) : smbl;
     it = bctable.find(smblnocharge);
     if (it == bctable.end())
     {
