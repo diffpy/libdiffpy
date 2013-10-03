@@ -27,7 +27,7 @@
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <blitz/tinyvec-et.h>
+#include <boost/numeric/ublas/storage.hpp>
 
 #include <diffpy/srreal/scatteringfactordata.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -43,30 +43,33 @@ namespace {
 // X-ray scattering factors
 
 const int WKTerms = 5;
+typedef boost::numeric::ublas::bounded_array<double, WKTerms> CoeffArray;
 
 class WaasKirfFormula
 {
     public:
 
         // Constructor
-        WaasKirfFormula()
-        {
-            a = 0.0;
-            b = 0.0;
-            c = 0.0;
-        }
+        WaasKirfFormula() : a(WKTerms, 0.0), b(WKTerms, 0.0), c(0.0)
+        { }
 
         // methods
         double atstol(double stol) const
         {
-            double rv = c + blitz::sum(a * exp(-b * stol * stol));
+            double rv = c;
+            CoeffArray::const_iterator ai = a.begin();
+            CoeffArray::const_iterator bi = b.begin();
+            for (; ai != a.end(); ++ai, ++bi)
+            {
+                rv += *ai * exp(-(*bi) * stol * stol);
+            }
             return rv;
         }
 
         // data
         string symbol;
-        blitz::TinyVector<double,WKTerms> a;
-        blitz::TinyVector<double,WKTerms> b;
+        CoeffArray a;
+        CoeffArray b;
         double c;
 };
 
