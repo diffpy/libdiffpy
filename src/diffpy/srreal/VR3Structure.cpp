@@ -17,7 +17,7 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/VR3Structure.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 namespace srreal {
@@ -79,7 +79,7 @@ VR3BondGenerator::VR3BondGenerator(StructureAdapterConstPtr adpt) :
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::VR3Adapter)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::VR3Adapter)
 BOOST_CLASS_EXPORT(diffpy::srreal::VR3Adapter)
 
 // End of file

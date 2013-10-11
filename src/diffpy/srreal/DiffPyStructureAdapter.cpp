@@ -28,7 +28,7 @@
 
 #include <cassert>
 
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 #include <diffpy/srreal/DiffPyStructureAdapter.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
@@ -391,7 +391,7 @@ registerPythonStructureAdapterFactory(createDiffPyStructureAdapter);
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::DiffPyStructureAdapter)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::DiffPyStructureAdapter)
 BOOST_CLASS_EXPORT(diffpy::srreal::DiffPyStructureAdapter)
 
 // End of file

@@ -25,7 +25,7 @@
 #include <diffpy/srreal/GaussianProfile.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 using namespace diffpy::validators;
@@ -374,7 +374,7 @@ void DebyePDFCalculator::cacheRlimitsData()
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::DebyePDFCalculator)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::DebyePDFCalculator)
 BOOST_CLASS_EXPORT(diffpy::srreal::DebyePDFCalculator)
 
 // End of file

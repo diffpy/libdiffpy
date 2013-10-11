@@ -25,7 +25,7 @@
 #include <diffpy/srreal/BaseDebyeSum.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 using namespace diffpy::validators;
@@ -293,7 +293,7 @@ void BaseDebyeSum::cacheStructureData()
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::BaseDebyeSum)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::BaseDebyeSum)
 BOOST_CLASS_EXPORT(diffpy::srreal::BaseDebyeSum)
 
 // End of file

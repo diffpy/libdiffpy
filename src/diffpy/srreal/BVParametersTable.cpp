@@ -21,7 +21,7 @@
 #include <boost/serialization/export.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 #include <diffpy/runtimepath.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
@@ -160,6 +160,6 @@ BVParametersTable::getStandardSetOfBVParam() const
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::BVParametersTable)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::BVParametersTable)
 
 // End of file

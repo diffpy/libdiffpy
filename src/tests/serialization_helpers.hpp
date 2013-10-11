@@ -19,7 +19,7 @@
 #ifndef SERIALIZATION_HELPERS_HPP_INCLUDED
 #define SERIALIZATION_HELPERS_HPP_INCLUDED
 
-#include <sstream>
+#include <string>
 #include <diffpy/serialization.hpp>
 
 
@@ -27,13 +27,10 @@
 template <class T>
 T dumpandload(const T& src)
 {
-    using namespace std;
-    stringstream storage(ios::in | ios::out | ios::binary);
-    diffpy::serialization::oarchive oa(storage, ios::binary);
-    oa << src;
-    diffpy::serialization::iarchive ia(storage, ios::binary);
+    using namespace diffpy;
+    std::string data = serialization_tostring(src);
     T rv;
-    ia >> rv;
+    serialization_fromstring(rv, data);
     return rv;
 }
 

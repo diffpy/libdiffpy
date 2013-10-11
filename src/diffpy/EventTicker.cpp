@@ -21,7 +21,7 @@
 *****************************************************************************/
 
 #include <diffpy/EventTicker.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 namespace eventticker {
@@ -99,6 +99,6 @@ EventTicker::value_type EventTicker::gtick(0, 0);
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::eventticker::EventTicker)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::eventticker::EventTicker)
 
 // End of file

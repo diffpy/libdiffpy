@@ -12,6 +12,10 @@
 *
 ******************************************************************************
 *
+* Declaration of template functions:
+*   diffpy::serialization_tostring
+*   diffpy::serialization_fromstring
+*
 * Shared definitions of serialization archive types:
 *   diffpy::serialization::iarchive
 *   diffpy::serialization::oarchive
@@ -21,18 +25,17 @@
 #ifndef SERIALIZATION_HPP_INCLUDED
 #define SERIALIZATION_HPP_INCLUDED
 
+#include <string>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
-/// this macro provides explicit template instantiation of the serialize
-/// method for a specified class.
-#define DIFFPY_INSTANTIATE_SERIALIZE(C) \
-    template void C::serialize( \
-            ::diffpy::serialization::iarchive&, const unsigned int); \
-    template void C::serialize( \
-            ::diffpy::serialization::oarchive&, const unsigned int); \
-
 namespace diffpy {
+
+template <typename T>
+    std::string serialization_tostring(const T& tobj);
+template <typename T>
+    void serialization_fromstring(T& tobj, const std::string& s);
+
 namespace serialization {
 
 typedef ::boost::archive::binary_iarchive iarchive;

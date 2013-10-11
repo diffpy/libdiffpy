@@ -23,7 +23,7 @@
 #include <diffpy/srreal/BondCalculator.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/mathutils.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 
@@ -231,7 +231,7 @@ bool BondCalculator::checkConeFilters(const R3::Vector& ru01) const
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::BondCalculator)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::BondCalculator)
 BOOST_CLASS_EXPORT(diffpy::srreal::BondCalculator)
 
 // End of file

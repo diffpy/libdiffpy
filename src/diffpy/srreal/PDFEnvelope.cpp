@@ -23,6 +23,7 @@
 #include <diffpy/srreal/PDFEnvelope.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 #include <diffpy/validators.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 using diffpy::validators::ensureNonNull;
@@ -131,5 +132,7 @@ void PDFEnvelopeOwner::clearEnvelopes()
 
 }   // namespace srreal
 }   // namespace diffpy
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PDFEnvelopePtr)
 
 // End of file

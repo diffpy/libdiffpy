@@ -24,7 +24,7 @@
 #include <stdexcept>
 #include <sstream>
 
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -226,9 +226,9 @@ PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp)
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::PQEvaluatorBasic)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PQEvaluatorBasic)
 BOOST_CLASS_EXPORT(diffpy::srreal::PQEvaluatorBasic)
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::PQEvaluatorOptimized)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PQEvaluatorOptimized)
 BOOST_CLASS_EXPORT(diffpy::srreal::PQEvaluatorOptimized)
 
 // End of file

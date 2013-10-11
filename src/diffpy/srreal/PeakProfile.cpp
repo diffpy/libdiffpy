@@ -20,6 +20,7 @@
 
 #include <diffpy/srreal/PeakProfile.hpp>
 #include <diffpy/HasClassRegistry.ipp>
+#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 
@@ -56,5 +57,7 @@ const double& PeakProfile::getPrecision() const
 
 }   // namespace srreal
 }   // namespace diffpy
+
+DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::PeakProfile)
 
 // End of file
