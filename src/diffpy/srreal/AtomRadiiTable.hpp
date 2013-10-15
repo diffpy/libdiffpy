@@ -82,7 +82,6 @@ typedef AtomRadiiTable::SharedPtr AtomRadiiTablePtr;
 
 // Serialization -------------------------------------------------------------
 
-
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::AtomRadiiTable)
 
 #endif  // ATOMRADIITABLE_HPP_INCLUDED

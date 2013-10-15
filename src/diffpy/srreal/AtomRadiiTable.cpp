@@ -129,6 +129,8 @@ string AtomRadiiTable::toString(string separator) const
 }   // srreal
 }   // diffpy
 
+// Serialization -------------------------------------------------------------
+
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::AtomRadiiTable)
 DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::AtomRadiiTable)
 
