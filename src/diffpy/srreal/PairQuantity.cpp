@@ -417,6 +417,6 @@ void PairQuantity::setPairMaskValue(int i, int j, bool mask)
 
 BOOST_CLASS_EXPORT(diffpy::srreal::PairQuantity)
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PairQuantity)
-DIFFPY_INSTANTIATE_SERIALIZATION(boost::shared_ptr<diffpy::srreal::PairQuantity>)
+DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::PairQuantity)
 
 // End of file
