@@ -18,6 +18,7 @@
 
 #include <diffpy/srreal/PDFBaseline.hpp>
 #include <diffpy/HasClassRegistry.ipp>
+#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 
@@ -25,5 +26,7 @@ namespace diffpy {
 template class HasClassRegistry<srreal::PDFBaseline>;
 
 }   // namespace diffpy
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PDFBaselinePtr)
 
 // End of file

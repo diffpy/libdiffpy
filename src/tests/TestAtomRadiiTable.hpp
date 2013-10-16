@@ -120,10 +120,16 @@ class TestAtomRadiiTable : public CxxTest::TestSuite
         {
             AtomRadiiTablePtr rtb1;
             mrtb->setCustom("H", 1.23);
+            ConstantRadiiTable* crtb =
+                dynamic_cast<ConstantRadiiTable*>(mrtb.get());
+            crtb->setDefault(0.5);
             rtb1 = dumpandload(mrtb);
             TS_ASSERT_EQUALS(1.23, rtb1->lookup("H"));
             TS_ASSERT_EQUALS(1u, rtb1->getAllCustom().size());
             TS_ASSERT_DIFFERS(mrtb.get(), rtb1.get());
+            ConstantRadiiTable* crtb1 =
+                dynamic_cast<ConstantRadiiTable*>(rtb1.get());
+            TS_ASSERT_EQUALS(0.5, crtb1->getDefault());
         }
 
 };

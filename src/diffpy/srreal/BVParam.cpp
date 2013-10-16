@@ -21,6 +21,7 @@
 #include <sstream>
 #include <boost/functional/hash.hpp>
 #include <diffpy/srreal/BVParam.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 
@@ -126,5 +127,7 @@ size_t hash_value(const BVParam& bp)
 
 }   // namespace srreal
 }   // namespace diffpy
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::BVParam)
 
 // End of file

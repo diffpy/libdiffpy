@@ -23,8 +23,10 @@
 #include <stdexcept>
 #include <vector>
 #include <boost/smart_ptr/make_shared.hpp>
+#include <boost/serialization/export.hpp>
 
 #include <diffpy/srreal/ConstantRadiiTable.hpp>
+#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 namespace srreal {
@@ -83,5 +85,10 @@ bool reg_ConstantRadiiTable = ConstantRadiiTable().registerThisType();
 
 }   // srreal
 }   // diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ConstantRadiiTable)
+BOOST_CLASS_EXPORT(diffpy::srreal::ConstantRadiiTable)
 
 // End of file

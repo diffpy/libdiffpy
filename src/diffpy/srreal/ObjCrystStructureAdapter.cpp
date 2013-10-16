@@ -30,7 +30,7 @@
 #include <cmath>
 #include <set>
 
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
@@ -650,10 +650,10 @@ registerPythonStructureAdapterFactory(createPyObjCrystMoleculeAdapter);
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::ObjCrystStructureAdapter)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ObjCrystStructureAdapter)
 BOOST_CLASS_EXPORT(diffpy::srreal::ObjCrystStructureAdapter)
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::ObjCrystMoleculeAdapter)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ObjCrystMoleculeAdapter)
 BOOST_CLASS_EXPORT(diffpy::srreal::ObjCrystMoleculeAdapter)
 
 // End of file

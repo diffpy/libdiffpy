@@ -21,7 +21,7 @@
 #include <cmath>
 #include <cassert>
 
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
@@ -719,7 +719,7 @@ void PDFCalculator::cacheRlimitsData()
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::PDFCalculator)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PDFCalculator)
 BOOST_CLASS_EXPORT(diffpy::srreal::PDFCalculator)
 
 // End of file

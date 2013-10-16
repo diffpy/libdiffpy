@@ -20,6 +20,7 @@
 #include <cassert>
 #include <cctype>
 
+#include <diffpy/serialization.ipp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/VR3Structure.hpp>
@@ -177,5 +178,7 @@ int atomValence(const std::string& atomtype)
 
 }   // namespace srreal
 }   // namespace diffpy
+
+DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::StructureAdapter)
 
 // End of file

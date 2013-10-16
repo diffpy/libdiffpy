@@ -22,7 +22,7 @@
 
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/mathutils.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 
@@ -416,5 +416,7 @@ void PairQuantity::setPairMaskValue(int i, int j, bool mask)
 // Serialization -------------------------------------------------------------
 
 BOOST_CLASS_EXPORT(diffpy::srreal::PairQuantity)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PairQuantity)
+DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::PairQuantity)
 
 // End of file

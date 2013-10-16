@@ -22,7 +22,7 @@
 #include <diffpy/srreal/ConstantRadiiTable.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/mathutils.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 using diffpy::validators::ensureNonNull;
@@ -368,6 +368,12 @@ void OverlapCalculator::setAtomRadiiTable(AtomRadiiTablePtr table)
 }
 
 
+void OverlapCalculator::setAtomRadiiTableByType(const std::string& tp)
+{
+    matomradiitable = AtomRadiiTable::createByType(tp);
+}
+
+
 AtomRadiiTablePtr& OverlapCalculator::getAtomRadiiTable()
 {
     return matomradiitable;
@@ -541,7 +547,7 @@ OverlapCalculator::getNeighborIds(int k) const
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::OverlapCalculator)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::OverlapCalculator)
 BOOST_CLASS_EXPORT(diffpy::srreal::OverlapCalculator)
 
 // End of file

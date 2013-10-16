@@ -21,6 +21,7 @@
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 #include <diffpy/validators.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 using diffpy::validators::ensureNonNull;
@@ -151,5 +152,8 @@ const string& ScatteringFactorTableOwner::getRadiationType() const
 
 }   // namespace srreal
 }   // namespace diffpy
+
+DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::ScatteringFactorTable)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ScatteringFactorTableOwner)
 
 // End of file

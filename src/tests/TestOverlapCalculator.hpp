@@ -22,6 +22,7 @@
 #include <diffpy/PythonInterface.hpp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/OverlapCalculator.hpp>
+#include <diffpy/serialization.ipp>
 #include "python_helpers.hpp"
 #include "serialization_helpers.hpp"
 

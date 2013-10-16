@@ -20,7 +20,7 @@
 #include <cassert>
 
 #include <diffpy/validators.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 #include <diffpy/srreal/BVSCalculator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 
@@ -230,7 +230,7 @@ double BVSCalculator::rmaxFromPrecision(double eps) const
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::BVSCalculator)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::BVSCalculator)
 BOOST_CLASS_EXPORT(diffpy::srreal::BVSCalculator)
 
 // End of file

@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <boost/functional/hash.hpp>
 
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
 
@@ -286,7 +286,7 @@ AtomicStructureBondGenerator::AtomicStructureBondGenerator(
 
 // Serialization -------------------------------------------------------------
 
-DIFFPY_INSTANTIATE_SERIALIZE(diffpy::srreal::AtomicStructureAdapter)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::AtomicStructureAdapter)
 BOOST_CLASS_EXPORT(diffpy::srreal::AtomicStructureAdapter)
 
 // End of file
