@@ -23,6 +23,7 @@
 
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
+#include "serialization_helpers.hpp"
 
 namespace diffpy {
 namespace srreal {
@@ -107,9 +108,25 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
         }
 
 
-        // FIXME
-        void xtest_serialization()
-        { }
+        void test_serialization()
+        {
+            Atom ai;
+            ai.atomtype = "C";
+            ai.cartesianposition = R3::Vector(1, 2, 3);
+            ai.anisotropy = true;
+            mpstru->append(ai);
+            ai.atomtype = "H";
+            ai.cartesianposition = R3::Vector(4, 5, 6);
+            ai.anisotropy = false;
+            mpstru->append(ai);
+            StructureAdapterPtr stru1;
+            stru1 = dumpandload(mstru);
+            AtomicStructureAdapterPtr astru1 =
+                boost::dynamic_pointer_cast<AtomicStructureAdapter>(stru1);
+            TS_ASSERT_EQUALS(2, astru1->countSites());
+            TS_ASSERT_EQUALS((*mpstru)[0], (*astru1)[0]);
+            TS_ASSERT_EQUALS((*mpstru)[1], (*astru1)[1]);
+        }
 
 };  // class TestAtomicStructureAdapter
 
