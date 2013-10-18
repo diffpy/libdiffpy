@@ -88,6 +88,9 @@ class TestBVParametersTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(2.15, mbvtb->lookup(bk).mRo);
             TS_ASSERT_EQUALS(0.37, mbvtb->lookup(bk).mB);
             TS_ASSERT_EQUALS("b", mbvtb->lookup(bk).mref_id);
+            const BVParam& bnacl0 = mbvtb->lookup("Na", 1, "Cl", -1);
+            TS_ASSERT_EQUALS(&bnacl0, &mbvtb->lookup("Na+", "Cl-"));
+            TS_ASSERT_EQUALS(&bnacl0, &mbvtb->lookup("Cl1-", "Na1+"));
         }
 
 

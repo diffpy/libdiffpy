@@ -24,6 +24,7 @@
 #include <diffpy/serialization.ipp>
 #include <diffpy/runtimepath.hpp>
 #include <diffpy/validators.hpp>
+#include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
 
 using namespace std;
@@ -60,6 +61,16 @@ const BVParam& BVParametersTable::lookup(const BVParam& bpk) const
     if (bpit != stdtable.end())  return *bpit;
     // not found - return blank BVParam
     return this->none();
+}
+
+
+const BVParam&
+BVParametersTable::lookup(const string& smbl0, const string& smbl1) const
+{
+    const BVParam& rv = this->lookup(
+            atomBareSymbol(smbl0), atomValence(smbl0),
+            atomBareSymbol(smbl1), atomValence(smbl1));
+    return rv;
 }
 
 

@@ -44,6 +44,8 @@ class BVParametersTable
 
         // methods
         const BVParam& lookup(const BVParam&) const;
+        const BVParam& lookup(
+                const std::string& smbl0, const std::string& smbl1) const;
         const BVParam& lookup(const std::string& atom0, int valence0,
                 const std::string& atom1, int valence1) const;
         void setCustom(const BVParam&);
