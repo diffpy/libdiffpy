@@ -38,6 +38,7 @@ class BVParam
         // methods
         /// comparison binary_function
         bool operator==(const BVParam& other) const;
+        bool operator!=(const BVParam& other) const;
         /// Return bond valence at a specified distance
         double bondvalence(double distance) const;
         /// Return distance corresponding  to a specified bond valence

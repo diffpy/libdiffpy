@@ -71,6 +71,12 @@ bool BVParam::operator==(const BVParam& other) const
 }
 
 
+bool BVParam::operator!=(const BVParam& other) const
+{
+    return !(*this == other);
+}
+
+
 double BVParam::bondvalence(double distance) const
 {
     double rv = (mB > 0.0) ? exp((mRo - distance) / mB) : 0.0;
