@@ -1,11 +1,18 @@
 # coding=UTF-8
+#-------------------------------------------------------------------------
+# CxxTest: A lightweight C++ unit testing library.
+# Copyright (c) 2008 Sandia Corporation.
+# This software is distributed under the LGPL License v3
+# For more information, see the COPYING file in the top CxxTest directory.
+# Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
+# the U.S. Government retains certain rights in this software.
+#-------------------------------------------------------------------------
 #
 # == Preamble ==
 # Authors of this script are in the Authors file in the same directory as this
 # script.
 #
-# please send bugreports/praise/comments/criticism to
-# gasper.azman at gmail.com or the cxxtest mailing list (dev at cxxtest.tigris.org)
+# Maintainer: Gašper Ažman <gasper.azman@gmail.com>
 #
 # This file is maintained as a part of the CxxTest test suite.
 # 
@@ -111,10 +118,15 @@ def UnitTest(env, target, source = [], **kwargs):
     kwargs["CXXFLAGS"] = cxxflags
     kwargs["CCFLAGS"]  = ccflags
     test = env.Program(target, source = source, **kwargs)
-    if multiget([kwargs, env, os.environ], 'CXXTEST_SKIP_ERRORS', False):
-        runner = env.Action(test[0].abspath, exitstatfunc=lambda x:0)
+    testCommand = multiget([kwargs, env, os.environ], 'CXXTEST_COMMAND')
+    if testCommand:
+        testCommand = testCommand.replace('%t', test[0].abspath)
     else:
-        runner = env.Action(test[0].abspath)
+        testCommand = test[0].abspath
+    if multiget([kwargs, env, os.environ], 'CXXTEST_SKIP_ERRORS', False):
+        runner = env.Action(testCommand, exitstatfunc=lambda x:0)
+    else:
+        runner = env.Action(testCommand)
     env.Alias(env['CXXTEST_TARGET'], test, runner)
     env.AlwaysBuild(env['CXXTEST_TARGET'])
     return test
@@ -217,6 +229,10 @@ def generate(env, **kwargs):
     CXXTEST_OPTS    - other options to pass to cxxtest.  Default: ''
     CXXTEST_SUFFIX  - the suffix of the test files.  Default: '.t.h'
     CXXTEST_TARGET  - the target to append the tests to.  Default: check
+    CXXTEST_COMMAND - the command that will be executed to run the test,
+                       %t will be replace with the test executable.
+                       Can be used for example for MPI or valgrind tests.
+                       Default: %t
     CXXTEST_CXXFLAGS_REMOVE - the flags that cxxtests can't compile with,
                               or give lots of warnings. Will be stripped.
                               Default: -pedantic -Weffc++
@@ -346,3 +362,4 @@ def generate(env, **kwargs):
 
 def exists(env):
     return os.path.exists(env['CXXTEST'])
+
