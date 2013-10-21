@@ -160,6 +160,14 @@ bool operator==(const diffpy::srreal::R3::Vector& u,
 
 
 inline
+bool operator!=(const diffpy::srreal::R3::Vector& u,
+        const diffpy::srreal::R3::Vector& v)
+{
+    return !(u == v);
+}
+
+
+inline
 bool operator==(const diffpy::srreal::R3::Matrix& A,
         const diffpy::srreal::R3::Matrix& B)
 {
@@ -169,6 +177,13 @@ bool operator==(const diffpy::srreal::R3::Matrix& A,
     return rv;
 }
 
+
+inline
+bool operator!=(const diffpy::srreal::R3::Matrix& A,
+        const diffpy::srreal::R3::Matrix& B)
+{
+    return !(A == B);
+}
 
 // Hashing -------------------------------------------------------------------
 
