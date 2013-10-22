@@ -23,8 +23,8 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
-#include <diffpy/srreal/PointsInSphere.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/srreal/AtomicStructureAdapter.hpp>
+#include "serialization_helpers.hpp"
 #include "objcryst_helpers.hpp"
 #include <ObjCryst/ObjCryst/Crystal.h>
 #include <ObjCryst/ObjCryst/Molecule.h>
@@ -424,7 +424,7 @@ class TestObjCrystMoleculeAdapter : public CxxTest::TestSuite
 
         void test_typeid()
         {
-            TS_ASSERT(typeid(ObjCrystMoleculeAdapter) == typeid(*m_c60));
+            TS_ASSERT(typeid(AtomicStructureAdapter) == typeid(*m_c60));
         }
 
 
@@ -491,31 +491,10 @@ class TestObjCrystMoleculeAdapter : public CxxTest::TestSuite
         }
 
 
-        void test_getLattice()
-        {
-            ObjCrystMoleculeAdapter* padpt =
-                dynamic_cast<ObjCrystMoleculeAdapter*>(m_c60.get());
-            TS_ASSERT(padpt);
-            const Lattice& L = padpt->getLattice();
-            const double eps = 1.0e-12;
-            TS_ASSERT_DELTA(1, L.a(), eps);
-            TS_ASSERT_DELTA(1, L.b(), eps);
-            TS_ASSERT_DELTA(1, L.c(), eps);
-            TS_ASSERT_DELTA(90, L.alpha(), eps);
-            TS_ASSERT_DELTA(90, L.beta(), eps);
-            TS_ASSERT_DELTA(90, L.gamma(), eps);
-        }
-
-
         void test_serialization()
         {
-            stringstream storage(ios::in | ios::out | ios::binary);
-            diffpy::serialization::oarchive oa(storage, ios::binary);
-            oa << m_c60;
-            diffpy::serialization::iarchive ia(storage, ios::binary);
             StructureAdapterPtr c60a;
-            TS_ASSERT(!c60a.get());
-            ia >> c60a;
+            c60a = dumpandload(m_c60);
             TS_ASSERT_DIFFERS(m_c60.get(), c60a.get());
             TS_ASSERT_EQUALS(60, c60a->countSites());
             TS_ASSERT_EQUALS(60.0, c60a->totalOccupancy());
@@ -560,7 +539,7 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
 
         void test_typeid()
         {
-            TS_ASSERT(typeid(ObjCrystMoleculeBondGenerator) ==
+            TS_ASSERT(typeid(AtomicStructureBondGenerator) ==
                     typeid(*m_c60bnds));
         }
 

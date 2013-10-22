@@ -16,10 +16,6 @@
 *   -- adapter to the Crystal class from ObjCryst++.
 * class ObjCrystBondGenerator
 *   -- Generate bonds from periodic ObjCrystStructureAdapter.
-* class ObjCrystMoleculeAdapter
-*   -- adapter class for Molecule class from ObjCryst++.
-* class ObjCrystMoleculeBondGenerator
-*   -- Generate bonds from ObjCrystMoleculeAdapter
 *
 *****************************************************************************/
 
@@ -143,77 +139,11 @@ class ObjCrystBondGenerator : public BaseBondGenerator
         boost::scoped_ptr<PointsInSphere> msphere;
 };
 
-// Adapter for ObjCryst::Molecule
+// ObjCryst::Molecule can be adapted with AtomicStructureAdapter
 //
 // Molecules are always considered aperiodic. The anisotropic ADPs are treated
 // as if in a cartesian cell. If this is not what is intended, pass the
 // molecule as a scattering component within an ObjCryst::Crystal.
-
-class ObjCrystMoleculeAdapter : public StructureAdapter
-{
-
-    friend class ObjCrystMoleculeBondGenerator;
-
-    public:
-
-        // constructors
-        ObjCrystMoleculeAdapter()  { }
-        ObjCrystMoleculeAdapter(const ObjCryst::Molecule&);
-
-        // methods - overloaded
-        virtual BaseBondGeneratorPtr createBondGenerator() const;
-        virtual int countSites() const;
-        virtual double numberDensity() const;
-        virtual const R3::Vector& siteCartesianPosition(int idx) const;
-        virtual double siteOccupancy(int idx) const;
-        virtual bool siteAnisotropy(int idx) const;
-        virtual const R3::Matrix& siteCartesianUij(int idx) const;
-        virtual const std::string& siteAtomType(int idx) const;
-        const Lattice& getLattice() const;
-
-
-    private:
-
-        // cached data per each atom in the molecule
-        std::vector<double> moccupancies;
-        std::vector<bool> manisotropies;
-        std::vector<std::string> matomtypes;
-        // The positions of the scatterers.
-        std::vector<R3::Vector> mvpos;
-        // The Uij for scatterers.
-        std::vector<R3::Matrix> mvuij;
-        // The Lattice instance needed by the bond generator
-        Lattice mlattice;
-
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & boost::serialization::base_object<StructureAdapter>(*this);
-            ar & moccupancies;
-            ar & manisotropies;
-            ar & matomtypes;
-            ar & mvpos;
-            ar & mvuij;
-            ar & mlattice;
-        }
-};
-
-
-class ObjCrystMoleculeBondGenerator : public BaseBondGenerator
-{
-    public:
-
-        // constructors
-        ObjCrystMoleculeBondGenerator(StructureAdapterConstPtr);
-
-    protected:
-
-        // The adapted structure
-        const ObjCrystMoleculeAdapter* mpstructure;
-
-};
 
 
 inline
@@ -224,15 +154,8 @@ createStructureAdapter(const ObjCryst::Crystal& cryst)
     return adapter;
 }
 
-
-inline
 StructureAdapterPtr
-createStructureAdapter(const ObjCryst::Molecule& molecule)
-{
-    StructureAdapterPtr adapter(new ObjCrystMoleculeAdapter(molecule));
-    return adapter;
-}
-
+createStructureAdapter(const ObjCryst::Molecule& molecule);
 
 }   // namespace srreal
 }   // namespace diffpy

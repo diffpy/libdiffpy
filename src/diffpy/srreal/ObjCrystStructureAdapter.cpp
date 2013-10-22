@@ -16,10 +16,8 @@
 *   -- adapter to the Crystal class from ObjCryst++.
 * class ObjCrystBondGenerator
 *   -- Generate bonds from periodic ObjCrystStructureAdapter.
-* class ObjCrystMoleculeAdapter
-*   -- adapter class for Molecule class from ObjCryst++.
-* class ObjCrystMoleculeBondGenerator
-*   -- Generate bonds from ObjCrystMoleculeAdapter
+* Factory function createStructureAdapter(ObjCryst::Molecule)
+*   -- builds AtomicStructureAdapter from the ObjCryst Molecule object
 *
 *****************************************************************************/
 
@@ -33,10 +31,13 @@
 #include <diffpy/serialization.ipp>
 #include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
+#include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
 
 using namespace std;
-using namespace diffpy::srreal;
+
+namespace diffpy {
+namespace srreal {
 
 namespace {
 
@@ -456,156 +457,32 @@ updater1()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// class ObjCrystMoleculeAdapter
+// StructureAdapter factory for ObjCryst::Molecule
 //////////////////////////////////////////////////////////////////////////////
 
-// Constructor ---------------------------------------------------------------
-
-ObjCrystMoleculeAdapter::
-ObjCrystMoleculeAdapter(const ObjCryst::Molecule& molecule)
+StructureAdapterPtr
+createStructureAdapter(const ObjCryst::Molecule& molecule)
 {
-    using ObjCryst::MolAtom;
-
-    mlattice.setLatPar(1, 1, 1, 90, 90, 90);
-
+    AtomicStructureAdapterPtr adpt(new AtomicStructureAdapter);
     size_t nbComponent = molecule.GetNbComponent();
-    // Initialize all cache stores.
-    moccupancies.clear();
-    manisotropies.clear();
-    matomtypes.clear();
-    mvpos.clear();
-    mvuij.clear();
-    moccupancies.reserve(nbComponent);
-    manisotropies.reserve(nbComponent);
-    matomtypes.reserve(nbComponent);
-    mvpos.reserve(nbComponent);
-    mvuij.reserve(nbComponent);
-
+    adpt->reserve(nbComponent);
+    Atom ai;
     for (size_t i = 0; i < nbComponent; ++i)
     {
-
-        const MolAtom& atom = molecule.GetAtom(i);
+        const ObjCryst::MolAtom& atom = molecule.GetAtom(i);
         if (atom.IsDummy()) continue;
-
-        // Store the atom
-        moccupancies.push_back(atom.GetOccupancy());
+        ai.occupancy = atom.GetOccupancy();
         const ObjCryst::ScatteringPower* sp = &(atom.GetScatteringPower());
-        manisotropies.push_back(!(sp->IsIsotropic()));
-        matomtypes.push_back(sp->GetSymbol());
-
-        // Store position
-        R3::Vector xyz;
-        xyz = atom.X(), atom.Y(), atom.Z();
-        mvpos.push_back(xyz);
-
+        ai.anisotropy = !(sp->IsIsotropic());
+        ai.atomtype = sp->GetSymbol();
+        ai.cartesianposition[0] = atom.X();
+        ai.cartesianposition[1] = atom.Y();
+        ai.cartesianposition[2] = atom.Z();
         // Store Uij
-        R3::Matrix Uij = getUij(&atom.GetScatteringPower());
-        mvuij.push_back(Uij);
+        ai.cartesianuij = getUij(sp);
+        adpt->append(ai);
     }
-
-    // final sanity checks
-    assert(int(moccupancies.size()) == this->countSites());
-    assert(int(manisotropies.size()) == this->countSites());
-    assert(int(matomtypes.size()) == this->countSites());
-    assert(int(mvpos.size()) == this->countSites());
-    assert(int(mvuij.size()) == this->countSites());
-
-}
-
-// Public Methods ------------------------------------------------------------
-
-BaseBondGeneratorPtr
-ObjCrystMoleculeAdapter::
-createBondGenerator() const
-{
-
-    BaseBondGeneratorPtr bnds(
-            new ObjCrystMoleculeBondGenerator(shared_from_this()));
-    return bnds;
-}
-
-
-int
-ObjCrystMoleculeAdapter::
-countSites() const
-{
-    return mvpos.size();
-}
-
-
-double
-ObjCrystMoleculeAdapter::
-numberDensity() const
-{
-    return 0.0;
-}
-
-
-const Lattice&
-ObjCrystMoleculeAdapter::
-getLattice() const
-{
-    return mlattice;
-}
-
-
-const R3::Vector&
-ObjCrystMoleculeAdapter::
-siteCartesianPosition(int idx) const
-{
-    assert(0 <= idx && idx < this->countSites());
-    return mvpos[idx];
-}
-
-
-double
-ObjCrystMoleculeAdapter::
-siteOccupancy(int idx) const
-{
-    assert(0 <= idx && idx < this->countSites());
-    return moccupancies[idx];
-}
-
-
-bool
-ObjCrystMoleculeAdapter::
-siteAnisotropy(int idx) const
-{
-    assert(0 <= idx && idx < this->countSites());
-    return manisotropies[idx];
-}
-
-
-const R3::Matrix&
-ObjCrystMoleculeAdapter::
-siteCartesianUij(int idx) const
-{
-    assert(0 <= idx && idx < this->countSites());
-    return mvuij[idx];
-}
-
-
-const string&
-ObjCrystMoleculeAdapter::
-siteAtomType(int idx) const
-{
-    assert(0 <= idx && idx < this->countSites());
-    return matomtypes[idx];
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// class ObjCrystMoleculeBondGenerator
-//////////////////////////////////////////////////////////////////////////////
-
-// Constructor ---------------------------------------------------------------
-
-ObjCrystMoleculeBondGenerator::
-ObjCrystMoleculeBondGenerator(StructureAdapterConstPtr adpt)
-    : BaseBondGenerator(adpt)
-{
-    mpstructure = dynamic_cast<const ObjCrystMoleculeAdapter*>(adpt.get());
-    assert(mpstructure);
+    return adpt;
 }
 
 // Factory Function and its Registration -------------------------------------
@@ -652,12 +529,12 @@ registerPythonStructureAdapterFactory(createPyObjCrystStructureAdapter);
 bool reg_PyObjCrystMoleculeAdapter =
 registerPythonStructureAdapterFactory(createPyObjCrystMoleculeAdapter);
 
+}   // namespace srreal
+}   // namespace diffpy
+
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ObjCrystStructureAdapter)
 BOOST_CLASS_EXPORT(diffpy::srreal::ObjCrystStructureAdapter)
-
-DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ObjCrystMoleculeAdapter)
-BOOST_CLASS_EXPORT(diffpy::srreal::ObjCrystMoleculeAdapter)
 
 // End of file
