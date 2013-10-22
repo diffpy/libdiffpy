@@ -24,7 +24,7 @@
 #include <diffpy/serialization.ipp>
 #include <diffpy/runtimepath.hpp>
 #include <diffpy/validators.hpp>
-#include <diffpy/srreal/StructureAdapter.hpp>
+#include <diffpy/srreal/AtomUtils.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
 
 using namespace std;

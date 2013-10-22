@@ -21,8 +21,8 @@
 
 #include <diffpy/validators.hpp>
 #include <diffpy/serialization.ipp>
+#include <diffpy/srreal/AtomUtils.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
-#include <diffpy/srreal/StructureAdapter.hpp>
 
 using namespace std;
 using namespace diffpy::validators;

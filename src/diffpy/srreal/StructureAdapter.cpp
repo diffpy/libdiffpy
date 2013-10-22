@@ -132,50 +132,6 @@ double maxUii(StructureAdapterConstPtr stru)
     return rv;
 }
 
-
-std::string atomBareSymbol(const std::string& atomtype)
-{
-    string::size_type pb, pe;
-    pb = atomtype.find_first_not_of("0123456789- \t");
-    pe = atomtype.find_last_not_of("+-012345678 \t");
-    string rv = atomtype.substr(pb, pe - pb + 1);
-    return rv;
-}
-
-
-/// Return valence of possibly ionic symbol such as "S2-" or "Cl-".
-int atomValence(const std::string& atomtype)
-{
-    string::const_reverse_iterator ci;
-    int rv = 0;
-    for (ci = atomtype.rbegin(); ci != atomtype.rend(); ++ci)
-    {
-        if (isspace(*ci))   continue;
-        // read trailing sign
-        if (rv == 0)
-        {
-            if (*ci == '+')
-            {
-                rv = 1;
-                continue;
-            }
-            if (*ci == '-')
-            {
-                rv = -1;
-                continue;
-            }
-            break;
-        }
-        // allow one [1-8] digit before the +/- sign
-        if (rv && '0' <= *ci && *ci <= '8')
-        {
-            rv *= (*ci - '0');
-        }
-        break;
-    }
-    return rv;
-}
-
 }   // namespace srreal
 }   // namespace diffpy
 

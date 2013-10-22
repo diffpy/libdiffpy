@@ -30,7 +30,7 @@
 #include <blitz/tinyvec-et.h>
 
 #include <diffpy/srreal/scatteringfactordata.hpp>
-#include <diffpy/srreal/StructureAdapter.hpp>
+#include <diffpy/srreal/AtomUtils.hpp>
 #include <diffpy/runtimepath.hpp>
 #include <diffpy/validators.hpp>
 
