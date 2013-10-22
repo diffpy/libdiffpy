@@ -90,8 +90,11 @@ class AtomicStructureAdapter : public StructureAdapter
         void insert(int, const Atom&);
         void append(const Atom&);
         void remove(int);
+        void reserve(size_t sz)  { matoms.reserve(sz); }
         Atom& operator[](int);
         const Atom& operator[](int) const;
+        Atom& at(int idx)  { return (*this)[idx]; }
+        const Atom& at(int idx) const  { return (*this)[idx]; }
         template <class Iter>
             void assign (Iter first, Iter last)  { matoms.assign(first, last); }
         void assign (size_t n, const Atom& a)  { matoms.assign(n, a); }
