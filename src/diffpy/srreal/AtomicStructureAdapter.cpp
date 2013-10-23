@@ -15,8 +15,6 @@
 * class AtomicStructureAdapter -- universal structure adapter for
 *     a non-periodic set of atoms.
 
-* class AtomicStructureBondGenerator -- bond generator
-*
 *****************************************************************************/
 
 #include <cassert>
@@ -101,8 +99,7 @@ size_t hash_value(const Atom& a)
 
 BaseBondGeneratorPtr AtomicStructureAdapter::createBondGenerator() const
 {
-    BaseBondGeneratorPtr bnds(
-            new AtomicStructureBondGenerator(shared_from_this()));
+    BaseBondGeneratorPtr bnds(new BaseBondGenerator(shared_from_this()));
     return bnds;
 }
 
@@ -265,19 +262,6 @@ const Atom& AtomicStructureAdapter::operator[](int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
     return matoms[idx];
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// class AtomicStructureBondGenerator
-//////////////////////////////////////////////////////////////////////////////
-
-// Constructor ---------------------------------------------------------------
-
-AtomicStructureBondGenerator::AtomicStructureBondGenerator(
-        StructureAdapterConstPtr adpt) : BaseBondGenerator(adpt)
-{
-    mastructure = dynamic_cast<const AtomicStructureAdapter*>(adpt.get());
-    assert(mastructure);
 }
 
 }   // namespace srreal

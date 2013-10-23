@@ -15,8 +15,6 @@
 * class AtomicStructureAdapter -- universal structure adapter for
 *     a non-periodic set of atoms.
 *
-* class AtomicStructureBondGenerator -- bond generator
-*
 *****************************************************************************/
 
 #ifndef ATOMICSTRUCTUREADAPTER_HPP_INCLUDED
@@ -129,21 +127,6 @@ class AtomicStructureAdapter : public StructureAdapter
 };
 
 typedef boost::shared_ptr<AtomicStructureAdapter> AtomicStructureAdapterPtr;
-
-
-class AtomicStructureBondGenerator : public BaseBondGenerator
-{
-    public:
-
-        // constructors
-        AtomicStructureBondGenerator(StructureAdapterConstPtr);
-
-    protected:
-
-        // data
-        const AtomicStructureAdapter* mastructure;
-};
-
 
 }   // namespace srreal
 }   // namespace diffpy

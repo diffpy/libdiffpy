@@ -539,8 +539,7 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
 
         void test_typeid()
         {
-            TS_ASSERT(typeid(AtomicStructureBondGenerator) ==
-                    typeid(*m_c60bnds));
+            TS_ASSERT(typeid(BaseBondGenerator) == typeid(*m_c60bnds));
         }
 
 
