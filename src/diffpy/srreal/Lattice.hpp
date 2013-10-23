@@ -119,6 +119,10 @@ class Lattice
         const R3::Vector& ucMaxDiagonal() const;
         double ucMaxDiagonalLength() const;
 
+        // comparison
+        bool operator==(const Lattice&) const;
+        bool operator!=(const Lattice&) const;
+
     private:
 
         // methods

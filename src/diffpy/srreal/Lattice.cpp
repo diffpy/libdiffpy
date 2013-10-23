@@ -261,6 +261,19 @@ double Lattice::ucMaxDiagonalLength() const
     return res;
 }
 
+
+bool Lattice::operator==(const Lattice& other) const
+{
+    bool rv = (this->base() == other.base());
+    return rv;
+}
+
+
+bool Lattice::operator!=(const Lattice& other) const
+{
+    return !(*this == other);
+}
+
 // Private Methods -----------------------------------------------------------
 
 void Lattice::updateMetrics()
