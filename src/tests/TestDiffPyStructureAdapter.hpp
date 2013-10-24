@@ -169,11 +169,7 @@ class TestDiffPyStructureAdapter : public CxxTest::TestSuite
         void test_siteCartesianUij()
         {
             // nickel should have all Uij equal zero.
-            const double* puij = m_ni->siteCartesianUij(0).data();
-            for (int i = 0; i < 9; ++i)
-            {
-                TS_ASSERT_EQUALS(0.0, puij[i]);
-            }
+            TS_ASSERT_EQUALS(R3::zeros(), m_ni->siteCartesianUij(0));
             // check CaTiO3 values
             const R3::Matrix& UTi = m_catio3->siteCartesianUij(7);
             const double eps = 1e-8;
