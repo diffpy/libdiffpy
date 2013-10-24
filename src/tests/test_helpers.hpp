@@ -20,8 +20,12 @@
 #define TEST_HELPERS_HPP_INCLUDED
 
 #include <string>
+#include <diffpy/srreal/forwardtypes.hpp>
 
 std::string prepend_tests_dir(const std::string& f);
 std::string prepend_testdata_dir(const std::string& f);
+
+diffpy::srreal::StructureAdapterPtr
+    loadTestPeriodicStructure(const std::string& tailname);
 
 #endif  // TEST_HELPERS_HPP_INCLUDED
