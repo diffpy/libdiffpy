@@ -23,7 +23,7 @@
 #include <ObjCryst/ObjCryst/CIF.h>
 
 #include "objcryst_helpers.hpp"
-#include "tests_dir.hpp"
+#include "test_helpers.hpp"
 
 using namespace std;
 

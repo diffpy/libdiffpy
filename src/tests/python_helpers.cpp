@@ -18,7 +18,7 @@
 
 #include <diffpy/PythonInterface.hpp>
 #include "python_helpers.hpp"
-#include "tests_dir.hpp"
+#include "test_helpers.hpp"
 
 using namespace std;
 using namespace boost;

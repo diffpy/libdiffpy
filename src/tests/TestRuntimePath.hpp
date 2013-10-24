@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <cxxtest/TestSuite.h>
 #include <diffpy/runtimepath.hpp>
-#include "tests_dir.hpp"
+#include "test_helpers.hpp"
 
 using diffpy::runtimepath::datapath;
 

@@ -12,31 +12,16 @@
 *
 ******************************************************************************
 *
-* Path definitions of datafiles that are used in testing.
-*
-* $Id: globals.hpp 2706 2009-02-15 03:49:57Z juhas $
+* Helper functions used in other unit tests.
 *
 *****************************************************************************/
 
-#include "tests_dir.hpp"
+#ifndef TEST_HELPERS_HPP_INCLUDED
+#define TEST_HELPERS_HPP_INCLUDED
 
-std::string prepend_tests_dir(const std::string& f)
-{
-    using namespace std;
-    string rv("%(tests_dir)s");
-    rv = rv + '/' + f;
-    return rv;
-}
+#include <string>
 
+std::string prepend_tests_dir(const std::string& f);
+std::string prepend_testdata_dir(const std::string& f);
 
-std::string prepend_testdata_dir(const std::string& f)
-{
-    using namespace std;
-    string ft = "testdata/";
-    ft += f;
-    string rv = prepend_tests_dir(ft);
-    return rv;
-}
-
-// vim:ft=cpp:
-// End of tests_dir.cpp
+#endif  // TEST_HELPERS_HPP_INCLUDED

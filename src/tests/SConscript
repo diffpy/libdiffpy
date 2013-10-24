@@ -27,21 +27,13 @@ def srcincluded(f):
 # alltests -- the unit test driver source files
 test_sources = filter(srcincluded, Glob('Test*.hpp'))
 
-# special builder for tests_dir.cpp
-def build_tests_dir(target, source, env):
-    tdfullpath = source[0].abspath
-    flds = {'tests_dir' : os.path.dirname(tdfullpath)}
-    tests_dir_code = open(tdfullpath).read() % flds
-    open(str(target[0]), 'w').write(tests_dir_code)
-    return None
+# Define the DIFFPYTESTSDIRPATH macro required for test_helpers.cpp
+thisdir = Dir('.').srcnode().abspath
+env_th = env_test.Clone()
+env_th.AppendUnique(CPPDEFINES=dict(DIFFPYTESTSDIRPATH=thisdir))
+thobj = env_th.Object('test_helpers.cpp')
 
-env_test.Append(BUILDERS={'Build_tests_dir_cpp' :
-        Builder(action=build_tests_dir)})
-tdcpp = env_test.Build_tests_dir_cpp(['tests_dir.cpp'],
-        [env_test.File('tests_dir.tpl').srcnode(),
-         env_test.Value(Dir('.').srcnode().abspath)])
-
-test_helpers = [tdcpp, 'python_helpers.cpp', 'objcryst_helpers.cpp']
+test_helpers = [thobj, 'python_helpers.cpp', 'objcryst_helpers.cpp']
 test_helpers = filter(srcsupported, test_helpers)
 
 alltests = env_test.CxxTest('alltests', test_sources + test_helpers)
