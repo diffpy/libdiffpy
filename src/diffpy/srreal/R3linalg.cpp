@@ -35,10 +35,10 @@ double determinant(const Matrix& A)
     gsl_matrix* gA = gsl_matrix_alloc(Ndim, Ndim);
     for (int i = 0; i != Ndim; ++i)
     {
-	for (int j = 0; j != Ndim; ++j)
-	{
-	    gsl_matrix_set(gA, i, j, A(i,j));
-	}
+        for (int j = 0; j != Ndim; ++j)
+        {
+            gsl_matrix_set(gA, i, j, A(i,j));
+        }
     }
     gsl_permutation* gP = gsl_permutation_alloc(Ndim);
     int signum;
@@ -56,10 +56,10 @@ const Matrix& inverse(const Matrix& A)
     gsl_matrix* gA = gsl_matrix_alloc(Ndim, Ndim);
     for (int i = 0; i != Ndim; ++i)
     {
-	for (int j = 0; j != Ndim; ++j)
-	{
-	    gsl_matrix_set(gA, i, j, A(i,j));
-	}
+        for (int j = 0; j != Ndim; ++j)
+        {
+            gsl_matrix_set(gA, i, j, A(i,j));
+        }
     }
     gsl_permutation* gP = gsl_permutation_alloc(Ndim);
     int signum;

@@ -54,10 +54,10 @@ class Vector : public ublas::vector<double, ublas::bounded_array<double,3> >
 
     public:
 
-	// constructors
-	Vector() : BaseVector(3)  { }
+        // constructors
+        Vector() : BaseVector(3)  { }
 
-	Vector(const double& x, const double& y, const double& z)
+        Vector(const double& x, const double& y, const double& z)
             : BaseVector(3)
         {
             Vector::iterator xi = this->begin();
@@ -66,17 +66,17 @@ class Vector : public ublas::vector<double, ublas::bounded_array<double,3> >
             *(xi++) = z;
         }
 
-	template <class T>
+        template <class T>
             Vector(const ublas::vector_expression<T>& r) : BaseVector(r)
         { }
 
-	template <class T>
+        template <class T>
             void operator=(const ublas::vector_expression<T>& r)
         {
             BaseVector::operator=(r);
         }
 
-	template <class T>
+        template <class T>
             void operator=(const BaseVector& r)
         {
             BaseVector::operator=(r);
@@ -103,10 +103,10 @@ class Matrix : public ublas::matrix<double,
 
     public:
 
-	// constructors
-	Matrix() : BaseMatrix(3, 3)  { }
+        // constructors
+        Matrix() : BaseMatrix(3, 3)  { }
 
-	Matrix(const double& x0, const double& x1, const double& x2,
+        Matrix(const double& x0, const double& x1, const double& x2,
                const double& x3, const double& x4, const double& x5,
                const double& x6, const double& x7, const double& x8) :
             BaseMatrix(3, 3)
@@ -117,17 +117,17 @@ class Matrix : public ublas::matrix<double,
             *(xi++) = x6; *(xi++) = x7; *(xi++) = x8;
         }
 
-	template <class T>
+        template <class T>
             Matrix(const ublas::matrix_expression<T>& r) : BaseMatrix(r)
         { }
 
-	template <class T>
+        template <class T>
             void operator=(const ublas::matrix_expression<T>& r)
         {
             BaseMatrix::operator=(r);
         }
 
-	template <class T>
+        template <class T>
             void operator=(const BaseMatrix& r)
         {
             BaseMatrix::operator=(r);
