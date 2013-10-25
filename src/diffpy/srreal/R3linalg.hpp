@@ -22,8 +22,9 @@
 
 #include <algorithm>
 #include <boost/serialization/base_object.hpp>
-#include <blitz/tinyvec-et.h>
-#include <blitz/tinymat.h>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <diffpy/mathutils.hpp>
 
 namespace diffpy {
@@ -32,25 +33,126 @@ namespace R3 {
 
 // Declarations --------------------------------------------------------------
 
+namespace ublas = boost::numeric::ublas;
+using ublas::prod;
+using ublas::row;
+using ublas::column;
+using ublas::trans;
+
 // Constants
 
 const int Ndim = 3;
-using blitz::product;
 using ::diffpy::mathutils::SQRT_DOUBLE_EPS;
+const ublas::zero_vector<double> zerovector(Ndim);
 
-// Types
+// Classes
 
-typedef blitz::TinyMatrix<double,Ndim,Ndim> Matrix;
-typedef blitz::TinyVector<double,Ndim> Vector;
+class Vector : public ublas::vector<double, ublas::bounded_array<double,3> >
+{
+        typedef ublas::vector<double, ublas::bounded_array<double,3> >
+            BaseVector;
+
+    public:
+
+	// constructors
+	Vector() : BaseVector(3)  { }
+
+	Vector(const double& x, const double& y, const double& z)
+            : BaseVector(3)
+        {
+            Vector::iterator xi = this->begin();
+            *(xi++) = x;
+            *(xi++) = y;
+            *(xi++) = z;
+        }
+
+	template <class T>
+            Vector(const ublas::vector_expression<T>& r) : BaseVector(r)
+        { }
+
+	template <class T>
+            void operator=(const ublas::vector_expression<T>& r)
+        {
+            BaseVector::operator=(r);
+        }
+
+	template <class T>
+            void operator=(const BaseVector& r)
+        {
+            BaseVector::operator=(r);
+        }
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<BaseVector>(*this);
+        }
+};
+
+
+class Matrix : public ublas::matrix<double,
+    ublas::row_major, ublas::bounded_array<double,9> >
+{
+    typedef ublas::matrix<double, ublas::row_major,
+        ublas::bounded_array<double,9> >  BaseMatrix;
+
+    public:
+
+	// constructors
+	Matrix() : BaseMatrix(3, 3)  { }
+
+	Matrix(const double& x0, const double& x1, const double& x2,
+               const double& x3, const double& x4, const double& x5,
+               const double& x6, const double& x7, const double& x8) :
+            BaseMatrix(3, 3)
+        {
+            Matrix::array_type::iterator xi = this->data().begin();
+            *(xi++) = x0; *(xi++) = x1; *(xi++) = x2;
+            *(xi++) = x3; *(xi++) = x4; *(xi++) = x5;
+            *(xi++) = x6; *(xi++) = x7; *(xi++) = x8;
+        }
+
+	template <class T>
+            Matrix(const ublas::matrix_expression<T>& r) : BaseMatrix(r)
+        { }
+
+	template <class T>
+            void operator=(const ublas::matrix_expression<T>& r)
+        {
+            BaseMatrix::operator=(r);
+        }
+
+	template <class T>
+            void operator=(const BaseMatrix& r)
+        {
+            BaseMatrix::operator=(r);
+        }
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<BaseMatrix>(*this);
+        }
+};
 
 // Functions
 
 const Matrix& identity();
-const Matrix& zeros();
+const Matrix& zeromatrix();
 double determinant(const Matrix& A);
-Matrix inverse(const Matrix& A);
-Matrix transpose(const Matrix& A);
+const Matrix& inverse(const Matrix& A);
 
+const Vector& floor(const Vector&);
 template <class V> double norm(const V&);
 template <class V> double distance(const V& u, const V& v);
 template <class V> double dot(const V& u, const V& v);
@@ -58,6 +160,54 @@ template <class V> Vector cross(const V& u, const V& v);
 template <class V> const Vector& mxvecproduct(const Matrix&, const V&);
 template <class V> const Vector& mxvecproduct(const V&, const Matrix&);
 
+// Equality ------------------------------------------------------------------
+
+inline
+bool operator==(const Vector& u, const Vector& v)
+{
+    bool rv = std::equal(u.begin(), u.end(), v.begin());
+    return rv;
+}
+
+
+inline
+bool operator!=(const Vector& u, const Vector& v)
+{
+    return !(u == v);
+}
+
+
+inline
+bool operator==(const Matrix& A, const Matrix& B)
+{
+    bool rv = (&A == &B) ||
+        std::equal(A.data().begin(), A.data().end(), B.data().begin());
+    return rv;
+}
+
+
+inline
+bool operator!=(const Matrix& A, const Matrix& B)
+{
+    return !(A == B);
+}
+
+// Hashing -------------------------------------------------------------------
+
+size_t hash_value(const Vector& v);
+size_t hash_value(const Matrix& A);
+
+// Inlined functions ---------------------------------------------------------
+
+inline
+const Vector& floor(const Vector& v)
+{
+    static Vector res;
+    Vector::const_iterator xi = v.begin();
+    Vector::iterator xo = res.begin();
+    for (; xi != v.end(); ++xi, ++xo)  *xo = std::floor(*xi);
+    return res;
+}
 
 // Template functions --------------------------------------------------------
 
@@ -139,85 +289,5 @@ bool EpsilonEqual::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
 
 }   // namespace mathutils
 }   // namespace diffpy
-
-namespace blitz {
-
-// Equality ------------------------------------------------------------------
-
-inline
-bool operator==(const diffpy::srreal::R3::Vector& u,
-        const diffpy::srreal::R3::Vector& v)
-{
-    diffpy::srreal::R3::Vector::const_iterator pu = u.begin();
-    diffpy::srreal::R3::Vector::const_iterator pv = v.begin();
-    bool rv = (pu == pv) || (
-            *pu++ == *pv++ &&
-            *pu++ == *pv++ &&
-            *pu++ == *pv++
-            );
-    return rv;
-}
-
-
-inline
-bool operator!=(const diffpy::srreal::R3::Vector& u,
-        const diffpy::srreal::R3::Vector& v)
-{
-    return !(u == v);
-}
-
-
-inline
-bool operator==(const diffpy::srreal::R3::Matrix& A,
-        const diffpy::srreal::R3::Matrix& B)
-{
-    using diffpy::srreal::R3::Ndim;
-    const size_t sz = Ndim * Ndim;
-    bool rv = (&A == &B) || std::equal(A.data(), A.data() + sz, B.data());
-    return rv;
-}
-
-
-inline
-bool operator!=(const diffpy::srreal::R3::Matrix& A,
-        const diffpy::srreal::R3::Matrix& B)
-{
-    return !(A == B);
-}
-
-// Hashing -------------------------------------------------------------------
-
-size_t hash_value(const diffpy::srreal::R3::Vector& v);
-size_t hash_value(const diffpy::srreal::R3::Matrix& A);
-
-}   // namespace blitz
-
-// Serialization -------------------------------------------------------------
-
-namespace boost {
-namespace serialization {
-
-template<class Archive>
-void serialize(Archive& ar,
-        diffpy::srreal::R3::Vector& v, const unsigned int version)
-{
-    ar & v[0] & v[1] & v[2];
-}
-
-
-template<class Archive>
-void serialize(Archive& ar,
-        diffpy::srreal::R3::Matrix& A, const unsigned int version)
-{
-    using namespace diffpy::srreal;
-    R3::Matrix::T_numtype* p = A.data();
-    R3::Matrix::T_numtype* plast = p + R3::Ndim * R3::Ndim;
-    for (; p != plast; ++p)     ar & (*p);
-}
-
-
-} // namespace serialization
-} // namespace boost
-
 
 #endif  // R3LINALG_HPP_INCLUDED

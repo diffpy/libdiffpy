@@ -27,7 +27,6 @@
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <blitz/tinyvec-et.h>
 
 #include <diffpy/srreal/scatteringfactordata.hpp>
 #include <diffpy/srreal/AtomUtils.hpp>
@@ -51,22 +50,34 @@ class WaasKirfFormula
         // Constructor
         WaasKirfFormula()
         {
-            a = 0.0;
-            b = 0.0;
+            fill(a, a + WKTerms, 0.0);
+            fill(b, b + WKTerms, 0.0);
             c = 0.0;
+        }
+
+        WaasKirfFormula(const WaasKirfFormula& wk0)
+        {
+            symbol = wk0.symbol;
+            copy(wk0.a, wk0.a + WKTerms, a);
+            copy(wk0.b, wk0.b + WKTerms, b);
+            c = wk0.c;
         }
 
         // methods
         double atstol(double stol) const
         {
-            double rv = c + blitz::sum(a * exp(-b * stol * stol));
+            double rv = c;
+            for (int i = 0; i < WKTerms; ++i)
+            {
+                rv += a[i] * exp(-b[i] * stol * stol);
+            }
             return rv;
         }
 
         // data
         string symbol;
-        blitz::TinyVector<double,WKTerms> a;
-        blitz::TinyVector<double,WKTerms> b;
+        double a[WKTerms];
+        double b[WKTerms];
         double c;
 };
 

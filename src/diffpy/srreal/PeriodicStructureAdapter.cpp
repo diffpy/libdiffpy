@@ -166,7 +166,7 @@ bool PeriodicStructureBondGenerator::iterateSymmetry()
 {
     msphere->next();
     bool done = msphere->finished();
-    mrcsphere = done ? 0.0 :
+    mrcsphere = done ? R3::zerovector :
         mpstructure->getLattice().cartesian(msphere->mno());
     return !done;
 }
@@ -175,7 +175,7 @@ bool PeriodicStructureBondGenerator::iterateSymmetry()
 void PeriodicStructureBondGenerator::rewindSymmetry()
 {
     msphere->rewind();
-    mrcsphere = msphere->finished() ? 0.0 :
+    mrcsphere = msphere->finished() ? R3::zerovector :
         mpstructure->getLattice().cartesian(msphere->mno());
     this->updater1();
 }

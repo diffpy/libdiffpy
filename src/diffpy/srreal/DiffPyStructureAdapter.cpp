@@ -213,7 +213,7 @@ void DiffPyStructureAdapter::fetchPythonData(python::object dpstru)
         R3::Matrix Ufrac;
         python::object uflat = ai.attr("U").attr("flat");
         python::stl_input_iterator<double> ufirst(uflat), ulast;
-        copy(ufirst, ulast, Ufrac.data());
+        copy(ufirst, ulast, Ufrac.data().begin());
         R3::Matrix Ucart = mlattice.cartesianMatrix(Ufrac);
         mcartesian_uijs.push_back(Ucart);
         // matomtypes
@@ -332,7 +332,7 @@ bool DiffPyStructurePeriodicBondGenerator::iterateSymmetry()
 {
     msphere->next();
     bool done = msphere->finished();
-    mrcsphere = done ? 0.0 :
+    mrcsphere = done ? R3::zerovector :
         mdpstructure->getLattice().cartesian(msphere->mno());
     return !done;
 }
@@ -341,7 +341,7 @@ bool DiffPyStructurePeriodicBondGenerator::iterateSymmetry()
 void DiffPyStructurePeriodicBondGenerator::rewindSymmetry()
 {
     msphere->rewind();
-    mrcsphere = msphere->finished() ? 0.0 :
+    mrcsphere = msphere->finished() ? R3::zerovector :
         mdpstructure->getLattice().cartesian(msphere->mno());
     this->updater1();
 }

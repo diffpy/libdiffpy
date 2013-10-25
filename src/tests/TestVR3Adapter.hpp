@@ -104,11 +104,7 @@ class TestVR3Adapter : public CxxTest::TestSuite
         void test_siteCartesianUij()
         {
             // Uij is always zero
-            const double* puij = mthree->siteCartesianUij(0).data();
-            for (int i = 0; i < 9; ++i)
-            {
-                TS_ASSERT_EQUALS(0.0, puij[i]);
-            }
+            TS_ASSERT_EQUALS(R3::zeromatrix(), mthree->siteCartesianUij(0));
         }
 
 

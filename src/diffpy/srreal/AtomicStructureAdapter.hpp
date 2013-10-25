@@ -36,7 +36,7 @@ class Atom
             cartesianposition(0.0, 0.0, 0.0),
             occupancy(1.0),
             anisotropy(false),
-            cartesianuij(R3::zeros())
+            cartesianuij(R3::zeromatrix())
         { };
 
         // data

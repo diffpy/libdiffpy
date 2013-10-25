@@ -507,7 +507,9 @@ template <class V>
 const R3::Vector& Lattice::cartesian(const V& lv) const
 {
     static R3::Vector lvcopy;
-    lvcopy = double(lv[0]), double(lv[1]), double(lv[2]);
+    lvcopy[0] = lv[0];
+    lvcopy[1] = lv[1];
+    lvcopy[2] = lv[2];
     return this->cartesian(lvcopy);
 }
 
@@ -516,7 +518,9 @@ template <class V>
 const R3::Vector& Lattice::fractional(const V& cv) const
 {
     static R3::Vector cvcopy;
-    cvcopy = double(cv[0]), double(cv[1]), double(cv[2]);
+    cvcopy[0] = cv[0];
+    cvcopy[1] = cv[1];
+    cvcopy[2] = cv[2];
     return this->fractional(cvcopy);
 }
 
@@ -525,7 +529,9 @@ template <class V>
 const R3::Vector& Lattice::ucvCartesian(const V& cv) const
 {
     static R3::Vector cvcopy;
-    cvcopy = double(cv[0]), double(cv[1]), double(cv[2]);
+    cvcopy[0] = cv[0];
+    cvcopy[1] = cv[1];
+    cvcopy[2] = cv[2];
     return this->ucvCartesian(cvcopy);
 }
 
@@ -534,7 +540,9 @@ template <class V>
 const R3::Vector& Lattice::ucvFractional(const V& cv) const
 {
     static R3::Vector cvcopy;
-    cvcopy = double(cv[0]), double(cv[1]), double(cv[2]);
+    cvcopy[0] = cv[0];
+    cvcopy[1] = cv[1];
+    cvcopy[2] = cv[2];
     return ucvFractional(cvcopy);
 }
 
