@@ -37,7 +37,7 @@
 *
 *     ReflectionsInQminQmax ref(Qmin, Qmax, a, b, c, alpha, beta, gamma)
 *     for (ReflectionsInQminQmax ref(Qmin, Qmax, a, b, c, alpha, beta, gamma);
-*	   !ref.finished(); ref.next() )
+*          !ref.finished(); ref.next() )
 *     {
 *         // Miller indices are in ref.h(), ref.k(), ref.l() or ref.hkl()
 *         // ref.Q() is magnitude of Q vector
@@ -233,10 +233,10 @@ PointsInSphere::PointsInSphere(double rmin, double rmax, const L& lat) :
 template <class L>
 ReflectionsInQminQmax::ReflectionsInQminQmax(
         double _qmin, double _qmax, const L& lat) :
-	    _Qmin(_qmin), _Qmax(_qmax),
-	    latpar(lat.a(), lat.b(), lat.c(),
+            _Qmin(_qmin), _Qmax(_qmax),
+            latpar(lat.a(), lat.b(), lat.c(),
                     lat.alpha(), lat.beta(), lat.gamma()),
-	    sph(_qmin*M_1_PI/2.0, _qmax*M_1_PI/2.0, latpar.reciprocal())
+            sph(_qmin*M_1_PI/2.0, _qmax*M_1_PI/2.0, latpar.reciprocal())
 { }
 
 // Template Constructor for ReflectionsInDmaxDmin ----------------------------
@@ -244,12 +244,12 @@ ReflectionsInQminQmax::ReflectionsInQminQmax(
 template <class L>
 ReflectionsInDmaxDmin::ReflectionsInDmaxDmin(
         double dmax, double dmin, const L& lat) :
-	    ReflectionsInQminQmax(2.0*M_PI/dmax, 2.0*M_PI/dmin, lat),
-	    _Dmin(dmin), _Dmax(dmax)
+            ReflectionsInQminQmax(2.0*M_PI/dmax, 2.0*M_PI/dmin, lat),
+            _Dmin(dmin), _Dmax(dmax)
 { }
 
 
 }   // namespace srreal
 }   // namespace diffpy
 
-#endif	// POINTSINSPHERE_HPP_INCLUDED
+#endif  // POINTSINSPHERE_HPP_INCLUDED
