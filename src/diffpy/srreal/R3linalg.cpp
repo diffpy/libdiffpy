@@ -44,10 +44,10 @@ double R3::determinant(const R3::Matrix& A)
     gsl_matrix* gA = gsl_matrix_alloc(R3::Ndim, R3::Ndim);
     for (int i = 0; i != R3::Ndim; ++i)
     {
-	for (int j = 0; j != R3::Ndim; ++j)
-	{
-	    gsl_matrix_set(gA, i, j, A(i,j));
-	}
+        for (int j = 0; j != R3::Ndim; ++j)
+        {
+            gsl_matrix_set(gA, i, j, A(i,j));
+        }
     }
     gsl_permutation* gP = gsl_permutation_alloc(R3::Ndim);
     int signum;
@@ -64,10 +64,10 @@ R3::Matrix R3::inverse(const R3::Matrix& A)
     gsl_matrix* gA = gsl_matrix_alloc(R3::Ndim, R3::Ndim);
     for (int i = 0; i != R3::Ndim; ++i)
     {
-	for (int j = 0; j != R3::Ndim; ++j)
-	{
-	    gsl_matrix_set(gA, i, j, A(i,j));
-	}
+        for (int j = 0; j != R3::Ndim; ++j)
+        {
+            gsl_matrix_set(gA, i, j, A(i,j));
+        }
     }
     gsl_permutation* gP = gsl_permutation_alloc(R3::Ndim);
     int signum;

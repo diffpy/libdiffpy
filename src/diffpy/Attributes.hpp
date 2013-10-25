@@ -38,9 +38,9 @@ class Attributes;
 class DoubleAttributeError : public std::runtime_error
 {
     public:
-	DoubleAttributeError(const std::string msg="") :
+        DoubleAttributeError(const std::string msg="") :
             std::runtime_error(msg)
-	{ }
+        { }
 };
 
 /// @class BaseDoubleAttribute

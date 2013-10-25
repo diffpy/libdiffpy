@@ -44,47 +44,47 @@ public:
 
     void test_determinant()
     {
-	// default lattice should be cartesian
-	R3::Matrix A1, A2;
-	A1 = 9, 1, 9,
-	     6, 7, 4,
-	     0, 2, 9;
-	A2 = 9, 1, 9,
-	     0, 2, 9,
-	     6, 7, 4;
-	double detA = 549;
-	TS_ASSERT_EQUALS(detA, R3::determinant(A1));
-	TS_ASSERT_EQUALS(-detA, R3::determinant(A2));
+        // default lattice should be cartesian
+        R3::Matrix A1, A2;
+        A1 = 9, 1, 9,
+             6, 7, 4,
+             0, 2, 9;
+        A2 = 9, 1, 9,
+             0, 2, 9,
+             6, 7, 4;
+        double detA = 549;
+        TS_ASSERT_EQUALS(detA, R3::determinant(A1));
+        TS_ASSERT_EQUALS(-detA, R3::determinant(A2));
     }
 
 
     void test_inverse()
     {
-	R3::Matrix A, invA;
-	A =
-	    0.5359, -0.5904, 0.8670,
-	   -0.0053,  0.7559, 0.2692,
-	   -0.8926,  0.9424, 0.9692;
-	invA =
-	    0.49063197005867, 1.42323870111089, -0.83420736316541,
-	   -0.24089965988852, 1.32489393619466, -0.15249839300481,
-	    0.68609361943181, 0.02249568627913,  0.41178393851247;
-	TS_ASSERT(allclose(invA, R3::inverse(A)));
+        R3::Matrix A, invA;
+        A =
+            0.5359, -0.5904, 0.8670,
+           -0.0053,  0.7559, 0.2692,
+           -0.8926,  0.9424, 0.9692;
+        invA =
+            0.49063197005867, 1.42323870111089, -0.83420736316541,
+           -0.24089965988852, 1.32489393619466, -0.15249839300481,
+            0.68609361943181, 0.02249568627913,  0.41178393851247;
+        TS_ASSERT(allclose(invA, R3::inverse(A)));
     }
 
 
     void test_transpose()
     {
-	R3::Matrix A, Atrans;
-	A =
-	    0.5359, -0.5904, 0.8670,
-	   -0.0053,  0.7559, 0.2692,
-	   -0.8926,  0.9424, 0.9692;
-	Atrans =
-	    0.5359, -0.0053, -0.8926,
+        R3::Matrix A, Atrans;
+        A =
+            0.5359, -0.5904, 0.8670,
+           -0.0053,  0.7559, 0.2692,
+           -0.8926,  0.9424, 0.9692;
+        Atrans =
+            0.5359, -0.0053, -0.8926,
            -0.5904, 0.7559, 0.9424,
             0.8670, 0.2692, 0.9692;
-	TS_ASSERT_EQUALS(Atrans, R3::transpose(A));
+        TS_ASSERT_EQUALS(Atrans, R3::transpose(A));
     }
 
 

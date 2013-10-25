@@ -31,7 +31,7 @@ Lattice::Lattice()
 
 
 Lattice::Lattice(double a0, double b0, double c0,
-	    double alpha0, double beta0, double gamma0)
+        double alpha0, double beta0, double gamma0)
 {
     mbaserot =
         1.0, 0.0, 0.0,
@@ -43,7 +43,7 @@ Lattice::Lattice(double a0, double b0, double c0,
 // Public Methods ------------------------------------------------------------
 
 void Lattice::setLatPar(double a0, double b0, double c0,
-	    double alpha0, double beta0, double gamma0)
+        double alpha0, double beta0, double gamma0)
 {
     using namespace diffpy::mathutils;
     ma = a0;
@@ -97,8 +97,8 @@ void Lattice::setLatPar(double a0, double b0, double c0,
 }
 
 void Lattice::setLatBase(const R3::Vector& va0,
-	const R3::Vector& vb0,
-	const R3::Vector& vc0)
+        const R3::Vector& vb0,
+        const R3::Vector& vc0)
 {
     using namespace diffpy::mathutils;
     mbase = va0[0], va0[1], va0[2],
