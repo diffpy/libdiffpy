@@ -37,12 +37,12 @@ if not (GetOption('clean') or env.GetOption('help')):
 # Compiler specific options
 if icpc:
     # options for Intel C++ compiler on hpc dev-intel07
-    env.AppendUnique(CCFLAGS=['-w1', '-fp-model', 'precise'])
+    env.PrependUnique(CCFLAGS=['-w1', '-fp-model', 'precise'])
     env.PrependUnique(LIBS=['imf'])
     fast_optimflags = ['-fast', '-no-ipo']
 else:
     # g++ options
-    env.AppendUnique(CCFLAGS=['-Wall'])
+    env.PrependUnique(CCFLAGS=['-Wall'])
     fast_optimflags = ['-ffast-math']
 
 # Configure build variants
