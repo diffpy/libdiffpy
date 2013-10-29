@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <sstream>
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
