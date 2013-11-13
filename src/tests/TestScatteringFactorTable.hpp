@@ -87,8 +87,8 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             msftb->setCustomAs("Calias", "C");
             TS_ASSERT_EQUALS(msftb->lookup("C", 0),
                     msftb->lookup("Calias", 0));
-            TS_ASSERT_EQUALS(msftb->lookup("C", 2.5),
-                    msftb->lookup("Calias", 2.5));
+            TS_ASSERT_DELTA(msftb->lookup("C", 2.5),
+                    msftb->lookup("Calias", 2.5), meps);
         }
 
 

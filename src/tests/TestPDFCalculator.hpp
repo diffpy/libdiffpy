@@ -35,12 +35,14 @@ class TestPDFCalculator : public CxxTest::TestSuite
         boost::shared_ptr<PDFCalculator> mpdfc;
         VR3Structure memptystru;
         double meps;
+        double mepsdb;
 
     public:
 
         void setUp()
         {
             meps = diffpy::mathutils::SQRT_DOUBLE_EPS;
+            mepsdb = 10 * diffpy::mathutils::DOUBLE_EPS;
             mpdfc.reset(new PDFCalculator);
         }
 
@@ -209,17 +211,17 @@ class TestPDFCalculator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(0.0, mpdfc->getExtendedRmin());
             mpdfc->setRmin(5);
             mpdfc->eval(memptystru);
-            TS_ASSERT_EQUALS(5.0, mpdfc->getExtendedRmin());
+            TS_ASSERT_DELTA(5.0, mpdfc->getExtendedRmin(), mepsdb);
         }
 
 
         void test_getExtendedRmax()
         {
             // empty structure should not extend the grid at all.
-            TS_ASSERT_EQUALS(10.0, mpdfc->getExtendedRmax());
+            TS_ASSERT_DELTA(10.0, mpdfc->getExtendedRmax(), mepsdb);
             mpdfc->setRmax(7);
             mpdfc->eval(memptystru);
-            TS_ASSERT_EQUALS(7.0, mpdfc->getExtendedRmax());
+            TS_ASSERT_DELTA(7.0, mpdfc->getExtendedRmax(), mepsdb);
         }
 
 

@@ -124,10 +124,11 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
 
         void test_totalOccupancy()
         {
+            const double eps = 10 * diffpy::mathutils::DOUBLE_EPS;
             TS_ASSERT_EQUALS(4.0, m_ni->totalOccupancy());
             TS_ASSERT_EQUALS(23.0, m_kbise->totalOccupancy());
             TS_ASSERT_EQUALS(20.0, m_catio3->totalOccupancy());
-            TS_ASSERT_EQUALS(40.0, m_pswt->totalOccupancy());
+            TS_ASSERT_DELTA(40.0, m_pswt->totalOccupancy(), eps);
         }
 
 
