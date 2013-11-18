@@ -238,6 +238,22 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
         }
 
 
+        void test_comparison()
+        {
+            const PeriodicStructureAdapter& kbise0 =
+                static_cast<const PeriodicStructureAdapter&>(*m_kbise);
+            PeriodicStructureAdapter kbise1(kbise0);
+            PeriodicStructureAdapter kbise2(kbise0);
+            TS_ASSERT_EQUALS(kbise0, kbise1);
+            TS_ASSERT(!(kbise0 != kbise1));
+            TS_ASSERT(kbise1.countSites());
+            kbise1.remove(0);
+            TS_ASSERT_DIFFERS(kbise0, kbise1);
+            TS_ASSERT(!(kbise0 == kbise1));
+            kbise2.setLatPar(3, 4, 5, 91, 92, 93);
+            TS_ASSERT_DIFFERS(kbise0, kbise2);
+        }
+
 };  // class TestPeriodicStructureAdapter
 
 //////////////////////////////////////////////////////////////////////////////

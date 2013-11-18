@@ -115,6 +115,14 @@ class AtomicStructureAdapter : public StructureAdapter
         // data
         std::vector<Atom> matoms;
 
+        // comparison
+        friend bool operator==(
+                const AtomicStructureAdapter& stru0,
+                const AtomicStructureAdapter& stru1)
+        {
+            return (stru0.matoms == stru1.matoms);
+        }
+
         // serialization
         friend class boost::serialization::access;
         template<class Archive>
@@ -127,6 +135,16 @@ class AtomicStructureAdapter : public StructureAdapter
 };
 
 typedef boost::shared_ptr<AtomicStructureAdapter> AtomicStructureAdapterPtr;
+
+// Complementary comparison function
+
+inline
+bool operator!=(
+        const AtomicStructureAdapter& stru0,
+        const AtomicStructureAdapter& stru1)
+{
+    return !(stru0 == stru1);
+}
 
 }   // namespace srreal
 }   // namespace diffpy

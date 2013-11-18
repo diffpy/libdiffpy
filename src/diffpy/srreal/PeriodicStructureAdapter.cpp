@@ -103,6 +103,28 @@ void PeriodicStructureAdapter::toFractional(Atom& a) const
     a.cartesianuij = L.fractionalMatrix(a.cartesianuij);
 }
 
+// Comparison functions ------------------------------------------------------
+
+bool operator==(
+        const PeriodicStructureAdapter& pstru0,
+        const PeriodicStructureAdapter& pstru1)
+{
+    const AtomicStructureAdapter& astru0 = pstru0;
+    const AtomicStructureAdapter& astru1 = pstru1;
+    bool rv =
+        (astru0 == astru1) &&
+        (pstru0.getLattice() == pstru1.getLattice());
+    return rv;
+}
+
+
+bool operator!=(
+        const PeriodicStructureAdapter& pstru0,
+        const PeriodicStructureAdapter& pstru1)
+{
+    return !(pstru0 == pstru1);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // class PeriodicStructureBondGenerator
 //////////////////////////////////////////////////////////////////////////////

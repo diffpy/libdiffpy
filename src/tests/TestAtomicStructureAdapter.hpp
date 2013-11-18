@@ -128,6 +128,26 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_EQUALS((*mpstru)[1], (*astru1)[1]);
         }
 
+
+        void test_comparison()
+        {
+            Atom ai;
+            ai.atomtype = "C";
+            const int SZ = 10;
+            for (int i = 0; i < SZ; ++i)
+            {
+                ai.cartesianposition[0] = i;
+                mpstru->append(ai);
+            }
+            AtomicStructureAdapterPtr cpstru =
+                boost::make_shared<AtomicStructureAdapter>(*mpstru);
+            TS_ASSERT_EQUALS(*mpstru, *cpstru);
+            TS_ASSERT(!(*mpstru != *cpstru));
+            cpstru->at(0).atomtype = "H";
+            TS_ASSERT_DIFFERS(*mpstru, *cpstru);
+            TS_ASSERT(!(*mpstru == *cpstru));
+        }
+
 };  // class TestAtomicStructureAdapter
 
 }   // namespace srreal

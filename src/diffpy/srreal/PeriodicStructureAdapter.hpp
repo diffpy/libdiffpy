@@ -66,6 +66,10 @@ class PeriodicStructureAdapter : public AtomicStructureAdapter
 
 };
 
+// Comparison functions
+bool operator==(const PeriodicStructureAdapter&, const PeriodicStructureAdapter&);
+bool operator!=(const PeriodicStructureAdapter&, const PeriodicStructureAdapter&);
+
 
 class PeriodicStructureBondGenerator : public BaseBondGenerator
 {
