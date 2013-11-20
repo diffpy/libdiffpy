@@ -63,12 +63,10 @@ PeriodicStructureAdapter::diff(StructureAdapterConstPtr other) const
     }
     StructureDifference sd(this->shared_from_this(), other);
     if (sd.stru0 == sd.stru1)  return sd;
-    typedef boost::shared_ptr<const class PeriodicStructureAdapter> Ptr;
-    Ptr pstru0 = boost::static_pointer_cast<Ptr::element_type>(sd.stru0);
-    Ptr pstru1 = boost::static_pointer_cast<Ptr::element_type>(sd.stru1);
-    assert(pstru0);
-    assert(pstru1);
-    if (pstru0->getLattice() != pstru1->getLattice())  return alldiffer;
+    typedef boost::shared_ptr<const class PeriodicStructureAdapter> PPtr;
+    PPtr pstru1 = boost::static_pointer_cast<PPtr::element_type>(sd.stru1);
+    assert(pstru1 == sd.stru1);
+    if (this->getLattice() != pstru1->getLattice())  return alldiffer;
     sd = this->AtomicStructureAdapter::diff(other);
     return sd;
 }
@@ -106,23 +104,23 @@ void PeriodicStructureAdapter::toFractional(Atom& a) const
 // Comparison functions ------------------------------------------------------
 
 bool operator==(
-        const PeriodicStructureAdapter& pstru0,
-        const PeriodicStructureAdapter& pstru1)
+        const PeriodicStructureAdapter& stru0,
+        const PeriodicStructureAdapter& stru1)
 {
-    const AtomicStructureAdapter& astru0 = pstru0;
-    const AtomicStructureAdapter& astru1 = pstru1;
+    const AtomicStructureAdapter& astru0 = stru0;
+    const AtomicStructureAdapter& astru1 = stru1;
     bool rv =
         (astru0 == astru1) &&
-        (pstru0.getLattice() == pstru1.getLattice());
+        (stru0.getLattice() == stru1.getLattice());
     return rv;
 }
 
 
 bool operator!=(
-        const PeriodicStructureAdapter& pstru0,
-        const PeriodicStructureAdapter& pstru1)
+        const PeriodicStructureAdapter& stru0,
+        const PeriodicStructureAdapter& stru1)
 {
-    return !(pstru0 == pstru1);
+    return !(stru0 == stru1);
 }
 
 //////////////////////////////////////////////////////////////////////////////
