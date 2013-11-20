@@ -28,10 +28,11 @@
 namespace diffpy {
 namespace srreal {
 
-/// store rotation matrix and translation vector for one symmetry operation
+/// store rotation matrix and translation vector for a symmetry operation
 class SymOpRotTrans
 {
     public:
+
         R3::Matrix R;
         R3::Vector t;
 
@@ -47,14 +48,31 @@ class SymOpRotTrans
 
 };
 
+// Comparison functions
+
+inline
+bool operator==(const SymOpRotTrans& op0, const SymOpRotTrans& op1)
+{
+    return (op0.R == op1.R) && (op0.t == op1.t);
+}
+
+inline
+bool operator!=(const SymOpRotTrans& op0, const SymOpRotTrans& op1)
+{
+    return !(op0 == op1);
+}
+
 
 class CrystalStructureAdapter : public PeriodicStructureAdapter
 {
     public:
 
+        // constructor
+        CrystalStructureAdapter();
+
         // methods - overloaded
         virtual BaseBondGeneratorPtr createBondGenerator() const;
-        virtual double numberDensity() const;
+        virtual int siteMultiplicity(int idx) const;
         virtual StructureDifference diff(StructureAdapterConstPtr other) const;
 
         // methods - own
@@ -62,15 +80,15 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
         void clearSymOps();
         void addSymOp(const SymOpRotTrans&);
         void addSymOp(const R3::Matrix& R, const R3::Vector& t);
-        const SymOpRotTrans& getSymOp(int i);
+        const SymOpRotTrans& getSymOp(int i) const;
+        void updateSymmetryPositions() const;
 
     private:
 
         // data
         /// array of symmetry operations
         std::vector<SymOpRotTrans> msymops;
-        std::vector<Atom> msymatoms;
-        mutable PeriodicStructureAdapter masymunit;
+        mutable std::vector< std::vector<Atom> > msymatoms;
         mutable bool msymmetry_cached;
 
         // comparison
@@ -85,7 +103,6 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
             ar & boost::serialization::base_object<PeriodicStructureAdapter>(*this);
             ar & msymops;
             ar & msymatoms;
-            ar & masymunit;
             ar & msymmetry_cached;
         }
 
@@ -93,8 +110,8 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
 
 
 // Comparison functions
-bool operator==(const PeriodicStructureAdapter&, const PeriodicStructureAdapter&);
-bool operator!=(const PeriodicStructureAdapter&, const PeriodicStructureAdapter&);
+bool operator==(const CrystalStructureAdapter&, const CrystalStructureAdapter&);
+bool operator!=(const CrystalStructureAdapter&, const CrystalStructureAdapter&);
 
 
 class CrystalStructureBondGenerator : public PeriodicStructureBondGenerator
