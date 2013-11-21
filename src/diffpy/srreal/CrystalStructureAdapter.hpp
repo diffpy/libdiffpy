@@ -76,11 +76,15 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
         virtual StructureDifference diff(StructureAdapterConstPtr other) const;
 
         // methods - own
+        void setSymmetryPrecision(double eps);
+        const double& getSymmetryPrecision() const;
         int countSymOps() const;
         void clearSymOps();
         void addSymOp(const SymOpRotTrans&);
         void addSymOp(const R3::Matrix& R, const R3::Vector& t);
         const SymOpRotTrans& getSymOp(int i) const;
+        /// return all symmetry related atoms in fractional coordinates
+        AtomVector expandLatticeAtom(const Atom&) const;
         void updateSymmetryPositions() const;
 
     private:
@@ -88,8 +92,13 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
         // data
         /// array of symmetry operations
         std::vector<SymOpRotTrans> msymops;
+        double msymmetry_precision;
         mutable std::vector<AtomVector> msymatoms;
         mutable bool msymmetry_cached;
+
+        /// symmetry helper method
+        /// return index of AtomVector atom at an equal position or -1
+        int findEqualPosition(const AtomVector&, const Atom&) const;
 
         // comparison
         friend bool operator==(
@@ -102,6 +111,7 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
         {
             ar & boost::serialization::base_object<PeriodicStructureAdapter>(*this);
             ar & msymops;
+            ar & msymmetry_precision;
             ar & msymatoms;
             ar & msymmetry_cached;
         }
@@ -145,5 +155,7 @@ class CrystalStructureBondGenerator : public PeriodicStructureBondGenerator
 
 }   // namespace srreal
 }   // namespace diffpy
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::CrystalStructureAdapter)
 
 #endif  // CRYSTALSTRUCTUREADAPTER_HPP_INCLUDED

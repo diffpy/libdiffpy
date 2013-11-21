@@ -23,6 +23,7 @@
 #include <cassert>
 
 #include <diffpy/serialization.ipp>
+#include <diffpy/validators.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
 #include <diffpy/srreal/CrystalStructureAdapter.hpp>
@@ -31,6 +32,10 @@ using namespace std;
 
 namespace diffpy {
 namespace srreal {
+
+// Constants -----------------------------------------------------------------
+
+const double DEFAULT_SYMMETRY_PRECISION = 5e-5;
 
 //////////////////////////////////////////////////////////////////////////////
 // class CrystalStructureAdapter
@@ -41,7 +46,9 @@ namespace srreal {
 CrystalStructureAdapter::CrystalStructureAdapter() :
     PeriodicStructureAdapter(),
     msymmetry_cached(false)
-{ }
+{
+    this->setSymmetryPrecision(DEFAULT_SYMMETRY_PRECISION);
+}
 
 // Public Methods ------------------------------------------------------------
 
@@ -86,6 +93,21 @@ CrystalStructureAdapter::diff(StructureAdapterConstPtr other) const
 }
 
 
+void CrystalStructureAdapter::setSymmetryPrecision(double eps)
+{
+    using namespace diffpy::validators;
+    ensureEpsilonPositive("symmetryprecision", eps);
+    if (eps != msymmetry_precision)  msymmetry_cached = false;
+    msymmetry_precision = eps;
+}
+
+
+const double& CrystalStructureAdapter::getSymmetryPrecision() const
+{
+    return msymmetry_precision;
+}
+
+
 int CrystalStructureAdapter::countSymOps() const
 {
     return msymops.size();
@@ -120,9 +142,91 @@ const SymOpRotTrans& CrystalStructureAdapter::getSymOp(int i) const
 }
 
 
+CrystalStructureAdapter::AtomVector
+CrystalStructureAdapter::expandLatticeAtom(const Atom& a0) const
+{
+    using mathutils::eps_eq;
+    AtomVector eqsites;
+    vector<int> eqduplicity;
+    vector<SymOpRotTrans>::const_iterator op = msymops.begin();
+    Atom a1 = a0;
+    for (; op != msymops.end(); ++op)
+    {
+        // positions and Uij-s are actually fractional here
+        a1.cartesianposition = R3::mxvecproduct(op->R, a0.cartesianposition);
+        a1.cartesianposition += op->t;
+        R3::Matrix utmp = R3::prod(a0.cartesianuij, R3::trans(op->R));
+        a1.cartesianuij = R3::prod(op->R, utmp);
+        // check if a1 is a duplicate of an existing symmetry site
+        int ieq = this->findEqualPosition(eqsites, a1);
+        if (ieq >= 0)
+        {
+            Atom& aeq = eqsites[ieq];
+            aeq.cartesianposition += a1.cartesianposition;
+            aeq.cartesianuij += a1.cartesianuij;
+            ++eqduplicity[ieq];
+            continue;
+        }
+        // a1 is a new symmetry site
+        eqsites.push_back(a1);
+        eqduplicity.push_back(1);
+    }
+    // calculate mean values from equivalent sites and adjust any roundoffs
+    assert(eqsites.size() == eqduplicity.size());
+    iterator ai = eqsites.begin();
+    vector<int>::const_iterator dpi = eqduplicity.begin();
+    for (; ai != eqsites.end(); ++ai, ++dpi)
+    {
+        R3::Vector& axyz = ai->cartesianposition;
+        axyz /= (*dpi);
+        axyz -= floor(axyz);
+        if (eps_eq(axyz[0], 1.0))  axyz[0] = 0.0;
+        if (eps_eq(axyz[1], 1.0))  axyz[1] = 0.0;
+        if (eps_eq(axyz[2], 1.0))  axyz[2] = 0.0;
+        ai->cartesianuij /= (*dpi);
+    }
+    return eqsites;
+}
+
+
 void CrystalStructureAdapter::updateSymmetryPositions() const
 {
-    // FIXME
+    // build asymmetric unit in lattice coordinates
+    AtomVector lcatoms(this->begin(), this->end());
+    AtomVector::iterator lcai = lcatoms.begin();
+    for (; lcai != lcatoms.end(); ++lcai)  this->toFractional(*lcai);
+    // build symmetry positions for all atoms in the asymmetric unit
+    msymatoms.resize(this->countSites());
+    assert(lcatoms.size() == msymatoms.size());
+    lcai = lcatoms.begin();
+    std::vector<AtomVector>::iterator saii = msymatoms.begin();
+    for (; lcai != lcatoms.end(); ++lcai, ++saii)
+    {
+        *saii = this->expandLatticeAtom(*lcai);
+        iterator ai = saii->begin();
+        for (; ai != saii->end(); ++ai)  this->toCartesian(*ai);
+    }
+    msymmetry_cached = true;
+}
+
+// Private Methods -----------------------------------------------------------
+
+int CrystalStructureAdapter::findEqualPosition(
+        const AtomVector& eqsites, const Atom& a0) const
+{
+    const double symeps = this->getSymmetryPrecision();
+    const Lattice& L = this->getLattice();
+    R3::Vector dxyz;
+    const_iterator ai = eqsites.begin();
+    for (; ai != eqsites.end(); ++ai)
+    {
+        dxyz = ai->cartesianposition - a0.cartesianposition;
+        dxyz[0] -= round(dxyz[0]);
+        dxyz[1] -= round(dxyz[1]);
+        dxyz[2] -= round(dxyz[2]);
+        if (L.norm(dxyz) <= symeps)  return (ai - eqsites.begin());
+    }
+    return -1;
 }
 
 // Comparison functions ------------------------------------------------------
@@ -250,6 +354,6 @@ void CrystalStructureBondGenerator::updater1()
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::CrystalStructureAdapter)
-BOOST_CLASS_EXPORT(diffpy::srreal::CrystalStructureAdapter)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::CrystalStructureAdapter)
 
 // End of file
