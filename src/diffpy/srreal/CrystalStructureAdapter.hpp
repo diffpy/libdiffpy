@@ -88,7 +88,7 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
         // data
         /// array of symmetry operations
         std::vector<SymOpRotTrans> msymops;
-        mutable std::vector< std::vector<Atom> > msymatoms;
+        mutable std::vector<AtomVector> msymatoms;
         mutable bool msymmetry_cached;
 
         // comparison

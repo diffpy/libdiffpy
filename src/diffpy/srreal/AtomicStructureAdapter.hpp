@@ -74,6 +74,8 @@ class AtomicStructureAdapter : public StructureAdapter
 {
     public:
 
+        typedef std::vector<Atom> AtomVector;
+
         // methods - overloaded
         virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int countSites() const;
@@ -97,10 +99,10 @@ class AtomicStructureAdapter : public StructureAdapter
             void assign (Iter first, Iter last)  { matoms.assign(first, last); }
         void assign (size_t n, const Atom& a)  { matoms.assign(n, a); }
         // iterator forwarding
-        typedef std::vector<Atom>::iterator iterator;
-        typedef std::vector<Atom>::const_iterator const_iterator;
-        typedef std::vector<Atom>::reverse_iterator reverse_iterator;
-        typedef std::vector<Atom>::const_reverse_iterator const_reverse_iterator;
+        typedef AtomVector::iterator iterator;
+        typedef AtomVector::const_iterator const_iterator;
+        typedef AtomVector::reverse_iterator reverse_iterator;
+        typedef AtomVector::const_reverse_iterator const_reverse_iterator;
         iterator begin()  { return matoms.begin(); }
         iterator end()  { return matoms.end(); }
         const_iterator begin() const  { return matoms.begin(); }
@@ -113,7 +115,7 @@ class AtomicStructureAdapter : public StructureAdapter
     private:
 
         // data
-        std::vector<Atom> matoms;
+        AtomVector matoms;
 
         // comparison
         friend bool operator==(

@@ -177,8 +177,8 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
     if (astru0.countSites() == astru1.countSites())
     {
         sd.diffmethod = StructureDifference::Method::SIDEBYSIDE;
-        std::vector<Atom>::const_iterator ai0 = astru0.matoms.begin();
-        std::vector<Atom>::const_iterator ai1 = astru1.matoms.begin();
+        const_iterator ai0 = astru0.matoms.begin();
+        const_iterator ai1 = astru1.matoms.begin();
         for (int i = 0; ai0 != astru0.matoms.end(); ++i, ++ai0, ++ai1)
         {
             if (*ai0 != *ai1)
@@ -198,7 +198,7 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
     sd.diffmethod = StructureDifference::Method::SORTED;
     std::vector<atomindex> satoms0, satoms1;
     satoms0.reserve(astru0.countSites());
-    std::vector<Atom>::const_iterator ai = astru0.matoms.begin();
+    const_iterator ai = astru0.matoms.begin();
     for (int i = 0; ai != astru0.matoms.end(); ++ai, ++i)
     {
         satoms0.push_back(atomindex(&(*ai), i));
