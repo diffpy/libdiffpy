@@ -114,6 +114,6 @@ StructureAdapterPtr nometa(StructureAdapterPtr stru)
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::NoMetaStructureAdapter)
-BOOST_CLASS_EXPORT(diffpy::srreal::NoMetaStructureAdapter)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::NoMetaStructureAdapter)
 
 // End of file

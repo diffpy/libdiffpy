@@ -82,4 +82,8 @@ StructureAdapterPtr nometa(const T& stru)
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::NoMetaStructureAdapter)
+
 #endif  // NOMETASTRUCTUREADAPTER_HPP_INCLUDED

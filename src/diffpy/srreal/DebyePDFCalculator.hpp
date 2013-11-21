@@ -151,4 +151,8 @@ class DebyePDFCalculator :
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::DebyePDFCalculator)
+
 #endif  // DEBYEPDFCALCULATOR_HPP_INCLUDED

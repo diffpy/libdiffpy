@@ -720,6 +720,6 @@ void PDFCalculator::cacheRlimitsData()
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PDFCalculator)
-BOOST_CLASS_EXPORT(diffpy::srreal::PDFCalculator)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::PDFCalculator)
 
 // End of file

@@ -84,4 +84,8 @@ StructureAdapterPtr nosymmetry(const T& stru)
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::NoSymmetryStructureAdapter)
+
 #endif  // NOSYMMETRYSTRUCTUREADAPTER_HPP_INCLUDED

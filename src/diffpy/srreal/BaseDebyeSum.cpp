@@ -294,6 +294,6 @@ void BaseDebyeSum::cacheStructureData()
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::BaseDebyeSum)
-BOOST_CLASS_EXPORT(diffpy::srreal::BaseDebyeSum)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::BaseDebyeSum)
 
 // End of file

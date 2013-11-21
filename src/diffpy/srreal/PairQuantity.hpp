@@ -190,5 +190,6 @@ void PairQuantity::setStructure(const T& stru)
 // Serialization -------------------------------------------------------------
 
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PairQuantity)
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::PairQuantity)
 
 #endif  // PAIRQUANTITY_HPP_INCLUDED

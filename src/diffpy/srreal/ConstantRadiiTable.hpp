@@ -61,4 +61,8 @@ class ConstantRadiiTable : public AtomRadiiTable
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::ConstantRadiiTable)
+
 #endif  // CONSTANTRADIITABLE_HPP_INCLUDED

@@ -27,6 +27,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
+#include <boost/serialization/export.hpp>
 
 #include <diffpy/EventTicker.hpp>
 #include <diffpy/srreal/QuantityType.hpp>
@@ -114,5 +115,7 @@ PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp);
 // Serialization -------------------------------------------------------------
 
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PQEvaluatorBasic)
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::PQEvaluatorBasic)
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::PQEvaluatorOptimized)
 
 #endif  // PQEVALUATOR_HPP_INCLUDED

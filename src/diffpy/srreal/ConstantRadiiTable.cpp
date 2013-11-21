@@ -89,6 +89,6 @@ bool reg_ConstantRadiiTable = ConstantRadiiTable().registerThisType();
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ConstantRadiiTable)
-BOOST_CLASS_EXPORT(diffpy::srreal::ConstantRadiiTable)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::ConstantRadiiTable)
 
 // End of file

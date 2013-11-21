@@ -392,6 +392,6 @@ registerPythonStructureAdapterFactory(createDiffPyStructureAdapter);
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::DiffPyStructureAdapter)
-BOOST_CLASS_EXPORT(diffpy::srreal::DiffPyStructureAdapter)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::DiffPyStructureAdapter)
 
 // End of file

@@ -116,4 +116,8 @@ class BaseDebyeSum :
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::BaseDebyeSum)
+
 #endif  // BASEDEBYESUM_HPP_INCLUDED

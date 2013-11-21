@@ -375,6 +375,6 @@ void DebyePDFCalculator::cacheRlimitsData()
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::DebyePDFCalculator)
-BOOST_CLASS_EXPORT(diffpy::srreal::DebyePDFCalculator)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::DebyePDFCalculator)
 
 // End of file

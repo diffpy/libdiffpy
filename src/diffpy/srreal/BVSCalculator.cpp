@@ -231,6 +231,6 @@ double BVSCalculator::rmaxFromPrecision(double eps) const
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::BVSCalculator)
-BOOST_CLASS_EXPORT(diffpy::srreal::BVSCalculator)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::BVSCalculator)
 
 // End of file

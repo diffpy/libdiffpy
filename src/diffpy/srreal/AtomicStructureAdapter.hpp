@@ -149,4 +149,8 @@ bool operator!=(
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::AtomicStructureAdapter)
+
 #endif  // ATOMICSTRUCTUREADAPTER_HPP_INCLUDED

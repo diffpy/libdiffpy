@@ -142,4 +142,8 @@ QuantityType OverlapCalculator::operator()(const T& stru)
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::OverlapCalculator)
+
 #endif  // OVERLAPCALCULATOR_HPP_INCLUDED

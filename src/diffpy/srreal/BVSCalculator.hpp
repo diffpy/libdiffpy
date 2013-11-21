@@ -98,4 +98,8 @@ class BVSCalculator : public PairQuantity
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::BVSCalculator)
+
 #endif  // BVSCALCULATOR_HPP_INCLUDED

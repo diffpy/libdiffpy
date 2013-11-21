@@ -208,4 +208,8 @@ class PDFCalculator :
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::PDFCalculator)
+
 #endif  // PDFCALCULATOR_HPP_INCLUDED

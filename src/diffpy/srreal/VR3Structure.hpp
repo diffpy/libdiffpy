@@ -90,4 +90,8 @@ StructureAdapterPtr createStructureAdapter(const VR3Structure& vr3stru)
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::VR3Adapter)
+
 #endif  // VR3STRUCTURE_HPP_INCLUDED

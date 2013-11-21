@@ -532,6 +532,6 @@ registerPythonStructureAdapterFactory(createPyObjCrystMoleculeAdapter);
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ObjCrystStructureAdapter)
-BOOST_CLASS_EXPORT(diffpy::srreal::ObjCrystStructureAdapter)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::ObjCrystStructureAdapter)
 
 // End of file

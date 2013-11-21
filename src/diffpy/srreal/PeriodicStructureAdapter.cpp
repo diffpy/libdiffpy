@@ -229,6 +229,6 @@ void PeriodicStructureBondGenerator::updater1()
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PeriodicStructureAdapter)
-BOOST_CLASS_EXPORT(diffpy::srreal::PeriodicStructureAdapter)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::PeriodicStructureAdapter)
 
 // End of file

@@ -80,6 +80,6 @@ VR3BondGenerator::VR3BondGenerator(StructureAdapterConstPtr adpt) :
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::VR3Adapter)
-BOOST_CLASS_EXPORT(diffpy::srreal::VR3Adapter)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::VR3Adapter)
 
 // End of file

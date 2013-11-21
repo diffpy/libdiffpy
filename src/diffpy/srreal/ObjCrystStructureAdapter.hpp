@@ -160,4 +160,8 @@ createStructureAdapter(const ObjCryst::Molecule& molecule);
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::ObjCrystStructureAdapter)
+
 #endif  // OBJCRYSTSTRUCTUREADAPTER_HPP_INCLUDED

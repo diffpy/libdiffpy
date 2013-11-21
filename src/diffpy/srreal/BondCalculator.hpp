@@ -86,4 +86,8 @@ QuantityType BondCalculator::operator()(const T& stru)
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::BondCalculator)
+
 #endif  // BONDCALCULATOR_HPP_INCLUDED

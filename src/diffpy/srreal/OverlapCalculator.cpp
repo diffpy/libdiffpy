@@ -548,6 +548,6 @@ OverlapCalculator::getNeighborIds(int k) const
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::OverlapCalculator)
-BOOST_CLASS_EXPORT(diffpy::srreal::OverlapCalculator)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::OverlapCalculator)
 
 // End of file

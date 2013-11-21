@@ -110,4 +110,8 @@ class PeriodicStructureBondGenerator : public BaseBondGenerator
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::PeriodicStructureAdapter)
+
 #endif  // PERIODICSTRUCTUREADAPTER_HPP_INCLUDED
