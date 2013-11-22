@@ -138,10 +138,11 @@ PeriodicStructureBondGenerator::PeriodicStructureBondGenerator(
     mcartesian_positions_uc.reserve(cntsites);
     const Lattice& L = mpstructure->getLattice();
     PeriodicStructureAdapter::const_iterator ai = mpstructure->begin();
+    R3::Vector xyzc;
     for (; ai != mpstructure->end(); ++ai)
     {
-        mcartesian_positions_uc.push_back(
-                L.ucvCartesian(ai->cartesianposition));
+        xyzc = L.ucvCartesian(ai->cartesianposition);
+        mcartesian_positions_uc.push_back(xyzc);
     }
 }
 
@@ -162,6 +163,13 @@ void PeriodicStructureBondGenerator::rewind()
     // BaseBondGenerator::rewind calls this->rewindSymmetry,
     // which takes care of msphere configuration
     this->BaseBondGenerator::rewind();
+}
+
+
+void PeriodicStructureBondGenerator::selectAnchorSite(int anchor)
+{
+    this->BaseBondGenerator::selectAnchorSite(anchor);
+    mr0 = mcartesian_positions_uc[anchor];
 }
 
 
@@ -209,6 +217,7 @@ void PeriodicStructureBondGenerator::getNextBond()
     {
         msite_current = msite_first;
     }
+    this->advanceIfSkippedSite();
     // update values only if not finished
     if (!this->finished())  this->updater1();
 }

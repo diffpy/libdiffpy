@@ -83,6 +83,7 @@ class PeriodicStructureBondGenerator : public BaseBondGenerator
         virtual void rewind();
 
         // configuration
+        virtual void selectAnchorSite(int);
         virtual void setRmin(double);
         virtual void setRmax(double);
 

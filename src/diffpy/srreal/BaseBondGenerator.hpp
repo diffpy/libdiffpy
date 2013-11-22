@@ -45,7 +45,7 @@ class BaseBondGenerator
         void next();
 
         // configuration
-        void selectAnchorSite(int);
+        virtual void selectAnchorSite(int);
         void selectSiteRange(int first, int last);
         void selectSite(int, bool);
         virtual void setRmin(double);
@@ -86,11 +86,11 @@ class BaseBondGenerator
         virtual void rewindSymmetry();
         virtual void getNextBond();
         void updateDistance();
+        void advanceIfSkippedSite();
 
     private:
 
         // methods
-        void advanceIfSkippedSite();
         void advanceWhileInvalid();
         bool bondOutOfRange() const;
         bool atSelfPair() const;
