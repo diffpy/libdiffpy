@@ -69,6 +69,7 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
 
     public:
 
+        typedef std::vector<SymOpRotTrans> SymOpVector;
         // constructor
         CrystalStructureAdapter();
 
@@ -95,7 +96,7 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
 
         // data
         /// array of symmetry operations
-        std::vector<SymOpRotTrans> msymops;
+        SymOpVector msymops;
         double msymmetry_precision;
         mutable std::vector<AtomVector> msymatoms;
         mutable bool msymmetry_cached;
@@ -127,7 +128,10 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
 };
 
 
+typedef boost::shared_ptr<CrystalStructureAdapter> CrystalStructureAdapterPtr;
+
 // Comparison functions
+
 bool operator==(const CrystalStructureAdapter&, const CrystalStructureAdapter&);
 bool operator!=(const CrystalStructureAdapter&, const CrystalStructureAdapter&);
 

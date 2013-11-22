@@ -157,7 +157,7 @@ CrystalStructureAdapter::expandLatticeAtom(const Atom& a0) const
     using mathutils::eps_eq;
     AtomVector eqsites;
     vector<int> eqduplicity;
-    vector<SymOpRotTrans>::const_iterator op = msymops.begin();
+    SymOpVector::const_iterator op = msymops.begin();
     Atom a1 = a0;
     for (; op != msymops.end(); ++op)
     {

@@ -66,7 +66,10 @@ class PeriodicStructureAdapter : public AtomicStructureAdapter
 
 };
 
+typedef boost::shared_ptr<PeriodicStructureAdapter> PeriodicStructureAdapterPtr;
+
 // Comparison functions
+
 bool operator==(const PeriodicStructureAdapter&, const PeriodicStructureAdapter&);
 bool operator!=(const PeriodicStructureAdapter&, const PeriodicStructureAdapter&);
 

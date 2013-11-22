@@ -74,9 +74,6 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
 {
     private:
 
-        typedef boost::shared_ptr<PeriodicStructureAdapter>
-            PeriodicStructureAdapterPtr;
-
         StructureAdapterPtr m_ni;
         StructureAdapterPtr m_kbise;
         StructureAdapterPtr m_catio3;
