@@ -154,6 +154,7 @@ class CrystalStructureBondGenerator : public PeriodicStructureBondGenerator
         // methods
         virtual bool iterateSymmetry();
         virtual void rewindSymmetry();
+        virtual void getNextBond();
         virtual void updater1();
 
         // data

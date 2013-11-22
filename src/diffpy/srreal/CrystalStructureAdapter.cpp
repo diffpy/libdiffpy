@@ -156,7 +156,11 @@ CrystalStructureAdapter::expandLatticeAtom(const Atom& a0) const
 {
     using mathutils::eps_eq;
     AtomVector eqsites;
+    vector<R3::Vector> eqsumpos;
     vector<int> eqduplicity;
+    eqsumpos.reserve(this->countSymOps());
+    eqduplicity.reserve(this->countSymOps());
+    const Lattice& L = this->getLattice();
     SymOpVector::const_iterator op = msymops.begin();
     Atom a1 = a0;
     for (; op != msymops.end(); ++op)
@@ -164,41 +168,40 @@ CrystalStructureAdapter::expandLatticeAtom(const Atom& a0) const
         // positions and Uij-s are actually fractional here
         a1.cartesianposition = R3::mxvecproduct(op->R, a0.cartesianposition);
         a1.cartesianposition += op->t;
-        R3::Matrix utmp = R3::prod(a0.cartesianuij, R3::trans(op->R));
-        a1.cartesianuij = R3::prod(op->R, utmp);
         // check if a1 is a duplicate of an existing symmetry site
         int ieq = this->findEqualPosition(eqsites, a1);
-        if (ieq >= 0)
+        if (ieq < 0)
         {
-            Atom& aeq = eqsites[ieq];
-            aeq.cartesianposition += a1.cartesianposition;
-            aeq.cartesianuij += a1.cartesianuij;
-            ++eqduplicity[ieq];
-            continue;
+            // a1 is a new symmetry site
+            R3::Matrix utmp = R3::prod(a0.cartesianuij, R3::trans(op->R));
+            a1.cartesianuij = R3::prod(op->R, utmp);
+            eqsites.push_back(a1);
+            eqsumpos.push_back(R3::zerovector);
+            eqduplicity.push_back(0);
+            ieq = eqsites.size() - 1;
         }
-        // a1 is a new symmetry site
-        eqsites.push_back(a1);
-        eqduplicity.push_back(1);
+        eqsumpos[ieq] += L.ucvFractional(a1.cartesianposition);
+        eqduplicity[ieq] += 1;
     }
     // assume P1 if there are no symmetry operations were defined
     if (msymops.empty())
     {
         assert(eqsites.empty());
+        assert(eqsumpos.empty());
         assert(eqduplicity.empty());
         eqsites.push_back(a0);
+        eqsumpos.push_back(a0.cartesianposition);
         eqduplicity.push_back(1);
     }
     // calculate mean values from equivalent sites and adjust any roundoffs
     assert(eqsites.size() == eqduplicity.size());
-    const Lattice& L = this->getLattice();
+    assert(eqsites.size() == eqsumpos.size());
     iterator ai = eqsites.begin();
+    vector<R3::Vector>::const_iterator sii = eqsumpos.begin();
     vector<int>::const_iterator dpi = eqduplicity.begin();
-    for (; ai != eqsites.end(); ++ai, ++dpi)
+    for (; ai != eqsites.end(); ++ai, ++sii, ++dpi)
     {
-        R3::Vector& axyz = ai->cartesianposition;
-        axyz /= (*dpi);
-        axyz = L.ucvFractional(axyz);
-        ai->cartesianuij /= (*dpi);
+        ai->cartesianposition = (*sii) / (*dpi);
     }
     return eqsites;
 }
@@ -307,13 +310,19 @@ const R3::Matrix& CrystalStructureBondGenerator::Ucartesian1() const
 
 bool CrystalStructureBondGenerator::iterateSymmetry()
 {
-    if (this->PeriodicStructureBondGenerator::iterateSymmetry())  return true;
-    // advance to the next symmetry equivalent position
+    // Iterate the sphere at a fixed symmetry position.
+    if (this->PeriodicStructureBondGenerator::iterateSymmetry())
+    {
+        this->updater1();
+        return true;
+    }
+    // Advance to the next symmetry position.  We are done if they
+    // were all already used.
     const AtomVector& sa = this->symatoms(this->site1());
     ++msymidx;
     if (msymidx >= sa.size())  return false;
-    // here the symmetry equivalent position msymidx exists
-    // the line below calls CrystalStructureBondGenerator::updater1
+    // rewind the sphere for the new symmetry position.
+    // this calls CrystalStructureBondGenerator::updater1()
     this->PeriodicStructureBondGenerator::rewindSymmetry();
     return true;
 }
@@ -324,6 +333,12 @@ void CrystalStructureBondGenerator::rewindSymmetry()
     msymidx = 0;
     // this calls CrystalStructureBondGenerator::updater1()
     this->PeriodicStructureBondGenerator::rewindSymmetry();
+}
+
+
+void CrystalStructureBondGenerator::getNextBond()
+{
+    this->BaseBondGenerator::getNextBond();
 }
 
 
