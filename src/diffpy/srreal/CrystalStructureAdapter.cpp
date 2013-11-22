@@ -180,18 +180,24 @@ CrystalStructureAdapter::expandLatticeAtom(const Atom& a0) const
         eqsites.push_back(a1);
         eqduplicity.push_back(1);
     }
+    // assume P1 if there are no symmetry operations were defined
+    if (msymops.empty())
+    {
+        assert(eqsites.empty());
+        assert(eqduplicity.empty());
+        eqsites.push_back(a0);
+        eqduplicity.push_back(1);
+    }
     // calculate mean values from equivalent sites and adjust any roundoffs
     assert(eqsites.size() == eqduplicity.size());
+    const Lattice& L = this->getLattice();
     iterator ai = eqsites.begin();
     vector<int>::const_iterator dpi = eqduplicity.begin();
     for (; ai != eqsites.end(); ++ai, ++dpi)
     {
         R3::Vector& axyz = ai->cartesianposition;
         axyz /= (*dpi);
-        axyz -= floor(axyz);
-        if (eps_eq(axyz[0], 1.0))  axyz[0] = 0.0;
-        if (eps_eq(axyz[1], 1.0))  axyz[1] = 0.0;
-        if (eps_eq(axyz[2], 1.0))  axyz[2] = 0.0;
+        axyz = L.ucvFractional(axyz);
         ai->cartesianuij /= (*dpi);
     }
     return eqsites;
