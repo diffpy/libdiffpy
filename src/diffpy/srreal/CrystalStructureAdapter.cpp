@@ -63,7 +63,7 @@ BaseBondGeneratorPtr CrystalStructureAdapter::createBondGenerator() const
 
 int CrystalStructureAdapter::siteMultiplicity(int idx) const
 {
-    if (!msymmetry_cached)  this->updateSymmetryPositions();
+    if (!this->isSymmetryCached())  this->updateSymmetryPositions();
     int rv = msymatoms[idx].size();
     return rv;
 }
@@ -139,6 +139,15 @@ void CrystalStructureAdapter::addSymOp(const R3::Matrix& R, const R3::Vector& t)
 const SymOpRotTrans& CrystalStructureAdapter::getSymOp(int i) const
 {
     return msymops[i];
+}
+
+
+const CrystalStructureAdapter::AtomVector&
+CrystalStructureAdapter::getEquivalentAtoms(int idx) const
+{
+    assert(0 <= idx && idx < this->countSites());
+    if (!this->isSymmetryCached())  this->updateSymmetryPositions();
+    return msymatoms[idx];
 }
 
 
@@ -227,6 +236,13 @@ int CrystalStructureAdapter::findEqualPosition(
         if (L.norm(dxyz) <= symeps)  return (ai - eqsites.begin());
     }
     return -1;
+}
+
+bool CrystalStructureAdapter::isSymmetryCached() const
+{
+    msymmetry_cached = msymmetry_cached &&
+        (int(msymatoms.size()) == this->countSites());
+    return msymmetry_cached;
 }
 
 // Comparison functions ------------------------------------------------------

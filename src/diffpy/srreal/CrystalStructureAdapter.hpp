@@ -83,6 +83,8 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
         void addSymOp(const SymOpRotTrans&);
         void addSymOp(const R3::Matrix& R, const R3::Vector& t);
         const SymOpRotTrans& getSymOp(int i) const;
+        /// return all symmetry equivalent atoms in the unit cell for site i
+        const AtomVector& getEquivalentAtoms(int idx) const;
         /// return all symmetry related atoms in fractional coordinates
         AtomVector expandLatticeAtom(const Atom&) const;
         void updateSymmetryPositions() const;
@@ -96,9 +98,13 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
         mutable std::vector<AtomVector> msymatoms;
         mutable bool msymmetry_cached;
 
-        /// symmetry helper method
+        // symmetry helpers
         /// return index of AtomVector atom at an equal position or -1
         int findEqualPosition(const AtomVector&, const Atom&) const;
+        /// fuzzy check if symmetry positions are up to date
+        /// this only detects addition or removal of atom in the asymmetric
+        /// unit, but does not check for changes in atom positions.
+        bool isSymmetryCached() const;
 
         // comparison
         friend bool operator==(
