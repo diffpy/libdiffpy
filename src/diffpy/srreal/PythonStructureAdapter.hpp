@@ -21,7 +21,7 @@
 #define PYTHONSTRUCTUREADAPTER_HPP_INCLUDED
 
 #include <boost/python.hpp>
-#include <diffpy/srreal/StructureAdapter.hpp>
+#include <diffpy/srreal/forwardtypes.hpp>
 
 namespace diffpy {
 namespace srreal {
