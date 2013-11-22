@@ -194,8 +194,12 @@ const R3::Vector& Lattice::ucvCartesian(const R3::Vector& cv) const
 
 const R3::Vector& Lattice::ucvFractional(const R3::Vector& lv) const
 {
+    using mathutils::eps_eq;
     static R3::Vector res;
     res = lv - floor(lv);
+    if (eps_eq(res[0], 1.0))  res[0] = 0.0;
+    if (eps_eq(res[1], 1.0))  res[1] = 0.0;
+    if (eps_eq(res[2], 1.0))  res[2] = 0.0;
     return res;
 }
 
