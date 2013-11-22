@@ -65,6 +65,8 @@ bool operator!=(const SymOpRotTrans& op0, const SymOpRotTrans& op1)
 
 class CrystalStructureAdapter : public PeriodicStructureAdapter
 {
+    friend class CrystalStructureBondGenerator;
+
     public:
 
         // constructor
@@ -137,25 +139,30 @@ class CrystalStructureBondGenerator : public PeriodicStructureBondGenerator
         // constructors
         CrystalStructureBondGenerator(StructureAdapterConstPtr);
 
-        // methods
-        // loop control
-        virtual void rewind();
+        // configuration
+        virtual void selectAnchorSite(int);
 
         // data access
         virtual const R3::Matrix& Ucartesian1() const;
-
-        // configuration
-        virtual void setRmin(double);
-        virtual void setRmax(double);
 
     protected:
 
         // methods
         virtual bool iterateSymmetry();
         virtual void rewindSymmetry();
+        virtual void updater1();
 
         // data
         const CrystalStructureAdapter* mcstructure;
+        size_t msymidx;
+        const R3::Matrix* mpuc1;
+
+    private:
+
+        typedef CrystalStructureAdapter::AtomVector AtomVector;
+
+        // methods
+        const AtomVector& symatoms(int idx);
 
 };
 

@@ -284,91 +284,66 @@ CrystalStructureBondGenerator::CrystalStructureBondGenerator(
 {
     mcstructure = dynamic_cast<const CrystalStructureAdapter*>(adpt.get());
     assert(mcstructure);
+    msymidx = 0;
+    mpuc1 = &(R3::zeromatrix());
 }
 
 // Public Methods ------------------------------------------------------------
 
-void CrystalStructureBondGenerator::rewind()
+void CrystalStructureBondGenerator::selectAnchorSite(int anchor)
 {
-/* FIXME
-    // Delay msphere instantiation to here instead of in constructor,
-    // so it is possible to use setRmin, setRmax.
-    if (!msphere.get())
-    {
-        const Lattice& L = mpstructure->getLattice();
-        double buffzone = L.ucMaxDiagonalLength();
-        double rsphmin = this->getRmin() - buffzone;
-        double rsphmax = this->getRmax() + buffzone;
-        msphere.reset(new PointsInSphere(rsphmin, rsphmax, L));
-    }
-    // BaseBondGenerator::rewind calls this->rewindSymmetry,
-    // which takes care of msphere configuration
-    this->BaseBondGenerator::rewind();
-*/
+    this->BaseBondGenerator::selectAnchorSite(anchor);
+    const Atom& a0 = this->symatoms(anchor)[0];
+    mr0 = a0.cartesianposition;
 }
 
 
 const R3::Matrix& CrystalStructureBondGenerator::Ucartesian1() const
 {
-// FIXME
-    return R3::zeromatrix();
-}
-
-
-void CrystalStructureBondGenerator::setRmin(double rmin)
-{
-/* FIXME
-    // destroy msphere so it will be created on rewind with new rmin
-    if (this->getRmin() != rmin)    msphere.reset();
-    this->BaseBondGenerator::setRmin(rmin);
-*/
-}
-
-
-void CrystalStructureBondGenerator::setRmax(double rmax)
-{
-/* FIXME
-    // destroy msphere so it will be created on rewind with new rmax
-    if (this->getRmax() != rmax)    msphere.reset();
-    this->BaseBondGenerator::setRmax(rmax);
-*/
+    return *mpuc1;
 }
 
 // Protected Methods ---------------------------------------------------------
 
 bool CrystalStructureBondGenerator::iterateSymmetry()
 {
-/* FIXME
-    msphere->next();
-    bool done = msphere->finished();
-    mrcsphere = done ? R3::zerovector :
-        mpstructure->getLattice().cartesian(msphere->mno());
-    return !done;
-*/
+    if (this->PeriodicStructureBondGenerator::iterateSymmetry())  return true;
+    // advance to the next symmetry equivalent position
+    const AtomVector& sa = this->symatoms(this->site1());
+    ++msymidx;
+    if (msymidx >= sa.size())  return false;
+    // here the symmetry equivalent position msymidx exists
+    // the line below calls CrystalStructureBondGenerator::updater1
+    this->PeriodicStructureBondGenerator::rewindSymmetry();
     return true;
 }
 
 
 void CrystalStructureBondGenerator::rewindSymmetry()
 {
-/* FIXME
-    msphere->rewind();
-    mrcsphere = msphere->finished() ? R3::zerovector :
-        mpstructure->getLattice().cartesian(msphere->mno());
-    this->updater1();
-*/
+    msymidx = 0;
+    // this calls CrystalStructureBondGenerator::updater1()
+    this->PeriodicStructureBondGenerator::rewindSymmetry();
 }
 
+
+void CrystalStructureBondGenerator::updater1()
+{
+    const AtomVector& sa = this->symatoms(this->site1());
+    assert(msymidx < sa.size());
+    mr1 = mrcsphere + sa[msymidx].cartesianposition;
+    mpuc1 = &(sa[msymidx].cartesianuij);
+    this->updateDistance();
+}
 
 // Private Methods -----------------------------------------------------------
 
-/* FIXME
-void CrystalStructureBondGenerator::updater1()
+const CrystalStructureAdapter::AtomVector&
+CrystalStructureBondGenerator::symatoms(int idx)
 {
-    mr1 = mrcsphere + mcartesian_positions_uc[this->site1()];
-    this->updateDistance();
+    assert(0 <= idx && idx < int(mcstructure->msymatoms.size()));
+    return mcstructure->msymatoms[idx];
 }
-*/
 
 }   // namespace srreal
 }   // namespace diffpy

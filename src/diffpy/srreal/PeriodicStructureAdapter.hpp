@@ -91,21 +91,19 @@ class PeriodicStructureBondGenerator : public BaseBondGenerator
 
         // data
         const PeriodicStructureAdapter* mpstructure;
+        boost::scoped_ptr<PointsInSphere> msphere;
+        R3::Vector mrcsphere;
 
         // methods
         virtual bool iterateSymmetry();
         virtual void rewindSymmetry();
         virtual void getNextBond();
+        virtual void updater1();
 
     private:
 
-        // methods
-        void updater1();
-
         // data
-        boost::scoped_ptr<PointsInSphere> msphere;
         std::vector<R3::Vector> mcartesian_positions_uc;
-        R3::Vector mrcsphere;
 };
 
 }   // namespace srreal
