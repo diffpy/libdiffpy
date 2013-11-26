@@ -23,7 +23,6 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
-#include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include "serialization_helpers.hpp"
 #include "objcryst_helpers.hpp"
 #include <ObjCryst/ObjCryst/Crystal.h>
@@ -40,7 +39,7 @@ using ObjCryst::ScatteringPowerAtom;
 
 namespace {
 
-int countBonds(BaseBondGenerator& bnds)
+int countBonds(diffpy::srreal::BaseBondGenerator& bnds)
 {
     int rv = 0;
     for (bnds.rewind(); !bnds.finished(); bnds.next())  ++rv;
@@ -111,7 +110,7 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
 
         void test_typeid()
         {
-            TS_ASSERT(typeid(ObjCrystStructureAdapter) == typeid(*m_ni));
+            TS_ASSERT(typeid(CrystalStructureAdapter) == typeid(*m_ni));
         }
 
 
@@ -144,7 +143,7 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
         {
             const double eps = 1.0e-5;
             R3::Vector rCa = m_catio3->siteCartesianPosition(0);
-            TS_ASSERT_DELTA(5.34323, rCa[0], eps);
+            TS_ASSERT_DELTA(-0.03637, rCa[0], eps);
             TS_ASSERT_DELTA(0.19603, rCa[1], eps);
             TS_ASSERT_DELTA(1.91003, rCa[2], eps);
         }
@@ -198,8 +197,8 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
 
         void test_getLattice()
         {
-            ObjCrystStructureAdapter* pkbise =
-                dynamic_cast<ObjCrystStructureAdapter*>(m_kbise.get());
+            CrystalStructureAdapter* pkbise =
+                dynamic_cast<CrystalStructureAdapter*>(m_kbise.get());
             TS_ASSERT(pkbise);
             const Lattice& L = pkbise->getLattice();
             const double eps = 1.0e-12;
@@ -230,10 +229,10 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(string("Bi3+"), kbise1->siteAtomType(1));
             TS_ASSERT_EQUALS(string("Se"), kbise1->siteAtomType(5));
             TS_ASSERT_EQUALS(string("Se"), kbise1->siteAtomType(11));
-            ObjCrystStructureAdapter* pkbise =
-                dynamic_cast<ObjCrystStructureAdapter*>(m_kbise.get());
-            ObjCrystStructureAdapter* pkbise1 =
-                dynamic_cast<ObjCrystStructureAdapter*>(kbise1.get());
+            CrystalStructureAdapter* pkbise =
+                dynamic_cast<CrystalStructureAdapter*>(m_kbise.get());
+            CrystalStructureAdapter* pkbise1 =
+                dynamic_cast<CrystalStructureAdapter*>(kbise1.get());
             const Lattice& L = pkbise->getLattice();
             const Lattice& L1 = pkbise1->getLattice();
             TS_ASSERT_EQUALS(L.a(), L1.a());
@@ -275,7 +274,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
 
         void test_typeid()
         {
-            TS_ASSERT(typeid(ObjCrystBondGenerator) ==
+            TS_ASSERT(typeid(CrystalStructureBondGenerator) ==
                     typeid(*m_nibnds));
         }
 
