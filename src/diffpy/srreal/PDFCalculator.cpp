@@ -491,7 +491,7 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
     for (; i < ilast; ++i)
     {
         double x = (this->rcalcloSteps() + i) * this->getRstep() - dist;
-        double y = pkf.yvalue(x, fwhm);
+        double y = pkf(x, fwhm);
         // Contributions in G(r) need to be normalized by pair distance,
         // not by r as done in PDFfit or PDFfit2.  Here we rescale RDF
         // in such way that division by r will give a correct result.

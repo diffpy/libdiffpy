@@ -36,7 +36,7 @@ class GaussianProfile : public PeakProfile
 
         // methods
         const std::string& type() const;
-        double yvalue(double x, double fwhm) const;
+        double operator()(double x, double fwhm) const;
         double xboundlo(double fwhm) const;
         double xboundhi(double fwhm) const;
         void setPrecision(double eps);

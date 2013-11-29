@@ -14,7 +14,7 @@
 *
 * class PeakProfile -- base class for calculation of peak profiles.
 *     When possible total integrated area of the profile should eqaul 1.
-*     The method yvalue(x, fwhm) returns amplitude of a zero-centered profile.
+*     The operator()(x, fwhm) returns amplitude of a zero-centered profile.
 *     Methods xboundlo(fwhm), xboundhi(fwhm) return low and high x-boundaries,
 *     where amplitude relative to the maximum becomes smaller than precision
 *     set by setPrecision().
@@ -44,7 +44,7 @@ class PeakProfile :
         // constructors
         PeakProfile();
         // methods
-        virtual double yvalue(double x, double fwhm) const = 0;
+        virtual double operator()(double x, double fwhm) const = 0;
         virtual double xboundlo(double fwhm) const = 0;
         virtual double xboundhi(double fwhm) const = 0;
         virtual void setPrecision(double eps);

@@ -59,7 +59,7 @@ const string& CroppedGaussianProfile::type() const
 }
 
 
-double CroppedGaussianProfile::yvalue(double x, double fwhm) const
+double CroppedGaussianProfile::operator()(double x, double fwhm) const
 {
     double xrel = x / fwhm;
     double rv = (fabs(xrel) >= mhalfboundrel) ? 0.0 :

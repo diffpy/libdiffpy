@@ -55,7 +55,7 @@ const string& GaussianProfile::type() const
 }
 
 
-double GaussianProfile::yvalue(double x, double fwhm) const
+double GaussianProfile::operator()(double x, double fwhm) const
 {
     if ( fwhm <= 0 ) return 0.0;
     double xrel = x / fwhm;
