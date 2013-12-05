@@ -21,6 +21,7 @@
 #include <diffpy/srreal/PeakWidthModel.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 #include <diffpy/validators.hpp>
+#include <diffpy/serialization.ipp>
 
 using std::string;
 using diffpy::validators::ensureNonNull;
@@ -62,5 +63,7 @@ const PeakWidthModelPtr& PeakWidthModelOwner::getPeakWidthModel() const
 
 }   // namespace srreal
 }   // namespace diffpy
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PeakWidthModelPtr)
 
 // End of file
