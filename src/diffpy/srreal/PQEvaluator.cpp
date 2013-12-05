@@ -65,7 +65,7 @@ PQEvaluatorType PQEvaluatorBasic::typeintused() const
 
 
 void PQEvaluatorBasic::updateValue(
-        PairQuantity& pq, StructureAdapterConstPtr stru)
+        PairQuantity& pq, StructureAdapterPtr stru)
 {
     mtypeused = BASIC;
     pq.setStructure(stru);
@@ -125,7 +125,7 @@ PQEvaluatorType PQEvaluatorOptimized::typeint() const
 
 
 void PQEvaluatorOptimized::updateValue(
-        PairQuantity& pq, StructureAdapterConstPtr stru)
+        PairQuantity& pq, StructureAdapterPtr stru)
 {
     mtypeused = OPTIMIZED;
     // revert to normal calculation if there is no structure or

@@ -37,7 +37,7 @@ class ConstantPeakWidth : public PeakWidthModel
         // methods
         virtual const std::string& type() const;
         virtual double calculate(const BaseBondGenerator&) const;
-        virtual double maxWidth(StructureAdapterConstPtr,
+        virtual double maxWidth(StructureAdapterPtr,
                 double rmin, double rmax) const;
 
         // data access

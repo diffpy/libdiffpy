@@ -111,12 +111,12 @@ double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
         bool anisotropy=true);
 
 /// Maximum diagonal Uii element from all atoms in the structure.
-double maxUii(StructureAdapterConstPtr stru);
+double maxUii(StructureAdapterPtr stru);
 
 /// Translate an index container to a vector of string symbols
 template <class T>
 std::vector<std::string>
-siteIndicesToTypes(const StructureAdapterConstPtr& stru, const T& indices)
+siteIndicesToTypes(const StructureAdapterPtr& stru, const T& indices)
 {
     std::vector<std::string> rv;
     rv.reserve(stru->countSites());

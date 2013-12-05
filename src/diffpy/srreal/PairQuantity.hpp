@@ -51,15 +51,15 @@ class PairQuantity : public diffpy::Attributes
         // methods
         const QuantityType& eval();
         template <class T> const QuantityType& eval(const T&);
-        const QuantityType& eval(StructureAdapterConstPtr);
+        const QuantityType& eval(StructureAdapterPtr);
         const QuantityType& value() const;
         void mergeParallelData(const std::string& pdata, int ncpu);
         virtual std::string getParallelData() const;
 
         // configuration
         template <class T> void setStructure(const T&);
-        void setStructure(StructureAdapterConstPtr);
-        const StructureAdapterConstPtr& getStructure() const;
+        void setStructure(StructureAdapterPtr);
+        const StructureAdapterPtr& getStructure() const;
         virtual void setRmin(double);
         const double& getRmin() const;
         virtual void setRmax(double);
@@ -100,7 +100,7 @@ class PairQuantity : public diffpy::Attributes
         typedef boost::unordered_map<
             std::pair<std::string,std::string>, bool> TypeMaskStorage;
         QuantityType mvalue;
-        StructureAdapterConstPtr mstructure;
+        StructureAdapterPtr mstructure;
         double mrmin;
         double mrmax;
         PQEvaluatorPtr mevaluator;
@@ -122,12 +122,8 @@ class PairQuantity : public diffpy::Attributes
         template<class Archive>
             void serialize(Archive& ar, const unsigned int version)
         {
-            // Some boost versions cannot load StructureAdapterConstPtr.
-            // Let's recast as regular pointer when saving or loading.
-            StructureAdapterPtr stru = boost::const_pointer_cast<
-                StructureAdapterPtr::element_type>(mstructure);
             ar & mvalue;
-            ar & stru; mstructure = stru;
+            ar & mstructure;
             ar & mrmin;
             ar & mrmax;
             ar & mevaluator;
@@ -167,12 +163,22 @@ StructureAdapterPtr convertToStructureAdapter(StructureAdapterPtr stru)
     return stru;
 }
 
+
+inline
+StructureAdapterPtr convertToStructureAdapter(StructureAdapterConstPtr stru)
+{
+    StructureAdapterPtr rv =
+        boost::const_pointer_cast<StructureAdapterPtr::element_type>(stru);
+    return rv;
+}
+
+
 // Template Public Methods ---------------------------------------------------
 
 template <class T>
 const QuantityType& PairQuantity::eval(const T& stru)
 {
-    StructureAdapterConstPtr pstru = convertToStructureAdapter(stru);
+    StructureAdapterPtr pstru = convertToStructureAdapter(stru);
     return this->eval(pstru);
 }
 
@@ -180,7 +186,7 @@ const QuantityType& PairQuantity::eval(const T& stru)
 template <class T>
 void PairQuantity::setStructure(const T& stru)
 {
-    StructureAdapterConstPtr pstru = convertToStructureAdapter(stru);
+    StructureAdapterPtr pstru = convertToStructureAdapter(stru);
     this->setStructure(pstru);
 }
 

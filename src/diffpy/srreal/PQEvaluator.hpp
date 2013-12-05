@@ -55,7 +55,7 @@ class PQEvaluatorBasic
         // methods
         virtual PQEvaluatorType typeint() const;
         PQEvaluatorType typeintused() const;
-        virtual void updateValue(PairQuantity&, StructureAdapterConstPtr);
+        virtual void updateValue(PairQuantity&, StructureAdapterPtr);
         void useFullSum(bool flag);
         void setupParallelRun(int cpuindex, int ncpu);
 
@@ -91,7 +91,7 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
 
         // methods
         virtual PQEvaluatorType typeint() const;
-        virtual void updateValue(PairQuantity&, StructureAdapterConstPtr);
+        virtual void updateValue(PairQuantity&, StructureAdapterPtr);
 
     private:
 

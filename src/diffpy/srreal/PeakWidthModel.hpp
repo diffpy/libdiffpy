@@ -45,7 +45,7 @@ class PeakWidthModel :
 
         // methods
         virtual double calculate(const BaseBondGenerator&) const = 0;
-        virtual double maxWidth(StructureAdapterConstPtr,
+        virtual double maxWidth(StructureAdapterPtr,
                 double rmin, double rmax) const = 0;
         virtual eventticker::EventTicker& ticker() const  { return mticker; }
 

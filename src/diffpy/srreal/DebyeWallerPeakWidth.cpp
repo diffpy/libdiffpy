@@ -59,7 +59,7 @@ double DebyeWallerPeakWidth::calculate(const BaseBondGenerator& bnds) const
 }
 
 
-double DebyeWallerPeakWidth::maxWidth(StructureAdapterConstPtr stru,
+double DebyeWallerPeakWidth::maxWidth(StructureAdapterPtr stru,
                 double rmin, double rmax) const
 {
     using diffpy::mathutils::GAUSS_SIGMA_TO_FWHM;

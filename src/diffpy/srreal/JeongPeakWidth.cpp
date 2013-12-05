@@ -74,7 +74,7 @@ double JeongPeakWidth::calculate(const BaseBondGenerator& bnds) const
 }
 
 
-double JeongPeakWidth::maxWidth(StructureAdapterConstPtr stru,
+double JeongPeakWidth::maxWidth(StructureAdapterPtr stru,
         double rmin, double rmax) const
 {
     double maxwidth0 = this->DebyeWallerPeakWidth::maxWidth(stru, rmin, rmax);
