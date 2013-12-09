@@ -27,10 +27,15 @@ using namespace std;
 namespace diffpy {
 namespace srreal {
 
+using diffpy::mathutils::DOUBLE_EPS;
+
 // Constructors --------------------------------------------------------------
 
-GaussianProfile::GaussianProfile() : mhalfboundrel(0.0)
-{ }
+GaussianProfile::GaussianProfile()
+{
+    // call setPrecision to update mhalfboundrel
+    this->setPrecision(DOUBLE_EPS);
+}
 
 
 PeakProfilePtr GaussianProfile::create() const
@@ -79,8 +84,6 @@ double GaussianProfile::xboundhi(double fwhm) const
 
 void GaussianProfile::setPrecision(double eps)
 {
-    using diffpy::mathutils::DOUBLE_EPS;
-    using diffpy::mathutils::DOUBLE_MAX;
     // correct any settings below DOUBLE_EPS
     double eps1 = max(eps, DOUBLE_EPS);
     this->PeakProfile::setPrecision(eps1);

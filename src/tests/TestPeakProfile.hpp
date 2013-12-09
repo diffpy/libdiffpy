@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <cxxtest/TestSuite.h>
 
+#include <diffpy/mathutils.hpp>
 #include <diffpy/srreal/PeakProfile.hpp>
 #include "serialization_helpers.hpp"
 
@@ -94,8 +95,9 @@ class TestPeakProfile : public CxxTest::TestSuite
 
         void test_setPrecision()
         {
+            using diffpy::mathutils::DOUBLE_EPS;
             double epsy = 1e-7;
-            TS_ASSERT_EQUALS(0.0, mpkgauss->getPrecision());
+            TS_ASSERT_DELTA(0.0, mpkgauss->getPrecision(), 10 * DOUBLE_EPS);
             mpkgauss->setPrecision(epsy);
             TS_ASSERT_EQUALS(epsy, mpkgauss->getPrecision());
             double xbhi1 = mpkgauss->xboundhi(1);
