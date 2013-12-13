@@ -79,6 +79,14 @@ class TestNoMetaStructureAdapter : public CxxTest::TestSuite
         }
 
 
+        void test_NoMetaTwice()
+        {
+            StructureAdapterPtr adpt0 = nometa(m_pswt);
+            StructureAdapterPtr adpt1 = nometa(adpt0);
+            TS_ASSERT_EQUALS(adpt0, adpt1);
+        }
+
+
         void test_serialization()
         {
             using namespace diffpy::serialization;
