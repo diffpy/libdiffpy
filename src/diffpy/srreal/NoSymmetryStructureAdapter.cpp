@@ -45,6 +45,15 @@ NoSymmetryStructureAdapter::NoSymmetryStructureAdapter(
 
 // Public Methods ------------------------------------------------------------
 
+StructureAdapterPtr NoSymmetryStructureAdapter::clone() const
+{
+    boost::shared_ptr<NoSymmetryStructureAdapter>
+        rv(new NoSymmetryStructureAdapter);
+    if (msrcstructure)  rv->msrcstructure = msrcstructure->clone();
+    return rv;
+}
+
+
 BaseBondGeneratorPtr NoSymmetryStructureAdapter::createBondGenerator() const
 {
     BaseBondGeneratorPtr bnds(new BaseBondGenerator(shared_from_this()));

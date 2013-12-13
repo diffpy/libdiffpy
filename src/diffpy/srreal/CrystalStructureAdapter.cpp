@@ -52,6 +52,13 @@ CrystalStructureAdapter::CrystalStructureAdapter() :
 
 // Public Methods ------------------------------------------------------------
 
+StructureAdapterPtr CrystalStructureAdapter::clone() const
+{
+    StructureAdapterPtr rv(new CrystalStructureAdapter(*this));
+    return rv;
+}
+
+
 BaseBondGeneratorPtr CrystalStructureAdapter::createBondGenerator() const
 {
     this->updateSymmetryPositions();

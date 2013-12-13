@@ -44,6 +44,7 @@ class DiffPyStructureAdapter : public StructureAdapter
         DiffPyStructureAdapter(boost::python::object);
 
         // methods - overloaded
+        virtual StructureAdapterPtr clone() const;
         virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int countSites() const;
         virtual double numberDensity() const;

@@ -77,6 +77,7 @@ class AtomicStructureAdapter : public StructureAdapter
         typedef std::vector<Atom> AtomVector;
 
         // methods - overloaded
+        virtual StructureAdapterPtr clone() const;
         virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int countSites() const;
         virtual const std::string& siteAtomType(int idx) const;

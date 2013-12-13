@@ -74,6 +74,7 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
         CrystalStructureAdapter();
 
         // methods - overloaded
+        virtual StructureAdapterPtr clone() const;
         virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int siteMultiplicity(int idx) const;
         virtual StructureDifference diff(StructureAdapterConstPtr other) const;

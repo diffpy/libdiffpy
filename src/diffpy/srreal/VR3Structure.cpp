@@ -33,6 +33,15 @@ VR3Adapter::VR3Adapter(const VR3Structure& vr3s) : mvr3structure(vr3s)
 
 // Public Methods ------------------------------------------------------------
 
+StructureAdapterPtr VR3Adapter::clone() const
+{
+    // VR3Adapter has only constant public methods
+    StructureAdapterPtr rv = boost::const_pointer_cast<
+        StructureAdapterPtr::element_type>(shared_from_this());
+    return rv;
+}
+
+
 int VR3Adapter::countSites() const
 {
     return mvr3structure.size();

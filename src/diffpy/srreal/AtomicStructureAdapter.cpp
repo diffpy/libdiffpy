@@ -98,6 +98,13 @@ size_t hash_value(const Atom& a)
 
 // Public Methods ------------------------------------------------------------
 
+StructureAdapterPtr AtomicStructureAdapter::clone() const
+{
+    StructureAdapterPtr rv(new AtomicStructureAdapter(*this));
+    return rv;
+}
+
+
 BaseBondGeneratorPtr AtomicStructureAdapter::createBondGenerator() const
 {
     BaseBondGeneratorPtr bnds(new BaseBondGenerator(shared_from_this()));

@@ -38,6 +38,7 @@ class PeriodicStructureAdapter : public AtomicStructureAdapter
     public:
 
         // methods - overloaded
+        virtual StructureAdapterPtr clone() const;
         virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual double numberDensity() const;
         virtual StructureDifference diff(StructureAdapterConstPtr other) const;

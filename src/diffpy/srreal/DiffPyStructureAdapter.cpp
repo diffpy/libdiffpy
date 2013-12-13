@@ -54,6 +54,15 @@ DiffPyStructureAdapter::DiffPyStructureAdapter(python::object dpstru)
 
 // Public Methods ------------------------------------------------------------
 
+StructureAdapterPtr DiffPyStructureAdapter::clone() const
+{
+    // DiffPyStructureAdapter has only constant public methods
+    StructureAdapterPtr rv = boost::const_pointer_cast<
+        StructureAdapterPtr::element_type>(shared_from_this());
+    return rv;
+}
+
+
 BaseBondGeneratorPtr DiffPyStructureAdapter::createBondGenerator() const
 {
     // FIXME: hack for handling non-periodic structures

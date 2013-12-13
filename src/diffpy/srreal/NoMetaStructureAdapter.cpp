@@ -43,6 +43,14 @@ NoMetaStructureAdapter::NoMetaStructureAdapter(
 
 // Public Methods ------------------------------------------------------------
 
+StructureAdapterPtr NoMetaStructureAdapter::clone() const
+{
+    boost::shared_ptr<NoMetaStructureAdapter> rv(new NoMetaStructureAdapter);
+    if (msrcstructure)  rv->msrcstructure = msrcstructure->clone();
+    return rv;
+}
+
+
 BaseBondGeneratorPtr NoMetaStructureAdapter::createBondGenerator() const
 {
     BaseBondGeneratorPtr bnds = msrcstructure->createBondGenerator();

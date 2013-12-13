@@ -50,6 +50,7 @@ class StructureAdapter :
         virtual ~StructureAdapter()  { }
 
         // methods
+        virtual StructureAdapterPtr clone() const = 0;
 
         /// factory for creating compatible BondGenerator instance.
         virtual BaseBondGeneratorPtr createBondGenerator() const = 0;

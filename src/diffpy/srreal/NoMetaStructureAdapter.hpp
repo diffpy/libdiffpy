@@ -39,6 +39,7 @@ class NoMetaStructureAdapter : public StructureAdapter
         NoMetaStructureAdapter(StructureAdapterPtr);
 
         // methods - overloaded
+        virtual StructureAdapterPtr clone() const;
         virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int countSites() const;
         virtual double numberDensity() const;

@@ -43,6 +43,7 @@ class VR3Adapter : public StructureAdapter
         VR3Adapter(const VR3Structure& vr3s);
 
         // methods
+        virtual StructureAdapterPtr clone() const;
         virtual int countSites() const;
         virtual const R3::Vector& siteCartesianPosition(int idx) const;
         virtual bool siteAnisotropy(int idx) const;

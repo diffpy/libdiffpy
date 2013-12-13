@@ -37,6 +37,13 @@ namespace srreal {
 
 // Public Methods ------------------------------------------------------------
 
+StructureAdapterPtr PeriodicStructureAdapter::clone() const
+{
+    StructureAdapterPtr rv(new PeriodicStructureAdapter(*this));
+    return rv;
+}
+
+
 BaseBondGeneratorPtr PeriodicStructureAdapter::createBondGenerator() const
 {
     BaseBondGeneratorPtr bnds(
