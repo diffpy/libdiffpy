@@ -59,6 +59,7 @@ class PairQuantity : public diffpy::Attributes
         // configuration
         template <class T> void setStructure(const T&);
         void setStructure(StructureAdapterPtr);
+        StructureAdapterPtr& getStructure();
         const StructureAdapterPtr& getStructure() const;
         virtual void setRmin(double);
         const double& getRmin() const;
