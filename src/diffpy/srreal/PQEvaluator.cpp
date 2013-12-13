@@ -27,7 +27,6 @@
 #include <diffpy/serialization.ipp>
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/PairQuantity.hpp>
-#include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
 
 using namespace std;
@@ -130,20 +129,22 @@ void PQEvaluatorOptimized::updateValue(
     mtypeused = OPTIMIZED;
     // revert to normal calculation if there is no structure or
     // if PairQuantity uses mask
-    if (pq.ticker() >= mvalue_ticker || !pq.getStructure() || pq.hasMask())
+    if (pq.ticker() >= mvalue_ticker || !mlast_structure || pq.hasMask())
     {
         this->PQEvaluatorBasic::updateValue(pq, stru);
+        mlast_structure = pq.getStructure()->clone();
         return;
     }
     // do not do fast updates if they take more work
-    StructureDifference sd = pq.getStructure()->diff(stru);
+    StructureDifference sd = mlast_structure->diff(stru);
     if (!sd.allowsfastupdate())
     {
         this->PQEvaluatorBasic::updateValue(pq, stru);
+        mlast_structure = pq.getStructure()->clone();
         return;
     }
     // Remove contributions from the extra sites in the old structure
-    assert(sd.stru0 == pq.mstructure);
+    assert(sd.stru0 == mlast_structure);
     int cntsites0 = sd.stru0->countSites();
     BaseBondGeneratorPtr bnds0 = sd.stru0->createBondGenerator();
     // loop counter
@@ -194,6 +195,7 @@ void PQEvaluatorOptimized::updateValue(
             pq.addPairContribution(*bnds1, summationscale);
         }
     }
+    mlast_structure = pq.getStructure()->clone();
     mvalue_ticker.click();
 }
 

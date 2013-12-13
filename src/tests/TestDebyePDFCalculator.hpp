@@ -232,11 +232,9 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
             TS_ASSERT(allclose(gb1, go1));
             // change position of 1 atom
-            AtomicStructureAdapterPtr stru10d1s =
-                boost::make_shared<AtomicStructureAdapter>(*mstru10d1);
-            (*stru10d1s)[0].cartesianposition[1] = 0.5;
-            pdfcb.eval(stru10d1s);
-            pdfco.eval(stru10d1s);
+            mstru10d1->at(0).cartesianposition[1] = 0.5;
+            pdfcb.eval(mstru10d1);
+            pdfco.eval(mstru10d1);
             QuantityType gb2 = pdfcb.getPDF();
             QuantityType go2 = pdfco.getPDF();
             TS_ASSERT(!allclose(gb1, gb2));

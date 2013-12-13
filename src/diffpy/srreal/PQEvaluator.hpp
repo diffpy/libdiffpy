@@ -31,7 +31,7 @@
 
 #include <diffpy/EventTicker.hpp>
 #include <diffpy/srreal/QuantityType.hpp>
-#include <diffpy/srreal/forwardtypes.hpp>
+#include <diffpy/srreal/StructureAdapter.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -95,6 +95,9 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
 
     private:
 
+        // data
+        StructureAdapterPtr mlast_structure;
+
         // serialization
         friend class boost::serialization::access;
         template<class Archive>
@@ -102,6 +105,7 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
         {
             using boost::serialization::base_object;
             ar & base_object<PQEvaluatorBasic>(*this);
+            ar & mlast_structure;
         }
 };
 
