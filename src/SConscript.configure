@@ -46,6 +46,12 @@ conf = Configure(env, custom_tests={
     'CheckBoostVersion' : CheckBoostVersion,
     })
 
+# boost_serialization must be at least 1.41.0
+boost_required = '1.41.0'
+if not conf.CheckBoostVersion(boost_required):
+    print('This software requires Boost %s or later.' % boost_required)
+    Exit(1)
+
 # boost_python
 configure_boost_library('boost_python')
 configure_boost_library('boost_serialization')
