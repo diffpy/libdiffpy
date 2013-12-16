@@ -166,6 +166,7 @@ bool operator!=(
 
 // Serialization -------------------------------------------------------------
 
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::Atom)
 BOOST_CLASS_EXPORT_KEY(diffpy::srreal::AtomicStructureAdapter)
 
 #endif  // ATOMICSTRUCTUREADAPTER_HPP_INCLUDED
