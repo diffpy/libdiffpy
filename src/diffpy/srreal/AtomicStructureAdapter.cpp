@@ -238,11 +238,18 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
     return sd;
 }
 
+typedef AtomicStructureAdapter::iterator iterator;
 
-void AtomicStructureAdapter::insert(int idx, const Atom& atom)
+iterator AtomicStructureAdapter::insert(int idx, const Atom& atom)
 {
     assert(0 <= idx && idx <= this->countSites());
-    matoms.insert(matoms.begin() + idx, atom);
+    return this->insert(matoms.begin() + idx, atom);
+}
+
+
+iterator AtomicStructureAdapter::insert(iterator ii, const Atom& atom)
+{
+    return matoms.insert(ii, atom);
 }
 
 
@@ -252,10 +259,22 @@ void AtomicStructureAdapter::append(const Atom& atom)
 }
 
 
-void AtomicStructureAdapter::remove(int idx)
+iterator AtomicStructureAdapter::erase(int idx)
 {
     assert(0 <= idx && idx < this->countSites());
-    matoms.erase(matoms.begin() + idx);
+    return matoms.erase(matoms.begin() + idx);
+}
+
+
+iterator AtomicStructureAdapter::erase(iterator pos)
+{
+    return matoms.erase(pos);
+}
+
+
+iterator AtomicStructureAdapter::erase(iterator first, iterator last)
+{
+    return matoms.erase(first, last);
 }
 
 

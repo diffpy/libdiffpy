@@ -67,7 +67,7 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
             mstru10r = boost::make_shared<AtomicStructureAdapter>();
             mstru10r->assign(mstru10->rbegin(), mstru10->rend());
             mstru9 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
-            mstru9->remove(9);
+            mstru9->erase(9);
         }
 
 

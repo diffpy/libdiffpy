@@ -75,6 +75,13 @@ class AtomicStructureAdapter : public StructureAdapter
     public:
 
         typedef std::vector<Atom> AtomVector;
+        typedef AtomVector::value_type value_type;
+        typedef AtomVector::iterator iterator;
+        typedef AtomVector::const_iterator const_iterator;
+        typedef AtomVector::reverse_iterator reverse_iterator;
+        typedef AtomVector::const_reverse_iterator const_reverse_iterator;
+        typedef AtomVector::difference_type difference_type;
+        typedef AtomVector::size_type size_type;
 
         // methods - overloaded
         virtual StructureAdapterPtr clone() const;
@@ -88,10 +95,19 @@ class AtomicStructureAdapter : public StructureAdapter
         virtual StructureDifference diff(StructureAdapterConstPtr other) const;
 
         // methods - own
-        void insert(int, const Atom&);
+        iterator insert(int, const Atom&);
+        iterator insert(iterator position, const Atom&);
+        template <class Iter>
+        void insert(iterator position, Iter first, Iter last)
+        {
+            matoms.insert(position, first, last);
+        }
         void append(const Atom&);
-        void remove(int);
+        iterator erase(int idx);
+        iterator erase(iterator pos);
+        iterator erase(iterator first, iterator last);
         void reserve(size_t sz)  { matoms.reserve(sz); }
+        size_type size() const  { return matoms.size(); }
         Atom& operator[](int);
         const Atom& operator[](int) const;
         Atom& at(int idx)  { return (*this)[idx]; }
@@ -100,10 +116,6 @@ class AtomicStructureAdapter : public StructureAdapter
             void assign (Iter first, Iter last)  { matoms.assign(first, last); }
         void assign (size_t n, const Atom& a)  { matoms.assign(n, a); }
         // iterator forwarding
-        typedef AtomVector::iterator iterator;
-        typedef AtomVector::const_iterator const_iterator;
-        typedef AtomVector::reverse_iterator reverse_iterator;
-        typedef AtomVector::const_reverse_iterator const_reverse_iterator;
         iterator begin()  { return matoms.begin(); }
         iterator end()  { return matoms.end(); }
         const_iterator begin() const  { return matoms.begin(); }

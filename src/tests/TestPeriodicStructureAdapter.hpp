@@ -244,7 +244,7 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(kbise0, kbise1);
             TS_ASSERT(!(kbise0 != kbise1));
             TS_ASSERT(kbise1.countSites());
-            kbise1.remove(0);
+            kbise1.erase(0);
             TS_ASSERT_DIFFERS(kbise0, kbise1);
             TS_ASSERT(!(kbise0 == kbise1));
             kbise2.setLatPar(3, 4, 5, 91, 92, 93);

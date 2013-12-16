@@ -89,14 +89,14 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(1u, sd.add1.size());
             for (int i = 1; i < (1 - sqrt(0.5)) * SZ; ++i)
             {
-                cpstru->remove(0);
+                cpstru->erase(0);
                 sd = mstru->diff(cpstru);
                 TS_ASSERT_EQUALS(SORTED, sd.diffmethod);
                 TS_ASSERT(sd.allowsfastupdate());
                 TS_ASSERT_EQUALS(i, int(sd.pop0.size()));
                 TS_ASSERT(sd.add1.empty());
             }
-            cpstru->remove(0);
+            cpstru->erase(0);
             sd = mstru->diff(cpstru);
             TS_ASSERT(!sd.allowsfastupdate());
             Atom a2;
