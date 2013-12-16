@@ -70,6 +70,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
         void test_setCustomAs()
         {
             msftb = ScatteringFactorTable::createByType("X");
+            TS_ASSERT_THROWS(msftb->lookup(""), invalid_argument);
             TS_ASSERT_DELTA(6.0, msftb->lookup("C"), 0.01);
             msftb->setCustomAs("C", "C", 6.3);
             TS_ASSERT_EQUALS(6.3, msftb->lookup("C"));

@@ -26,7 +26,9 @@ std::string atomBareSymbol(const std::string& atomtype)
     std::string::size_type pb, pe;
     pb = atomtype.find_first_not_of("0123456789- \t");
     pe = atomtype.find_last_not_of("+-012345678 \t");
-    std::string rv = atomtype.substr(pb, pe - pb + 1);
+    std::string::size_type npos = std::string::npos;
+    std::string rv;
+    if (pb != npos && pe != npos)  rv = atomtype.substr(pb, pe - pb + 1);
     return rv;
 }
 
