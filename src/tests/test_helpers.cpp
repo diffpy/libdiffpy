@@ -97,8 +97,8 @@ diffpy::srreal::StructureAdapterPtr
     {
         Atom ai;
         double ignore;
-        R3::Vector& xyz = ai.cartesianposition;
-        R3::Matrix& Uc = ai.cartesianuij;
+        R3::Vector& xyz = ai.xyz_cartn;
+        R3::Matrix& Uc = ai.uij_cartn;
         fp >>
             ai.atomtype >> xyz[0] >> xyz[1] >> xyz[2] >> ai.occupancy >>
             ignore >> ignore >> ignore >> ignore >>

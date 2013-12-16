@@ -54,12 +54,12 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
             mstru10 = boost::make_shared<AtomicStructureAdapter>();
             Atom ai;
             ai.atomtype = "C";
-            ai.cartesianuij = R3::identity();
-            ai.cartesianuij(0, 0) = ai.cartesianuij(1, 1) =
-                ai.cartesianuij(2, 2) = 0.004;
+            ai.uij_cartn = R3::identity();
+            ai.uij_cartn(0, 0) = ai.uij_cartn(1, 1) =
+                ai.uij_cartn(2, 2) = 0.004;
             for (int i = 0; i < SZ; ++i)
             {
-                ai.cartesianposition[0] = i;
+                ai.xyz_cartn[0] = i;
                 mstru10->append(ai);
             }
             mstru10d1 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
@@ -232,7 +232,7 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
             TS_ASSERT(allclose(gb1, go1));
             // change position of 1 atom
-            mstru10d1->at(0).cartesianposition[1] = 0.5;
+            mstru10d1->at(0).xyz_cartn[1] = 0.5;
             pdfcb.eval(mstru10d1);
             pdfco.eval(mstru10d1);
             QuantityType gb2 = pdfcb.getPDF();

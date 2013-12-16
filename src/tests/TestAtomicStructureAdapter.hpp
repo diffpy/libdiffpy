@@ -69,7 +69,7 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
             const int SZ = 10;
             for (int i = 0; i < SZ; ++i)
             {
-                ai.cartesianposition[0] = i;
+                ai.xyz_cartn[0] = i;
                 mpstru->append(ai);
             }
             AtomicStructureAdapterPtr cpstru =
@@ -112,11 +112,11 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
         {
             Atom ai;
             ai.atomtype = "C";
-            ai.cartesianposition = R3::Vector(1, 2, 3);
+            ai.xyz_cartn = R3::Vector(1, 2, 3);
             ai.anisotropy = true;
             mpstru->append(ai);
             ai.atomtype = "H";
-            ai.cartesianposition = R3::Vector(4, 5, 6);
+            ai.xyz_cartn = R3::Vector(4, 5, 6);
             ai.anisotropy = false;
             mpstru->append(ai);
             StructureAdapterPtr stru1;
@@ -136,7 +136,7 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
             const int SZ = 10;
             for (int i = 0; i < SZ; ++i)
             {
-                ai.cartesianposition[0] = i;
+                ai.xyz_cartn[0] = i;
                 mpstru->append(ai);
             }
             AtomicStructureAdapterPtr cpstru =

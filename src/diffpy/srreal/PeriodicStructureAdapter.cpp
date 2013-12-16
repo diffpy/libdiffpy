@@ -96,16 +96,16 @@ const Lattice& PeriodicStructureAdapter::getLattice() const
 void PeriodicStructureAdapter::toCartesian(Atom& a) const
 {
     const Lattice& L = this->getLattice();
-    a.cartesianposition = L.cartesian(a.cartesianposition);
-    a.cartesianuij = L.cartesianMatrix(a.cartesianuij);
+    a.xyz_cartn = L.cartesian(a.xyz_cartn);
+    a.uij_cartn = L.cartesianMatrix(a.uij_cartn);
 }
 
 
 void PeriodicStructureAdapter::toFractional(Atom& a) const
 {
     const Lattice& L = this->getLattice();
-    a.cartesianposition = L.fractional(a.cartesianposition);
-    a.cartesianuij = L.fractionalMatrix(a.cartesianuij);
+    a.xyz_cartn = L.fractional(a.xyz_cartn);
+    a.uij_cartn = L.fractionalMatrix(a.uij_cartn);
 }
 
 // Comparison functions ------------------------------------------------------
@@ -148,7 +148,7 @@ PeriodicStructureBondGenerator::PeriodicStructureBondGenerator(
     R3::Vector xyzc;
     for (; ai != mpstructure->end(); ++ai)
     {
-        xyzc = L.ucvCartesian(ai->cartesianposition);
+        xyzc = L.ucvCartesian(ai->xyz_cartn);
         mcartesian_positions_uc.push_back(xyzc);
     }
 }

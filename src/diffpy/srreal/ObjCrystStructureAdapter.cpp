@@ -170,10 +170,10 @@ createStructureAdapter(const ObjCryst::Crystal& cryst)
         ai.anisotropy = !(sp->IsIsotropic());
         ai.atomtype = sp->GetSymbol();
         R3::Vector xyz(sc.mX, sc.mY, sc.mZ);
-        ai.cartesianposition = L.cartesian(xyz);
+        ai.xyz_cartn = L.cartesian(xyz);
         // Store Uij
         R3::Matrix uijl = getUij(sp);
-        ai.cartesianuij = ai.anisotropy ?  L.cartesianMatrix(uijl) : uijl;
+        ai.uij_cartn = ai.anisotropy ?  L.cartesianMatrix(uijl) : uijl;
         adpt->append(ai);
     }
     const ObjCryst::SpaceGroup& spacegroup = cryst.GetSpaceGroup();
@@ -204,11 +204,11 @@ createStructureAdapter(const ObjCryst::Molecule& molecule)
         const ObjCryst::ScatteringPower* sp = &(atom.GetScatteringPower());
         ai.anisotropy = !(sp->IsIsotropic());
         ai.atomtype = sp->GetSymbol();
-        ai.cartesianposition[0] = atom.X();
-        ai.cartesianposition[1] = atom.Y();
-        ai.cartesianposition[2] = atom.Z();
+        ai.xyz_cartn[0] = atom.X();
+        ai.xyz_cartn[1] = atom.Y();
+        ai.xyz_cartn[2] = atom.Z();
         // Store Uij
-        ai.cartesianuij = getUij(sp);
+        ai.uij_cartn = getUij(sp);
         adpt->append(ai);
     }
     return adpt;

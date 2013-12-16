@@ -173,21 +173,21 @@ CrystalStructureAdapter::expandLatticeAtom(const Atom& a0) const
     for (; op != msymops.end(); ++op)
     {
         // positions and Uij-s are actually fractional here
-        a1.cartesianposition = R3::mxvecproduct(op->R, a0.cartesianposition);
-        a1.cartesianposition += op->t;
+        a1.xyz_cartn = R3::mxvecproduct(op->R, a0.xyz_cartn);
+        a1.xyz_cartn += op->t;
         // check if a1 is a duplicate of an existing symmetry site
         int ieq = this->findEqualPosition(eqsites, a1);
         if (ieq < 0)
         {
             // a1 is a new symmetry site
-            R3::Matrix utmp = R3::prod(a0.cartesianuij, R3::trans(op->R));
-            a1.cartesianuij = R3::prod(op->R, utmp);
+            R3::Matrix utmp = R3::prod(a0.uij_cartn, R3::trans(op->R));
+            a1.uij_cartn = R3::prod(op->R, utmp);
             eqsites.push_back(a1);
             eqsumpos.push_back(R3::zerovector);
             eqduplicity.push_back(0);
             ieq = eqsites.size() - 1;
         }
-        eqsumpos[ieq] += L.ucvFractional(a1.cartesianposition);
+        eqsumpos[ieq] += L.ucvFractional(a1.xyz_cartn);
         eqduplicity[ieq] += 1;
     }
     // assume P1 if there are no symmetry operations were defined
@@ -197,7 +197,7 @@ CrystalStructureAdapter::expandLatticeAtom(const Atom& a0) const
         assert(eqsumpos.empty());
         assert(eqduplicity.empty());
         eqsites.push_back(a0);
-        eqsumpos.push_back(a0.cartesianposition);
+        eqsumpos.push_back(a0.xyz_cartn);
         eqduplicity.push_back(1);
     }
     // calculate mean values from equivalent sites and adjust any roundoffs
@@ -208,7 +208,7 @@ CrystalStructureAdapter::expandLatticeAtom(const Atom& a0) const
     vector<int>::const_iterator dpi = eqduplicity.begin();
     for (; ai != eqsites.end(); ++ai, ++sii, ++dpi)
     {
-        ai->cartesianposition = (*sii) / (*dpi);
+        ai->xyz_cartn = (*sii) / (*dpi);
     }
     return eqsites;
 }
@@ -245,7 +245,7 @@ int CrystalStructureAdapter::findEqualPosition(
     const_iterator ai = eqsites.begin();
     for (; ai != eqsites.end(); ++ai)
     {
-        dxyz = ai->cartesianposition - a0.cartesianposition;
+        dxyz = ai->xyz_cartn - a0.xyz_cartn;
         dxyz[0] -= round(dxyz[0]);
         dxyz[1] -= round(dxyz[1]);
         dxyz[2] -= round(dxyz[2]);
@@ -304,7 +304,7 @@ void CrystalStructureBondGenerator::selectAnchorSite(int anchor)
 {
     this->BaseBondGenerator::selectAnchorSite(anchor);
     const Atom& a0 = this->symatoms(anchor)[0];
-    mr0 = a0.cartesianposition;
+    mr0 = a0.xyz_cartn;
 }
 
 
@@ -353,8 +353,8 @@ void CrystalStructureBondGenerator::updater1()
 {
     const AtomVector& sa = this->symatoms(this->site1());
     assert(msymidx < sa.size());
-    mr1 = mrcsphere + sa[msymidx].cartesianposition;
-    mpuc1 = &(sa[msymidx].cartesianuij);
+    mr1 = mrcsphere + sa[msymidx].xyz_cartn;
+    mpuc1 = &(sa[msymidx].uij_cartn);
     this->updateDistance();
 }
 

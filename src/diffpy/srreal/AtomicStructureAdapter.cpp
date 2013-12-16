@@ -38,9 +38,9 @@ bool operator< (const Atom& a0, const Atom& a1)
 {
     if (a0.atomtype < a1.atomtype)  return true;
     if (a0.atomtype > a1.atomtype)  return false;
-    R3::Vector::const_iterator p0 = a0.cartesianposition.begin();
-    R3::Vector::const_iterator p1 = a1.cartesianposition.begin();
-    for (; p0 != a0.cartesianposition.end(); ++p0, ++p1)
+    R3::Vector::const_iterator p0 = a0.xyz_cartn.begin();
+    R3::Vector::const_iterator p1 = a1.xyz_cartn.begin();
+    for (; p0 != a0.xyz_cartn.end(); ++p0, ++p1)
     {
         if (*p0 < *p1)  return true;
         if (*p0 > *p1)  return false;
@@ -50,9 +50,9 @@ bool operator< (const Atom& a0, const Atom& a1)
     if (a0.anisotropy < a1.anisotropy)  return true;
     if (a0.anisotropy > a1.anisotropy)  return false;
     typedef R3::Matrix::array_type::const_iterator CIter;
-    CIter u0 = a0.cartesianuij.data().begin();
-    CIter u0last = a0.cartesianuij.data().end();
-    CIter u1 = a1.cartesianuij.data().begin();
+    CIter u0 = a0.uij_cartn.data().begin();
+    CIter u0last = a0.uij_cartn.data().end();
+    CIter u1 = a1.uij_cartn.data().begin();
     for (; u0 != u0last; ++u0, ++u1)
     {
         if (*u0 < *u1)  return true;
@@ -66,10 +66,10 @@ bool operator==(const Atom& a0, const Atom& a1)
 {
     bool rv = (&a0 == &a1) || (
             a0.atomtype == a1.atomtype &&
-            (a0.cartesianposition == a1.cartesianposition) &&
+            (a0.xyz_cartn == a1.xyz_cartn) &&
             a0.occupancy == a1.occupancy &&
             a0.anisotropy == a1.anisotropy &&
-            a0.cartesianuij == a1.cartesianuij
+            a0.uij_cartn == a1.uij_cartn
             );
     return rv;
 }
@@ -85,10 +85,10 @@ size_t hash_value(const Atom& a)
 {
     size_t seed = 0;
     boost::hash_combine(seed, a.atomtype);
-    boost::hash_combine(seed, a.cartesianposition);
+    boost::hash_combine(seed, a.xyz_cartn);
     boost::hash_combine(seed, a.occupancy);
     boost::hash_combine(seed, a.anisotropy);
-    boost::hash_combine(seed, a.cartesianuij);
+    boost::hash_combine(seed, a.uij_cartn);
     return seed;
 }
 
@@ -128,7 +128,7 @@ const string& AtomicStructureAdapter::siteAtomType(int idx) const
 const R3::Vector& AtomicStructureAdapter::siteCartesianPosition(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return matoms[idx].cartesianposition;
+    return matoms[idx].xyz_cartn;
 }
 
 
@@ -149,7 +149,7 @@ bool AtomicStructureAdapter::siteAnisotropy(int idx) const
 const R3::Matrix& AtomicStructureAdapter::siteCartesianUij(int idx) const
 {
     assert(0 <= idx && idx < this->countSites());
-    return matoms[idx].cartesianuij;
+    return matoms[idx].uij_cartn;
 }
 
 // helper for diff

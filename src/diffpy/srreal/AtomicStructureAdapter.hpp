@@ -33,18 +33,18 @@ class Atom
 
         // constructor
         Atom() :
-            cartesianposition(0.0, 0.0, 0.0),
+            xyz_cartn(0.0, 0.0, 0.0),
             occupancy(1.0),
             anisotropy(false),
-            cartesianuij(R3::zeromatrix())
+            uij_cartn(R3::zeromatrix())
         { };
 
         // data
         std::string atomtype;
-        R3::Vector cartesianposition;
+        R3::Vector xyz_cartn;
         double occupancy;
         bool anisotropy;
-        R3::Matrix cartesianuij;
+        R3::Matrix uij_cartn;
 
     private:
 
@@ -54,10 +54,10 @@ class Atom
             void serialize(Archive& ar, const unsigned int version)
         {
             ar & atomtype;
-            ar & cartesianposition;
+            ar & xyz_cartn;
             ar & occupancy;
             ar & anisotropy;
-            ar & cartesianuij;
+            ar & uij_cartn;
         }
 
 };
