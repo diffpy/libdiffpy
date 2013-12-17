@@ -46,8 +46,8 @@ conf = Configure(env, custom_tests={
     'CheckBoostVersion' : CheckBoostVersion,
     })
 
-# boost_serialization must be at least 1.41.0
-boost_required = '1.41.0'
+# libdiffpy uses boost_serialization features that appeared in 1.43.0.
+boost_required = '1.43.0'
 if not conf.CheckBoostVersion(boost_required):
     print('This software requires Boost %s or later.' % boost_required)
     Exit(1)
