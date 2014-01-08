@@ -28,6 +28,7 @@ if env['PLATFORM'] == 'darwin':
     fixmacflags = lambda x: (str(x) not in ('-u', '_PyMac_Error'))
     env.Replace(CCFLAGS=filter(fixmacflags, env['CCFLAGS']))
     env.Replace(LIBS=filter(fixmacflags, env['LIBS']))
+    env.AppendUnique(CXXFLAGS='-ftemplate-depth=256')
     fast_linkflags[:] = []
 
 # configure version specific options.
