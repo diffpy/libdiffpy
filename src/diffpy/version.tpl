@@ -46,6 +46,12 @@
 
 #define DIFFPY_GIT_SHA "${DIFFPY_GIT_SHA}"
 
+// Optional Features ---------------------------------------------------------
+
+#if ${DIFFPY_HAS_OBJCRYST}
+# define DIFFPY_HAS_OBJCRYST
+#endif
+
 #endif  // VERSION_HPP_INCLUDED
 
 // vim:ft=cpp:

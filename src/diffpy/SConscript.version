@@ -25,6 +25,7 @@ def build_VersionCode(target, source, env):
         'DIFFPY_VERSION_STR' : "%i.%i-t%i" % (major, minor, daydate),
         'DIFFPY_VERSION_DATE' : gisodate,
         'DIFFPY_GIT_SHA' : gsha,
+        'DIFFPY_HAS_OBJCRYST' : int(env['has_objcryst']),
     }
     versiontemplate = string.Template(tplcode)
     versioncode = versiontemplate.safe_substitute(flds)
@@ -47,6 +48,7 @@ else:
     gitlog = proc.stdout.read().strip()
     vhpp, = env.BuildVersionCode(['version.hpp'], vtpl)
     env.Depends(vhpp, env.Value(gitlog))
+    env.Depends(vhpp, env.Value(env['has_objcryst']))
     majorminor = parsemajorminor(vtpl.get_contents())
 
 env['majorminor'] = majorminor
