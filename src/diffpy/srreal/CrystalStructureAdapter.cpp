@@ -190,7 +190,7 @@ CrystalStructureAdapter::expandLatticeAtom(const Atom& a0) const
         eqsumpos[ieq] += L.ucvFractional(a1.xyz_cartn);
         eqduplicity[ieq] += 1;
     }
-    // assume P1 if there are no symmetry operations were defined
+    // assume P1 if symmetry operations were not defined
     if (msymops.empty())
     {
         assert(eqsites.empty());
