@@ -44,7 +44,7 @@ if os.path.isfile(str(vhpp.srcnode())):
     majorminor = parsemajorminor(vhpp.srcnode().get_contents())
 else:
     vtpl = File('version.tpl')
-    proc = Popen(['git', 'log', '-1', '--format=%h %at %ai'], stdout=PIPE)
+    proc = Popen(['git', 'log', '-1', '--format=%H %at %ai'], stdout=PIPE)
     gitlog = proc.stdout.read().strip()
     vhpp, = env.BuildVersionCode(['version.hpp'], vtpl)
     env.Depends(vhpp, env.Value(gitlog))
