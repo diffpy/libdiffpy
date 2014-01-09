@@ -1,12 +1,27 @@
 import os
-from subprocess import Popen, PIPE
+import re
 
 Import('env')
+
+def gitinfo():
+    from subprocess import Popen, PIPE
+    kw = dict(stdout=PIPE)
+    proc = Popen(['git', 'describe'], **kw)
+    desc = proc.stdout.read()
+    proc = Popen(['git', 'log', '-1', '--format=%H %ai'], **kw)
+    glog = proc.stdout.read()
+    rv = {}
+    rv['version'] = '-'.join(desc.strip().split('-')[:2])
+    rv['commit'], rv['date'] = glog.strip().split(None, 1)
+    mx = re.search(r'(?m)^(\d+)\.(\d+)(?:-(\d+))?', rv['version'])
+    rv['major'] = int(mx.group(1))
+    rv['minor'] = int(mx.group(2))
+    rv['number'] = mx.group(3) and int(mx.group(3)) or 0
+    return rv
 
 
 def parsemajorminor(hcode):
     'Extract major and minor version from a C++ header file.'
-    import re
     mx = re.search(r'(?m)^#define *DIFFPY_VERSION_MAJOR *(\d+)', hcode)
     major = int(mx.group(1))
     mx = re.search(r'(?m)^#define *DIFFPY_VERSION_MINOR *(\d+)', hcode)
@@ -17,14 +32,15 @@ def parsemajorminor(hcode):
 def build_VersionCode(target, source, env):
     import string
     tplcode = source[0].get_contents()
-    major, minor = parsemajorminor(tplcode)
-    gsha, gepoch, gisodate = gitlog.split(None, 2)
-    daydate = int(gepoch) // 86400
+    numversion = (10000000 * ginfo['major'] +
+            100000 * ginfo['minor'] + ginfo['number'])
     flds = {
-        'DIFFPY_VERSION' : 10000000 * major + 100000 * minor + daydate,
-        'DIFFPY_VERSION_STR' : "%i.%i-t%i" % (major, minor, daydate),
-        'DIFFPY_VERSION_DATE' : gisodate,
-        'DIFFPY_GIT_SHA' : gsha,
+        'DIFFPY_VERSION' : numversion,
+        'DIFFPY_VERSION_MAJOR' : ginfo['major'],
+        'DIFFPY_VERSION_MINOR' : ginfo['minor'],
+        'DIFFPY_VERSION_STR' : ginfo['version'],
+        'DIFFPY_VERSION_DATE' : ginfo['date'],
+        'DIFFPY_GIT_SHA' : ginfo['commit'],
         'DIFFPY_HAS_OBJCRYST' : int(env['has_objcryst']),
     }
     versiontemplate = string.Template(tplcode)
@@ -44,12 +60,11 @@ if os.path.isfile(str(vhpp.srcnode())):
     majorminor = parsemajorminor(vhpp.srcnode().get_contents())
 else:
     vtpl = File('version.tpl')
-    proc = Popen(['git', 'log', '-1', '--format=%H %at %ai'], stdout=PIPE)
-    gitlog = proc.stdout.read().strip()
+    ginfo = gitinfo()
     vhpp, = env.BuildVersionCode(['version.hpp'], vtpl)
-    env.Depends(vhpp, env.Value(gitlog))
+    env.Depends(vhpp, env.Value(ginfo['version'] + ginfo['commit']))
     env.Depends(vhpp, env.Value(env['has_objcryst']))
-    majorminor = parsemajorminor(vtpl.get_contents())
+    majorminor = (ginfo['major'], ginfo['minor'])
 
 env['majorminor'] = majorminor
 

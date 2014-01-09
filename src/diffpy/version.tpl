@@ -25,10 +25,10 @@
 #ifndef VERSION_HPP_INCLUDED
 #define VERSION_HPP_INCLUDED
 
-#define DIFFPY_VERSION_MAJOR 1
-#define DIFFPY_VERSION_MINOR 0
+#define DIFFPY_VERSION_MAJOR ${DIFFPY_VERSION_MAJOR}
+#define DIFFPY_VERSION_MINOR ${DIFFPY_VERSION_MINOR}
 
-// DIFFPY_VERSION % 100000 is a version age in days since Unix time epoch
+// DIFFPY_VERSION % 100000 is number of git commits since minor version
 // DIFFPY_VERSION / 100000 % 100 is the minor version
 // DIFFPY_VERSION / 10000000 is the major version
 
