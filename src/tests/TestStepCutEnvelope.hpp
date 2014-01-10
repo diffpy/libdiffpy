@@ -86,6 +86,6 @@ class TestStepCutEnvelope : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(13.1, e1->getDoubleAttr("stepcut"));
         }
 
-};  // class TestDiffPyStructureBondGenerator
+};  // class TestStepCutEnvelope
 
 // End of file

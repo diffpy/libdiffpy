@@ -105,6 +105,6 @@ class TestNoMetaStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT(typeid(NoMetaStructureAdapter) == typeid(*pswtbare1));
         }
 
-};  // class TestDiffPyStructureAdapter
+};  // class TestNoMetaStructureAdapter
 
 // End of file

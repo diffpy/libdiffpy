@@ -85,6 +85,6 @@ class TestSphericalShapeEnvelope : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(13.1, e1->getDoubleAttr("spdiameter"));
         }
 
-};  // class TestDiffPyStructureBondGenerator
+};  // class TestSphericalShapeEnvelope
 
 // End of file
