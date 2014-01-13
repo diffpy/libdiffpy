@@ -131,17 +131,13 @@ void PQEvaluatorOptimized::updateValue(
     // if PairQuantity uses mask
     if (pq.ticker() >= mvalue_ticker || !mlast_structure || pq.hasMask())
     {
-        this->PQEvaluatorBasic::updateValue(pq, stru);
-        mlast_structure = pq.getStructure()->clone();
-        return;
+        return this->updateValueCompletely(pq, stru);
     }
     // do not do fast updates if they take more work
     StructureDifference sd = mlast_structure->diff(stru);
     if (!sd.allowsfastupdate())
     {
-        this->PQEvaluatorBasic::updateValue(pq, stru);
-        mlast_structure = pq.getStructure()->clone();
-        return;
+        return this->updateValueCompletely(pq, stru);
     }
     // Remove contributions from the extra sites in the old structure
     assert(sd.stru0 == mlast_structure);
@@ -171,7 +167,14 @@ void PQEvaluatorOptimized::updateValue(
     // save current value to override the resetValue call from setStructure
     assert(sd.stru1);
     pq.stashPartialValue();
+    // setStructure(stru1) calls stru1->customPQConfig(pq), which may totally
+    // change pq configuration.  If so, revert to full calculation.
+    assert(pq.ticker() < mvalue_ticker);
     pq.setStructure(sd.stru1);
+    if (pq.ticker() >= mvalue_ticker)
+    {
+        return this->updateValueCompletely(pq, stru);
+    }
     pq.restorePartialValue();
     int cntsites1 = sd.stru1->countSites();
     BaseBondGeneratorPtr bnds1 = sd.stru1->createBondGenerator();
@@ -197,6 +200,14 @@ void PQEvaluatorOptimized::updateValue(
     }
     mlast_structure = pq.getStructure()->clone();
     mvalue_ticker.click();
+}
+
+
+void PQEvaluatorOptimized::updateValueCompletely(
+        PairQuantity& pq, StructureAdapterPtr stru)
+{
+    this->PQEvaluatorBasic::updateValue(pq, stru);
+    mlast_structure = pq.getStructure()->clone();
 }
 
 // Factory for PairQuantity evaluators ---------------------------------------

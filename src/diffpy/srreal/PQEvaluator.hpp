@@ -98,6 +98,9 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
         // data
         StructureAdapterPtr mlast_structure;
 
+        // helper method
+        void updateValueCompletely(PairQuantity&, StructureAdapterPtr);
+
         // serialization
         friend class boost::serialization::access;
         template<class Archive>
