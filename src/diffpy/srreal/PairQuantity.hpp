@@ -83,6 +83,8 @@ class PairQuantity : public diffpy::Attributes
 
         friend class PQEvaluatorBasic;
         friend class PQEvaluatorOptimized;
+        friend StructureAdapterPtr
+            replacePairQuantityStructure(PairQuantity&, StructureAdapterPtr);
 
         // methods
         virtual void resizeValue(size_t);
@@ -190,6 +192,14 @@ void PairQuantity::setStructure(const T& stru)
     StructureAdapterPtr pstru = convertToStructureAdapter(stru);
     this->setStructure(pstru);
 }
+
+// Other functions -----------------------------------------------------------
+
+/// The purpose of this function is to support Python pickling of
+/// PairQuantity objects that hold Python-derived StructureAdapter classes.
+/// Use it only if you absolutely have to and you know what you do.
+StructureAdapterPtr
+replacePairQuantityStructure(PairQuantity& pq, StructureAdapterPtr stru);
 
 }   // namespace srreal
 }   // namespace diffpy

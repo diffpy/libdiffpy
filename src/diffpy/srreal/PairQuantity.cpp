@@ -416,6 +416,19 @@ void PairQuantity::setPairMaskValue(int i, int j, bool mask)
     else    minvertpairmask.insert(ij);
 }
 
+// Other functions -----------------------------------------------------------
+
+/// The purpose of this function is to support Python pickling of
+/// PairQuantity objects that hold Python-derived StructureAdapter classes.
+/// Use it only if you absolutely have to and you know what you do.
+StructureAdapterPtr
+replacePairQuantityStructure(PairQuantity& pq, StructureAdapterPtr stru)
+{
+    StructureAdapterPtr rv = pq.mstructure;
+    pq.mstructure = stru;
+    return rv;
+}
+
 }   // namespace srreal
 }   // namespace diffpy
 
