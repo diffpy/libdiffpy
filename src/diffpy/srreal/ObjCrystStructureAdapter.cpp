@@ -21,14 +21,11 @@
 *
 *****************************************************************************/
 
-#include <diffpy/PythonInterface.hpp>
-
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <set>
 
-#include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
 
 using namespace std;
@@ -213,50 +210,6 @@ createStructureAdapter(const ObjCryst::Molecule& molecule)
     }
     return adpt;
 }
-
-// Factory Function and its Registration -------------------------------------
-
-StructureAdapterPtr
-createPyObjCrystStructureAdapter(boost::python::object stru)
-{
-    using diffpy::importFromPyModule;
-    boost::python::object cls_Crystal, None;
-    cls_Crystal = importFromPyModule("pyobjcryst.crystal", "Crystal", None);
-    StructureAdapterPtr rv;
-    if (cls_Crystal.ptr() != Py_None &&
-        PyObject_IsInstance(stru.ptr(), cls_Crystal.ptr()) == 1)
-    {
-        ObjCryst::Crystal* pcryst =
-            boost::python::extract<ObjCryst::Crystal*>(stru);
-        rv = createStructureAdapter(*pcryst);
-    }
-    return rv;
-}
-
-StructureAdapterPtr
-createPyObjCrystMoleculeAdapter(boost::python::object stru)
-{
-    using diffpy::importFromPyModule;
-    boost::python::object cls_Molecule, None;
-    cls_Molecule = importFromPyModule("pyobjcryst.molecule", "Molecule", None);
-    StructureAdapterPtr rv;
-    if (cls_Molecule.ptr() != Py_None &&
-        PyObject_IsInstance(stru.ptr(), cls_Molecule.ptr()) == 1)
-    {
-        ObjCryst::Molecule* pmolecule =
-            boost::python::extract<ObjCryst::Molecule*>(stru);
-        rv = createStructureAdapter(*pmolecule);
-    }
-    return rv;
-}
-
-
-
-bool reg_PyObjCrystStructureAdapter =
-registerPythonStructureAdapterFactory(createPyObjCrystStructureAdapter);
-
-bool reg_PyObjCrystMoleculeAdapter =
-registerPythonStructureAdapterFactory(createPyObjCrystMoleculeAdapter);
 
 }   // namespace srreal
 }   // namespace diffpy
