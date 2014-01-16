@@ -33,7 +33,7 @@ env_th = env_test.Clone()
 env_th.AppendUnique(CPPDEFINES=dict(DIFFPYTESTSDIRPATH=thisdir))
 thobj = env_th.Object('test_helpers.cpp')
 
-test_helpers = [thobj, 'python_helpers.cpp', 'objcryst_helpers.cpp']
+test_helpers = [thobj, 'objcryst_helpers.cpp']
 test_helpers = filter(srcsupported, test_helpers)
 
 alltests = env_test.CxxTest('alltests', test_sources + test_helpers)
