@@ -54,6 +54,7 @@ vars.Add(BoolVariable('enable_objcryst',
 vars.Update(env)
 env.Help(vars.GenerateHelpText(env))
 
+env['has_objcryst'] = None
 builddir = env.Dir('build/%s-%s' % (env['build'], platform.machine()))
 
 Export('env')
