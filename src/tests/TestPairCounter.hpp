@@ -18,7 +18,7 @@
 
 #include <cxxtest/TestSuite.h>
 
-#include <diffpy/srreal/VR3Structure.hpp>
+#include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/PairCounter.hpp>
 
 using namespace std;
@@ -29,20 +29,22 @@ class TestPairCounter : public CxxTest::TestSuite
 
 private:
 
-    VR3Structure mstru;
-    VR3Structure mline100;
+    AtomicStructureAdapterPtr mstru;
+    AtomicStructureAdapterPtr mline100;
 
 public:
 
     void setUp()
     {
-        mstru.clear();
-        if (mline100.empty())
+        mstru.reset(new AtomicStructureAdapter);
+        if (!mline100)
         {
+            mline100.reset(new AtomicStructureAdapter);
+            Atom a;
             for (int i = 0; i < 100; ++i)
             {
-                R3::Vector P(1.0*i, 0.0, 0.0);
-                mline100.push_back(P);
+                a.xyz_cartn = R3::Vector(1.0*i, 0.0, 0.0);
+                mline100->append(a);
             }
         }
     }
@@ -51,14 +53,15 @@ public:
     void test_call()
     {
         PairCounter pcount;
+        Atom a;
         for (int i = 0; i < 100; ++i)
         {
             int npairs = i * (i - 1) / 2;
             TS_ASSERT_EQUALS(npairs, pcount(mstru));
-            R3::Vector P(1.0*i, 0.0, 0.0);
-            mstru.push_back(P);
+            a.xyz_cartn = R3::Vector(1.0*i, 0.0, 0.0);
+            mstru->append(a);
         }
-        mstru.clear();
+        mstru->clear();
         TS_ASSERT_EQUALS(0, pcount(mstru));
     }
 

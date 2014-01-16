@@ -18,7 +18,7 @@
 
 #include <cxxtest/TestSuite.h>
 
-#include <diffpy/srreal/VR3Structure.hpp>
+#include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/srreal/JeongPeakWidth.hpp>
 #include <diffpy/srreal/ConstantPeakWidth.hpp>
@@ -33,7 +33,7 @@ class TestPDFCalculator : public CxxTest::TestSuite
     private:
 
         boost::shared_ptr<PDFCalculator> mpdfc;
-        VR3Structure memptystru;
+        StructureAdapterPtr memptystru;
         double meps;
         double mepsdb;
 
@@ -41,6 +41,7 @@ class TestPDFCalculator : public CxxTest::TestSuite
 
         void setUp()
         {
+            memptystru = emptyStructureAdapter();
             meps = diffpy::mathutils::SQRT_DOUBLE_EPS;
             mepsdb = 10 * diffpy::mathutils::DOUBLE_EPS;
             mpdfc.reset(new PDFCalculator);

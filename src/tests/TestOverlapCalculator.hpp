@@ -18,7 +18,7 @@
 
 #include <cxxtest/TestSuite.h>
 
-#include <diffpy/srreal/VR3Structure.hpp>
+#include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/PeriodicStructureAdapter.hpp>
 #include <diffpy/srreal/OverlapCalculator.hpp>
 #include <diffpy/serialization.ipp>
@@ -53,9 +53,12 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 
         void test_lineNoTouch()
         {
-            VR3Structure stru;
-            stru.push_back(R3::Vector(0.0, 0.0, 0.0));
-            stru.push_back(R3::Vector(0.0, 0.0, 2.0));
+            AtomicStructureAdapterPtr stru(new AtomicStructureAdapter);
+            Atom a0, a1;
+            a0.xyz_cartn = R3::Vector(0.0, 0.0, 0.0);
+            a1.xyz_cartn = R3::Vector(0.0, 0.0, 2.0);
+            stru->append(a0);
+            stru->append(a1);
             molc->eval(stru);
             TS_ASSERT_EQUALS(0.0, molc->totalSquareOverlap());
             QuantityType sqolps = molc->siteSquareOverlaps();
@@ -73,9 +76,12 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 
         void test_lineTouch()
         {
-            VR3Structure stru;
-            stru.push_back(R3::Vector(0.0, 0.0, 0.0));
-            stru.push_back(R3::Vector(0.0, 0.0, 1.5));
+            AtomicStructureAdapterPtr stru(new AtomicStructureAdapter);
+            Atom a0, a1;
+            a0.xyz_cartn = R3::Vector(0.0, 0.0, 0.0);
+            a1.xyz_cartn = R3::Vector(0.0, 0.0, 1.5);
+            stru->append(a0);
+            stru->append(a1);
             molc->eval(stru);
             TS_ASSERT_EQUALS(0.25, molc->totalSquareOverlap());
             QuantityType sqolps = molc->siteSquareOverlaps();
@@ -94,19 +100,23 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 
         void test_gradients()
         {
-            VR3Structure stru;
-            stru.push_back(R3::Vector(0.0, 0.0, 0.0));
-            stru.push_back(R3::Vector(0.17, 0.31, 0.37));
+            AtomicStructureAdapterPtr stru(new AtomicStructureAdapter);
+            Atom a0, a1;
+            a0.xyz_cartn = R3::Vector(0.0, 0.0, 0.0);
+            a1.xyz_cartn = R3::Vector(0.17, 0.31, 0.37);
+            stru->append(a0);
+            stru->append(a1);
             molc->eval(stru);
             std::vector<R3::Vector> g = molc->gradients();
             double dx = 1e-6;
             double tsqo0 = molc->totalSquareOverlap();
-            R3::Vector r1 = stru[1];
+            R3::Vector r1 = stru->siteCartesianPosition(1);
             R3::Vector gn1;
             for (int k = 0; k != R3::Ndim; ++k)
             {
-                stru[1] = r1;
-                stru[1][k] += dx;
+                R3::Vector& xyz1 = stru->at(1).xyz_cartn;
+                xyz1 = r1;
+                xyz1[k] += dx;
                 molc->eval(stru);
                 gn1[k] = (molc->totalSquareOverlap() - tsqo0) / dx;
             }
@@ -232,9 +242,12 @@ class TestOverlapCalculator : public CxxTest::TestSuite
         void test_serialization()
         {
             // build customized PDFCalculator
-            VR3Structure stru;
-            stru.push_back(R3::Vector(0.0, 0.0, 0.0));
-            stru.push_back(R3::Vector(0.0, 0.0, 1.5));
+            AtomicStructureAdapterPtr stru(new AtomicStructureAdapter);
+            Atom a0, a1;
+            a0.xyz_cartn = R3::Vector(0.0, 0.0, 0.0);
+            a1.xyz_cartn = R3::Vector(0.0, 0.0, 1.5);
+            stru->append(a0);
+            stru->append(a1);
             molc->eval(stru);
             boost::shared_ptr<OverlapCalculator> olc1;
             olc1 = dumpandload(molc);
