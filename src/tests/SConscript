@@ -1,4 +1,5 @@
 import os
+import re
 
 Import('env', 'libdiffpy')
 
@@ -7,6 +8,8 @@ env_test = env.Clone(CXXTEST_SUFFIX='.hpp')
 env_test.Tool('cxxtest')
 lib_dir = libdiffpy[0].dir.abspath
 env_test.PrependUnique(LIBS='diffpy', LIBPATH=lib_dir)
+keeplibs = re.compile('diffpy|boost_serialization|ObjCryst').search
+env_test.Replace(LIBS=filter(keeplibs, env_test['LIBS']))
 env_test.PrependENVPath('LD_LIBRARY_PATH', lib_dir)
 env_test.PrependENVPath('DYLD_LIBRARY_PATH', lib_dir)
 
