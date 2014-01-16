@@ -103,6 +103,7 @@ class AtomicStructureAdapter : public StructureAdapter
             matoms.insert(position, first, last);
         }
         void append(const Atom&);
+        void clear();
         iterator erase(int idx);
         iterator erase(iterator pos);
         iterator erase(iterator first, iterator last);

@@ -259,6 +259,12 @@ void AtomicStructureAdapter::append(const Atom& atom)
 }
 
 
+void AtomicStructureAdapter::clear()
+{
+    matoms.clear();
+}
+
+
 iterator AtomicStructureAdapter::erase(int idx)
 {
     assert(0 <= idx && idx < this->countSites());
