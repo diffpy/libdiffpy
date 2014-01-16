@@ -18,6 +18,8 @@ if icpc:
 
 # Declare external libraries.
 env.ParseConfig("gsl-config --cflags --libs")
+# dladdr in runtimepath.cpp requires the dl library.
+env.AppendUnique(LIBS=['dl'])
 
 fast_linkflags = ['-s']
 
