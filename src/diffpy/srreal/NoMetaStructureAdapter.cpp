@@ -14,8 +14,8 @@
 *
 * class NoMetaStructureAdapter -- StructureAdapter proxy class that disables
 *     customPQConfig of another StructureAdapter instance.  This may be used
-*     for preventing the DiffPyStructureAdapter from applying scale,
-*     spdiameter and such metadata to the PDFCalculator.
+*     for preventing the adapter for diffpy.Structure class from applying
+*     scale, spdiameter and such metadata to the PDFCalculator.
 *
 * nometa -- factory function that returns a NoMetaStructureAdapter
 *     instance wrapped in StructureAdapterPtr
