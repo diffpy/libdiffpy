@@ -52,8 +52,7 @@ if not conf.CheckBoostVersion(boost_required):
     print('This software requires Boost %s or later.' % boost_required)
     Exit(1)
 
-# boost_python
-configure_boost_library('boost_python')
+# boost_serialization
 configure_boost_library('boost_serialization')
 
 # check for ObjCryst, autoadd appends to LIBS if found.

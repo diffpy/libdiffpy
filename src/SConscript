@@ -17,17 +17,12 @@ if icpc:
     env.Tool('intelc', topdir=icpc[:icpc.rfind('/bin')])
 
 # Declare external libraries.
-env.ParseConfig("python-config --includes")
-env.ParseConfig("python-config --ldflags")
 env.ParseConfig("gsl-config --cflags --libs")
 
 fast_linkflags = ['-s']
 
 # Platform specific intricacies.
 if env['PLATFORM'] == 'darwin':
-    fixmacflags = lambda x: (str(x) not in ('-u', '_PyMac_Error'))
-    env.Replace(CCFLAGS=filter(fixmacflags, env['CCFLAGS']))
-    env.Replace(LIBS=filter(fixmacflags, env['LIBS']))
     env.AppendUnique(CXXFLAGS='-ftemplate-depth=256')
     fast_linkflags[:] = []
 
