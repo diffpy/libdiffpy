@@ -21,11 +21,11 @@
 #include <sstream>
 #include <cxxtest/TestSuite.h>
 
-#include <diffpy/srreal/PythonStructureAdapter.hpp>
 #include <diffpy/srreal/NoMetaStructureAdapter.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/serialization.hpp>
-#include "python_helpers.hpp"
+#include "test_helpers.hpp"
+#include "test_custompqconfig.hpp"
 
 using namespace std;
 using namespace boost;
@@ -46,12 +46,14 @@ class TestNoMetaStructureAdapter : public CxxTest::TestSuite
         void setUp()
         {
             CxxTest::setAbortTestOnFail(true);
-            if (!m_pswt.get())
+            if (!m_pswt)
             {
-                python::object stru;
-                stru = loadTestStructure("PbScW25TiO3.stru");
-                stru.attr("pdffit")["scale"] = 2.5;
-                m_pswt = createStructureAdapter(stru);
+                StructureAdapterPtr pswt;
+                pswt = loadTestPeriodicStructure("PbScW25TiO3.stru");
+                PeriodicAdapterWithPQConfigPtr pswt_pqcfg;
+                pswt_pqcfg = addCustomPQConfig(pswt);
+                pswt_pqcfg->cfg["scale"] = 2.5;
+                m_pswt = pswt_pqcfg;
             }
             CxxTest::setAbortTestOnFail(false);
         }

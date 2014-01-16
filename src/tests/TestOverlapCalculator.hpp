@@ -19,11 +19,10 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/VR3Structure.hpp>
-#include <diffpy/PythonInterface.hpp>
-#include <diffpy/srreal/PythonStructureAdapter.hpp>
+#include <diffpy/srreal/PeriodicStructureAdapter.hpp>
 #include <diffpy/srreal/OverlapCalculator.hpp>
 #include <diffpy/serialization.ipp>
-#include "python_helpers.hpp"
+#include "test_helpers.hpp"
 #include "serialization_helpers.hpp"
 
 using namespace std;
@@ -34,7 +33,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
     private:
 
         boost::shared_ptr<OverlapCalculator> molc;
-        boost::python::object mnacl;
+        StructureAdapterPtr mnacl;
         double meps;
 
     public:
@@ -47,7 +46,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
             molc->getAtomRadiiTable()->setCustom("", 1.0);
             molc->getAtomRadiiTable()->setCustom("Na1+", 1.5);
             molc->getAtomRadiiTable()->setCustom("Cl1-", 1.8);
-            if (mnacl.ptr() == Py_None)  mnacl = loadTestStructure("NaCl.cif");
+            if (!mnacl)  mnacl = loadTestPeriodicStructure("NaCl.stru");
             CxxTest::setAbortTestOnFail(true);
         }
 
@@ -120,12 +119,14 @@ class TestOverlapCalculator : public CxxTest::TestSuite
         void test_bccTouch()
         {
             using namespace boost;
-            python::object Structure =
-                diffpy::importFromPyModule("diffpy.Structure", "Structure");
-            python::object bcc = Structure();
-            bcc.attr("lattice").attr("setLatPar")(2.0, 2.0, 2.0);
-            bcc.attr("addNewAtom")("C", python::make_tuple(0.0, 0.0, 0.0));
-            bcc.attr("addNewAtom")("C", python::make_tuple(0.5, 0.5, 0.5));
+            PeriodicStructureAdapterPtr bcc(new PeriodicStructureAdapter);
+            bcc->setLatPar(2.0, 2.0, 2.0, 90, 90, 90);
+            Atom a;
+            a.atomtype = "C";
+            bcc->append(a);
+            a.xyz_cartn = R3::Vector(0.5, 0.5, 0.5);
+            bcc->toCartesian(a);
+            bcc->append(a);
             molc->getAtomRadiiTable()->setCustom("C", 1.0);
             molc->eval(bcc);
             TS_ASSERT_EQUALS(2, molc->getStructure()->countSites());
@@ -136,9 +137,8 @@ class TestOverlapCalculator : public CxxTest::TestSuite
             TS_ASSERT_DELTA(0.0, R3::norm(g[0]), meps);
             TS_ASSERT_DELTA(0.0, R3::norm(g[1]), meps);
             // move the second atom so it touches only one ball
-            bcc[1].attr("xyz")[0] = -0.25;
-            bcc[1].attr("xyz")[1] = 0.0;
-            bcc[1].attr("xyz")[2] = 0.0;
+            bcc->at(1).xyz_cartn = R3::Vector(-0.25, 0.0, 0.0);
+            bcc->toCartesian(bcc->at(1));
             molc->eval(bcc);
             double tsqo = 1.5 * 1.5 + 0.5 * 0.5;
             TS_ASSERT_DELTA(tsqo, molc->totalSquareOverlap(), meps);
@@ -189,8 +189,6 @@ class TestOverlapCalculator : public CxxTest::TestSuite
         void test_NaCl_gradient()
         {
             using namespace boost;
-            python::object Structure =
-                diffpy::importFromPyModule("diffpy.Structure", "Structure");
             molc->eval(mnacl);
             // default gradients are all zero
             std::vector<R3::Vector> g = molc->gradients();
@@ -199,11 +197,11 @@ class TestOverlapCalculator : public CxxTest::TestSuite
             {
                 TS_ASSERT_DELTA(0.0, R3::norm(g[i]), meps);
             }
-            python::object nacl1 = Structure(mnacl);
-            python::object xyzc0 = nacl1[0].attr("xyz_cartn");
-            xyzc0[0] = 0.02;
-            xyzc0[1] = 0.03;
-            xyzc0[2] = 0.07;
+            StructureAdapterPtr nacl1 = mnacl->clone();
+            PeriodicStructureAdapter& nacl1ref =
+                static_cast<PeriodicStructureAdapter&>(*nacl1);
+            R3::Vector& xyzc0 = nacl1ref[0].xyz_cartn;
+            xyzc0 = R3::Vector(0.02, 0.03, 0.07);
             molc->eval(nacl1);
             double c0 = molc->totalSquareOverlap();
             R3::Vector g0 = molc->gradients()[0];
@@ -223,8 +221,8 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 
         void test_NaCl_mixed_overlap()
         {
-            boost::python::object nacl_mixed;
-            nacl_mixed = loadTestStructure("NaCl_mixed.cif");
+            StructureAdapterPtr nacl_mixed;
+            nacl_mixed = loadTestPeriodicStructure("NaCl_mixed.stru");
             molc->eval(nacl_mixed);
             double olp = pow(3.3 - 5.62 / 2, 2) * 6 / 2;
             TS_ASSERT_DELTA(olp, molc->meanSquareOverlap(), meps);

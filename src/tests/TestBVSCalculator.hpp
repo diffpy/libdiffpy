@@ -19,12 +19,13 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/serialization.hpp>
-#include <diffpy/srreal/PythonStructureAdapter.hpp>
+#include <diffpy/srreal/PeriodicStructureAdapter.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
-#include "python_helpers.hpp"
+#include "test_helpers.hpp"
 
 using namespace std;
 using diffpy::srreal::BVSCalculator;
+using diffpy::srreal::StructureAdapterPtr;
 
 //////////////////////////////////////////////////////////////////////////////
 // class TestBVSCalculator
@@ -34,7 +35,7 @@ class TestBVSCalculator : public CxxTest::TestSuite
 {
     private:
 
-        boost::python::object mnacl;
+        StructureAdapterPtr mnacl;
         boost::shared_ptr<BVSCalculator> mbvc;
 
     public:
@@ -42,10 +43,7 @@ class TestBVSCalculator : public CxxTest::TestSuite
         void setUp()
         {
             CxxTest::setAbortTestOnFail(true);
-            if (mnacl.ptr() == Py_None)
-            {
-                mnacl = loadTestStructure("NaCl.cif");
-            }
+            if (!mnacl)  mnacl = loadTestPeriodicStructure("NaCl.stru");
             mbvc.reset(new BVSCalculator);
             CxxTest::setAbortTestOnFail(false);
         }
@@ -69,8 +67,8 @@ class TestBVSCalculator : public CxxTest::TestSuite
 
         void test_NaCl_mixed()
         {
-            boost::python::object nacl_mixed =
-                loadTestStructure("NaCl_mixed.cif");
+            StructureAdapterPtr nacl_mixed =
+                loadTestPeriodicStructure("NaCl_mixed.stru");
             mbvc->eval(mnacl);
             BVSCalculator bvc;
             bvc.eval(nacl_mixed);
