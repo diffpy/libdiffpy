@@ -23,7 +23,7 @@
 #include <diffpy/serialization.ipp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/VR3Structure.hpp>
+#include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
 
 using namespace std;
@@ -82,8 +82,8 @@ StructureAdapter::diff(StructureAdapterConstPtr other) const
 
 StructureAdapterPtr emptyStructureAdapter()
 {
-    static StructureAdapterPtr stru(new VR3Adapter);
-    assert(stru.get() && stru->countSites() == 0);
+    static StructureAdapterPtr stru(new AtomicStructureAdapter);
+    assert(stru && stru->countSites() == 0);
     return stru;
 }
 
