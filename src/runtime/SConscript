@@ -1,6 +1,6 @@
-Import('env')
+Import('env', 'GlobSources')
 
-env['lib_datafiles'] += Glob('*.dat')
-env['lib_datafiles'] += Glob('bvparm2011sel.cif')
+env['lib_datafiles'] += GlobSources('*.dat')
+env['lib_datafiles'] += [File('bvparm2011sel.cif')]
 
 # vim: ft=python

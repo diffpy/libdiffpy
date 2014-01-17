@@ -1,7 +1,7 @@
 import os
 import re
 
-Import('env', 'libdiffpy')
+Import('env', 'GlobSources', 'libdiffpy')
 
 # Environment for building unit test driver
 env_test = env.Clone(CXXTEST_SUFFIX='.hpp')
@@ -22,13 +22,14 @@ def srcsupported(f):
 def srcincluded(f):
     fl = str(f).lower()
     rv = srcsupported(f)
+    rv = rv and f.srcnode().isfile()
     if env_test.get('tests') is not None:
         rv = rv and any(t.lower() in fl
                 for t in Split(env_test['tests']))
     return rv
 
 # alltests -- the unit test driver source files
-test_sources = filter(srcincluded, Glob('Test*.hpp'))
+test_sources = filter(srcincluded, GlobSources('Test*.hpp'))
 
 # Define the DIFFPYTESTSDIRPATH macro required for test_helpers.cpp
 thisdir = Dir('.').srcnode().abspath

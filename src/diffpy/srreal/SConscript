@@ -1,10 +1,11 @@
-Import('env')
+Import('env', 'GlobSources')
 
 def srcsupported(f):
     rv = env.get('has_objcryst') or 'objcryst' not in str(f).lower()
+    rv = rv and f.srcnode().isfile()
     return rv
 
-env['lib_includes'] += filter(srcsupported, Glob('*.[hi]pp'))
-env['lib_sources'] += filter(srcsupported, Glob('*.cpp'))
+env['lib_includes'] += filter(srcsupported, GlobSources('*.[hi]pp'))
+env['lib_sources'] += filter(srcsupported, GlobSources('*.cpp'))
 
 # vim: ft=python
