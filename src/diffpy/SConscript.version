@@ -66,6 +66,7 @@ else:
     env.Depends(vhpp, env.Value(env['has_objcryst']))
     majorminor = (ginfo['major'], ginfo['minor'])
 
+env['lib_includes'] += [vhpp]
 env['majorminor'] = majorminor
 
 # vim: ft=python
