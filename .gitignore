@@ -22,3 +22,7 @@ config.log
 errors.err
 sconscript.local
 tags
+
+#eclipse
+.project
+.pydevproject
