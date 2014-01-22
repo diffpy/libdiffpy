@@ -80,22 +80,15 @@ StructureDifference
 CrystalStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
     StructureDifference alldiffer;
-    if (!other || typeid(CrystalStructureAdapter) != typeid(*other))
-    {
-        return alldiffer;
-    }
+    typedef boost::shared_ptr<const class CrystalStructureAdapter> CPtr;
+    CPtr cother = boost::dynamic_pointer_cast<CPtr::element_type>(other);
+    if (!cother)  return alldiffer;
     StructureDifference sd(this->shared_from_this(), other);
     if (sd.stru0 == sd.stru1)  return sd;
     // compare symmetry operations in both adapters
-    typedef boost::shared_ptr<const class CrystalStructureAdapter> CPtr;
-    CPtr cstru1 = boost::static_pointer_cast<CPtr::element_type>(sd.stru1);
-    assert(cstru1 == sd.stru1);
-    if (msymops != cstru1->msymops)  return alldiffer;
-    // downcast to allow comparison with PeriodicStructureAdapter::diff
-    typedef boost::shared_ptr<const class PeriodicStructureAdapter> PPtr;
-    PPtr pstru1 = boost::static_pointer_cast<PPtr::element_type>(sd.stru1);
-    assert(typeid(PeriodicStructureAdapter) == typeid(*pstru1));
-    sd = this->PeriodicStructureAdapter::diff(pstru1);
+    assert(cother == sd.stru1);
+    if (msymops != cother->msymops)  return alldiffer;
+    sd = this->PeriodicStructureAdapter::diff(other);
     return sd;
 }
 

@@ -64,16 +64,13 @@ StructureDifference
 PeriodicStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
     StructureDifference alldiffer;
-    if (!other || typeid(PeriodicStructureAdapter) != typeid(*other))
-    {
-        return alldiffer;
-    }
+    typedef boost::shared_ptr<const class PeriodicStructureAdapter> PPtr;
+    PPtr pother = boost::dynamic_pointer_cast<PPtr::element_type>(other);
+    if (!pother)  return alldiffer;
     StructureDifference sd(this->shared_from_this(), other);
     if (sd.stru0 == sd.stru1)  return sd;
-    typedef boost::shared_ptr<const class PeriodicStructureAdapter> PPtr;
-    PPtr pstru1 = boost::static_pointer_cast<PPtr::element_type>(sd.stru1);
-    assert(pstru1 == sd.stru1);
-    if (this->getLattice() != pstru1->getLattice())  return alldiffer;
+    assert(pother == sd.stru1);
+    if (this->getLattice() != pother->getLattice())  return alldiffer;
     sd = this->AtomicStructureAdapter::diff(other);
     return sd;
 }
