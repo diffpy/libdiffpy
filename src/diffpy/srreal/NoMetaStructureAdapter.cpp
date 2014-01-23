@@ -37,6 +37,9 @@ namespace srreal {
 NoMetaStructureAdapter::NoMetaStructureAdapter(
         StructureAdapterPtr srcstructure)
 {
+    boost::shared_ptr<NoMetaStructureAdapter> nmptr =
+        boost::dynamic_pointer_cast<NoMetaStructureAdapter>(srcstructure);
+    if (nmptr)  srcstructure = nmptr->getSourceStructure();
     msrcstructure = srcstructure.get() ?
         srcstructure : emptyStructureAdapter();
 }

@@ -39,6 +39,9 @@ namespace srreal {
 NoSymmetryStructureAdapter::NoSymmetryStructureAdapter(
         StructureAdapterPtr srcstructure)
 {
+    boost::shared_ptr<NoSymmetryStructureAdapter> nmptr =
+        boost::dynamic_pointer_cast<NoSymmetryStructureAdapter>(srcstructure);
+    if (nmptr)  srcstructure = nmptr->getSourceStructure();
     msrcstructure = srcstructure.get() ?
         srcstructure : emptyStructureAdapter();
 }
