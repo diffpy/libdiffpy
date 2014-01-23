@@ -65,6 +65,10 @@ class Atom
 // Functions related to class Atom
 
 bool operator<(const Atom&, const Atom&);
+inline bool operator>(const Atom& a0, const Atom& a1)  { return a1 < a0; }
+inline bool operator<=(const Atom& a0, const Atom& a1)  { return !(a1 < a0); }
+inline bool operator>=(const Atom& a0, const Atom& a1)  { return !(a0 < a1); }
+
 bool operator==(const Atom&, const Atom&);
 bool operator!=(const Atom&, const Atom&);
 size_t hash_value(const Atom&);
