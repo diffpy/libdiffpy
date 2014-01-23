@@ -52,6 +52,10 @@ class NoSymmetryStructureAdapter : public StructureAdapter
         virtual const std::string& siteAtomType(int idx) const;
         virtual void customPQConfig(PairQuantity* pq) const;
 
+        // methods - own
+        StructureAdapterPtr getSourceStructure();
+        StructureAdapterConstPtr getSourceStructure() const;
+
     private:
 
         // data

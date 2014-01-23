@@ -109,6 +109,20 @@ void NoSymmetryStructureAdapter::customPQConfig(PairQuantity* pq) const
     msrcstructure->customPQConfig(pq);
 }
 
+
+StructureAdapterPtr
+NoSymmetryStructureAdapter::getSourceStructure()
+{
+    return msrcstructure;
+}
+
+
+StructureAdapterConstPtr
+NoSymmetryStructureAdapter::getSourceStructure() const
+{
+    return msrcstructure;
+}
+
 // Routines ------------------------------------------------------------------
 
 StructureAdapterPtr nosymmetry(StructureAdapterPtr stru)
