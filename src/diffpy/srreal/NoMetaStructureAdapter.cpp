@@ -106,6 +106,20 @@ void NoMetaStructureAdapter::customPQConfig(PairQuantity* pq) const
     // disable customPQConfig of the wrapped PairQuantity
 }
 
+
+StructureAdapterPtr
+NoMetaStructureAdapter::getSourceStructure()
+{
+    return msrcstructure;
+}
+
+
+StructureAdapterConstPtr
+NoMetaStructureAdapter::getSourceStructure() const
+{
+    return msrcstructure;
+}
+
 // Routines ------------------------------------------------------------------
 
 StructureAdapterPtr nometa(StructureAdapterPtr stru)
