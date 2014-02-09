@@ -32,8 +32,8 @@ def parsemajorminor(hcode):
 def build_VersionCode(target, source, env):
     import string
     tplcode = source[0].get_contents()
-    numversion = (10000000 * ginfo['major'] +
-            100000 * ginfo['minor'] + ginfo['number'])
+    numversion = (1000000 * ginfo['major'] +
+            1000 * ginfo['minor'] + ginfo['number'])
     flds = {
         'DIFFPY_VERSION' : numversion,
         'DIFFPY_VERSION_MAJOR' : ginfo['major'],

@@ -28,9 +28,9 @@
 #define DIFFPY_VERSION_MAJOR ${DIFFPY_VERSION_MAJOR}
 #define DIFFPY_VERSION_MINOR ${DIFFPY_VERSION_MINOR}
 
-// DIFFPY_VERSION % 100000 is number of git commits since minor version
-// DIFFPY_VERSION / 100000 % 100 is the minor version
-// DIFFPY_VERSION / 10000000 is the major version
+// DIFFPY_VERSION % 1000 is number of git commits since minor version
+// DIFFPY_VERSION / 1000 % 1000 is the minor version
+// DIFFPY_VERSION / 1000000 is the major version
 
 #define DIFFPY_VERSION ${DIFFPY_VERSION}
 
