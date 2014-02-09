@@ -3,22 +3,6 @@ import re
 
 Import('env')
 
-def gitinfo():
-    from subprocess import Popen, PIPE
-    kw = dict(stdout=PIPE)
-    proc = Popen(['git', 'describe', '--match=v[[:digit:]]*'], **kw)
-    desc = proc.stdout.read()
-    proc = Popen(['git', 'log', '-1', '--format=%H %ai'], **kw)
-    glog = proc.stdout.read()
-    rv = {}
-    rv['version'] = '-'.join(desc.strip().split('-')[:2]).lstrip('v')
-    rv['commit'], rv['date'] = glog.strip().split(None, 1)
-    mx = re.search(r'(?m)^(\d+)\.(\d+)(?:-(\d+))?', rv['version'])
-    rv['major'] = int(mx.group(1))
-    rv['minor'] = int(mx.group(2))
-    rv['number'] = mx.group(3) and int(mx.group(3)) or 0
-    return rv
-
 
 def parsemajorminor(hcode):
     'Extract major and minor version from a C++ header file.'
@@ -59,6 +43,7 @@ vhpp = File('version.hpp')
 if os.path.isfile(str(vhpp.srcnode())):
     majorminor = parsemajorminor(vhpp.srcnode().get_contents())
 else:
+    from libdiffpybuildutils import gitinfo
     vtpl = File('version.tpl')
     ginfo = gitinfo()
     vhpp, = env.BuildVersionCode(['version.hpp'], vtpl)
