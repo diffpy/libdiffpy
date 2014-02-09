@@ -1,9 +1,22 @@
-# Top level targets that are defined in subsidiary SConscripts
-#
-# lib               -- build shared library object
-# install           -- install everything under prefix directory
-# install-include   -- install C++ header files
-# install-lib       -- install shared library object
+MY_SCONS_HELP = """\
+SCons build rules for the libdiffpy C++ library
+Usage: scons [target] [var=value]
+
+Targets:
+
+lib                 build the shared library object
+install             install everything
+install-lib         install the shared library object
+install-include     install the C++ header files
+install-data        install data files used by the library
+alltests            build the unit test program "alltests"
+test                execute unit tests (requires the cxxtest framework)
+
+Build configuration variables:
+%s
+Variables can be also assigned in a user-written script sconsvars.py.
+SCons construction environment can be customized in sconscript.local script.
+"""
 
 import os
 import platform
@@ -28,7 +41,8 @@ env.EnsureSConsVersion(0, 98)
 # Customizable compile variables
 vars = Variables('sconsvars.py')
 
-vars.Add('tests', 'Custom list of unit test sources', None)
+vars.Add('tests',
+    'Fixed-string patterns for selecting unit test sources.', None)
 vars.Add(EnumVariable('build',
     'compiler settings', 'debug',
     allowed_values=('debug', 'fast')))
@@ -52,7 +66,7 @@ vars.Add(PathVariable('datadir',
 vars.Add(BoolVariable('enable_objcryst',
     'enable objcryst support, when installed', True))
 vars.Update(env)
-env.Help(vars.GenerateHelpText(env))
+env.Help(MY_SCONS_HELP % vars.GenerateHelpText(env))
 
 env['has_objcryst'] = None
 builddir = env.Dir('build/%s-%s' % (env['build'], platform.machine()))
