@@ -23,6 +23,9 @@ errors.err
 sconscript.local
 tags
 
-#eclipse
+# eclipse
 .project
 .pydevproject
+
+# source distribution tarball
+libdiffpy-*.tar.gz

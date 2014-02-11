@@ -1,0 +1,58 @@
+import os
+from libdiffpybuildutils import gitinfo
+
+Import('env')
+
+
+def add_version_hpp(target, source, env):
+    import tarfile
+    tf = tarfile.open(target[0].path, 'a')
+    # pick tar info from Attributes.hpp member
+    tmembers = tf.getmembers()
+    tia, = [m for m in tmembers if m.name.endswith('diffpy/Attributes.hpp')]
+    vp = source[0].path
+    vname = tia.name.replace('Attributes.hpp', os.path.basename(vp))
+    tiv = tf.gettarinfo(vp, vname)
+    tiv.mtime = tia.mtime
+    tiv.mode = tia.mode
+    tiv.uid = tia.uid
+    tiv.gid = tia.gid
+    tiv.uname = tia.uname
+    tiv.gname = tia.gname
+    tf.addfile(tiv, open(vp, 'rb'))
+    tf.close()
+    return
+
+
+def die_without_git(target, source, env):
+    print('sdist  must be built from a git repository.')
+    Exit(1)
+    return
+
+
+def generate_sdist_actions(target, source, env, for_signature):
+    actions = []
+    ginfo = gitinfo()
+    if not ginfo:  return [die_without_git]
+    prefix = 'libdiffpy-%(version)s/' % ginfo
+    gitcmd = ('git -c tar.umask=0022 archive '
+            '--prefix=%s --output=$TARGET HEAD') % prefix
+    actions.append(gitcmd)
+    actions.append(add_version_hpp)
+    actions.append('gzip -f -9 $TARGET')
+    dst = '${TARGET.base}-%(version)s${TARGET.suffix}.gz' % ginfo
+    actions.append(Move(dst, '${TARGET.file}.gz'))
+    return actions
+
+
+env.Append(BUILDERS={'BuildSourceDistribution' :
+    Builder(generator=generate_sdist_actions, suffix='.tar')})
+
+# build node for version.hpp
+vhpp = filter(lambda f: str(f).endswith('diffpy/version.hpp'),
+        env['lib_includes'])[0]
+
+sdist = Alias('sdist', env.BuildSourceDistribution('#/libdiffpy', vhpp))
+AlwaysBuild(sdist)
+
+# vim: ft=python

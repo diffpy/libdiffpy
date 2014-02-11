@@ -73,6 +73,9 @@ SConscript('runtime/SConscript')
 # Load all other sconscripts that update lib_includes and lib_sources
 SConscript('diffpy/SConscript')
 
+# Define sdist target for creating source distribution bundle
+SConscript('SConscript.sdist')
+
 # Top Level Targets ----------------------------------------------------------
 
 # lib -- shared library object

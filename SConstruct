@@ -11,6 +11,7 @@ install-include     install the C++ header files
 install-data        install data files used by the library
 alltests            build the unit test program "alltests"
 test                execute unit tests (requires the cxxtest framework)
+sdist               create source distribution tarball (requires git repo)
 
 Build configuration variables:
 %s
