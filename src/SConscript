@@ -79,6 +79,7 @@ SConscript('diffpy/SConscript')
 libdiffpy = env.SharedLibrary('diffpy', env['lib_sources'])
 Export('libdiffpy')
 Alias('lib', libdiffpy)
+Default(libdiffpy)
 
 # Define targets related to testing.  Do so only when testing is requested.
 # This enables library build on machines without cxxtest.

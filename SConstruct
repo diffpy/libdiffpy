@@ -4,7 +4,7 @@ Usage: scons [target] [var=value]
 
 Targets:
 
-lib                 build the shared library object
+lib                 build the shared library object [default]
 install             install everything
 install-lib         install the shared library object
 install-include     install the C++ header files
