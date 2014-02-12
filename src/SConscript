@@ -29,7 +29,9 @@ if env['PLATFORM'] == 'darwin':
     fast_linkflags[:] = []
 
 # configure version specific options.
-if not (GetOption('clean') or env.GetOption('help')):
+skip_configure = (GetOption('clean') or GetOption('help') or
+        (['sdist'] == list(COMMAND_LINE_TARGETS)))
+if not skip_configure:
     SConscript('SConscript.configure')
 
 # Compiler specific options
@@ -74,7 +76,10 @@ SConscript('runtime/SConscript')
 SConscript('diffpy/SConscript')
 
 # Define sdist target for creating source distribution bundle
-SConscript('SConscript.sdist')
+# Do so only if required to avoid extra git executions.
+# Note: See .gitattributes for files excluded from sdist.
+if 'sdist' in COMMAND_LINE_TARGETS:
+    SConscript('SConscript.sdist')
 
 # Top Level Targets ----------------------------------------------------------
 
