@@ -25,7 +25,7 @@ fast_linkflags = ['-s']
 
 # Platform specific intricacies.
 if env['PLATFORM'] == 'darwin':
-    env.AppendUnique(CXXFLAGS='-ftemplate-depth=256')
+    env.AppendUnique(CXXFLAGS='-ftemplate-depth-256')
     fast_linkflags[:] = []
 
 # configure version specific options.
