@@ -15,15 +15,13 @@ Recommended software:
 * `cxxtest` - CxxTest Unit Testing Framework, http://cxxtest.com/
 
 Required software is usually available in the system package manager,
-for example, on Ubuntu Linux the dependencies can be installed as
+for example, on Ubuntu Linux the dependencies can be installed as::
 
-    sh
     sudo apt-get install \
-    build-essential scons libboost-dev libgsl0-dev
+        build-essential scons libboost-dev libgsl0-dev
 
-For Mac OS X machine with the MacPorts package manager one could do
+For Mac OS X machine with the MacPorts package manager one could do::
 
-    sh
     sudo port install scons boost gsl
 
 
@@ -36,9 +34,8 @@ Installation
 ------------------------------------------------------------------------
 
 
-To build and install the libdiffpy library from sources, run
+To build and install the libdiffpy library from sources, run::
 
-    sh
     sudo scons -j4 install
 
 This installs libdiffpy for all users under the `/usr/local` directory.
@@ -59,9 +56,8 @@ https://github.com/diffpy/libdiffpy.
 
 Feel free to fork the project and contribute.  When developing it is
 preferable to compile with `build=develop` option, which compiles the
-library with debug information and C-assertions checks:
+library with debug information and C-assertions checks::
 
-    sh
     scons -j4 build=develop
 
 The build script checks for a presence of `sconsvars.py` file, which

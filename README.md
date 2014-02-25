@@ -68,7 +68,7 @@ If administrator (root) access is not available, see the usage info from
 `scons --help` for options to install to a user-writable location.
 
 
-## DEVELOPMENT
+## CONTRIBUTION
 
 libdiffpy is an open-source software developed as a part of the
 DiffPy-CMI complex modeling initiative at the Brookhaven National
