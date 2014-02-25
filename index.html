@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>libdiffpy’s documentation &mdash; libdiffpy 1.1-42 documentation</title>
+    <title>libdiffpy’s documentation &mdash; libdiffpy 1.1-44 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.1-42',
+        VERSION:     '1.1-44',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/sidebar.js"></script>
-    <link rel="top" title="libdiffpy 1.1-42 documentation" href="#" /> 
+    <link rel="top" title="libdiffpy 1.1-44 documentation" href="#" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +35,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="#">libdiffpy 1.1-42 documentation</a> &raquo;</li> 
+        <li><a href="#">libdiffpy 1.1-44 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -46,8 +46,8 @@
             
   <div class="section" id="libdiffpy-s-documentation">
 <h1>libdiffpy&#8217;s documentation<a class="headerlink" href="#libdiffpy-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Software version 1.1-42.</p>
-<p>Last updated February 16, 2014.</p>
+<p>Software version 1.1-44.</p>
+<p>Last updated February 25, 2014.</p>
 <p>libdiffpy - C++ calculators of PDF, bond valence sum and other pair quantities</p>
 <p>libdiffpy is a C++ library for calculating atomic pair distribution function
 (PDF), bond valence sums, atom overlaps for a hard-sphere model, bond
@@ -133,21 +133,19 @@ Simon J.L. Billinge
 <li><cite>cxxtest</cite> - CxxTest Unit Testing Framework, <a class="reference external" href="http://cxxtest.com/">http://cxxtest.com/</a></li>
 </ul>
 <p>Required software is usually available in the system package manager,
-for example, on Ubuntu Linux the dependencies can be installed as</p>
-<blockquote>
-<div>sh
-sudo apt-get install build-essential scons libboost-dev libgsl0-dev</div></blockquote>
-<p>For Mac OS X machine with the MacPorts package manager one could do</p>
-<blockquote>
-<div>sh
-sudo port install scons boost gsl</div></blockquote>
+for example, on Ubuntu Linux the dependencies can be installed as:</p>
+<div class="highlight-python"><pre>sudo apt-get install \
+    build-essential scons libboost-dev libgsl0-dev</pre>
+</div>
+<p>For Mac OS X machine with the MacPorts package manager one could do:</p>
+<div class="highlight-python"><pre>sudo port install scons boost gsl</pre>
+</div>
 <p>For other packages see their project pages for installation instructions.</p>
 <div class="section" id="index-1">
 <span id="id1"></span><h3>Installation<a class="headerlink" href="#index-1" title="Permalink to this headline">¶</a></h3>
-<p>To build and install the libdiffpy library from sources, run</p>
-<blockquote>
-<div>sh
-sudo scons -j4 install</div></blockquote>
+<p>To build and install the libdiffpy library from sources, run:</p>
+<div class="highlight-python"><pre>sudo scons -j4 install</pre>
+</div>
 <p>This installs libdiffpy for all users under the <cite>/usr/local</cite> directory.
 If administrator (root) access is not available, see the usage info from
 <cite>scons &#8211;help</cite> for options to install to a user-writable location.</p>
@@ -161,9 +159,8 @@ Laboratory.  The libdiffpy sources are hosted at
 <p>Feel free to fork the project and contribute.  When developing it is
 preferable to compile with <cite>build=develop</cite> option, which compiles the
 library with debug information and C-assertions checks:</p>
-<blockquote>
-<div>sh
-scons -j4 build=develop</div></blockquote>
+<div class="highlight-python"><pre>scons -j4 build=develop</pre>
+</div>
 <p>The build script checks for a presence of <cite>sconsvars.py</cite> file, which
 can be used to permanently set the <cite>build</cite> variable.  The SCons
 construction environment can be further customized in a <cite>sconscript.local</cite>
@@ -240,7 +237,7 @@ script.  The library integrity can be verified by executing unit tests with
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="#">libdiffpy 1.1-42 documentation</a> &raquo;</li> 
+        <li><a href="#">libdiffpy 1.1-44 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
