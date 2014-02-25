@@ -35,7 +35,7 @@ libdiffpy library requires C++ compiler and the following software:
 
 Recommended software:
 
-* `libObjCryst` - C++ library of free objects for crystallography, FIXME-URL
+* `libObjCryst` - C++ library of free objects for crystallography, https://github.com/diffpy/libobjcryst/
 * `cxxtest` - CxxTest Unit Testing Framework, http://cxxtest.com/
 
 Required software is usually available in the system package manager,
