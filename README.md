@@ -35,7 +35,8 @@ libdiffpy library requires C++ compiler and the following software:
 
 Recommended software:
 
-* `libObjCryst` - C++ library of free objects for crystallography, https://github.com/diffpy/libobjcryst/
+* `libobjcryst` - C++ library of free objects for crystallography,
+  https://github.com/diffpy/libobjcryst/
 * `cxxtest` - CxxTest Unit Testing Framework, http://cxxtest.com/
 
 Required software is usually available in the system package manager,
@@ -68,7 +69,7 @@ If administrator (root) access is not available, see the usage info from
 `scons --help` for options to install to a user-writable location.
 
 
-## CONTRIBUTION
+## DEVELOPMENT
 
 libdiffpy is an open-source software developed as a part of the
 DiffPy-CMI complex modeling initiative at the Brookhaven National
