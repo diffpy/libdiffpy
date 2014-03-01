@@ -1,9 +1,20 @@
 /*****************************************************************************
-* Short Title: definition of Lattice class
 *
-* Comments: class for general coordinate system
+* libdiffpy         by DANSE Diffraction group
+*                   Simon J. L. Billinge
+*                   (c) 2009 The Trustees of Columbia University
+*                   in the City of New York.  All rights reserved.
 *
-* <license text>
+* File coded by:    Pavol Juhas
+*
+* See AUTHORS.txt for a list of people who contributed.
+* See LICENSE.txt for license information.
+*
+******************************************************************************
+*
+* class Lattice -- vector and matrix conversions between general and
+*     Cartesian coordinate systems
+*
 *****************************************************************************/
 
 #include <list>

@@ -1,10 +1,20 @@
-/***********************************************************************
-* Short Title: unit tests for Lattice class
+/*****************************************************************************
 *
-* Comments:
+* libdiffpy         by DANSE Diffraction group
+*                   Simon J. L. Billinge
+*                   (c) 2009 The Trustees of Columbia University
+*                   in the City of New York.  All rights reserved.
 *
-* <license text>
-***********************************************************************/
+* File coded by:    Pavol Juhas
+*
+* See AUTHORS.txt for a list of people who contributed.
+* See LICENSE.txt for license information.
+*
+******************************************************************************
+*
+* class TestLattice -- unit tests for the Lattice class
+*
+*****************************************************************************/
 
 #include <cxxtest/TestSuite.h>
 #include <gsl/gsl_linalg.h>

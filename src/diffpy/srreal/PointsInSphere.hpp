@@ -1,6 +1,6 @@
 /*****************************************************************************
 *
-* diffpy.srreal     by DANSE Diffraction group
+* libdiffpy         by DANSE Diffraction group
 *                   Simon J. L. Billinge
 *                   (c) 2006 trustees of the Michigan State University
 *                   All rights reserved.

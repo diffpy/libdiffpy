@@ -1,11 +1,20 @@
-/***********************************************************************
-* Short Title: linear algebra functions on R3
+/*****************************************************************************
 *
-* R3linalg -- vector and matrix types and linar algebra
-*     operations in R3 space
+* libdiffpy         by DANSE Diffraction group
+*                   Simon J. L. Billinge
+*                   (c) 2009 The Trustees of Columbia University
+*                   in the City of New York.  All rights reserved.
 *
-* <license text>
-***********************************************************************/
+* File coded by:    Pavol Juhas
+*
+* See AUTHORS.txt for a list of people who contributed.
+* See LICENSE.txt for license information.
+*
+******************************************************************************
+*
+* R3linalg -- vector and matrix types and linar algebra operations in R3 space
+*
+*****************************************************************************/
 
 #include <boost/functional/hash.hpp>
 #include <gsl/gsl_linalg.h>

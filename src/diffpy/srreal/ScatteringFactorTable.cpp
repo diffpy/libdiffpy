@@ -1,6 +1,6 @@
 /*****************************************************************************
 *
-* diffpy.srreal     by DANSE Diffraction group
+* libdiffpy         by DANSE Diffraction group
 *                   Simon J. L. Billinge
 *                   (c) 2009 The Trustees of Columbia University
 *                   in the City of New York.  All rights reserved.
