@@ -2,7 +2,7 @@
 *
 * diffpy.srreal     by DANSE Diffraction group
 *                   Simon J. L. Billinge
-*                   (c) 2009 trustees of the Michigan State University
+*                   (c) 2006 trustees of the Michigan State University
 *                   All rights reserved.
 *
 * File coded by:    Pavol Juhas

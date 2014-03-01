@@ -2,8 +2,8 @@
 *
 * diffpy.lib        by DANSE Diffraction group
 *                   Simon J. L. Billinge
-*                   (c) 2009 Trustees of the Michigan State University.
-*                   All rights reserved.
+*                   (c) 2009 Trustees of the Columbia University
+*                   in the City of New York.  All rights reserved.
 *
 * File coded by:    Pavol Juhas
 *
