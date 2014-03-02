@@ -2,8 +2,8 @@
 #
 # libdiffpy         Complex Modeling Initiative
 #                   Pavol Juhas
-#                   2013 Brookhaven National Laboratory,
-#                   Upton, New York.  All rights reserved.
+#                   2013 Brookhaven Science Associates,
+#                   Brookhaven National Laboratory.
 #
 #***************************************************************
 #
@@ -13,7 +13,7 @@
 # data from references 'b', 'a', then entries with parameter
 # b == 0.37 and after that entries that were not 'unchecked'.
 # If this was still not enough one of the remaining entries was
-# selected more less randomly.
+# selected more less arbitrarily.
 #
 # The original bvparm2011.cif file was retrieved on 2013-06-27 from
 #  http://www.iucr.org/__data/assets/file/0018/59004/bvparm2011.cif
