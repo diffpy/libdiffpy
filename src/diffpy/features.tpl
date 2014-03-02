@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-* diffpy.srreal     Complex Modeling Initiative
-*                   Pavol Juhas
-*                   (c) 2014 Brookhaven National Laboratory,
-*                   Upton, New York.  All rights reserved.
+* libdiffpy         Complex Modeling Initiative
+*                   (c) 2014 Brookhaven Science Associates,
+*                   Brookhaven National Laboratory.
+*                   All rights reserved.
 *
 * File coded by:    Pavol Juhas
 *
