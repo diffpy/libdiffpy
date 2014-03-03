@@ -93,7 +93,7 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
             }
             if (!m_catio3)
             {
-                m_catio3 = loadTestPeriodicStructure("icsd_62149.stru");
+                m_catio3 = loadTestPeriodicStructure("CaTiO3.stru");
             }
             if (!m_pswt)
             {
@@ -133,7 +133,7 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
             const double eps = 1.0e-7;
             TS_ASSERT_DELTA(0.0914114, m_ni->numberDensity(), eps);
             TS_ASSERT_DELTA(0.0335565, m_kbise->numberDensity(), eps);
-            TS_ASSERT_DELTA(0.0894126, m_catio3->numberDensity(), eps);
+            TS_ASSERT_DELTA(0.0894566, m_catio3->numberDensity(), eps);
             TS_ASSERT_DELTA(0.0760332, m_pswt->numberDensity(), eps);
         }
 
@@ -141,10 +141,10 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
         void test_siteCartesianPosition()
         {
             const double eps = 1.0e-5;
-            R3::Vector rCa = m_catio3->siteCartesianPosition(0);
-            TS_ASSERT_DELTA(2.72617, rCa[0], eps);
-            TS_ASSERT_DELTA(2.91718, rCa[1], eps);
-            TS_ASSERT_DELTA(1.91003, rCa[2], eps);
+            R3::Vector rCa = m_catio3->siteCartesianPosition(4);
+            TS_ASSERT_DELTA(0.03486, rCa[0], eps);
+            TS_ASSERT_DELTA(0.19366, rCa[1], eps);
+            TS_ASSERT_DELTA(1.90975, rCa[2], eps);
         }
 
 
@@ -166,17 +166,17 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
             // nickel should have all Uij equal zero.
             TS_ASSERT_EQUALS(R3::zeromatrix(), m_ni->siteCartesianUij(0));
             // check CaTiO3 values
-            const R3::Matrix& UTi = m_catio3->siteCartesianUij(7);
+            const R3::Matrix& UO2 = m_catio3->siteCartesianUij(12);
             const double eps = 1e-8;
-            TS_ASSERT_DELTA(0.0052, UTi(0,0), eps);
-            TS_ASSERT_DELTA(0.0049, UTi(1,1), eps);
-            TS_ASSERT_DELTA(0.0049, UTi(2,2), eps);
-            TS_ASSERT_DELTA(0.00016, UTi(0,1), eps);
-            TS_ASSERT_DELTA(0.00016, UTi(1,0), eps);
-            TS_ASSERT_DELTA(0.00001, UTi(0,2), eps);
-            TS_ASSERT_DELTA(0.00001, UTi(2,0), eps);
-            TS_ASSERT_DELTA(0.00021, UTi(1,2), eps);
-            TS_ASSERT_DELTA(0.00021, UTi(2,1), eps);
+            TS_ASSERT_DELTA(0.0065, UO2(0,0), eps);
+            TS_ASSERT_DELTA(0.0060, UO2(1,1), eps);
+            TS_ASSERT_DELTA(0.0095, UO2(2,2), eps);
+            TS_ASSERT_DELTA(0.0020, UO2(0,1), eps);
+            TS_ASSERT_DELTA(0.0020, UO2(1,0), eps);
+            TS_ASSERT_DELTA(-0.0008, UO2(0,2), eps);
+            TS_ASSERT_DELTA(-0.0008, UO2(2,0), eps);
+            TS_ASSERT_DELTA(-0.0010, UO2(1,2), eps);
+            TS_ASSERT_DELTA(-0.0010, UO2(2,1), eps);
         }
 
 
