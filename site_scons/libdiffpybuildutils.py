@@ -23,10 +23,11 @@ def gitinfo():
     glog = proc.stdout.read()
     rv['version'] = '-'.join(desc.strip().split('-')[:2]).lstrip('v')
     rv['commit'], rv['date'] = glog.strip().split(None, 1)
-    mx = re.search(r'(?m)^(\d+)\.(\d+)(?:-(\d+))?', rv['version'])
+    mx = re.search(r'(?m)^(\d+)\.(\d+)([ab]\d*)?(?:-(\d+))?', rv['version'])
     rv['major'] = int(mx.group(1))
     rv['minor'] = int(mx.group(2))
-    rv['number'] = mx.group(3) and int(mx.group(3)) or 0
+    rv['prerelease'] = mx.group(3)
+    rv['number'] = mx.group(4) and int(mx.group(4)) or 0
     _cached_gitinfo = rv
     return gitinfo()
 

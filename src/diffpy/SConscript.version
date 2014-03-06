@@ -18,6 +18,8 @@ def build_VersionCode(target, source, env):
     tplcode = source[0].get_contents()
     numversion = (1000000 * ginfo['major'] +
             1000 * ginfo['minor'] + ginfo['number'])
+    if ginfo['prerelease']:
+        numversion = "(-500 + %i)" % numversion
     flds = {
         'DIFFPY_VERSION' : numversion,
         'DIFFPY_VERSION_MAJOR' : ginfo['major'],
