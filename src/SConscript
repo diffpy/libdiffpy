@@ -86,7 +86,7 @@ if 'sdist' in COMMAND_LINE_TARGETS:
 # lib -- shared library object
 libdiffpy = env.SharedLibrary('diffpy', env['lib_sources'])
 Export('libdiffpy')
-Alias('lib', libdiffpy)
+Alias('lib', [libdiffpy, env['lib_includes']])
 Default(libdiffpy)
 
 # Define targets related to testing.  Do so only when testing is requested.
