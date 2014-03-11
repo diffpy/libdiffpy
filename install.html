@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation &mdash; libdiffpy 1.1-44 documentation</title>
+    <title>Installation &mdash; libdiffpy 1.2a0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '1.1-44',
+        URL_ROOT:    './',
+        VERSION:     '1.2a0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/sidebar.js"></script>
-    <link rel="top" title="libdiffpy 1.1-44 documentation" href="index.html" /> 
+    <link rel="top" title="libdiffpy 1.2a0 documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="index.html">libdiffpy 1.1-44 documentation</a> &raquo;</li> 
+        <li><a href="index.html">libdiffpy 1.2a0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -54,29 +52,45 @@
 </ul>
 <p>Recommended software:</p>
 <ul class="simple">
-<li><cite>libObjCryst</cite> - C++ library of free objects for crystallography, FIXME-URL</li>
-<li><cite>cxxtest</cite> - CxxTest Unit Testing Framework, <a class="reference external" href="http://cxxtest.com/">http://cxxtest.com/</a></li>
+<li><cite>libobjcryst</cite> - C++ library of free objects for crystallography,
+<a class="reference external" href="https://github.com/diffpy/libobjcryst">https://github.com/diffpy/libobjcryst</a></li>
+<li><cite>cxxtest</cite> - CxxTest Unit Testing Framework, <a class="reference external" href="http://cxxtest.com">http://cxxtest.com</a></li>
 </ul>
-<p>Required software is usually available in the system package manager,
-for example, on Ubuntu Linux the dependencies can be installed as:</p>
-<div class="highlight-python"><pre>sudo apt-get install \
-    build-essential scons libboost-dev libgsl0-dev</pre>
+<p>On Ubuntu Linux the required software can be installed using the
+system package manager:</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo apt-get install \
+    build-essential scons libboost-dev libgsl0-dev
+</pre></div>
 </div>
-<p>For Mac OS X machine with the MacPorts package manager one could do:</p>
-<div class="highlight-python"><pre>sudo port install scons boost gsl</pre>
+<p>For Mac OS X machine with the MacPorts package manager the installation
+command is:</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo port install scons boost gsl
+</pre></div>
 </div>
 <p>For other packages see their project pages for installation instructions.</p>
 <div class="section" id="index-1">
 <span id="id1"></span><h2>Installation<a class="headerlink" href="#index-1" title="Permalink to this headline">¶</a></h2>
 <p>To build and install the libdiffpy library from sources, run:</p>
-<div class="highlight-python"><pre>sudo scons -j4 install</pre>
+<div class="highlight-python"><div class="highlight"><pre>sudo scons -j4 install
+</pre></div>
 </div>
 <p>This installs libdiffpy for all users under the <cite>/usr/local</cite> directory.
 If administrator (root) access is not available, see the usage info from
 <cite>scons &#8211;help</cite> for options to install to a user-writable location.</p>
+<p>To verify libdiffpy installation, compile and run the included
+test code [examples/testlib.cpp](examples/testlib.cpp):</p>
+<div class="highlight-python"><div class="highlight"><pre>cd examples
+c++ testlib.cpp -ldiffpy
+./a.out
+</pre></div>
 </div>
-<div class="section" id="contribution">
-<span id="index-2"></span><h2>Contribution<a class="headerlink" href="#contribution" title="Permalink to this headline">¶</a></h2>
+<p>If compilation fails because of missing header files or missing libdiffpy
+library, adjust the <cite>CPATH</cite> and <cite>LIBRARY_PATH</cite> environment variables or
+use the <cite>-I</cite> or <cite>-L</cite> compiler options.  If the libdiffpy shared library
+cannot be found at runtime, adjust the <cite>LD_LIBRARY_PATH</cite> environment variable.</p>
+</div>
+<div class="section" id="development">
+<span id="index-2"></span><h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
 <p>libdiffpy is an open-source software developed as a part of the
 DiffPy-CMI complex modeling initiative at the Brookhaven National
 Laboratory.  The libdiffpy sources are hosted at
@@ -84,7 +98,8 @@ Laboratory.  The libdiffpy sources are hosted at
 <p>Feel free to fork the project and contribute.  When developing it is
 preferable to compile with <cite>build=develop</cite> option, which compiles the
 library with debug information and C-assertions checks:</p>
-<div class="highlight-python"><pre>scons -j4 build=develop</pre>
+<div class="highlight-python"><div class="highlight"><pre>scons -j4 build=develop
+</pre></div>
 </div>
 <p>The build script checks for a presence of <cite>sconsvars.py</cite> file, which
 can be used to permanently set the <cite>build</cite> variable.  The SCons
@@ -104,7 +119,7 @@ script.  The library integrity can be verified by executing unit tests with
   <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#index-1">Installation</a></li>
-<li><a class="reference internal" href="#contribution">Contribution</a></li>
+<li><a class="reference internal" href="#development">Development</a></li>
 </ul>
 </li>
 </ul>
@@ -137,12 +152,12 @@ script.  The library integrity can be verified by executing unit tests with
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="index.html">libdiffpy 1.1-44 documentation</a> &raquo;</li> 
+        <li><a href="index.html">libdiffpy 1.2a0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2014, Brookhaven National Laboratory.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
     </div>
   </body>
 </html>

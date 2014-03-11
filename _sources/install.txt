@@ -11,19 +11,20 @@ libdiffpy library requires C++ compiler and the following software:
 
 Recommended software:
 
-* `libObjCryst` - C++ library of free objects for crystallography, FIXME-URL
-* `cxxtest` - CxxTest Unit Testing Framework, http://cxxtest.com/
+* `libobjcryst` - C++ library of free objects for crystallography,
+  https://github.com/diffpy/libobjcryst
+* `cxxtest` - CxxTest Unit Testing Framework, http://cxxtest.com
 
-Required software is usually available in the system package manager,
-for example, on Ubuntu Linux the dependencies can be installed as::
+On Ubuntu Linux the required software can be installed using the
+system package manager::
 
     sudo apt-get install \
         build-essential scons libboost-dev libgsl0-dev
 
-For Mac OS X machine with the MacPorts package manager one could do::
+For Mac OS X machine with the MacPorts package manager the installation
+command is::
 
     sudo port install scons boost gsl
-
 
 For other packages see their project pages for installation instructions.
 
@@ -42,12 +43,23 @@ This installs libdiffpy for all users under the `/usr/local` directory.
 If administrator (root) access is not available, see the usage info from
 `scons --help` for options to install to a user-writable location.
 
+To verify libdiffpy installation, compile and run the included
+test code [examples/testlib.cpp](examples/testlib.cpp)::
 
-.. index:: Contribution
+    cd examples
+    c++ testlib.cpp -ldiffpy
+    ./a.out
 
-Contribution
+If compilation fails because of missing header files or missing libdiffpy
+library, adjust the `CPATH` and `LIBRARY_PATH` environment variables or
+use the `-I` or `-L` compiler options.  If the libdiffpy shared library
+cannot be found at runtime, adjust the `LD_LIBRARY_PATH` environment variable.
+
+
+.. index:: Development
+
+Development
 ------------------------------------------------------------------------
-
 
 libdiffpy is an open-source software developed as a part of the
 DiffPy-CMI complex modeling initiative at the Brookhaven National
@@ -65,3 +77,4 @@ can be used to permanently set the `build` variable.  The SCons
 construction environment can be further customized in a `sconscript.local`
 script.  The library integrity can be verified by executing unit tests with
 `scons -j4 test` (requires the CxxTest framework).
+
