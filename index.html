@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>libdiffpy’s documentation &mdash; libdiffpy 1.2a0 documentation</title>
+    <title>libdiffpy’s documentation &mdash; libdiffpy 1.2a0-2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.2a0',
+        VERSION:     '1.2a0-2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/sidebar.js"></script>
-    <link rel="top" title="libdiffpy 1.2a0 documentation" href="#" /> 
+    <link rel="top" title="libdiffpy 1.2a0-2 documentation" href="#" /> 
   </head>
   <body>
     <div class="related">
@@ -33,7 +33,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="#">libdiffpy 1.2a0 documentation</a> &raquo;</li> 
+        <li><a href="#">libdiffpy 1.2a0-2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -44,8 +44,8 @@
             
   <div class="section" id="libdiffpy-s-documentation">
 <h1>libdiffpy&#8217;s documentation<a class="headerlink" href="#libdiffpy-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Software version 1.2a0.</p>
-<p>Last updated March 06, 2014.</p>
+<p>Software version 1.2a0-2.</p>
+<p>Last updated March 11, 2014.</p>
 <p>libdiffpy - C++ calculators of PDF, bond valence sum and other pair quantities</p>
 <p>libdiffpy is a C++ library for calculating atomic pair distribution function
 (PDF), bond valence sums, atom overlaps for a hard-sphere model, bond
@@ -66,71 +66,85 @@ New calculator class can thus be readily defined for any quantity that is
 obtained by iteration over atom pairs.</p>
 <div class="section" id="disclaimer">
 <h2>Disclaimer<a class="headerlink" href="#disclaimer" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="open-source-license-agreement">
-<h3>OPEN SOURCE LICENSE AGREEMENT<a class="headerlink" href="#open-source-license-agreement" title="Permalink to this headline">¶</a></h3>
-<p>Copyright (c) 2009-2011, University of Tennessee
+<div class="highlight-python"><div class="highlight"><pre>OPEN SOURCE LICENSE AGREEMENT
+=============================
+
+Copyright (c) 2009-2011, University of Tennessee
 Copyright (c) 1989, 1991 Free Software Foundation, Inc.
-Copyright (c) 2006, The Regents of the University of California through</p>
-<blockquote>
-<div>Lawrence Berkeley National Laboratory</div></blockquote>
-<p>Copyright (c) 2014, Australian Synchrotron Research Program Inc., (&#8220;ASRP&#8221;)
+Copyright (c) 2006, The Regents of the University of California through
+    Lawrence Berkeley National Laboratory
+Copyright (c) 2014, Australian Synchrotron Research Program Inc., (&quot;ASRP&quot;)
 Copyright (c) 2006-2007, Board of Trustees of Michigan State University
-Copyright (c) 2008-2012, The Trustees of Columbia University in the City</p>
-<blockquote>
-<div>of New York</div></blockquote>
-<dl class="docutils">
-<dt>Copyright (c) 2014, Brookhaven Science Associates, Brookhaven National</dt>
-<dd>Laboratory</dd>
-</dl>
-<p>The &#8220;DiffPy-CMI&#8221; is distributed subject to the following license conditions:</p>
-<p>SOFTWARE LICENSE AGREEMENT</p>
-<blockquote>
-<div>Software: DiffPy-CMI</div></blockquote>
-<p>(1) The &#8220;Software&#8221;, below, refers to the aforementioned DiffPy-CMI (in either
-source code, or binary form and accompanying documentation).</p>
-<p>Part of the software was derived from the DANSE, ObjCryst++ (with permission),
+Copyright (c) 2008-2012, The Trustees of Columbia University in the City
+    of New York
+
+Copyright (c) 2014, Brookhaven Science Associates, Brookhaven National
+    Laboratory
+
+
+The &quot;DiffPy-CMI&quot; is distributed subject to the following license conditions:
+
+
+SOFTWARE LICENSE AGREEMENT
+
+    Software: DiffPy-CMI
+
+
+(1) The &quot;Software&quot;, below, refers to the aforementioned DiffPy-CMI (in either
+source code, or binary form and accompanying documentation).
+
+Part of the software was derived from the DANSE, ObjCryst++ (with permission),
 PyCifRW, Python periodictable, CCTBX, and SasView open source projects, of
-which the original Copyrights are contained in each individual file.</p>
-<p>Each licensee is addressed as &#8220;you&#8221; or &#8220;Licensee.&#8221;</p>
-<p>(2) The copyright holders shown above and their third-party Licensors hereby
+which the original Copyrights are contained in each individual file.
+
+Each licensee is addressed as &quot;you&quot; or &quot;Licensee.&quot;
+
+
+(2) The copyright holders shown above and their third-party Licensors hereby
 grant licensee a royalty-free nonexclusive license, subject to the limitations
-stated herein and U.S. Government license rights.</p>
-<p>(3) You may modify and make a copy or copies of the software for use within
-your organization, if you meet the following conditions:</p>
-<blockquote>
-<div><ol class="loweralpha simple">
-<li>Copies in source code must include the copyright notice and this
-software license agreement.</li>
-<li>Copies in binary form must include the copyright notice and this
-Software License Agreement in the documentation and/or other materials
-provided with the copy.</li>
-</ol>
-</div></blockquote>
-<p>(4) You may modify a copy or copies of the Software or any portion of it, thus
+stated herein and U.S. Government license rights.
+
+
+(3) You may modify and make a copy or copies of the software for use within
+your organization, if you meet the following conditions:
+
+    (a) Copies in source code must include the copyright notice and this
+        software license agreement.
+
+    (b) Copies in binary form must include the copyright notice and this
+        Software License Agreement in the documentation and/or other materials
+        provided with the copy.
+
+
+(4) You may modify a copy or copies of the Software or any portion of it, thus
 forming a work based on the Software, and distribute copies of such work
-outside your organization, if you meet all of the following conditions:</p>
-<blockquote>
-<div><ol class="loweralpha simple">
-<li>Copies in source code must include the copyright notice and this
-Software License Agreement;</li>
-<li>Copies in binary form must include the copyright notice and this
-Software License Agreement in the documentation and/or other materials
-provided with the copy;</li>
-<li>Modified copies and works based on the Software must carry prominent
-notices stating that you changed specified portions of the Software.</li>
-<li>Neither the name of Brookhaven Science Associates or Brookhaven
-National Laboratory nor the names of its contributors may be used to
-endorse or promote products derived from this software without specific
-written permission.</li>
-</ol>
-</div></blockquote>
-<p>(5) Portions of the Software resulted from work developed under a U.S.
+outside your organization, if you meet all of the following conditions:
+
+    (a) Copies in source code must include the copyright notice and this
+        Software License Agreement;
+
+    (b) Copies in binary form must include the copyright notice and this
+        Software License Agreement in the documentation and/or other materials
+        provided with the copy;
+
+    (c) Modified copies and works based on the Software must carry prominent
+        notices stating that you changed specified portions of the Software.
+
+    (d) Neither the name of Brookhaven Science Associates or Brookhaven
+        National Laboratory nor the names of its contributors may be used to
+        endorse or promote products derived from this software without specific
+        written permission.
+
+
+(5) Portions of the Software resulted from work developed under a U.S.
 Government contract and are subject to the following license:
 The Government is granted for itself and others acting on its behalf a
 paid-up, nonexclusive, irrevocable worldwide license in this computer software
 to reproduce, prepare derivative works, and perform publicly and display
-publicly.</p>
-<p>(6) WARRANTY DISCLAIMER. THE SOFTWARE IS SUPPLIED &#8220;AS IS&#8221; WITHOUT
+publicly.
+
+
+(6) WARRANTY DISCLAIMER. THE SOFTWARE IS SUPPLIED &quot;AS IS&quot; WITHOUT
 WARRANTY OF ANY KIND. THE COPYRIGHT HOLDERS, THEIR THIRD PARTY
 LICENSORS, THE UNITED STATES, THE UNITED STATES DEPARTMENT OF ENERGY, AND
 THEIR EMPLOYEES: (1) DISCLAIM ANY WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
@@ -139,48 +153,63 @@ PARTICULAR PURPOSE, TITLE OR NON-INFRINGEMENT, (2) DO NOT ASSUME ANY LEGAL
 LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF
 THE SOFTWARE, (3) DO NOT REPRESENT THAT USE OF THE SOFTWARE WOULD NOT INFRINGE
 PRIVATELY OWNED RIGHTS, (4) DO NOT WARRANT THAT THE SOFTWARE WILL FUNCTION
-UNINTERRUPTED, THAT IT IS ERROR-FREE OR THAT ANY ERRORS WILL BE CORRECTED.</p>
-<p>(7) LIMITATION OF LIABILITY. IN NO EVENT WILL THE COPYRIGHT HOLDERS, THEIR
+UNINTERRUPTED, THAT IT IS ERROR-FREE OR THAT ANY ERRORS WILL BE CORRECTED.
+
+
+(7) LIMITATION OF LIABILITY. IN NO EVENT WILL THE COPYRIGHT HOLDERS, THEIR
 THIRD PARTY LICENSORS, THE UNITED STATES, THE UNITED STATES DEPARTMENT OF
 ENERGY, OR THEIR EMPLOYEES: BE LIABLE FOR  ANY INDIRECT, INCIDENTAL,
 CONSEQUENTIAL, SPECIAL OR PUNITIVE  DAMAGES OF ANY KIND OR NATURE, INCLUDING
 BUT NOT LIMITED TO LOSS OF PROFITS OR LOSS OF DATA, FOR ANY REASON WHATSOEVER,
 WHETHER SUCH LIABILITY IS ASSERTED ON THE BASIS OF CONTRACT, TORT (INCLUDING
 NEGLIGENCE OR STRICT LIABILITY), OR OTHERWISE, EVEN IF ANY OF SAID PARTIES HAS
-BEEN WARNED OF THE POSSIBILITY OF SUCH LOSS OR DAMAGES.</p>
-</div>
-<div class="section" id="brookhaven-national-laboratory-notice">
-<h3>Brookhaven National Laboratory Notice<a class="headerlink" href="#brookhaven-national-laboratory-notice" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="acknowledgment-of-sponsorship">
-<h4>Acknowledgment of sponsorship<a class="headerlink" href="#acknowledgment-of-sponsorship" title="Permalink to this headline">¶</a></h4>
-<p>This software was produced by the Brookhaven National Laboratory, under
-Contract DE-AC02-98CH10886 with the Department of Energy.</p>
-</div>
-<div class="section" id="government-disclaimer-of-liability">
-<h4>Government disclaimer of liability<a class="headerlink" href="#government-disclaimer-of-liability" title="Permalink to this headline">¶</a></h4>
-<p>Neither the United States nor the United States Department of Energy, nor
+BEEN WARNED OF THE POSSIBILITY OF SUCH LOSS OR DAMAGES.
+
+
+Brookhaven National Laboratory Notice
+=====================================
+
+Acknowledgment of sponsorship
+-----------------------------
+
+This software was produced by the Brookhaven National Laboratory, under
+Contract DE-AC02-98CH10886 with the Department of Energy.
+
+
+Government disclaimer of liability
+----------------------------------
+
+Neither the United States nor the United States Department of Energy, nor
 any of their employees, makes any warranty, express or implied, or assumes
 any legal liability or responsibility for the accuracy, completeness, or
 usefulness of any data, apparatus, product, or process disclosed, or
-represents that its use would not infringe privately owned rights.</p>
-</div>
-<div class="section" id="brookhaven-disclaimer-of-liability">
-<h4>Brookhaven disclaimer of liability<a class="headerlink" href="#brookhaven-disclaimer-of-liability" title="Permalink to this headline">¶</a></h4>
-<p>Brookhaven National Laboratory makes no representations or warranties,
-express or implied, nor assumes any liability for the use of this software.</p>
-</div>
-<div class="section" id="maintenance-of-notice">
-<h4>Maintenance of notice<a class="headerlink" href="#maintenance-of-notice" title="Permalink to this headline">¶</a></h4>
-<p>In the interest of clarity regarding the origin and status of this
+represents that its use would not infringe privately owned rights.
+
+
+Brookhaven disclaimer of liability
+----------------------------------
+
+Brookhaven National Laboratory makes no representations or warranties,
+express or implied, nor assumes any liability for the use of this software.
+
+
+Maintenance of notice
+---------------------
+
+In the interest of clarity regarding the origin and status of this
 software, Brookhaven National Laboratory requests that any recipient of it
 maintain this notice affixed to any distribution by the recipient that
-contains a copy or derivative of this software.</p>
-<p>END OF LICENSE</p>
-</div>
+contains a copy or derivative of this software.
+
+
+END OF LICENSE
+</pre></div>
 </div>
 </div>
 <div class="section" id="acknowledgments">
 <h2>Acknowledgments<a class="headerlink" href="#acknowledgments" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="developers">
+<h3>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h3>
 <p>libdiffpy is developed and maintained by</p>
 <div class="highlight-python"><div class="highlight"><pre>Authors:
 
@@ -194,76 +223,14 @@ https://github.com/diffpy/libdiffpy/graphs/contributors
 </pre></div>
 </div>
 </div>
+</div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id1">
-<h3>Installation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p id="index-0">libdiffpy library requires C++ compiler and the following software:</p>
-<ul class="simple">
-<li><cite>scons</cite> - software constructions tool (1.0 or later)</li>
-<li><cite>libboost-dev</cite> - Boost C++ libraries development files (1.43 or later)</li>
-<li><cite>GSL</cite> - GNU Scientific Library for C</li>
-</ul>
-<p>Recommended software:</p>
-<ul class="simple">
-<li><cite>libobjcryst</cite> - C++ library of free objects for crystallography,
-<a class="reference external" href="https://github.com/diffpy/libobjcryst">https://github.com/diffpy/libobjcryst</a></li>
-<li><cite>cxxtest</cite> - CxxTest Unit Testing Framework, <a class="reference external" href="http://cxxtest.com">http://cxxtest.com</a></li>
-</ul>
-<p>On Ubuntu Linux the required software can be installed using the
-system package manager:</p>
-<div class="highlight-python"><div class="highlight"><pre>sudo apt-get install \
-    build-essential scons libboost-dev libgsl0-dev
-</pre></div>
-</div>
-<p>For Mac OS X machine with the MacPorts package manager the installation
-command is:</p>
-<div class="highlight-python"><div class="highlight"><pre>sudo port install scons boost gsl
-</pre></div>
-</div>
-<p>For other packages see their project pages for installation instructions.</p>
-<div class="section" id="index-1">
-<span id="id2"></span><h4>Installation<a class="headerlink" href="#index-1" title="Permalink to this headline">¶</a></h4>
-<p>To build and install the libdiffpy library from sources, run:</p>
-<div class="highlight-python"><div class="highlight"><pre>sudo scons -j4 install
-</pre></div>
-</div>
-<p>This installs libdiffpy for all users under the <cite>/usr/local</cite> directory.
-If administrator (root) access is not available, see the usage info from
-<cite>scons &#8211;help</cite> for options to install to a user-writable location.</p>
-<p>To verify libdiffpy installation, compile and run the included
-test code [examples/testlib.cpp](examples/testlib.cpp):</p>
-<div class="highlight-python"><div class="highlight"><pre>cd examples
-c++ testlib.cpp -ldiffpy
-./a.out
-</pre></div>
-</div>
-<p>If compilation fails because of missing header files or missing libdiffpy
-library, adjust the <cite>CPATH</cite> and <cite>LIBRARY_PATH</cite> environment variables or
-use the <cite>-I</cite> or <cite>-L</cite> compiler options.  If the libdiffpy shared library
-cannot be found at runtime, adjust the <cite>LD_LIBRARY_PATH</cite> environment variable.</p>
-</div>
-<div class="section" id="development">
-<span id="index-2"></span><h4>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h4>
-<p>libdiffpy is an open-source software developed as a part of the
-DiffPy-CMI complex modeling initiative at the Brookhaven National
-Laboratory.  The libdiffpy sources are hosted at
-<a class="reference external" href="https://github.com/diffpy/libdiffpy">https://github.com/diffpy/libdiffpy</a>.</p>
-<p>Feel free to fork the project and contribute.  When developing it is
-preferable to compile with <cite>build=develop</cite> option, which compiles the
-library with debug information and C-assertions checks:</p>
-<div class="highlight-python"><div class="highlight"><pre>scons -j4 build=develop
-</pre></div>
-</div>
-<p>The build script checks for a presence of <cite>sconsvars.py</cite> file, which
-can be used to permanently set the <cite>build</cite> variable.  The SCons
-construction environment can be further customized in a <cite>sconscript.local</cite>
-script.  The library integrity can be verified by executing unit tests with
-<cite>scons -j4 test</cite> (requires the CxxTest framework).</p>
-</div>
+<p>See the <a class="reference external" href="https://github.com/diffpy/libdiffpy#requirements">README.rst</a>
+file included with the distribution.</p>
 </div>
 <div class="section" id="api-and-index">
-<h3>API and Index<a class="headerlink" href="#api-and-index" title="Permalink to this headline">¶</a></h3>
+<h2>API and Index<a class="headerlink" href="#api-and-index" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul class="simple">
 </ul>
@@ -272,7 +239,6 @@ script.  The library integrity can be verified by executing unit tests with
 <li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
 <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
 </ul>
-</div>
 </div>
 </div>
 
@@ -285,27 +251,13 @@ script.  The library integrity can be verified by executing unit tests with
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">libdiffpy&#8217;s documentation</a><ul>
-<li><a class="reference internal" href="#disclaimer">Disclaimer</a><ul>
-<li><a class="reference internal" href="#open-source-license-agreement">OPEN SOURCE LICENSE AGREEMENT</a></li>
-<li><a class="reference internal" href="#brookhaven-national-laboratory-notice">Brookhaven National Laboratory Notice</a><ul>
-<li><a class="reference internal" href="#acknowledgment-of-sponsorship">Acknowledgment of sponsorship</a></li>
-<li><a class="reference internal" href="#government-disclaimer-of-liability">Government disclaimer of liability</a></li>
-<li><a class="reference internal" href="#brookhaven-disclaimer-of-liability">Brookhaven disclaimer of liability</a></li>
-<li><a class="reference internal" href="#maintenance-of-notice">Maintenance of notice</a></li>
+<li><a class="reference internal" href="#disclaimer">Disclaimer</a></li>
+<li><a class="reference internal" href="#acknowledgments">Acknowledgments</a><ul>
+<li><a class="reference internal" href="#developers">Developers</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a class="reference internal" href="#acknowledgments">Acknowledgments</a></li>
-<li><a class="reference internal" href="#installation">Installation</a><ul>
-<li><a class="reference internal" href="#id1">Installation</a><ul>
-<li><a class="reference internal" href="#index-1">Installation</a></li>
-<li><a class="reference internal" href="#development">Development</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#api-and-index">API and Index</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -338,7 +290,7 @@ script.  The library integrity can be verified by executing unit tests with
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="#">libdiffpy 1.2a0 documentation</a> &raquo;</li> 
+        <li><a href="#">libdiffpy 1.2a0-2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

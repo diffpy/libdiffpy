@@ -38,7 +38,7 @@ obtained by iteration over atom pairs.
 Disclaimer
 ===================
 
-.. include:: ../../../LICENSE.txt
+.. literalinclude:: ../../../LICENSE.txt
 
 ================
 Acknowledgments
@@ -55,10 +55,12 @@ libdiffpy is developed and maintained by
 Installation
 ======================================
 
-.. include:: install.rst
+See the `README.rst <https://github.com/diffpy/libdiffpy#requirements>`_
+file included with the distribution.
 
+======================================
 API and Index
-==================
+======================================
 
 .. toctree::
    :maxdepth: 3
