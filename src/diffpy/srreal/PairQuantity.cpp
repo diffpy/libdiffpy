@@ -143,7 +143,7 @@ const double& PairQuantity::getRmax() const
 void PairQuantity::setEvaluatorType(PQEvaluatorType evtp)
 {
     if (mevaluator.get() && mevaluator->typeint() == evtp)  return;
-    mevaluator = createPQEvaluator(evtp);
+    mevaluator = createPQEvaluator(evtp, mevaluator);
     this->resetValue();
 }
 

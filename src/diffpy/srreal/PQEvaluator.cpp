@@ -212,7 +212,7 @@ void PQEvaluatorOptimized::updateValueCompletely(
 
 // Factory for PairQuantity evaluators ---------------------------------------
 
-PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp)
+PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp, PQEvaluatorPtr pqevsrc)
 {
     PQEvaluatorPtr rv;
     switch (pqtp)
@@ -229,6 +229,14 @@ PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp)
             ostringstream emsg;
             emsg << "Invalid PQEvaluatorType value " << pqtp;
             throw invalid_argument(emsg.str());
+    }
+    if (pqevsrc)
+    {
+        rv->musefullsum = pqevsrc->musefullsum;
+        rv->mcpuindex = pqevsrc->mcpuindex;
+        rv->mncpu = pqevsrc->mncpu;
+        rv->mvalue_ticker = pqevsrc->mvalue_ticker;
+        rv->mtypeused = pqevsrc->mtypeused;
     }
     return rv;
 }

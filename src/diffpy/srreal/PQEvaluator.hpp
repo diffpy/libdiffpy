@@ -48,6 +48,8 @@ class PQEvaluatorBasic
 {
     public:
 
+        friend
+            PQEvaluatorPtr createPQEvaluator(PQEvaluatorType, PQEvaluatorPtr);
         // constructor
         PQEvaluatorBasic();
         virtual ~PQEvaluatorBasic()  { }
@@ -114,7 +116,8 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
 
 // Factory function for PairQuantity evaluators ------------------------------
 
-PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp);
+PQEvaluatorPtr createPQEvaluator(
+        PQEvaluatorType pqtp, PQEvaluatorPtr pqevsrc=PQEvaluatorPtr());
 
 }   // namespace srreal
 }   // namespace diffpy
