@@ -26,6 +26,7 @@ fast_linkflags = ['-s']
 # Platform specific intricacies.
 if env['PLATFORM'] == 'darwin':
     env.AppendUnique(CXXFLAGS='-ftemplate-depth-256')
+    env.Append(SHLINKFLAGS=['-install_name', '$TARGET.abspath'])
     fast_linkflags[:] = []
 
 # configure version specific options.
