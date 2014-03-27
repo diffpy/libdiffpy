@@ -38,11 +38,11 @@
 
 #define DIFFPY_VERSION_STR "${DIFFPY_VERSION_STR}"
 
-// DIFFPY_VERSION_DATE is the subversion date of DIFFPY_VERSION
+// DIFFPY_VERSION_DATE is the commit date of DIFFPY_VERSION
 
 #define DIFFPY_VERSION_DATE "${DIFFPY_VERSION_DATE}"
 
-// DIFFPY_GIT_SHA is an abbreviated git commit hash for the current version
+// DIFFPY_GIT_SHA is a full git commit hash for the current version
 
 #define DIFFPY_GIT_SHA "${DIFFPY_GIT_SHA}"
 
