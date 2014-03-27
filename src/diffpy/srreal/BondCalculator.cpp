@@ -46,6 +46,14 @@ enum {
     CHUNK_SIZE,
 };
 
+bool pchunks_compare(QuantityType::const_iterator p0,
+        QuantityType::const_iterator p1)
+{
+    bool rv = lexicographical_compare(
+            p0, p0 + CHUNK_SIZE, p1, p1 + CHUNK_SIZE);
+    return rv;
+}
+
 }   // namespace
 
 // Constructor ---------------------------------------------------------------
@@ -184,21 +192,23 @@ void BondCalculator::executeParallelMerge(const std::string& pdata)
 
 void BondCalculator::finishValue()
 {
-    vector<QuantityType> chunks;
+    // sort by distance values
+    vector<QuantityType::const_iterator> pchunks;
+    pchunks.reserve(this->count());
     QuantityType::const_iterator v0 = mvalue.begin();
-    QuantityType w;
     for (; v0 < mvalue.end(); v0 += CHUNK_SIZE)
     {
-        w.assign(v0, v0 + CHUNK_SIZE);
-        chunks.push_back(w);
+        pchunks.push_back(v0);
     }
-    sort(chunks.begin(), chunks.end());
-    vector<QuantityType>::const_iterator wi = chunks.begin();
-    QuantityType::iterator v2 = mvalue.begin();
-    for (; wi != chunks.end(); ++wi, v2 += CHUNK_SIZE)
+    sort(pchunks.begin(), pchunks.end(), pchunks_compare);
+    QuantityType svalue(mvalue.size());
+    vector<QuantityType::const_iterator>::const_iterator p = pchunks.begin();
+    QuantityType::iterator v1 = svalue.begin();
+    for (; p != pchunks.end(); ++p, v1 += CHUNK_SIZE)
     {
-        copy(wi->begin(), wi->end(), v2);
+        copy(*p, (*p) + CHUNK_SIZE, v1);
     }
+    mvalue.swap(svalue);
 }
 
 // Private Methods -----------------------------------------------------------
