@@ -34,6 +34,9 @@ skip_configure = (GetOption('clean') or GetOption('help') or
         (['sdist'] == list(COMMAND_LINE_TARGETS)))
 if not skip_configure:
     SConscript('SConscript.configure')
+elif GetOption('clean'):
+    # make sure ObjCryst files will be also cleaned
+    env['has_objcryst'] = True
 
 # Compiler specific options
 if icpc:
