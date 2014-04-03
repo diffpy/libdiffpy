@@ -180,25 +180,30 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
     const AtomicStructureAdapter& astru1 = *pstru1;
     sd.pop0.reserve(astru0.countSites());
     sd.add1.reserve(astru1.countSites());
-    // try fast side-by-side comparison for equal length structures
-    if (astru0.countSites() == astru1.countSites())
+    // try fast side-by-side comparison
+    sd.diffmethod = StructureDifference::Method::SIDEBYSIDE;
+    const_iterator ai0 = astru0.matoms.begin();
+    const_iterator ai1 = astru1.matoms.begin();
+    int nboth = min(astru0.countSites(), astru1.countSites());
+    for (int i = 0; i < nboth; ++i, ++ai0, ++ai1)
     {
-        sd.diffmethod = StructureDifference::Method::SIDEBYSIDE;
-        const_iterator ai0 = astru0.matoms.begin();
-        const_iterator ai1 = astru1.matoms.begin();
-        for (int i = 0; ai0 != astru0.matoms.end(); ++i, ++ai0, ++ai1)
+        if (*ai0 != *ai1)
         {
-            if (*ai0 != *ai1)
-            {
-                sd.pop0.push_back(i);
-                sd.add1.push_back(i);
-            }
-            if (!sd.allowsfastupdate())  break;
+            sd.pop0.push_back(i);
+            sd.add1.push_back(i);
         }
-        if (sd.allowsfastupdate())  return sd;
     }
-    // here the structures are either of different length or differ too much
-    // when compared side by side.  Let's start from a blank slate.
+    for (int i = nboth; ai0 != astru0.matoms.end(); ++i, ++ai0)
+    {
+        sd.pop0.push_back(i);
+    }
+    for (int i = nboth; ai1 != astru1.matoms.end(); ++i, ++ai1)
+    {
+        sd.add1.push_back(i);
+    }
+    if (sd.allowsfastupdate())  return sd;
+    // here the structures differ too much when compared side by side.
+    // Let's compare assuming no relation in atom site order.
     sd.pop0.clear();
     sd.add1.clear();
     // let's build sorted vectors of atoms in stru0 and stru1
