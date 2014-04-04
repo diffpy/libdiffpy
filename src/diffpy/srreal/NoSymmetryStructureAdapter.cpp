@@ -25,6 +25,7 @@
 *****************************************************************************/
 
 #include <diffpy/serialization.ipp>
+#include <diffpy/srreal/StructureDifference.hpp>
 #include <diffpy/srreal/NoSymmetryStructureAdapter.hpp>
 
 namespace diffpy {
@@ -110,6 +111,23 @@ const R3::Matrix& NoSymmetryStructureAdapter::siteCartesianUij(int idx) const
 void NoSymmetryStructureAdapter::customPQConfig(PairQuantity* pq) const
 {
     msrcstructure->customPQConfig(pq);
+}
+
+
+StructureDifference
+NoSymmetryStructureAdapter::diff(StructureAdapterConstPtr other) const
+{
+    StructureDifference alldiffer;
+    typedef boost::shared_ptr<const class NoSymmetryStructureAdapter> PPtr;
+    PPtr pother = boost::dynamic_pointer_cast<PPtr::element_type>(other);
+    if (!pother)  return alldiffer;
+    StructureDifference sd =
+        this->getSourceStructure()->diff(pother->getSourceStructure());
+    assert(sd.stru0 == this->getSourceStructure());
+    assert(sd.stru1 == pother->getSourceStructure());
+    sd.stru0 = this->shared_from_this();
+    sd.stru1 = other;
+    return sd;
 }
 
 

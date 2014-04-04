@@ -52,6 +52,7 @@ class NoSymmetryStructureAdapter : public StructureAdapter
         virtual bool siteAnisotropy(int idx) const;
         virtual const R3::Matrix& siteCartesianUij(int idx) const;
         virtual void customPQConfig(PairQuantity* pq) const;
+        virtual StructureDifference diff(StructureAdapterConstPtr) const;
 
         // methods - own
         StructureAdapterPtr getSourceStructure();
