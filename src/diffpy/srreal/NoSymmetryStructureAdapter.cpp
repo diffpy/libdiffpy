@@ -76,6 +76,12 @@ double NoSymmetryStructureAdapter::numberDensity() const
 }
 
 
+const std::string& NoSymmetryStructureAdapter::siteAtomType(int idx) const
+{
+    return msrcstructure->siteAtomType(idx);
+}
+
+
 const R3::Vector& NoSymmetryStructureAdapter::siteCartesianPosition(
         int idx) const
 {
@@ -98,12 +104,6 @@ bool NoSymmetryStructureAdapter::siteAnisotropy(int idx) const
 const R3::Matrix& NoSymmetryStructureAdapter::siteCartesianUij(int idx) const
 {
     return msrcstructure->siteCartesianUij(idx);
-}
-
-
-const std::string& NoSymmetryStructureAdapter::siteAtomType(int idx) const
-{
-    return msrcstructure->siteAtomType(idx);
 }
 
 
