@@ -46,7 +46,7 @@ namespace srreal {
 //////////////////////////////////////////////////////////////////////////////
 
 PQEvaluatorBasic::PQEvaluatorBasic() :
-    musefullsum(false),
+    mconfigflags(0),
     mcpuindex(0), mncpu(1), mtypeused(NONE)
 { }
 
@@ -76,18 +76,19 @@ void PQEvaluatorBasic::updateValue(
     // split outer loop for many atoms.  The CPUs should have similar load.
     bool chop_outer = (mncpu <= ((cntsites - 1) * CPU_LOAD_VARIANCE + 1));
     bool chop_inner = !chop_outer;
+    bool usefullsum = this->getFlag(USEFULLSUM);
     for (int i0 = 0; i0 < cntsites; ++i0)
     {
         if (chop_outer && (n++ % mncpu))    continue;
         bnds->selectAnchorSite(i0);
-        int i1hi = musefullsum ? cntsites : (i0 + 1);
+        int i1hi = usefullsum ? cntsites : (i0 + 1);
         bnds->selectSiteRange(0, i1hi);
         for (bnds->rewind(); !bnds->finished(); bnds->next())
         {
             if (chop_inner && (n++ % mncpu))    continue;
             int i1 = bnds->site1();
             if (!pq.getPairMask(i0, i1))   continue;
-            int summationscale = (musefullsum || i0 == i1) ? 1 : 2;
+            int summationscale = (usefullsum || i0 == i1) ? 1 : 2;
             pq.addPairContribution(*bnds, summationscale);
         }
     }
@@ -95,9 +96,16 @@ void PQEvaluatorBasic::updateValue(
 }
 
 
-void PQEvaluatorBasic::useFullSum(bool flag)
+void PQEvaluatorBasic::setFlag(PQEvaluatorFlag flag, bool value)
 {
-    musefullsum = flag;
+    if (value)  mconfigflags |= int(flag);
+    else  mconfigflags &= ~int(flag);
+}
+
+
+bool PQEvaluatorBasic::getFlag(PQEvaluatorFlag flag) const
+{
+    return mconfigflags & int(flag);
 }
 
 
@@ -232,7 +240,7 @@ PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp, PQEvaluatorPtr pqevsrc)
     }
     if (pqevsrc)
     {
-        rv->musefullsum = pqevsrc->musefullsum;
+        rv->mconfigflags = pqevsrc->mconfigflags;
         rv->mcpuindex = pqevsrc->mcpuindex;
         rv->mncpu = pqevsrc->mncpu;
         rv->mvalue_ticker = pqevsrc->mvalue_ticker;

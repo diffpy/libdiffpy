@@ -61,7 +61,7 @@ bool pchunks_compare(QuantityType::const_iterator p0,
 BondCalculator::BondCalculator()
 {
     this->setRmax(DEFAULT_BONDCALCULATOR_RMAX);
-    mevaluator->useFullSum(true);
+    mevaluator->setFlag(USEFULLSUM, true);
 }
 
 // Public Methods ------------------------------------------------------------

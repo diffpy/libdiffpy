@@ -44,6 +44,10 @@ typedef boost::shared_ptr<class PQEvaluatorBasic> PQEvaluatorPtr;
 
 enum PQEvaluatorType {NONE, BASIC, OPTIMIZED};
 
+enum PQEvaluatorFlag {
+    USEFULLSUM = 1
+};
+
 class PQEvaluatorBasic
 {
     public:
@@ -58,14 +62,16 @@ class PQEvaluatorBasic
         virtual PQEvaluatorType typeint() const;
         PQEvaluatorType typeintused() const;
         virtual void updateValue(PairQuantity&, StructureAdapterPtr);
-        void useFullSum(bool flag);
+        void setFlag(PQEvaluatorFlag flag, bool value);
+        bool getFlag(PQEvaluatorFlag flag) const;
         void setupParallelRun(int cpuindex, int ncpu);
 
     protected:
 
+
         // data
-        /// flag for performing full double summation in updateValue
-        bool musefullsum;
+        /// per-bit storage of boolean configuration flags
+        int mconfigflags;
         /// zero-based index of this CPU
         int mcpuindex;
         /// total number of the CPU units
@@ -82,7 +88,7 @@ class PQEvaluatorBasic
         template<class Archive>
             void serialize(Archive& ar, const unsigned int version)
         {
-            ar & musefullsum & mcpuindex & mncpu & mvalue_ticker;
+            ar & mconfigflags & mcpuindex & mncpu & mvalue_ticker;
         }
 };
 

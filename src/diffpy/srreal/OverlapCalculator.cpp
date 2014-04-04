@@ -62,7 +62,7 @@ vector<T> vectorconvert(const QuantityType& v)
 
 OverlapCalculator::OverlapCalculator()
 {
-    mevaluator->useFullSum(true);
+    mevaluator->setFlag(USEFULLSUM, true);
     // default configuration
     AtomRadiiTablePtr table(new ConstantRadiiTable);
     this->setAtomRadiiTable(table);
