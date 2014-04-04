@@ -61,7 +61,7 @@ class StructureAdapter :
 
         /// total number of atoms in the structure unit accounting
         /// for possibly fractional occupancies.
-        virtual double totalOccupancy() const;
+        double totalOccupancy() const;
 
         /// number density in the structure model or 0 when not defined.
         virtual double numberDensity() const;
