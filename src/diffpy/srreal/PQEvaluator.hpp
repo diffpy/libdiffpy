@@ -45,7 +45,10 @@ typedef boost::shared_ptr<class PQEvaluatorBasic> PQEvaluatorPtr;
 enum PQEvaluatorType {NONE, BASIC, OPTIMIZED};
 
 enum PQEvaluatorFlag {
-    USEFULLSUM = 1
+    // sum over full matrix of atom pairs, use pair symmetry otherwise.
+    USEFULLSUM = 1,
+    // allow fast updates only if unchanged atoms keep their indices.
+    FIXEDSITEINDEX = 2,
 };
 
 class PQEvaluatorBasic
