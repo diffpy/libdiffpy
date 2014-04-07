@@ -258,14 +258,13 @@ void BondCalculator::finishValue()
 
 void BondCalculator::stashPartialValue()
 {
-    mstashedvalue = this->value();
+    mstashedvalue.swap(mvalue);
 }
 
 
 void BondCalculator::restorePartialValue()
 {
-    assert(!mstashedvalue.empty());
-    mvalue = mstashedvalue;
+    mvalue.swap(mstashedvalue);
     mstashedvalue.clear();
 }
 
