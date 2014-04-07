@@ -61,13 +61,10 @@ typedef vector<QuantityType::const_iterator> ChunkPtrVector;
 ChunkPtrVector chunks_split(const QuantityType& pv)
 {
     assert(0 == pv.size() % CHUNK_SIZE);
-    ChunkPtrVector rv;
-    rv.reserve(pv.size() / CHUNK_SIZE);
+    ChunkPtrVector rv(pv.size() / CHUNK_SIZE);
     QuantityType::const_iterator src = pv.begin();
-    for (; src != pv.end(); src += CHUNK_SIZE)
-    {
-        rv.push_back(src);
-    }
+    ChunkPtrVector::iterator dst = rv.begin();
+    for (; src != pv.end(); src += CHUNK_SIZE, ++dst)  *dst = src;
     return rv;
 }
 
