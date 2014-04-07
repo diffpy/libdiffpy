@@ -35,7 +35,6 @@ namespace srreal {
 namespace {
 
 const double DEFAULT_BONDCALCULATOR_RMAX = 5.0;
-const double DISTANCE_REMOVE = -1.0;
 
 enum {
     DISTANCE_OFFSET,
@@ -207,16 +206,15 @@ void BondCalculator::addPairContribution(
     const R3::Vector& r01 = bnds.r01();
     ru01 = r01 / bnds.distance();
     if (!(this->checkConeFilters(ru01)))  return;
+    double entry[CHUNK_SIZE];
+    entry[DISTANCE_OFFSET] = bnds.distance();
+    entry[SITE0_OFFSET] = bnds.site0();
+    entry[SITE1_OFFSET] = bnds.site1();
+    entry[DIRECTION0_OFFSET] = r01[0];
+    entry[DIRECTION1_OFFSET] = r01[1];
+    entry[DIRECTION2_OFFSET] = r01[2];
     QuantityType& pv = (summationscale > 0) ? mpairsadd : mpairspop;
-    int baseidx = pv.size();
-    pv.insert(pv.end(), CHUNK_SIZE, 0.0);
-    pv[baseidx + DISTANCE_OFFSET] =
-        (summationscale == 1) ?  bnds.distance() : DISTANCE_REMOVE;
-    pv[baseidx + SITE0_OFFSET] = bnds.site0();
-    pv[baseidx + SITE1_OFFSET] = bnds.site1();
-    pv[baseidx + DIRECTION0_OFFSET] = r01[0];
-    pv[baseidx + DIRECTION1_OFFSET] = r01[1];
-    pv[baseidx + DIRECTION2_OFFSET] = r01[2];
+    pv.insert(pv.end(), entry, entry + CHUNK_SIZE);
 }
 
 
