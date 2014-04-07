@@ -19,7 +19,6 @@
 #include <cassert>
 #include <cmath>
 #include <sstream>
-#include <boost/unordered_set.hpp>
 
 #include <diffpy/srreal/BondCalculator.hpp>
 #include <diffpy/validators.hpp>
@@ -54,6 +53,33 @@ bool pchunks_compare(QuantityType::const_iterator p0,
     bool rv = lexicographical_compare(
             p0, p0 + CHUNK_SIZE, p1, p1 + CHUNK_SIZE);
     return rv;
+}
+
+typedef vector<QuantityType::const_iterator> ChunkPtrVector;
+
+
+ChunkPtrVector chunks_split(const QuantityType& pv)
+{
+    assert(0 == pv.size() % CHUNK_SIZE);
+    ChunkPtrVector rv;
+    rv.reserve(pv.size() / CHUNK_SIZE);
+    QuantityType::const_iterator src = pv.begin();
+    for (; src != pv.end(); src += CHUNK_SIZE)
+    {
+        rv.push_back(src);
+    }
+    return rv;
+}
+
+
+void
+chunks_merge(const ChunkPtrVector& chunks, QuantityType::iterator dst)
+{
+    ChunkPtrVector::const_iterator xc = chunks.begin();
+    for (; xc != chunks.end(); ++xc, dst += CHUNK_SIZE)
+    {
+        copy(*xc, (*xc) + CHUNK_SIZE, dst);
+    }
 }
 
 }   // namespace
@@ -154,11 +180,23 @@ void BondCalculator::filterOff()
     mfilter_degrees.clear();
 }
 
+// PairQuantity overloads
+
+string BondCalculator::getParallelData() const
+{
+    ostringstream storage(ios::binary);
+    diffpy::serialization::oarchive oa(storage, ios::binary);
+    oa << mpairspop << mpairsadd;
+    return storage.str();
+}
+
 // Protected Methods ---------------------------------------------------------
 
 void BondCalculator::resetValue()
 {
     mvalue.clear();
+    mpairspop.clear();
+    mpairsadd.clear();
     this->PairQuantity::resetValue();
 }
 
@@ -172,15 +210,16 @@ void BondCalculator::addPairContribution(
     const R3::Vector& r01 = bnds.r01();
     ru01 = r01 / bnds.distance();
     if (!(this->checkConeFilters(ru01)))  return;
-    int baseidx = mvalue.size();
-    mvalue.insert(mvalue.end(), CHUNK_SIZE, 0.0);
-    mvalue[baseidx + DISTANCE_OFFSET] =
+    QuantityType& pv = (summationscale > 0) ? mpairsadd : mpairspop;
+    int baseidx = pv.size();
+    pv.insert(pv.end(), CHUNK_SIZE, 0.0);
+    pv[baseidx + DISTANCE_OFFSET] =
         (summationscale == 1) ?  bnds.distance() : DISTANCE_REMOVE;
-    mvalue[baseidx + SITE0_OFFSET] = bnds.site0();
-    mvalue[baseidx + SITE1_OFFSET] = bnds.site1();
-    mvalue[baseidx + DIRECTION0_OFFSET] = r01[0];
-    mvalue[baseidx + DIRECTION1_OFFSET] = r01[1];
-    mvalue[baseidx + DIRECTION2_OFFSET] = r01[2];
+    pv[baseidx + SITE0_OFFSET] = bnds.site0();
+    pv[baseidx + SITE1_OFFSET] = bnds.site1();
+    pv[baseidx + DIRECTION0_OFFSET] = r01[0];
+    pv[baseidx + DIRECTION1_OFFSET] = r01[1];
+    pv[baseidx + DIRECTION2_OFFSET] = r01[2];
 }
 
 
@@ -188,51 +227,32 @@ void BondCalculator::executeParallelMerge(const std::string& pdata)
 {
     istringstream storage(pdata, ios::binary);
     diffpy::serialization::iarchive ia(storage, ios::binary);
-    QuantityType pvalue;
-    ia >> pvalue;
-    mvalue.insert(mvalue.end(), pvalue.begin(), pvalue.end());
+    QuantityType parpop, paradd;
+    ia >> parpop >> paradd;
+    mpairspop.insert(mpairspop.end(), parpop.begin(), parpop.end());
+    mpairsadd.insert(mpairsadd.end(), paradd.begin(), paradd.end());
 }
 
 
 void BondCalculator::finishValue()
 {
     // filter-out entries marked for removal
-    typedef std::pair<int,int> SitePair;
-    boost::unordered_set<SitePair> isremoved;
-    QuantityType svalue(mvalue);
-    QuantityType::const_reverse_iterator src = svalue.rbegin();
-    QuantityType::reverse_iterator dst = svalue.rbegin();
-    for (; src != svalue.rend(); src += CHUNK_SIZE)
-    {
-        const double& d = *(src + CHUNK_SIZE - DISTANCE_OFFSET - 1);
-        int i0 = int(*(src + CHUNK_SIZE - SITE0_OFFSET - 1));
-        int i1 = int(*(src + CHUNK_SIZE - SITE1_OFFSET - 1));
-        SitePair sp(i0, i1);
-        if (d == DISTANCE_REMOVE)
-        {
-            isremoved.insert(sp);
-            continue;
-        }
-        if (isremoved.count(sp))  continue;
-        copy(src, src + CHUNK_SIZE, dst);
-        dst += CHUNK_SIZE;
-    }
-    // sort by distance values
-    vector<QuantityType::const_iterator> pchunks;
-    pchunks.reserve(this->count());
-    QuantityType::const_iterator v0 = dst.base();
-    for (; v0 != svalue.end(); v0 += CHUNK_SIZE)
-    {
-        pchunks.push_back(v0);
-    }
-    sort(pchunks.begin(), pchunks.end(), pchunks_compare);
-    vector<QuantityType::const_iterator>::const_iterator p = pchunks.begin();
-    QuantityType::iterator v1 = mvalue.begin();
-    for (; p != pchunks.end(); ++p, v1 += CHUNK_SIZE)
-    {
-        copy(*p, (*p) + CHUNK_SIZE, v1);
-    }
-    mvalue.erase(v1, mvalue.end());
+    assert(mpairspop.size() <= mvalue.size());
+    ChunkPtrVector pval = chunks_split(mvalue);
+    ChunkPtrVector ppop = chunks_split(mpairspop);
+    sort(ppop.begin(), ppop.end(), pchunks_compare);
+    ChunkPtrVector padd = chunks_split(mpairsadd);
+    sort(padd.begin(), padd.end(), pchunks_compare);
+    ChunkPtrVector::iterator last;
+    last = set_difference(pval.begin(), pval.end(),
+            ppop.begin(), ppop.end(), pval.begin(), pchunks_compare);
+    pval.erase(last, pval.end());
+    ChunkPtrVector ptot(pval.size() + padd.size());
+    merge(pval.begin(), pval.end(), padd.begin(), padd.end(), ptot.begin());
+    mvalue.resize(ptot.size() * CHUNK_SIZE);
+    chunks_merge(ptot, mvalue.begin());
+    mpairspop.clear();
+    mpairsadd.clear();
 }
 
 

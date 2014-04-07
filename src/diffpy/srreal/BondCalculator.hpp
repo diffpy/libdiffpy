@@ -42,6 +42,9 @@ class BondCalculator : public PairQuantity
         void filterCone(R3::Vector coneaxis, double degrees);
         void filterOff();
 
+        // PairQuantity overloads
+        virtual std::string getParallelData() const;
+
     protected:
 
         // PairQuantity overloads
@@ -75,6 +78,8 @@ class BondCalculator : public PairQuantity
         std::vector<R3::Vector> mfilter_directions;
         std::vector<double> mfilter_degrees;
         QuantityType mstashedvalue;
+        QuantityType mpairspop;
+        QuantityType mpairsadd;
 
 };
 
