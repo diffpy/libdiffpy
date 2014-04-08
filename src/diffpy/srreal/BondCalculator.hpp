@@ -50,6 +50,10 @@ class BondCalculator : public PairQuantity
         virtual void executeParallelMerge(const std::string& pdata);
         virtual void finishValue();
 
+        // support for PQEvaluatorOptimized
+        virtual void stashPartialValue();
+        virtual void restorePartialValue();
+
     private:
 
         // serialization
@@ -70,6 +74,7 @@ class BondCalculator : public PairQuantity
         // data
         std::vector<R3::Vector> mfilter_directions;
         std::vector<double> mfilter_degrees;
+        QuantityType mstashedvalue;
 
 };
 

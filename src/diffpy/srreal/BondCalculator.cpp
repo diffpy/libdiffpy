@@ -19,6 +19,7 @@
 #include <cassert>
 #include <cmath>
 #include <sstream>
+#include <boost/unordered_set.hpp>
 
 #include <diffpy/srreal/BondCalculator.hpp>
 #include <diffpy/validators.hpp>
@@ -35,6 +36,7 @@ namespace srreal {
 namespace {
 
 const double DEFAULT_BONDCALCULATOR_RMAX = 5.0;
+const double DISTANCE_REMOVE = -1.0;
 
 enum {
     DISTANCE_OFFSET,
@@ -62,6 +64,7 @@ BondCalculator::BondCalculator()
 {
     this->setRmax(DEFAULT_BONDCALCULATOR_RMAX);
     mevaluator->setFlag(USEFULLSUM, true);
+    mevaluator->setFlag(FIXEDSITEINDEX, true);
 }
 
 // Public Methods ------------------------------------------------------------
@@ -164,14 +167,15 @@ void BondCalculator::addPairContribution(
         const BaseBondGenerator& bnds,
         int summationscale)
 {
-    assert(summationscale == 1);
+    assert(summationscale == +1 || summationscale == -1);
     static R3::Vector ru01;
     const R3::Vector& r01 = bnds.r01();
     ru01 = r01 / bnds.distance();
     if (!(this->checkConeFilters(ru01)))  return;
     int baseidx = mvalue.size();
     mvalue.insert(mvalue.end(), CHUNK_SIZE, 0.0);
-    mvalue[baseidx + DISTANCE_OFFSET] = bnds.distance();
+    mvalue[baseidx + DISTANCE_OFFSET] =
+        (summationscale == 1) ?  bnds.distance() : DISTANCE_REMOVE;
     mvalue[baseidx + SITE0_OFFSET] = bnds.site0();
     mvalue[baseidx + SITE1_OFFSET] = bnds.site1();
     mvalue[baseidx + DIRECTION0_OFFSET] = r01[0];
@@ -192,23 +196,57 @@ void BondCalculator::executeParallelMerge(const std::string& pdata)
 
 void BondCalculator::finishValue()
 {
+    // filter-out entries marked for removal
+    typedef std::pair<int,int> SitePair;
+    boost::unordered_set<SitePair> isremoved;
+    QuantityType svalue(mvalue);
+    QuantityType::const_reverse_iterator src = svalue.rbegin();
+    QuantityType::reverse_iterator dst = svalue.rbegin();
+    for (; src != svalue.rend(); src += CHUNK_SIZE)
+    {
+        const double& d = *(src + CHUNK_SIZE - DISTANCE_OFFSET - 1);
+        int i0 = int(*(src + CHUNK_SIZE - SITE0_OFFSET - 1));
+        int i1 = int(*(src + CHUNK_SIZE - SITE1_OFFSET - 1));
+        SitePair sp(i0, i1);
+        if (d == DISTANCE_REMOVE)
+        {
+            isremoved.insert(sp);
+            continue;
+        }
+        if (isremoved.count(sp))  continue;
+        copy(src, src + CHUNK_SIZE, dst);
+        dst += CHUNK_SIZE;
+    }
     // sort by distance values
     vector<QuantityType::const_iterator> pchunks;
     pchunks.reserve(this->count());
-    QuantityType::const_iterator v0 = mvalue.begin();
-    for (; v0 < mvalue.end(); v0 += CHUNK_SIZE)
+    QuantityType::const_iterator v0 = dst.base();
+    for (; v0 != svalue.end(); v0 += CHUNK_SIZE)
     {
         pchunks.push_back(v0);
     }
     sort(pchunks.begin(), pchunks.end(), pchunks_compare);
-    QuantityType svalue(mvalue.size());
     vector<QuantityType::const_iterator>::const_iterator p = pchunks.begin();
-    QuantityType::iterator v1 = svalue.begin();
+    QuantityType::iterator v1 = mvalue.begin();
     for (; p != pchunks.end(); ++p, v1 += CHUNK_SIZE)
     {
         copy(*p, (*p) + CHUNK_SIZE, v1);
     }
-    mvalue.swap(svalue);
+    mvalue.erase(v1, mvalue.end());
+}
+
+
+void BondCalculator::stashPartialValue()
+{
+    mstashedvalue = this->value();
+}
+
+
+void BondCalculator::restorePartialValue()
+{
+    assert(!mstashedvalue.empty());
+    mvalue = mstashedvalue;
+    mstashedvalue.clear();
 }
 
 // Private Methods -----------------------------------------------------------
