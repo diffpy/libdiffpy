@@ -244,8 +244,9 @@ void BondCalculator::finishValue()
     pval.erase(last, pval.end());
     ChunkPtrVector ptot(pval.size() + padd.size());
     merge(pval.begin(), pval.end(), padd.begin(), padd.end(), ptot.begin());
-    mvalue.resize(ptot.size() * CHUNK_SIZE);
-    chunks_merge(ptot, mvalue.begin());
+    QuantityType value1(ptot.size() * CHUNK_SIZE);
+    chunks_merge(ptot, value1.begin());
+    mvalue.swap(value1);
 }
 
 
