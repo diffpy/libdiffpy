@@ -246,8 +246,6 @@ void BondCalculator::finishValue()
     merge(pval.begin(), pval.end(), padd.begin(), padd.end(), ptot.begin());
     mvalue.resize(ptot.size() * CHUNK_SIZE);
     chunks_merge(ptot, mvalue.begin());
-    mpairspop.clear();
-    mpairsadd.clear();
 }
 
 
