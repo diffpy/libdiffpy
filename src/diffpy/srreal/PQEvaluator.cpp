@@ -99,6 +99,7 @@ void PQEvaluatorBasic::updateValue(
     // split outer loop for many atoms.  The CPUs should have similar load.
     bool chop_outer = (mncpu <= ((cntsites - 1) * CPU_LOAD_VARIANCE + 1));
     bool chop_inner = !chop_outer;
+    if (!this->isParallel())  chop_outer = chop_inner = false;
     bool usefullsum = this->getFlag(USEFULLSUM);
     for (int i0 = 0; i0 < cntsites; ++i0)
     {
@@ -142,6 +143,12 @@ void PQEvaluatorBasic::setupParallelRun(int cpuindex, int ncpu)
     }
     mcpuindex = cpuindex;
     mncpu = ncpu;
+}
+
+
+bool PQEvaluatorBasic::isParallel() const
+{
+    return mncpu > 1;
 }
 
 //////////////////////////////////////////////////////////////////////////////

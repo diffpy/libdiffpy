@@ -68,6 +68,7 @@ class PQEvaluatorBasic
         void setFlag(PQEvaluatorFlag flag, bool value);
         bool getFlag(PQEvaluatorFlag flag) const;
         void setupParallelRun(int cpuindex, int ncpu);
+        bool isParallel() const;
 
     protected:
 
