@@ -69,14 +69,30 @@ ChunkPtrVector chunks_split(const QuantityType& pv)
 
 
 void
-chunks_merge(const ChunkPtrVector& chunks, QuantityType::iterator dst)
+chunks_merge(const ChunkPtrVector& chunks, QuantityType& datadest)
 {
     ChunkPtrVector::const_iterator xc = chunks.begin();
+    QuantityType tdest(CHUNK_SIZE * chunks.size());
+    QuantityType::iterator dst = tdest.begin();
     for (; xc != chunks.end(); ++xc, dst += CHUNK_SIZE)
     {
         copy(*xc, (*xc) + CHUNK_SIZE, dst);
     }
+    datadest.swap(tdest);
 }
+
+
+void
+chunks_merge(const QuantityType& data0, const QuantityType& data1,
+        QuantityType& datadest)
+{
+    ChunkPtrVector p0 = chunks_split(data0);
+    ChunkPtrVector p1 = chunks_split(data1);
+    ChunkPtrVector ptot(p0.size() + p1.size());
+    merge(p0.begin(), p0.end(), p1.begin(), p1.end(), ptot.begin());
+    chunks_merge(ptot, datadest);
+}
+
 
 }   // namespace
 
@@ -224,8 +240,8 @@ void BondCalculator::executeParallelMerge(const std::string& pdata)
     diffpy::serialization::iarchive ia(storage, ios::binary);
     QuantityType parpop, paradd;
     ia >> parpop >> paradd;
-    mpairspop.insert(mpairspop.end(), parpop.begin(), parpop.end());
-    mpairsadd.insert(mpairsadd.end(), paradd.begin(), paradd.end());
+    chunks_merge(mpairspop, parpop, mpairspop);
+    chunks_merge(mpairsadd, paradd, mpairsadd);
 }
 
 
@@ -233,20 +249,26 @@ void BondCalculator::finishValue()
 {
     // filter-out entries marked for removal
     assert(mpairspop.size() <= mvalue.size());
-    ChunkPtrVector pval = chunks_split(mvalue);
     ChunkPtrVector ppop = chunks_split(mpairspop);
     sort(ppop.begin(), ppop.end(), pchunks_compare);
     ChunkPtrVector padd = chunks_split(mpairsadd);
     sort(padd.begin(), padd.end(), pchunks_compare);
+    if (mevaluator->isParallel())
+    {
+        chunks_merge(ppop, mpairspop);
+        chunks_merge(padd, mpairsadd);
+        return;
+    }
+    ChunkPtrVector pval = chunks_split(mvalue);
     ChunkPtrVector::iterator last;
     last = set_difference(pval.begin(), pval.end(),
             ppop.begin(), ppop.end(), pval.begin(), pchunks_compare);
     pval.erase(last, pval.end());
     ChunkPtrVector ptot(pval.size() + padd.size());
     merge(pval.begin(), pval.end(), padd.begin(), padd.end(), ptot.begin());
-    QuantityType value1(ptot.size() * CHUNK_SIZE);
-    chunks_merge(ptot, value1.begin());
-    mvalue.swap(value1);
+    chunks_merge(ptot, mvalue);
+    mpairspop.clear();
+    mpairsadd.clear();
 }
 
 
