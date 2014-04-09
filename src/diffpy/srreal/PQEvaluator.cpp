@@ -99,6 +99,7 @@ void PQEvaluatorBasic::updateValue(
     // split outer loop for many atoms.  The CPUs should have similar load.
     bool chop_outer = (mncpu <= ((cntsites - 1) * CPU_LOAD_VARIANCE + 1));
     bool chop_inner = !chop_outer;
+    bool hasmask = pq.hasMask();
     if (!this->isParallel())  chop_outer = chop_inner = false;
     bool usefullsum = this->getFlag(USEFULLSUM);
     for (int i0 = 0; i0 < cntsites; ++i0)
@@ -111,7 +112,7 @@ void PQEvaluatorBasic::updateValue(
         {
             if (chop_inner && (n++ % mncpu))    continue;
             int i1 = bnds->site1();
-            if (!pq.getPairMask(i0, i1))   continue;
+            if (hasmask && !pq.getPairMask(i0, i1))   continue;
             int summationscale = (usefullsum || i0 == i1) ? 1 : 2;
             pq.addPairContribution(*bnds, summationscale);
         }
