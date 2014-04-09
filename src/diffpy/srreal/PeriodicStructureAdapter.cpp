@@ -221,7 +221,6 @@ void PeriodicStructureBondGenerator::getNextBond()
     {
         msite_current = msite_first;
     }
-    this->advanceIfSkippedSite();
     // update values only if not finished
     if (!this->finished())  this->updater1();
 }

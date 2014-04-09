@@ -46,7 +46,10 @@ class BaseBondGenerator
         // configuration
         virtual void selectAnchorSite(int);
         void selectSiteRange(int first, int last);
-        void selectSite(int, bool);
+        void selectSites(const SiteIndices&);
+        void selectSites(
+                SiteIndices::const_iterator first,
+                SiteIndices::const_iterator last);
         virtual void setRmin(double);
         virtual void setRmax(double);
 
@@ -68,9 +71,9 @@ class BaseBondGenerator
 
         // data
         int msite_anchor;
-        int msite_first;
-        int msite_last;
-        int msite_current;
+        SiteIndices::const_iterator msite_first;
+        SiteIndices::const_iterator msite_last;
+        SiteIndices::const_iterator msite_current;
         double mrmin;
         double mrmax;
         StructureAdapterConstPtr mstructure;
@@ -78,14 +81,14 @@ class BaseBondGenerator
         R3::Vector mr1;
         R3::Vector mr01;
         double mdistance;
-        std::vector<bool> msite_selected;
+        SiteIndices msite_all;
+        SiteIndices msite_selection;
 
         // methods
         virtual bool iterateSymmetry();
         virtual void rewindSymmetry();
         virtual void getNextBond();
         void updateDistance();
-        void advanceIfSkippedSite();
 
     private:
 

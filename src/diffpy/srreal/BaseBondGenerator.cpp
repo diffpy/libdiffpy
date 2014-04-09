@@ -17,7 +17,6 @@
 *
 *****************************************************************************/
 
-#include <algorithm>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/mathutils.hpp>
@@ -34,18 +33,15 @@ namespace srreal {
 BaseBondGenerator::BaseBondGenerator(StructureAdapterConstPtr stru)
 {
     msite_anchor = 0;
-    msite_first = 0;
-    msite_last = 0;
-    msite_current = 0;
+    int cnt = stru->countSites();
+    msite_all.resize(cnt);
+    for (int i = 0; i != cnt; ++i)  msite_all[i] = i;
+    msite_first = msite_all.begin();
+    msite_last = msite_all.end();
+    msite_current = msite_first;
     mstructure = stru;
     this->setRmin(0.0);
     this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
-    msite_selected.resize(mstructure->countSites(), true);
-    if (mstructure->countSites())
-    {
-        this->selectAnchorSite(0);
-        this->selectSiteRange(0, mstructure->countSites());
-    }
 }
 
 // Public Methods ------------------------------------------------------------
@@ -55,7 +51,6 @@ BaseBondGenerator::BaseBondGenerator(StructureAdapterConstPtr stru)
 void BaseBondGenerator::rewind()
 {
     msite_current = msite_first;
-    this->advanceIfSkippedSite();
     // avoid calling rewindSymmetry at an invalid site
     if (this->finished())   return;
     this->rewindSymmetry();
@@ -88,20 +83,32 @@ void BaseBondGenerator::selectAnchorSite(int anchor)
 
 void BaseBondGenerator::selectSiteRange(int first, int last)
 {
-    assert(0 <= first && first < mstructure->countSites());
+    assert(0 <= first);
     assert(last <= mstructure->countSites());
-    msite_first = first;
-    msite_last = last;
-    std::fill(msite_selected.begin() + first,
-            msite_selected.begin() + last, true);
+    msite_first = msite_all.begin() + first;
+    msite_last = msite_all.begin() + last;
     this->setFinishedFlag();
 }
 
 
-void BaseBondGenerator::selectSite(int siteindex, bool select)
+void BaseBondGenerator::selectSites(const SiteIndices& selection)
 {
-    msite_selected[siteindex] = select;
+    msite_selection = selection;
+    msite_first = msite_selection.begin();
+    msite_last = msite_selection.end();
+    this->setFinishedFlag();
 }
+
+
+void BaseBondGenerator::selectSites(
+        SiteIndices::const_iterator first,
+        SiteIndices::const_iterator last)
+{
+    msite_first = first;
+    msite_last = last;
+    this->setFinishedFlag();
+}
+
 
 void BaseBondGenerator::setRmin(double rmin)
 {
@@ -138,7 +145,7 @@ int BaseBondGenerator::site0() const
 
 int BaseBondGenerator::site1() const
 {
-    return msite_current;
+    return *msite_current;
 }
 
 
@@ -214,8 +221,7 @@ void BaseBondGenerator::rewindSymmetry()
 void BaseBondGenerator::getNextBond()
 {
     if (this->iterateSymmetry())  return;
-    msite_current += 1;
-    this->advanceIfSkippedSite();
+    ++msite_current;
     // avoid calling rewindSymmetry at an invalid site
     if (!(this->finished()))  this->rewindSymmetry();
 }
@@ -230,15 +236,6 @@ void BaseBondGenerator::updateDistance()
 }
 
 // Private Methods -----------------------------------------------------------
-
-void BaseBondGenerator::advanceIfSkippedSite()
-{
-    while (!this->finished() && !msite_selected[msite_current])
-    {
-        ++msite_current;
-    }
-}
-
 
 void BaseBondGenerator::advanceWhileInvalid()
 {
