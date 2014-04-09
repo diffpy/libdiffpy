@@ -20,7 +20,6 @@
 #ifndef BASEBONDGENERATOR_HPP_INCLUDED
 #define BASEBONDGENERATOR_HPP_INCLUDED
 
-#include <vector>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/forwardtypes.hpp>
 

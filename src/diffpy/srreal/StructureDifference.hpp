@@ -22,7 +22,6 @@
 #ifndef STRUCTUREDIFFERENCE_HPP_INCLUDED
 #define STRUCTUREDIFFERENCE_HPP_INCLUDED
 
-#include <vector>
 #include <diffpy/srreal/forwardtypes.hpp>
 
 namespace diffpy {
@@ -49,10 +48,10 @@ class StructureDifference {
         StructureAdapterConstPtr stru1;
         /// indices of atoms in stru0 that are not in stru1.
         /// These atoms need to be removed for a fast update of PairQuantity.
-        std::vector<int> pop0;
+        SiteIndices pop0;
         /// indices of atoms in stru1 that are not in stru0
         /// These atoms need to be added in a fast update of PairQuantity.
-        std::vector<int> add1;
+        SiteIndices add1;
         /// type of comparison used in obtaining this difference
         Method::Type diffmethod;
 

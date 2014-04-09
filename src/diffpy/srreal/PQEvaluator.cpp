@@ -41,12 +41,12 @@ namespace {
 // tolerated load variance for splitting outer loop for parallel evaluation
 const double CPU_LOAD_VARIANCE = 0.1;
 
-std::vector<int>
-complementary_indices(const int sz, const std::vector<int>& indices0)
+SiteIndices
+complementary_indices(const int sz, const SiteIndices& indices0)
 {
-    std::vector<int> rv;
+    SiteIndices rv;
     rv.reserve(sz);
-    std::vector<int>::const_iterator ii0 = indices0.begin();
+    SiteIndices::const_iterator ii0 = indices0.begin();
     for (int k = 0; k < sz; ++k)
     {
         if (ii0 == indices0.end() || k < *ii0)
@@ -191,15 +191,15 @@ void PQEvaluatorOptimized::updateValue(
     bool usefullsum = this->getFlag(USEFULLSUM);
     // the loop is adjusted according to usefullsum and split within
     // the outer loop in case of parallel evaluation.
-    std::vector<int> anchors = sd.pop0;
-    std::vector<int> unchanged;
+    SiteIndices anchors = sd.pop0;
+    SiteIndices unchanged;
     if (usefullsum && !sd.pop0.empty())
     {
         unchanged = complementary_indices(cntsites0, sd.pop0);
         anchors.insert(anchors.end(), unchanged.begin(), unchanged.end());
     }
     bnds0->selectSiteRange(0, cntsites0);
-    std::vector<int>::const_iterator ii0;
+    SiteIndices::const_iterator ii0;
     bool needsreselection = usefullsum;
     for (ii0 = anchors.begin(); ii0 != anchors.end(); ++ii0)
     {
@@ -210,7 +210,7 @@ void PQEvaluatorOptimized::updateValue(
         // anchor is an unchanged atom
         if (needsreselection && ii0 >= (anchors.begin() + sd.pop0.size()))
         {
-            std::vector<int>::const_iterator kk = unchanged.begin();
+            SiteIndices::const_iterator kk = unchanged.begin();
             for (; kk != unchanged.end(); ++kk)
             {
                 bnds0->selectSite(*kk, false);
@@ -242,7 +242,7 @@ void PQEvaluatorOptimized::updateValue(
     int cntsites1 = sd.stru1->countSites();
     BaseBondGeneratorPtr bnds1 = sd.stru1->createBondGenerator();
     bnds1->selectSiteRange(0, cntsites1);
-    std::vector<int>::const_iterator ii1;
+    SiteIndices::const_iterator ii1;
     anchors = sd.add1;
     unchanged.clear();
     if (usefullsum && !sd.add1.empty())
@@ -266,7 +266,7 @@ void PQEvaluatorOptimized::updateValue(
         if (!usefullsum)  bnds1->selectSite(i0, true);
         if (needsreselection && ii1 >= (anchors.begin() + sd.add1.size()))
         {
-            std::vector<int>::const_iterator kk = unchanged.begin();
+            SiteIndices::const_iterator kk = unchanged.begin();
             for (; kk != unchanged.end(); ++kk)
             {
                 bnds1->selectSite(*kk, false);

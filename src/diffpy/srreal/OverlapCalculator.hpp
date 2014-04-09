@@ -42,9 +42,9 @@ class OverlapCalculator : public PairQuantity
         /// directions between the centers of overlapping sites
         std::vector<R3::Vector> directions() const;
         /// indices of the first site for all overlapping pairs
-        std::vector<int> sites0() const;
+        SiteIndices sites0() const;
         /// indices of the second site for all overlapping pairs
-        std::vector<int> sites1() const;
+        SiteIndices sites1() const;
         /// atom symbols for the first site of all overlapping pairs
         std::vector<std::string> types0() const;
         /// atom symbols for the second site of all overlapping pairs

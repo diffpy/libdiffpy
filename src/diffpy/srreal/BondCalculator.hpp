@@ -35,8 +35,8 @@ class BondCalculator : public PairQuantity
         template <class T> QuantityType operator()(const T&);
         QuantityType distances() const;
         std::vector<R3::Vector> directions() const;
-        std::vector<int> sites0() const;
-        std::vector<int> sites1() const;
+        SiteIndices sites0() const;
+        SiteIndices sites1() const;
         std::vector<std::string> types0() const;
         std::vector<std::string> types1() const;
         void filterCone(R3::Vector coneaxis, double degrees);

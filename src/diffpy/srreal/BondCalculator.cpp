@@ -132,9 +132,9 @@ vector<R3::Vector> BondCalculator::directions() const
 }
 
 
-vector<int> BondCalculator::sites0() const
+SiteIndices BondCalculator::sites0() const
 {
-    vector<int> rv;
+    SiteIndices rv;
     rv.reserve(this->count());
     BondDataStorage::const_iterator bi = mbonds.begin();
     for (; bi != mbonds.end(); ++bi)  rv.push_back(bi->site0);
@@ -142,9 +142,9 @@ vector<int> BondCalculator::sites0() const
 }
 
 
-vector<int> BondCalculator::sites1() const
+SiteIndices BondCalculator::sites1() const
 {
-    vector<int> rv;
+    SiteIndices rv;
     rv.reserve(this->count());
     BondDataStorage::const_iterator bi = mbonds.begin();
     for (; bi != mbonds.end(); ++bi)  rv.push_back(bi->site1);

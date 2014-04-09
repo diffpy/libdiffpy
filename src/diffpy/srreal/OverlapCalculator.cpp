@@ -110,14 +110,14 @@ vector<R3::Vector> OverlapCalculator::directions() const
 }
 
 
-vector<int> OverlapCalculator::sites0() const
+SiteIndices OverlapCalculator::sites0() const
 {
     QuantityType rv0 = this->subvector(SITE0_OFFSET, OVERLAPPING);
     return vectorconvert<int>(rv0);
 }
 
 
-vector<int> OverlapCalculator::sites1() const
+SiteIndices OverlapCalculator::sites1() const
 {
     QuantityType rv0 = this->subvector(SITE1_OFFSET, OVERLAPPING);
     return vectorconvert<int>(rv0);

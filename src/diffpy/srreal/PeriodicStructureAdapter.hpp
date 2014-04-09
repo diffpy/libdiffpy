@@ -24,7 +24,6 @@
 
 #include <boost/scoped_ptr.hpp>
 
-#include <diffpy/srreal/forwardtypes.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/Lattice.hpp>
 
