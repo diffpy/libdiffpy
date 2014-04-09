@@ -57,6 +57,32 @@ class BondCalculator : public PairQuantity
         virtual void stashPartialValue();
         virtual void restorePartialValue();
 
+        friend class BondOp;
+        class BondEntry {
+
+            public:
+
+                double distance;
+                int site0;
+                int site1;
+                double direction0;
+                double direction1;
+                double direction2;
+
+            private:
+
+                friend class boost::serialization::access;
+                template<class Archive>
+                void serialize(Archive& ar, const unsigned int version)
+                {
+                    ar & distance & site0 & site1;
+                    ar & direction0 & direction1 & direction2;
+                }
+
+        };
+
+        typedef std::vector<BondEntry> BondDataStorage;
+
     private:
 
         // serialization
@@ -66,6 +92,7 @@ class BondCalculator : public PairQuantity
         {
             using boost::serialization::base_object;
             ar & base_object<PairQuantity>(*this);
+            ar & mbonds;
             ar & mfilter_directions;
             ar & mfilter_degrees;
         }
@@ -77,9 +104,10 @@ class BondCalculator : public PairQuantity
         // data
         std::vector<R3::Vector> mfilter_directions;
         std::vector<double> mfilter_degrees;
-        QuantityType mstashedvalue;
-        QuantityType mpairspop;
-        QuantityType mpairsadd;
+        BondDataStorage mbonds;
+        BondDataStorage mstashedbonds;
+        BondDataStorage mpopbonds;
+        BondDataStorage maddbonds;
 
 };
 

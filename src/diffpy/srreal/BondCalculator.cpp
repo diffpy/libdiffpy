@@ -36,65 +36,66 @@ namespace {
 
 const double DEFAULT_BONDCALCULATOR_RMAX = 5.0;
 
-enum {
-    DISTANCE_OFFSET,
-    SITE0_OFFSET,
-    SITE1_OFFSET,
-    DIRECTION0_OFFSET,
-    DIRECTION1_OFFSET,
-    DIRECTION2_OFFSET,
-    CHUNK_SIZE,
-};
-
-bool pchunks_compare(QuantityType::const_iterator p0,
-        QuantityType::const_iterator p1)
-{
-    bool rv = lexicographical_compare(
-            p0, p0 + CHUNK_SIZE, p1, p1 + CHUNK_SIZE);
-    return rv;
-}
-
-typedef vector<QuantityType::const_iterator> ChunkPtrVector;
-
-
-ChunkPtrVector chunks_split(const QuantityType& pv)
-{
-    assert(0 == pv.size() % CHUNK_SIZE);
-    ChunkPtrVector rv(pv.size() / CHUNK_SIZE);
-    QuantityType::const_iterator src = pv.begin();
-    ChunkPtrVector::iterator dst = rv.begin();
-    for (; src != pv.end(); src += CHUNK_SIZE, ++dst)  *dst = src;
-    return rv;
-}
-
-
-void
-chunks_merge(const ChunkPtrVector& chunks, QuantityType& datadest)
-{
-    ChunkPtrVector::const_iterator xc = chunks.begin();
-    QuantityType tdest(CHUNK_SIZE * chunks.size());
-    QuantityType::iterator dst = tdest.begin();
-    for (; xc != chunks.end(); ++xc, dst += CHUNK_SIZE)
-    {
-        copy(*xc, (*xc) + CHUNK_SIZE, dst);
-    }
-    datadest.swap(tdest);
-}
-
-
-void
-chunks_merge(const QuantityType& data0, const QuantityType& data1,
-        QuantityType& datadest)
-{
-    ChunkPtrVector p0 = chunks_split(data0);
-    ChunkPtrVector p1 = chunks_split(data1);
-    ChunkPtrVector ptot(p0.size() + p1.size());
-    merge(p0.begin(), p0.end(), p1.begin(), p1.end(), ptot.begin());
-    chunks_merge(ptot, datadest);
-}
-
-
 }   // namespace
+
+class BondOp {
+
+    public:
+
+        static bool compare(
+                const BondCalculator::BondEntry& be0,
+                const BondCalculator::BondEntry& be1)
+        {
+            if (be0.distance < be1.distance)  return true;
+            if (be0.distance > be1.distance)  return false;
+            if (be0.site0 < be1.site0)  return true;
+            if (be0.site0 > be1.site0)  return false;
+            if (be0.site1 < be1.site1)  return true;
+            if (be0.site1 > be1.site1)  return false;
+            if (be0.direction0 < be1.direction0)  return true;
+            if (be0.direction0 > be1.direction0)  return false;
+            if (be0.direction1 < be1.direction1)  return true;
+            if (be0.direction1 > be1.direction1)  return false;
+            if (be0.direction2 < be1.direction2)  return true;
+            if (be0.direction2 > be1.direction2)  return false;
+            return false;
+        }
+
+
+        static bool reverse_compare(
+                const BondCalculator::BondEntry& be0,
+                const BondCalculator::BondEntry& be1)
+        {
+            return compare(be1, be0);
+        }
+
+
+        static void bmerge(
+                BondCalculator::BondDataStorage& dstbonds,
+                const BondCalculator::BondDataStorage& srcbonds)
+        {
+            dstbonds.resize(dstbonds.size() + srcbonds.size());
+            merge(dstbonds.rbegin() + srcbonds.size(), dstbonds.rend(),
+                    srcbonds.rbegin(), srcbonds.rend(),
+                    dstbonds.rbegin(), reverse_compare);
+        }
+
+
+        static BondCalculator::BondEntry entryFrom(
+                const BaseBondGenerator& bnds)
+        {
+            BondCalculator::BondEntry rv;
+            rv.distance = bnds.distance();
+            rv.site0 = bnds.site0();
+            rv.site1 = bnds.site1();
+            rv.direction0 = bnds.r01()[0];
+            rv.direction1 = bnds.r01()[1];
+            rv.direction2 = bnds.r01()[2];
+            return rv;
+        }
+
+
+};  // class BondOp
 
 // Constructor ---------------------------------------------------------------
 
@@ -111,11 +112,8 @@ QuantityType BondCalculator::distances() const
 {
     QuantityType rv;
     rv.reserve(this->count());
-    QuantityType::const_iterator v = mvalue.begin() + DISTANCE_OFFSET;
-    for (; v < mvalue.end(); v += CHUNK_SIZE)
-    {
-        rv.push_back(*v);
-    }
+    BondDataStorage::const_iterator bi = mbonds.begin();
+    for (; bi != mbonds.end(); bi++)  rv.push_back(bi->distance);
     return rv;
 }
 
@@ -124,13 +122,10 @@ vector<R3::Vector> BondCalculator::directions() const
 {
     vector<R3::Vector> rv;
     rv.reserve(this->count());
-    QuantityType::const_iterator v = mvalue.begin();
-    for (; v < mvalue.end(); v += CHUNK_SIZE)
+    BondDataStorage::const_iterator bi = mbonds.begin();
+    for (; bi != mbonds.end(); ++bi)
     {
-        R3::Vector dir(
-                *(v + DIRECTION0_OFFSET),
-                *(v + DIRECTION1_OFFSET),
-                *(v + DIRECTION2_OFFSET));
+        R3::Vector dir(bi->direction0, bi->direction1, bi->direction2);
         rv.push_back(dir);
     }
     return rv;
@@ -141,11 +136,8 @@ vector<int> BondCalculator::sites0() const
 {
     vector<int> rv;
     rv.reserve(this->count());
-    QuantityType::const_iterator v = mvalue.begin() + SITE0_OFFSET;
-    for (; v < mvalue.end(); v += CHUNK_SIZE)
-    {
-        rv.push_back(int(*v));
-    }
+    BondDataStorage::const_iterator bi = mbonds.begin();
+    for (; bi != mbonds.end(); ++bi)  rv.push_back(bi->site0);
     return rv;
 }
 
@@ -154,11 +146,8 @@ vector<int> BondCalculator::sites1() const
 {
     vector<int> rv;
     rv.reserve(this->count());
-    QuantityType::const_iterator v = mvalue.begin() + SITE1_OFFSET;
-    for (; v < mvalue.end(); v += CHUNK_SIZE)
-    {
-        rv.push_back(int(*v));
-    }
+    BondDataStorage::const_iterator bi = mbonds.begin();
+    for (; bi != mbonds.end(); ++bi)  rv.push_back(bi->site1);
     return rv;
 }
 
@@ -198,7 +187,7 @@ string BondCalculator::getParallelData() const
 {
     ostringstream storage(ios::binary);
     diffpy::serialization::oarchive oa(storage, ios::binary);
-    oa << mpairspop << mpairsadd;
+    oa << mpopbonds << maddbonds;
     return storage.str();
 }
 
@@ -207,8 +196,9 @@ string BondCalculator::getParallelData() const
 void BondCalculator::resetValue()
 {
     mvalue.clear();
-    mpairspop.clear();
-    mpairsadd.clear();
+    mbonds.clear();
+    maddbonds.clear();
+    mpopbonds.clear();
     this->PairQuantity::resetValue();
 }
 
@@ -222,15 +212,8 @@ void BondCalculator::addPairContribution(
     const R3::Vector& r01 = bnds.r01();
     ru01 = r01 / bnds.distance();
     if (!(this->checkConeFilters(ru01)))  return;
-    double entry[CHUNK_SIZE];
-    entry[DISTANCE_OFFSET] = bnds.distance();
-    entry[SITE0_OFFSET] = bnds.site0();
-    entry[SITE1_OFFSET] = bnds.site1();
-    entry[DIRECTION0_OFFSET] = r01[0];
-    entry[DIRECTION1_OFFSET] = r01[1];
-    entry[DIRECTION2_OFFSET] = r01[2];
-    QuantityType& pv = (summationscale > 0) ? mpairsadd : mpairspop;
-    pv.insert(pv.end(), entry, entry + CHUNK_SIZE);
+    BondDataStorage& bes = (summationscale > 0) ? maddbonds : mpopbonds;
+    bes.push_back(BondOp::entryFrom(bnds));
 }
 
 
@@ -238,58 +221,50 @@ void BondCalculator::executeParallelMerge(const std::string& pdata)
 {
     istringstream storage(pdata, ios::binary);
     diffpy::serialization::iarchive ia(storage, ios::binary);
-    QuantityType parpop, paradd;
-    ia >> parpop >> paradd;
-    chunks_merge(mpairspop, parpop, mpairspop);
-    chunks_merge(mpairsadd, paradd, mpairsadd);
+    BondDataStorage bpop, badd;
+    ia >> bpop >> badd;
+    BondOp::bmerge(mpopbonds, bpop);
+    BondOp::bmerge(maddbonds, badd);
 }
 
 
 void BondCalculator::finishValue()
 {
     // filter-out entries marked for removal
-    assert(mpairspop.size() <= mvalue.size());
-    ChunkPtrVector ppop = chunks_split(mpairspop);
-    sort(ppop.begin(), ppop.end(), pchunks_compare);
-    ChunkPtrVector padd = chunks_split(mpairsadd);
-    sort(padd.begin(), padd.end(), pchunks_compare);
-    if (mevaluator->isParallel())
-    {
-        chunks_merge(ppop, mpairspop);
-        chunks_merge(padd, mpairsadd);
-        return;
-    }
-    ChunkPtrVector pval = chunks_split(mvalue);
-    ChunkPtrVector::iterator last;
-    last = set_difference(pval.begin(), pval.end(),
-            ppop.begin(), ppop.end(), pval.begin(), pchunks_compare);
-    pval.erase(last, pval.end());
-    ChunkPtrVector ptot(pval.size() + padd.size());
-    merge(pval.begin(), pval.end(), padd.begin(), padd.end(), ptot.begin());
-    chunks_merge(ptot, mvalue);
-    mpairspop.clear();
-    mpairsadd.clear();
+    assert(mpopbonds.size() <= mbonds.size());
+    sort(mpopbonds.begin(), mpopbonds.end(), BondOp::compare);
+    sort(maddbonds.begin(), maddbonds.end(), BondOp::compare);
+    if (mevaluator->isParallel())  return;
+    BondDataStorage::iterator last;
+    last = set_difference(mbonds.begin(), mbonds.end(),
+            mpopbonds.begin(), mpopbonds.end(),
+            mbonds.begin(), BondOp::compare);
+    mbonds.erase(last, mbonds.end());
+    if (mbonds.empty())  mbonds.swap(maddbonds);
+    else  BondOp::bmerge(mbonds, maddbonds);
+    mvalue = this->distances();
+    mpopbonds.clear();
+    maddbonds.clear();
 }
 
 
 void BondCalculator::stashPartialValue()
 {
-    mstashedvalue.swap(mvalue);
+    mstashedbonds.swap(mbonds);
 }
 
 
 void BondCalculator::restorePartialValue()
 {
-    mvalue.swap(mstashedvalue);
-    mstashedvalue.clear();
+    mbonds.swap(mstashedbonds);
+    mstashedbonds.clear();
 }
 
 // Private Methods -----------------------------------------------------------
 
 int BondCalculator::count() const
 {
-    int rv = int(mvalue.size()) / CHUNK_SIZE;
-    return rv;
+    return mbonds.size();
 }
 
 
