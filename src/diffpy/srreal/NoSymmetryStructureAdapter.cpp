@@ -157,6 +157,8 @@ StructureAdapterPtr nosymmetry(StructureAdapterPtr stru)
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::NoSymmetryStructureAdapter)
 BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::NoSymmetryStructureAdapter)
 

@@ -84,7 +84,7 @@ StructureAdapterPtr nosymmetry(StructureAdapterPtr stru);
 template <class T>
 StructureAdapterPtr nosymmetry(const T& stru)
 {
-    StructureAdapterPtr bstru = createStructureAdapter(stru);
+    StructureAdapterPtr bstru = convertToStructureAdapter(stru);
     return nosymmetry(bstru);
 }
 

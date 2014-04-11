@@ -80,7 +80,7 @@ StructureAdapterPtr nometa(StructureAdapterPtr stru);
 template <class T>
 StructureAdapterPtr nometa(const T& stru)
 {
-    StructureAdapterPtr bstru = createStructureAdapter(stru);
+    StructureAdapterPtr bstru = convertToStructureAdapter(stru);
     return nometa(bstru);
 }
 
