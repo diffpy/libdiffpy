@@ -73,6 +73,12 @@ double NoMetaStructureAdapter::numberDensity() const
 }
 
 
+const std::string& NoMetaStructureAdapter::siteAtomType(int idx) const
+{
+    return msrcstructure->siteAtomType(idx);
+}
+
+
 const R3::Vector& NoMetaStructureAdapter::siteCartesianPosition(
         int idx) const
 {
@@ -95,12 +101,6 @@ bool NoMetaStructureAdapter::siteAnisotropy(int idx) const
 const R3::Matrix& NoMetaStructureAdapter::siteCartesianUij(int idx) const
 {
     return msrcstructure->siteCartesianUij(idx);
-}
-
-
-const std::string& NoMetaStructureAdapter::siteAtomType(int idx) const
-{
-    return msrcstructure->siteAtomType(idx);
 }
 
 
