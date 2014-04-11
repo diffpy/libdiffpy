@@ -130,6 +130,50 @@ siteIndicesToTypes(const StructureAdapterPtr& stru, const T& indices)
     return rv;
 }
 
+// Conversion helpers --------------------------------------------------------
+
+/// createStructureAdapter a last-resort conversion of the argument type
+/// to StructureAdapterPtr.  Classes convertible to StructureAdapter should
+/// define a corresponding createStructureAdapter function for seamless
+/// integration with PairQuantity calculators.
+
+/// This converter provides by-value support for StructureAdapter instances.
+
+inline
+StructureAdapterPtr createStructureAdapter(const StructureAdapter& stru)
+{
+    return stru.clone();
+}
+
+/// convertToStructureAdapter is an interface function that should be used
+/// by the clients that need to convert to StructureAdapterPtr.
+
+template <class T>
+StructureAdapterPtr convertToStructureAdapter(const T& stru)
+{
+    StructureAdapterPtr rv = createStructureAdapter(stru);
+    return rv;
+}
+
+
+template <class T>
+StructureAdapterPtr convertToStructureAdapter(const boost::shared_ptr<T>& stru)
+{
+    StructureAdapterPtr rv =
+        boost::dynamic_pointer_cast<StructureAdapterPtr::element_type>(stru);
+    assert(rv);
+    return rv;
+}
+
+
+inline
+StructureAdapterPtr convertToStructureAdapter(StructureAdapterConstPtr stru)
+{
+    StructureAdapterPtr rv =
+        boost::const_pointer_cast<StructureAdapterPtr::element_type>(stru);
+    return rv;
+}
+
 }   // namespace srreal
 }   // namespace diffpy
 

@@ -48,4 +48,10 @@ createStructureAdapter(const ObjCryst::Molecule& molecule);
 }   // namespace srreal
 }   // namespace diffpy
 
+// Required for argument-lookup visibility when instantiating the
+// convertToStructureAdapter template.
+namespace ObjCryst {
+using ::diffpy::srreal::createStructureAdapter;
+}
+
 #endif  // OBJCRYSTSTRUCTUREADAPTER_HPP_INCLUDED
