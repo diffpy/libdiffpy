@@ -187,6 +187,7 @@ void PQEvaluatorOptimized::updateValue(
     assert(sd.stru0 == mlast_structure);
     int cntsites0 = sd.stru0->countSites();
     BaseBondGeneratorPtr bnds0 = sd.stru0->createBondGenerator();
+    pq.configureBondGenerator(*bnds0);
     // loop counter
     long n = mcpuindex;
     bool usefullsum = this->getFlag(USEFULLSUM);
@@ -241,6 +242,7 @@ void PQEvaluatorOptimized::updateValue(
     pq.restorePartialValue();
     int cntsites1 = sd.stru1->countSites();
     BaseBondGeneratorPtr bnds1 = sd.stru1->createBondGenerator();
+    pq.configureBondGenerator(*bnds1);
     anchors = sd.add1;
     unchanged.clear();
     if (!sd.add1.empty())
