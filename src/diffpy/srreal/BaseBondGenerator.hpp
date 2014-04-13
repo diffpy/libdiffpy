@@ -26,8 +26,8 @@
 namespace diffpy {
 namespace srreal {
 
-/// Default rmax is very large, but still within the integer type limits.
-const double DEFAULT_BONDGENERATOR_RMAX = 1.0e6;
+/// Use zero default for rmax so any misconfiguration of r-limits is obvious.
+const double DEFAULT_BONDGENERATOR_RMAX = 0.0;
 
 class BaseBondGenerator
 {

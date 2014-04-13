@@ -36,6 +36,8 @@ BVSCalculator::BVSCalculator()
 {
     // default configuration
     const double valence_precision = 1e-5;
+    // use very large rmax, it will be cropped by rmaxFromPrecision
+    this->setRmax(100);
     BVParametersTablePtr bvtb(new BVParametersTable);
     this->setBVParamTable(bvtb);
     this->setValencePrecision(valence_precision);

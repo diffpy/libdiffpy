@@ -24,6 +24,8 @@ using namespace diffpy::srreal;
 
 PairCounter::PairCounter()
 {
+    // use very large default rmax.
+    this->setRmax(1000);
     this->resizeValue(1);
 }
 

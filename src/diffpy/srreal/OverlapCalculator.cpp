@@ -67,6 +67,8 @@ OverlapCalculator::OverlapCalculator()
     AtomRadiiTablePtr table(new ConstantRadiiTable);
     this->setAtomRadiiTable(table);
     this->cacheStructureData();
+    // use very large rmax, it will be cropped by rmaxused
+    this->setRmax(100);
     mneighborids_cached = false;
     // attributes
     this->registerDoubleAttribute("rmaxused", this,
