@@ -39,12 +39,6 @@ namespace srreal {
 
 double ScatteringFactorTable::lookup(const string& smbl, double q) const
 {
-    if (0.0 == q)
-    {
-        boost::unordered_map<std::string,double>::const_iterator ii =
-            mqzerocache.find(smbl);
-        if (ii != mqzerocache.end())   return ii->second;
-    }
     double rv;
     CustomDataStorage::const_iterator csft = mcustom.find(smbl);
     if (csft != mcustom.end())
@@ -56,7 +50,6 @@ double ScatteringFactorTable::lookup(const string& smbl, double q) const
     else {
         rv = this->standardLookup(smbl, q);
     }
-    if (0.0 == q)  mqzerocache[smbl] = rv;
     return rv;
 }
 
@@ -65,8 +58,9 @@ void ScatteringFactorTable::setCustomAs(
         const string& smbl, const string& srcsmbl)
 {
     const double scale = 1.0;
-    mcustom[smbl] = make_pair(srcsmbl, scale);
-    mqzerocache.erase(smbl);
+    CustomDataStorage::mapped_type entry(srcsmbl, scale);
+    if (mcustom.count(smbl) && mcustom.at(smbl) == entry)  return;
+    mcustom[smbl] = entry;
     mticker.click();
 }
 
@@ -77,8 +71,9 @@ void ScatteringFactorTable::setCustomAs(
 {
     double fsrc = this->standardLookup(srcsmbl, q);
     double scale = value / fsrc;
-    mcustom[smbl] = make_pair(srcsmbl, scale);
-    mqzerocache.erase(smbl);
+    CustomDataStorage::mapped_type entry(srcsmbl, scale);
+    if (mcustom.count(smbl) && mcustom.at(smbl) == entry)  return;
+    mcustom[smbl] = entry;
     mticker.click();
 }
 
@@ -87,7 +82,6 @@ void ScatteringFactorTable::resetCustom(const string& smbl)
 {
     if (mcustom.count(smbl))  mticker.click();
     mcustom.erase(smbl);
-    mqzerocache.erase(smbl);
 }
 
 
@@ -95,7 +89,6 @@ void ScatteringFactorTable::resetAll()
 {
     if (!mcustom.empty())  mticker.click();
     mcustom.clear();
-    mqzerocache.clear();
 }
 
 

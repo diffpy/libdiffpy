@@ -57,7 +57,6 @@ class ScatteringFactorTable :
 
         // data
         CustomDataStorage mcustom;
-        mutable boost::unordered_map<std::string, double> mqzerocache;
         mutable eventticker::EventTicker mticker;
 
         // serialization helpers for accessing mcustom
