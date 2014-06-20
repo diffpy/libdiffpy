@@ -69,11 +69,13 @@ class PeakWidthModelOwner
         void setPeakWidthModelByType(const std::string& tp);
         PeakWidthModelPtr& getPeakWidthModel();
         const PeakWidthModelPtr& getPeakWidthModel() const;
+        eventticker::EventTicker& ticker() const;
 
     private:
 
         // data
         PeakWidthModelPtr mpwmodel;
+        mutable eventticker::EventTicker mprivateticker;
 
         // serialization
         friend class boost::serialization::access;
@@ -81,7 +83,7 @@ class PeakWidthModelOwner
         template<class Archive>
             void serialize(Archive& ar, const unsigned int version)
         {
-            ar & mpwmodel;
+            ar & mpwmodel & mprivateticker;
         }
 
 };

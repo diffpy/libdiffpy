@@ -66,8 +66,7 @@ BaseDebyeSum::BaseDebyeSum()
 
 eventticker::EventTicker& BaseDebyeSum::ticker() const
 {
-    const PeakWidthModelPtr& pwm = this->getPeakWidthModel();
-    if (pwm)  mticker.updateFrom(pwm->ticker());
+    mticker.updateFrom(this->PeakWidthModelOwner::ticker());
     return mticker;
 }
 

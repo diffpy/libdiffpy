@@ -38,7 +38,7 @@ namespace srreal {
 void PeakWidthModelOwner::setPeakWidthModel(PeakWidthModelPtr pwm)
 {
     ensureNonNull("PeakWidthModel", pwm);
-    if (mpwmodel != pwm)  pwm->ticker().click();
+    if (mpwmodel != pwm)  mprivateticker.click();
     mpwmodel = pwm;
 }
 
@@ -46,7 +46,7 @@ void PeakWidthModelOwner::setPeakWidthModel(PeakWidthModelPtr pwm)
 void PeakWidthModelOwner::setPeakWidthModelByType(const string& tp)
 {
     mpwmodel = PeakWidthModel::createByType(tp);
-    mpwmodel->ticker().click();
+    mprivateticker.click();
 }
 
 
@@ -59,6 +59,13 @@ PeakWidthModelPtr& PeakWidthModelOwner::getPeakWidthModel()
 const PeakWidthModelPtr& PeakWidthModelOwner::getPeakWidthModel() const
 {
     return mpwmodel;
+}
+
+
+eventticker::EventTicker& PeakWidthModelOwner::ticker() const
+{
+    if (mpwmodel)  mprivateticker.updateFrom(mpwmodel->ticker());
+    return mprivateticker;
 }
 
 }   // namespace srreal

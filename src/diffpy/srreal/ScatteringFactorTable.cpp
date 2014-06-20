@@ -109,7 +109,7 @@ void ScatteringFactorTableOwner::setScatteringFactorTable(
         ScatteringFactorTablePtr sft)
 {
     ensureNonNull("ScatteringFactorTable", sft);
-    if (msftable != sft)  sft->ticker().click();
+    if (msftable != sft)  mprivateticker.click();
     msftable = sft;
 }
 
@@ -118,7 +118,7 @@ void ScatteringFactorTableOwner::setScatteringFactorTableByType(
         const string& tp)
 {
     msftable = ScatteringFactorTable::createByType(tp);
-    msftable->ticker().click();
+    mprivateticker.click();
 }
 
 
@@ -141,6 +141,13 @@ const string& ScatteringFactorTableOwner::getRadiationType() const
     static string empty;
     const string& tp = msftable.get() ? msftable->radiationType() : empty;
     return tp;
+}
+
+
+eventticker::EventTicker& ScatteringFactorTableOwner::ticker() const
+{
+    if (msftable)  mprivateticker.updateFrom(msftable->ticker());
+    return mprivateticker;
 }
 
 }   // namespace srreal

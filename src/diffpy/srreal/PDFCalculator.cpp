@@ -84,13 +84,13 @@ PDFCalculator::PDFCalculator()
 
 eventticker::EventTicker& PDFCalculator::ticker() const
 {
-    const PeakWidthModelPtr& pwm = this->getPeakWidthModel();
-    if (pwm)  mticker.updateFrom(pwm->ticker());
-    const ScatteringFactorTablePtr& sftb = this->getScatteringFactorTable();
-    if (sftb)  mticker.updateFrom(sftb->ticker());
-    const PeakProfilePtr& ppkf = this->getPeakProfile();
-    if (ppkf)  mticker.updateFrom(ppkf->ticker());
-    return mticker;
+    eventticker::EventTicker& tic = this->PairQuantity::ticker();
+    assert(&mticker == &tic);
+    tic.updateFrom(this->PeakWidthModelOwner::ticker());
+    tic.updateFrom(this->ScatteringFactorTableOwner::ticker());
+    const PeakProfilePtr& pkpf = this->getPeakProfile();
+    if (pkpf)  tic.updateFrom(pkpf->ticker());
+    return tic;
 }
 
 // results
@@ -335,7 +335,7 @@ double PDFCalculator::getExtendedRmax() const
 void PDFCalculator::setPeakProfile(PeakProfilePtr pkf)
 {
     ensureNonNull("PeakProfile", pkf);
-    if (mpeakprofile != pkf)  pkf->ticker().click();
+    if (mpeakprofile != pkf)  mticker.click();
     mpeakprofile = pkf;
 }
 

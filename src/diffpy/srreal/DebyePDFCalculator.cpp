@@ -88,8 +88,7 @@ eventticker::EventTicker& DebyePDFCalculator::ticker() const
     // collect composite tickers for the BaseDebyeSum parent class
     eventticker::EventTicker& tic = this->BaseDebyeSum::ticker();
     assert(&mticker == &tic);
-    const ScatteringFactorTablePtr& sftb = this->getScatteringFactorTable();
-    if (sftb)  tic.updateFrom(sftb->ticker());
+    tic.updateFrom(this->ScatteringFactorTableOwner::ticker());
     return tic;
 }
 

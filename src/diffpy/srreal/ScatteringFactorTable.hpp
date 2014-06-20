@@ -76,19 +76,20 @@ class ScatteringFactorTableOwner
         ScatteringFactorTablePtr& getScatteringFactorTable();
         const ScatteringFactorTablePtr& getScatteringFactorTable() const;
         const std::string& getRadiationType() const;
-
+        eventticker::EventTicker& ticker() const;
 
     private:
 
         // data
         ScatteringFactorTablePtr msftable;
+        mutable eventticker::EventTicker mprivateticker;
 
         // serialization
         friend class boost::serialization::access;
         template<class Archive>
             void serialize(Archive& ar, const unsigned int version)
         {
-            ar & msftable;
+            ar & msftable & mprivateticker;
         }
 };
 
