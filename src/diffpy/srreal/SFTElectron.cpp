@@ -67,10 +67,7 @@ double SFTElectron::standardLookup(const string& smbl, double q) const
 
 // Registration --------------------------------------------------------------
 
-bool reg_SFTElectron = (
-        SFTElectron().registerThisType() &&
-        ScatteringFactorTable::aliasType("electron", "E")
-        );
+bool reg_SFTElectron = SFTElectron().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

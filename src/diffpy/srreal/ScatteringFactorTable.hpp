@@ -38,7 +38,10 @@ class ScatteringFactorTable :
 {
     public:
 
-        // methods
+        // HasClassRegistry override
+        bool registerThisType() const;
+
+        // own methods
         virtual const std::string& radiationType() const = 0;
         double lookup(const std::string& smbl, double q=0.0) const;
         virtual double standardLookup(const std::string&, double) const = 0;

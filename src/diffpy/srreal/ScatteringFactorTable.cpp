@@ -37,6 +37,16 @@ namespace srreal {
 
 // public methods
 
+bool ScatteringFactorTable::registerThisType() const
+{
+    typedef diffpy::HasClassRegistry<ScatteringFactorTable> HCRBase;
+    bool rv = this->HCRBase::registerThisType();
+    rv = rv && ScatteringFactorTable::aliasType(
+            this->type(), this->radiationType());
+    return rv;
+}
+
+
 double ScatteringFactorTable::lookup(const string& smbl, double q) const
 {
     double rv;

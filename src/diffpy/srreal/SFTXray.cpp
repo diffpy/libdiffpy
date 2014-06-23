@@ -66,10 +66,7 @@ double SFTXray::standardLookup(const string& smbl, double q) const
 
 // Registration --------------------------------------------------------------
 
-bool reg_SFTXray = (
-        SFTXray().registerThisType() &&
-        ScatteringFactorTable::aliasType("xray", "X")
-        );
+bool reg_SFTXray = SFTXray().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

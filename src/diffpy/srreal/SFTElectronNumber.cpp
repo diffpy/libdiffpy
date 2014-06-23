@@ -66,8 +66,7 @@ double SFTElectronNumber::standardLookup(const string& smbl, double q) const
 
 // Registration --------------------------------------------------------------
 
-bool reg_SFTElectronNumber = SFTElectronNumber().registerThisType() &&
-        ScatteringFactorTable::aliasType("electronnumber", "EN");
+bool reg_SFTElectronNumber = SFTElectronNumber().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy

@@ -67,10 +67,7 @@ double SFTNeutron::standardLookup(const string& smbl, double q) const
 
 // Registration --------------------------------------------------------------
 
-bool reg_SFTNeutron = (
-        SFTNeutron().registerThisType() &&
-        ScatteringFactorTable::aliasType("neutron", "N")
-        );
+bool reg_SFTNeutron = SFTNeutron().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
