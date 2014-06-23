@@ -56,7 +56,7 @@ class HasClassRegistry
         // methods provided by HasClassRegistry
 
         /// Add a prototype of this instance to the registry
-        bool registerThisType() const;
+        virtual bool registerThisType() const;
 
         /// Make registered type tp available under a different alias
         static bool aliasType(const std::string& tp, const std::string& al);
