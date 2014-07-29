@@ -91,8 +91,8 @@ if 'sdist' in COMMAND_LINE_TARGETS:
 # lib -- shared library object
 libdiffpy = env.SharedLibrary('diffpy', env['lib_sources'])
 Export('libdiffpy')
-Alias('lib', [libdiffpy, env['lib_includes']])
-Default(libdiffpy)
+lib = Alias('lib', [libdiffpy, env['lib_includes']])
+Default(lib)
 
 # Define targets related to testing.  Do so only when testing is requested.
 # This enables library build on machines without cxxtest.
