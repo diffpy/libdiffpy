@@ -123,6 +123,6 @@ data_targets = map(data_target_path, env['lib_datafiles'])
 Alias('install-data', InstallAs(data_targets, env['lib_datafiles']))
 
 # install
-Alias('install', ['install-include', 'install-lib', 'install-data'])
+Alias('install', ['install-lib', 'install-include', 'install-data'])
 
 # vim: ft=python
