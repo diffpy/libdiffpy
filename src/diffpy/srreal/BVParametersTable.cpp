@@ -18,7 +18,6 @@
 
 #include <cassert>
 #include <fstream>
-#include <boost/serialization/export.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <diffpy/serialization.ipp>

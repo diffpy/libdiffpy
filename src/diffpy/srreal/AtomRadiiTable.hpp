@@ -25,9 +25,9 @@
 
 #include <string>
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/export.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 #include <diffpy/boostextensions/serialize_unordered_map.hpp>
 #include <diffpy/HasClassRegistry.hpp>

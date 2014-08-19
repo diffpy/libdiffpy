@@ -25,8 +25,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/export.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
