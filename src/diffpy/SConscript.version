@@ -63,11 +63,12 @@ else:
     ginfo = gitinfo()
     vhpp, = env.BuildVersionCode(['version.hpp'], vtpl)
     env.Depends(vhpp, env.Value(ginfo['version'] + ginfo['commit']))
-    env.Depends(vhpp, env.Value(env['has_objcryst']))
     majorminor = (ginfo['major'], ginfo['minor'])
 
-env['lib_includes'] += [vhpp]
-env['lib_includes'] += env.BuildFeaturesCode(['features.tpl'])
+fhpp, = env.BuildFeaturesCode(['features.tpl'])
+env.Depends(fhpp, env.Value(env['has_objcryst']))
+
+env['lib_includes'] += [vhpp, fhpp]
 env['majorminor'] = majorminor
 
 # vim: ft=python
