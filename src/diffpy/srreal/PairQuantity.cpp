@@ -351,6 +351,19 @@ bool PairQuantity::hasMask() const
 }
 
 
+bool PairQuantity::hasPairMask() const
+{
+    bool rv = this->hasMask() && !this->hasTypeMask();
+    return rv;
+}
+
+
+bool PairQuantity::hasTypeMask() const
+{
+    return !mtypemask.empty();
+}
+
+
 void PairQuantity::stashPartialValue()
 {
     const char* emsg =
