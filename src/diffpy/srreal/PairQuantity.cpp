@@ -192,7 +192,6 @@ void PairQuantity::invertMask()
 
 void PairQuantity::setPairMask(int i, int j, bool mask)
 {
-    mtypemask.clear();
     if (i < 0)  i = ALLATOMSINT;
     if (j < 0)  j = ALLATOMSINT;
     // short circuit for all-all
@@ -201,6 +200,13 @@ void PairQuantity::setPairMask(int i, int j, bool mask)
         this->maskAllPairs(mask);
         return;
     }
+    // update ticker if we are switching from type-mask mode
+    if (!mtypemask.empty())
+    {
+        mtypemask.clear();
+        mticker.click();
+    }
+    // handle one ALLATOMSINT argument
     if (ALLATOMSINT == i || ALLATOMSINT == j)
     {
         int k = (ALLATOMSINT != i) ? i : j;
@@ -256,6 +262,7 @@ setTypeMask(string smbli, string smblj, bool mask)
         this->maskAllPairs(mask);
         return;
     }
+    bool modified = false;
     // when all is used, remove all typemask elements with the other type
     if (ALLATOMSSTR == smbli || ALLATOMSSTR == smblj)
     {
@@ -263,10 +270,17 @@ setTypeMask(string smbli, string smblj, bool mask)
         TypeMaskStorage::iterator tpmsk;
         for (tpmsk = mtypemask.begin(); tpmsk != mtypemask.end();)
         {
-            tpmsk = (sk == tpmsk->first.first || sk == tpmsk->first.second) ?
-                mtypemask.erase(tpmsk) : ++tpmsk;
+            if (sk == tpmsk->first.first || sk == tpmsk->first.second)
+            {
+                modified = true;
+                tpmsk = mtypemask.erase(tpmsk);
+            }
+            else  ++tpmsk;
         }
     }
+    modified = modified ||
+        !(mtypemask.count(smblij) && mtypemask.at(smblij) == mask);
+    if (modified)  mticker.click();
     mtypemask[smblij] = mask;
 }
 

@@ -91,6 +91,31 @@ public:
     }
 
 
+    void test_maskTicker()
+    {
+        using diffpy::eventticker::EventTicker;
+        PairCounter pcount;
+        EventTicker et0 = pcount.ticker();
+        pcount.maskAllPairs(true);
+        pcount.setPairMask(pcount.ALLATOMSINT, pcount.ALLATOMSINT, true);
+        pcount.setTypeMask("all", "all", true);
+        TS_ASSERT_EQUALS(et0, pcount.ticker());
+        pcount.setTypeMask("A", "B", true);
+        EventTicker et1 = pcount.ticker();
+        TS_ASSERT_LESS_THAN(et0, et1);
+        pcount.setTypeMask("A", "B", true);
+        TS_ASSERT_EQUALS(et1, pcount.ticker());
+        pcount.setTypeMask("A", "B", false);
+        EventTicker et2 = pcount.ticker();
+        TS_ASSERT_LESS_THAN(et1, et2);
+        pcount.setPairMask(0, 0, false);
+        EventTicker et3 = pcount.ticker();
+        TS_ASSERT_LESS_THAN(et2, et3);
+        pcount.setPairMask(0, 5, false);
+        TS_ASSERT_EQUALS(et3, pcount.ticker());
+    }
+
+
     void test_parallel()
     {
         const int ncpu = 7;
