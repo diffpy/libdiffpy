@@ -168,6 +168,9 @@ void PairQuantity::setupParallelRun(int cpuindex, int ncpu)
 
 void PairQuantity::maskAllPairs(bool mask)
 {
+    bool nochange = minvertpairmask.empty() && msiteallmask.empty() &&
+        mtypemask.empty() && (mdefaultpairmask == mask);
+    if (!nochange)  mticker.click();
     minvertpairmask.clear();
     msiteallmask.clear();
     mtypemask.clear();
@@ -177,6 +180,7 @@ void PairQuantity::maskAllPairs(bool mask)
 
 void PairQuantity::invertMask()
 {
+    mticker.click();
     mdefaultpairmask = !mdefaultpairmask;
     TypeMaskStorage::iterator tpmsk;
     for (tpmsk = mtypemask.begin(); tpmsk != mtypemask.end(); ++tpmsk)
@@ -410,7 +414,7 @@ void PairQuantity::updateMaskData()
 
 void PairQuantity::setPairMaskValue(int i, int j, bool mask)
 {
-    assert(i >= ALLATOMSINT && j >= ALLATOMSINT);
+    assert(i >= 0 && j >= 0);
     pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
     if (mask == mdefaultpairmask)  minvertpairmask.erase(ij);
     else    minvertpairmask.insert(ij);
