@@ -358,6 +358,7 @@ double DebyePDFCalculator::extFromPeakTails() const
 
 void DebyePDFCalculator::cacheRlimitsData()
 {
+    const int minreductionsteps = 50;
     double ext_total = min(this->getMaxExtension(),
         this->extFromTerminationRipples() + this->extFromPeakTails());
     // abbreviations
@@ -365,7 +366,11 @@ void DebyePDFCalculator::cacheRlimitsData()
     const double& rmax = this->getRmax();
     const double& dr = this->getRstep();
     mrcalclosteps = max(0, pdfutils_rminSteps(rmin - ext_total, dr));
-    mrcalchisteps = pdfutils_rmaxSteps(rmax + ext_total, dr);
+    const int nhi = pdfutils_rmaxSteps(rmax + ext_total, dr);
+    if (nhi <= (mrcalchisteps - minreductionsteps) || nhi > mrcalchisteps)
+    {
+        mrcalchisteps = nhi;
+    }
 }
 
 }   // namespace srreal
