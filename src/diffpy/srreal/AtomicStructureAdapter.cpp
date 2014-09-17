@@ -168,20 +168,17 @@ StructureDifference
 AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
     using std::min;
-    typedef boost::shared_ptr<const class AtomicStructureAdapter> Ptr;
-    StructureDifference sd(this->shared_from_this(), other);
+    StructureDifference sd = this->StructureAdapter::diff(other);
     if (sd.stru0 == sd.stru1)  return sd;
-    Ptr pstru0 = boost::static_pointer_cast<Ptr::element_type>(sd.stru0);
-    Ptr pstru1 = boost::dynamic_pointer_cast<Ptr::element_type>(sd.stru1);
-    if (!pstru1)  return this->StructureAdapter::diff(other);
-    assert(pstru0);
-    assert(pstru1);
-    const AtomicStructureAdapter& astru0 = *pstru0;
-    const AtomicStructureAdapter& astru1 = *pstru1;
-    sd.pop0.reserve(astru0.countSites());
-    sd.add1.reserve(astru1.countSites());
+    typedef boost::shared_ptr<const class AtomicStructureAdapter> APtr;
+    APtr pother = boost::dynamic_pointer_cast<APtr::element_type>(other);
+    if (!pother)  return sd;
     // try fast side-by-side comparison
     sd.diffmethod = StructureDifference::Method::SIDEBYSIDE;
+    const AtomicStructureAdapter& astru0 = *this;
+    const AtomicStructureAdapter& astru1 = *pother;
+    sd.pop0.clear();
+    sd.add1.clear();
     const_iterator ai0 = astru0.matoms.begin();
     const_iterator ai1 = astru1.matoms.begin();
     int nboth = min(astru0.countSites(), astru1.countSites());

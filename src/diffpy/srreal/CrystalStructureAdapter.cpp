@@ -79,15 +79,14 @@ int CrystalStructureAdapter::siteMultiplicity(int idx) const
 StructureDifference
 CrystalStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
-    StructureDifference alldiffer;
+    StructureDifference sd = this->StructureAdapter::diff(other);
+    if (sd.stru0 == sd.stru1)  return sd;
     typedef boost::shared_ptr<const class CrystalStructureAdapter> CPtr;
     CPtr cother = boost::dynamic_pointer_cast<CPtr::element_type>(other);
-    if (!cother)  return alldiffer;
-    StructureDifference sd(this->shared_from_this(), other);
-    if (sd.stru0 == sd.stru1)  return sd;
+    if (!cother)  return sd;
     // compare symmetry operations in both adapters
     assert(cother == sd.stru1);
-    if (msymops != cother->msymops)  return alldiffer;
+    if (msymops != cother->msymops)  return sd;
     sd = this->PeriodicStructureAdapter::diff(other);
     return sd;
 }

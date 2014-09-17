@@ -117,12 +117,12 @@ void NoSymmetryStructureAdapter::customPQConfig(PairQuantity* pq) const
 StructureDifference
 NoSymmetryStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
-    StructureDifference alldiffer;
+    StructureDifference sd = this->StructureAdapter::diff(other);
+    if (sd.stru0 == sd.stru1)  return sd;
     typedef boost::shared_ptr<const class NoSymmetryStructureAdapter> PPtr;
     PPtr pother = boost::dynamic_pointer_cast<PPtr::element_type>(other);
-    if (!pother)  return alldiffer;
-    StructureDifference sd =
-        this->getSourceStructure()->diff(pother->getSourceStructure());
+    if (!pother)  return sd;
+    sd = this->getSourceStructure()->diff(pother->getSourceStructure());
     assert(sd.stru0 == this->getSourceStructure());
     assert(sd.stru1 == pother->getSourceStructure());
     sd.stru0 = this->shared_from_this();

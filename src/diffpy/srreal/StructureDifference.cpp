@@ -40,7 +40,22 @@ StructureDifference::StructureDifference(
         StructureAdapterConstPtr newstru)
     :
     stru0(oldstru), stru1(newstru), diffmethod(Method::NONE)
-{ }
+{
+    if (stru0 && stru0 == stru1)
+    {
+        diffmethod = Method::SIDEBYSIDE;
+        return;
+    }
+    // assume completely different structures
+    int v;
+    SiteIndices::iterator ii;
+    int n0 = stru0 ? stru0->countSites() : 0;
+    pop0.resize(n0);
+    for (ii = pop0.begin(), v = 0; ii != pop0.end();)  *(ii++) = v++;
+    int n1 = stru1 ? stru1->countSites() : 0;
+    add1.resize(n1);
+    for (ii = add1.begin(), v = 0; ii != add1.end();)  *(ii++) = v++;
+}
 
 // Public Methods ------------------------------------------------------------
 

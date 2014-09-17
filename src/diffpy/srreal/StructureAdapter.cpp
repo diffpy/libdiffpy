@@ -74,7 +74,7 @@ double StructureAdapter::siteOccupancy(int idx) const
 StructureDifference
 StructureAdapter::diff(StructureAdapterConstPtr other) const
 {
-    StructureDifference sd;
+    StructureDifference sd(this->shared_from_this(), other);
     return sd;
 }
 

@@ -63,14 +63,13 @@ double PeriodicStructureAdapter::numberDensity() const
 StructureDifference
 PeriodicStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
-    StructureDifference alldiffer;
+    StructureDifference sd = this->StructureAdapter::diff(other);
+    if (sd.stru0 == sd.stru1)  return sd;
     typedef boost::shared_ptr<const class PeriodicStructureAdapter> PPtr;
     PPtr pother = boost::dynamic_pointer_cast<PPtr::element_type>(other);
-    if (!pother)  return alldiffer;
-    StructureDifference sd(this->shared_from_this(), other);
-    if (sd.stru0 == sd.stru1)  return sd;
+    if (!pother)  return sd;
     assert(pother == sd.stru1);
-    if (this->getLattice() != pother->getLattice())  return alldiffer;
+    if (this->getLattice() != pother->getLattice())  return sd;
     sd = this->AtomicStructureAdapter::diff(other);
     return sd;
 }
