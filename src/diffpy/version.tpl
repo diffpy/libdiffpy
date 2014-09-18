@@ -20,6 +20,9 @@
 *   DIFFPY_VERSION_DATE
 *   DIFFPY_GIT_SHA
 *
+* Declaration of libdiffpy_version_info struct for version data resolved
+* at runtime.
+*
 *****************************************************************************/
 
 #ifndef VERSION_HPP_INCLUDED
@@ -45,6 +48,20 @@
 // DIFFPY_GIT_SHA is a full git commit hash for the current version
 
 #define DIFFPY_GIT_SHA "${DIFFPY_GIT_SHA}"
+
+// libdiffpy_version_info will hold runtime version data, which may be
+// different from client compile-time values.
+
+struct libdiffpy_version_info {
+
+    static const int version;
+    static const char* version_str;
+    static const int major;
+    static const int minor;
+    static const char* date;
+    static const char* git_sha;
+
+};
 
 #endif  // VERSION_HPP_INCLUDED
 
