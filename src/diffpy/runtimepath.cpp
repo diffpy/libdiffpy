@@ -103,7 +103,7 @@ const string& diffpyruntime()
         did_librt = true;
         return librt;
     }
-    // second candidate is resolved with respect to physical libary location
+    // second candidate is resolved with respect to physical library location
     // according to the source tree layout
     string d2 = dirname(realpath(i.dli_fname, fpb));
     d2 += "/../../src/runtime";
