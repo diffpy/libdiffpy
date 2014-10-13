@@ -36,8 +36,8 @@ DefaultEnvironment(ENV=subdictionary(os.environ, [
 # Create construction environment
 env = DefaultEnvironment().Clone()
 
-# Variables definitions below work only with 0.98 or later.
-env.EnsureSConsVersion(0, 98)
+# Variables definitions below work only with 0.98.1 or later.
+env.EnsureSConsVersion(0, 98, 1)
 
 # Customizable compile variables
 vars = Variables('sconsvars.py')
