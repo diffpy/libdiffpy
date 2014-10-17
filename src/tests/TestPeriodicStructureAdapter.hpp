@@ -24,6 +24,7 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/PeriodicStructureAdapter.hpp>
+#include <diffpy/srreal/PointsInSphere.hpp>
 #include "test_helpers.hpp"
 #include "serialization_helpers.hpp"
 

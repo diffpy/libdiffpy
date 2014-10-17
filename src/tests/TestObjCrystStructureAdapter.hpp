@@ -23,6 +23,7 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
+#include <diffpy/srreal/PointsInSphere.hpp>
 #include "serialization_helpers.hpp"
 #include "objcryst_helpers.hpp"
 #include <ObjCryst/ObjCryst/Crystal.h>
