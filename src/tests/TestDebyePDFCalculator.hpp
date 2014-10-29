@@ -71,6 +71,14 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
         }
 
 
+        void test_setQstep()
+        {
+            mpdfc->setRstep(2.0);
+            mpdfc->setQstep(0.02);
+            TS_ASSERT_EQUALS(0.02, mpdfc->getQstep());
+        }
+
+
         void test_access_Envelopes()
         {
             TS_ASSERT_EQUALS(2u, mpdfc->usedEnvelopeTypes().size());
