@@ -77,6 +77,7 @@ class DebyePDFCalculator :
         // Q-range configuration
         void setQmin(double);
         const double& getQmin() const;
+        void setQmax(double);
         virtual void setQstep(double);
         void setOptimumQstep();
         bool isOptimumQstep() const;

@@ -49,9 +49,9 @@ DebyePDFCalculator::DebyePDFCalculator()
     this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
     this->setMaxExtension(DEFAULT_PDFCALCULATOR_MAXEXTENSION);
-    this->setOptimumQstep();
     this->setQmin(0.0);
     this->setQmax(DEFAULT_DEBYEPDFCALCULATOR_QMAX);
+    this->setOptimumQstep();
     // envelopes
     this->addEnvelopeByType("scale");
     this->addEnvelopeByType("qresolution");
@@ -135,6 +135,13 @@ void DebyePDFCalculator::setQmin(double qmin)
 const double& DebyePDFCalculator::getQmin() const
 {
     return mqminpdf;
+}
+
+
+void DebyePDFCalculator::setQmax(double qmax)
+{
+    this->BaseDebyeSum::setQmax(qmax);
+    this->updateQstep();
 }
 
 
