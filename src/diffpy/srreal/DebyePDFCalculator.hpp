@@ -146,6 +146,9 @@ class DebyePDFCalculator :
             ar & mmaxextension;
             ar & mrcalclosteps;
             ar & mrcalchisteps;
+            if (version >= 1) {
+                ar & mrlimits_are_cached;
+            }
         }
 
 };  // class DebyePDFCalculator
@@ -155,6 +158,7 @@ class DebyePDFCalculator :
 
 // Serialization -------------------------------------------------------------
 
+BOOST_CLASS_VERSION(diffpy::srreal::DebyePDFCalculator, 1)
 BOOST_CLASS_EXPORT_KEY(diffpy::srreal::DebyePDFCalculator)
 
 #endif  // DEBYEPDFCALCULATOR_HPP_INCLUDED
