@@ -71,6 +71,18 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
         }
 
 
+        void test_setQmax()
+        {
+            const double dq0 = mpdfc->getQstep();
+            const double qmax0 = mpdfc->getQmax();
+            const double qmax1 = 2 * dq0;
+            mpdfc->setQmax(qmax1);
+            TS_ASSERT_EQUALS(qmax1 / 4.0, mpdfc->getQstep());
+            mpdfc->setQmax(qmax0);
+            TS_ASSERT_EQUALS(dq0, mpdfc->getQstep());
+        }
+
+
         void test_setQstep()
         {
             mpdfc->setRstep(2.0);
