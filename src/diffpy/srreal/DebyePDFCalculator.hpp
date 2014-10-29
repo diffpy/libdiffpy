@@ -119,15 +119,16 @@ class DebyePDFCalculator :
         double extFromTerminationRipples() const;
         /// r-range extension to account for tails from out-of-range peaks
         double extFromPeakTails() const;
-        void cacheRlimitsData();
+        void cacheRlimitsData() const;
 
         // data
         double mqminpdf;
         bool moptimumqstep;
         double mrstep;
         double mmaxextension;
-        int mrcalclosteps;
-        int mrcalchisteps;
+        mutable int mrcalclosteps;
+        mutable int mrcalchisteps;
+        mutable bool mrlimits_are_cached;
 
         // serialization
         friend class boost::serialization::access;

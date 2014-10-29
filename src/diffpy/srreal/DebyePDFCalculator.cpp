@@ -43,6 +43,7 @@ DebyePDFCalculator::DebyePDFCalculator()
     // initializations
     mrcalclosteps = 0;
     mrcalchisteps = 0;
+    mrlimits_are_cached = false;
     // default configuration
     this->setScatteringFactorTableByType("xray");
     this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
@@ -169,6 +170,7 @@ QuantityType DebyePDFCalculator::getRgrid() const
 void DebyePDFCalculator::setRmin(double rmin)
 {
     ensureNonNegative("Rmin", rmin);
+    if (mrmin != rmin)  mrlimits_are_cached = false;
     this->PairQuantity::setRmin(rmin);
 }
 
@@ -176,6 +178,7 @@ void DebyePDFCalculator::setRmin(double rmin)
 void DebyePDFCalculator::setRmax(double rmax)
 {
     ensureNonNegative("Rmax", rmax);
+    if (mrmax != rmax)  mrlimits_are_cached = false;
     this->PairQuantity::setRmax(rmax);
     this->updateQstep();
 }
@@ -186,6 +189,7 @@ void DebyePDFCalculator::setRstep(double rstep)
     // NOTE: do not update ticker here, rstep is only used in the FFT
     // and not in the Debye summation.
     ensureEpsilonPositive("Rstep", rstep);
+    if (mrstep != rstep)  mrlimits_are_cached = false;
     mrstep = rstep;
 }
 
@@ -199,7 +203,11 @@ const double& DebyePDFCalculator::getRstep() const
 void DebyePDFCalculator::setMaxExtension(double maxextension)
 {
     ensureNonNegative("maxextension", maxextension);
-    if (mmaxextension != maxextension)  mticker.click();
+    if (mmaxextension != maxextension)
+    {
+        mticker.click();
+        mrlimits_are_cached = false;
+    }
     mmaxextension = maxextension;
 }
 
@@ -319,6 +327,7 @@ void DebyePDFCalculator::updateQstep()
 
 double DebyePDFCalculator::rcalclo() const
 {
+    if (!mrlimits_are_cached)  this->cacheRlimitsData();
     double rv = mrcalclosteps * this->getRstep();
     return rv;
 }
@@ -326,6 +335,7 @@ double DebyePDFCalculator::rcalclo() const
 
 double DebyePDFCalculator::rcalchi() const
 {
+    if (!mrlimits_are_cached)  this->cacheRlimitsData();
     double rv = mrcalchisteps * this->getRstep();
     return rv;
 }
@@ -356,7 +366,7 @@ double DebyePDFCalculator::extFromPeakTails() const
 }
 
 
-void DebyePDFCalculator::cacheRlimitsData()
+void DebyePDFCalculator::cacheRlimitsData() const
 {
     const int minreductionsteps = 50;
     double ext_total = min(this->getMaxExtension(),
@@ -371,6 +381,7 @@ void DebyePDFCalculator::cacheRlimitsData()
     {
         mrcalchisteps = nhi;
     }
+    mrlimits_are_cached = true;
 }
 
 }   // namespace srreal
