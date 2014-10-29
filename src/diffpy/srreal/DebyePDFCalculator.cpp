@@ -147,8 +147,8 @@ void DebyePDFCalculator::setQmax(double qmax)
 
 void DebyePDFCalculator::setQstep(double qstep)
 {
-    moptimumqstep = false;
     this->BaseDebyeSum::setQstep(qstep);
+    moptimumqstep = false;
     this->updateQstep();
 }
 
@@ -327,7 +327,7 @@ void DebyePDFCalculator::updateQstep()
         (M_PI / rmaxext) : (this->getQmax() / 4);
     // if custom qstep is higher than the optimum one,
     // force adjustment to the optimum value.
-    if (this->getQstep() > oqstep)  moptimumqstep = true;
+    if (this->getQstep() >= oqstep)  moptimumqstep = true;
     if (moptimumqstep)  this->BaseDebyeSum::setQstep(oqstep);
 }
 
