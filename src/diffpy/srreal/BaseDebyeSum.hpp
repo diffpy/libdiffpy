@@ -50,7 +50,7 @@ class BaseDebyeSum :
         const double& getQmin() const;
         void setQmax(double);
         const double& getQmax() const;
-        virtual void setQstep(double);
+        void setQstep(double);
         const double& getQstep() const;
 
         // Summation cutoff due to Q-dependent pair scaling or large distance
