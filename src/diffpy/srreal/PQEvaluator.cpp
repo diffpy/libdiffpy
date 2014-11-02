@@ -205,6 +205,7 @@ void PQEvaluatorOptimized::updateValue(
         anchors.end() : (anchors.begin() + sd.pop0.size());
     SiteIndices::const_iterator ii0;
     bool needsreselection = usefullsum;
+    const bool hastypemask = pq.hasTypeMask();
     for (ii0 = anchors.begin(); ii0 != last_anchor; ++ii0)
     {
         if (n++ % mncpu)    continue;
@@ -222,7 +223,8 @@ void PQEvaluatorOptimized::updateValue(
         for (bnds0->rewind(); !bnds0->finished(); bnds0->next())
         {
             int i1 = bnds0->site1();
-            assert(pq.getPairMask(i0, i1));
+            assert(hastypemask || pq.getPairMask(i0, i1));
+            if (hastypemask && !pq.getPairMask(i0, i1))   continue;
             const int summationscale = (usefullsum || i0 == i1) ? -1 : -2;
             pq.addPairContribution(*bnds0, summationscale);
         }
@@ -272,7 +274,8 @@ void PQEvaluatorOptimized::updateValue(
         for (bnds1->rewind(); !bnds1->finished(); bnds1->next())
         {
             int i1 = bnds1->site1();
-            assert(pq.getPairMask(i0, i1));
+            assert(hastypemask || pq.getPairMask(i0, i1));
+            if (hastypemask && !pq.getPairMask(i0, i1))   continue;
             const int summationscale = (usefullsum || i0 == i1) ? +1 : +2;
             pq.addPairContribution(*bnds1, summationscale);
         }
