@@ -172,11 +172,13 @@ void BondCalculator::filterCone(R3::Vector coneaxis, double degrees)
     coneaxis /= nmconeaxis;
     mfilter_directions.push_back(coneaxis);
     mfilter_degrees.push_back(degrees);
+    mticker.click();
 }
 
 
 void BondCalculator::filterOff()
 {
+    if (!mfilter_directions.empty())  mticker.click();
     mfilter_directions.clear();
     mfilter_degrees.clear();
 }
