@@ -216,6 +216,7 @@ void DebyePDFCalculator::setMaxExtension(double maxextension)
         mrlimits_are_cached = false;
     }
     mmaxextension = maxextension;
+    this->updateQstep();
 }
 
 
