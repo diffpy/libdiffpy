@@ -41,10 +41,10 @@ test_helpers = thobj + ['objcryst_helpers.cpp']
 test_helpers = filter(srcsupported, test_helpers)
 
 alltests = env_test.CxxTest('alltests', test_sources + test_helpers)
-Alias('alltests', alltests)
+Alias('alltests', [alltests, env['lib_includes']])
 
 # test -- alias for executing unit tests.
-test = env_test.Alias('test', alltests, alltests[0].abspath)
+test = env_test.Alias('test', 'alltests', alltests[0].abspath)
 AlwaysBuild(test)
 
 # vim: ft=python
