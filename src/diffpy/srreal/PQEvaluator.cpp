@@ -268,7 +268,7 @@ void PQEvaluatorOptimized::updateValue(
         // at an added atom.
         else if (needsreselection && ii1 >= (anchors.end() - sd.add1.size()))
         {
-            bnds1->selectSites(unchanged.begin(), unchanged.end());
+            bnds1->selectSites(anchors.begin(), anchors.end());
             needsreselection = false;
         }
         for (bnds1->rewind(); !bnds1->finished(); bnds1->next())
