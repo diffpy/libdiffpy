@@ -105,9 +105,13 @@ class BondCalculator : public PairQuantity
         std::vector<R3::Vector> mfilter_directions;
         std::vector<double> mfilter_degrees;
         BondDataStorage mbonds;
-        BondDataStorage mstashedbonds;
         BondDataStorage mpopbonds;
         BondDataStorage maddbonds;
+        // support for PQEvaluatorOptimized
+        struct {
+            BondDataStorage bonds;
+            BondDataStorage popbonds;
+        } mstashedvalue;
 
 };
 

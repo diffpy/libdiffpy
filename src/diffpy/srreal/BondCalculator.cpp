@@ -252,14 +252,18 @@ void BondCalculator::finishValue()
 
 void BondCalculator::stashPartialValue()
 {
-    mstashedbonds.swap(mbonds);
+    mstashedvalue.bonds.swap(mbonds);
+    mstashedvalue.popbonds.swap(mpopbonds);
+    // No need to stash maddbonds as they are evaluated after partial value.
 }
 
 
 void BondCalculator::restorePartialValue()
 {
-    mbonds.swap(mstashedbonds);
-    mstashedbonds.clear();
+    mbonds.swap(mstashedvalue.bonds);
+    mpopbonds.swap(mstashedvalue.popbonds);
+    mstashedvalue.bonds.clear();
+    mstashedvalue.popbonds.clear();
 }
 
 // Private Methods -----------------------------------------------------------
