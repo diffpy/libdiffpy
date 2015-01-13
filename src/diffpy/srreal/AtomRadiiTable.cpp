@@ -22,9 +22,9 @@
 #include <stdexcept>
 #include <vector>
 
+#include <diffpy/serialization.ipp>
 #include <diffpy/srreal/AtomRadiiTable.hpp>
 #include <diffpy/HasClassRegistry.ipp>
-#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 

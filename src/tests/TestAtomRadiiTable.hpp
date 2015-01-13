@@ -19,9 +19,9 @@
 #include <stdexcept>
 #include <cxxtest/TestSuite.h>
 
+#include "serialization_helpers.hpp"
 #include <diffpy/srreal/AtomRadiiTable.hpp>
 #include <diffpy/srreal/ConstantRadiiTable.hpp>
-#include "serialization_helpers.hpp"
 
 using namespace std;
 using namespace diffpy::srreal;

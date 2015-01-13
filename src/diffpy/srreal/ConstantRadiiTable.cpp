@@ -25,8 +25,8 @@
 #include <boost/smart_ptr/make_shared.hpp>
 #include <boost/serialization/export.hpp>
 
-#include <diffpy/srreal/ConstantRadiiTable.hpp>
 #include <diffpy/serialization.ipp>
+#include <diffpy/srreal/ConstantRadiiTable.hpp>
 
 namespace diffpy {
 namespace srreal {
