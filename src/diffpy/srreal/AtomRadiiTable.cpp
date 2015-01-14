@@ -39,7 +39,7 @@ using namespace std;
 
 double AtomRadiiTable::lookup(const string& smbl) const
 {
-    boost::unordered_map<string,double>::const_iterator tb;
+    CustomRadiiStorage::const_iterator tb;
     tb = mcustomradius.find(smbl);
     if (tb != mcustomradius.end())  return tb->second;
     return this->standardLookup(smbl);
@@ -60,7 +60,7 @@ void AtomRadiiTable::fromString(const string& s)
     // replace commas with space so we can use the split function
     replace(s1.begin(), s1.end(), ',', ' ');
     istringstream ss1(s1);
-    boost::unordered_map<string,double> rds;
+    CustomRadiiStorage rds;
     for (string w; ss1 >> w;)
     {
         string::size_type p = w.find(':');
@@ -83,7 +83,7 @@ void AtomRadiiTable::fromString(const string& s)
         rds[smbl] = value;
     }
     // everything worked up to here, we can do the assignment
-    boost::unordered_map<string,double>::const_iterator kv = rds.begin();
+    CustomRadiiStorage::const_iterator kv = rds.begin();
     for (; kv != rds.end(); ++kv)  mcustomradius[kv->first] = kv->second;
 }
 
@@ -100,7 +100,7 @@ void AtomRadiiTable::resetAll()
 }
 
 
-const boost::unordered_map<string,double>&
+const AtomRadiiTable::CustomRadiiStorage&
 AtomRadiiTable::getAllCustom() const
 {
     return mcustomradius;
@@ -109,7 +109,7 @@ AtomRadiiTable::getAllCustom() const
 
 string AtomRadiiTable::toString(string separator) const
 {
-    boost::unordered_map<string,double>::const_iterator tb;
+    CustomRadiiStorage::const_iterator tb;
     vector<string> symbols;
     for (tb = mcustomradius.begin(); tb != mcustomradius.end(); ++tb)
     {
