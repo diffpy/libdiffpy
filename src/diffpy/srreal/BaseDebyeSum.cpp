@@ -196,7 +196,7 @@ void BaseDebyeSum::stashPartialValue()
 void BaseDebyeSum::restorePartialValue()
 {
     assert(mdbsumstash.size() == mvalue.size());
-    mvalue = mdbsumstash;
+    mvalue.swap(mdbsumstash);
     mdbsumstash.clear();
 }
 
