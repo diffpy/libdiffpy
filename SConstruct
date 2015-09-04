@@ -5,7 +5,7 @@ Usage: scons [target] [var=value]
 Targets:
 
 lib                 build the shared library object [default]
-install             install everything
+install             install everything under prefix directory
 install-lib         install the shared library object
 install-include     install the C++ header files
 install-data        install data files used by the library
@@ -26,11 +26,12 @@ def subdictionary(d, keyset):
     return dict([kv for kv in d.items() if kv[0] in keyset])
 
 # copy system environment variables related to compilation
-DefaultEnvironment(ENV=subdictionary(os.environ, [
-    'PATH', 'PYTHONPATH',
-    'CPATH', 'CPLUS_INCLUDE_PATH', 'LIBRARY_PATH',
-    'LD_LIBRARY_PATH', 'DYLD_LIBRARY_PATH',
-    ])
+DefaultEnvironment(ENV=subdictionary(os.environ, '''
+    PATH PYTHONPATH
+    CPATH CPLUS_INCLUDE_PATH LIBRARY_PATH
+    LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH
+    MACOSX_DEPLOYMENT_TARGET
+    '''.split())
 )
 
 # Create construction environment

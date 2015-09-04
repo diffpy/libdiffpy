@@ -4,6 +4,10 @@ Import('env')
 
 # Build environment configuration --------------------------------------------
 
+# Apply CFLAGS, CXXFLAGS, LDFLAGS from the system environment.
+flagnames = 'CFLAGS CXXFLAGS LDFLAGS'.split()
+env.MergeFlags([os.environ.get(n, '') for n in flagnames])
+
 # The directory of this SConscript should be searched first for any headers.
 env.PrependUnique(CPPPATH=Dir('.'))
 
