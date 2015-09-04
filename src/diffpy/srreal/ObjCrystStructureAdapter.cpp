@@ -12,12 +12,9 @@
 *
 ******************************************************************************
 *
-* class ObjCrystStructureAdapter
-*   -- adapter to the Crystal class from ObjCryst++.
-* class ObjCrystBondGenerator
-*   -- Generate bonds from periodic ObjCrystStructureAdapter.
-* Factory function createStructureAdapter(ObjCryst::Molecule)
-*   -- builds AtomicStructureAdapter from the ObjCryst Molecule object
+* StructureAdapterPtr createStructureAdapter(const ObjCryst::Crystal&)
+* StructureAdapterPtr createStructureAdapter(const ObjCryst::Molecule&)
+*   -- structure adapter factories for ObjCryst objects.
 *
 *****************************************************************************/
 
