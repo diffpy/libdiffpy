@@ -112,6 +112,8 @@ libinstall = Install(env['libdir'], libdiffpy)
 if env['PLATFORM'] == 'darwin':
     env.AddPostAction(libinstall,
             'install_name_tool -id $TARGET.abspath $TARGET')
+elif env['PLATFORM'] == 'posix' and os.getuid() == 0 and WhereIs('ldconfig'):
+    env.AddPostAction(libinstall, 'ldconfig')
 Alias('install-lib', libinstall)
 
 # install-includes
