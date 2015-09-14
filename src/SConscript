@@ -108,10 +108,12 @@ if set(('test', 'alltests')).intersection(COMMAND_LINE_TARGETS):
 prefix = env['prefix']
 
 # install-lib
-libinstall = Install(env['libdir'], libdiffpy)
+libinstall = env.Install(env['libdir'], libdiffpy)
 if env['PLATFORM'] == 'darwin':
+    # DARWIN_INSTALL_NAME can be pre-set in sconscript.local
+    env.SetDefault(DARWIN_INSTALL_NAME='$TARGET.abspath')
     env.AddPostAction(libinstall,
-            'install_name_tool -id $TARGET.abspath $TARGET')
+            'install_name_tool -id $DARWIN_INSTALL_NAME $TARGET')
 if env['PLATFORM'] == 'posix' and WhereIs('ldconfig'):
     opts = ''
     if os.getuid() != 0:  opts = '-n'
