@@ -1,0 +1,40 @@
+package:
+  name: libdiffpy
+  ## Use __conda_version__.txt.
+  # version: 1.2.73
+
+source:
+  git_url: https://github.com/diffpy/libdiffpy.git
+  git_rev: 8e0da27e30dfe1a4b0ab07eaa88b6e9db4123cea
+
+  # fn: libdiffpy-1.2.tar.gz
+  # url: https://github.com/diffpy/libdiffpy/releases/download/v1.2/libdiffpy-1.2.tar.gz
+  # md5: 04676fd1b012d239c3563446f407dda0
+
+build:
+  number: 0
+  binary_relocation: False      # [linux]
+
+requirements:
+  build:
+    - scons
+    - boost                     # [linux]
+    - boost 1.56.0 py27_2       # [osx]
+    - gsl
+    - cxxtest
+    - libobjcryst
+
+  run:
+    - boost                     # [linux]
+    - boost 1.56.0              # [osx]
+    - gsl
+    - libobjcryst
+
+about:
+  home: https://github.com/diffpy/libdiffpy
+  summary: C++ calculators of PDF, bond valence sum and other pair quantities.
+  license: Modified BSD License
+  license_file: LICENSE.txt
+
+# See http://docs.continuum.io/conda/build.html
+# for more information about meta.yaml.
