@@ -50,6 +50,8 @@ vars.Add(EnumVariable('build',
     allowed_values=('debug', 'fast')))
 vars.Add(BoolVariable('profile',
     'build with profiling information', False))
+vars.Add(BoolVariable('coverage',
+    'build for code coverage analysis', False))
 vars.Add(PathVariable('prefix',
     'installation prefix directory', '/usr/local'))
 vars.Update(env)
