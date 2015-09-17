@@ -1,0 +1,120 @@
+sudo: required
+
+language: generic
+
+os:
+  - linux
+  - osx
+
+env:
+  global:
+    - MYPYTHON_VERSION=2.7
+  matrix:
+    - MYUSEMC=true
+    - MYUSEMC=false
+
+matrix:
+  exclude:
+    - os: osx
+      env: MYUSEMC=false
+
+before_install:
+  - git fetch origin --unshallow --tags
+  - if ${MYUSEMC}; then
+        NOAPT=true; NOMC=false;
+    else
+        NOAPT=false; NOMC=true;
+        MYPIPFLAGS="--user";
+    fi
+  - MYMCREPO=https://repo.continuum.io/miniconda
+  - case ${TRAVIS_OS_NAME} in
+    linux)
+        MYMCBUNDLE=Miniconda-latest-Linux-x86_64.sh ;;
+    osx)
+        MYMCBUNDLE=Miniconda-latest-MacOSX-x86_64.sh ;;
+    *)
+        echo "Unsupported operating system." >&2;
+        exit 2 ;;
+    esac
+
+  - mkdir -p ~/pkgs/
+  - pushd ~/pkgs/
+
+  - $NOMC || wget --timestamping ${MYMCREPO}/${MYMCBUNDLE}
+  - $NOMC || test -x ~/mc/bin/conda || bash ${MYMCBUNDLE} -b -f -p ~/mc
+  - $NOMC || export PATH="${HOME}/mc/bin:${PATH}"
+  - $NOMC || conda update conda --yes
+  - $NOMC || conda install --yes python=${MYPYTHON_VERSION} conda-build
+  - $NOMC || conda create --name=testenv --yes python=${MYPYTHON_VERSION}
+  - $NOMC || conda config --add channels pavoljuhas/channel/dev
+  - $NOMC || conda config --add channels pavoljuhas
+
+  - $NOAPT || test "${TRAVIS_OS_NAME}" = "linux"
+  - $NOAPT || sudo apt-get update -qq
+  - $NOAPT || sudo apt-get install -y
+                  libgsl0-dev libboost-all-dev python-pip build-essential scons
+  - $NOAPT || wget --timestamping
+                  https://github.com/CxxTest/cxxtest/releases/download/4.4/cxxtest-4.4.tar.gz
+  - $NOAPT || tar xzf cxxtest-4.4.tar.gz
+  - $NOAPT || export "CXXTEST=${PWD}/cxxtest-4.4"
+  - $NOAPT || git clone https://github.com/diffpy/libObjCryst.git
+
+  - popd
+
+install:
+  - $NOMC || conda build conda-recipe
+  - $NOMC || MYCONDAPACKAGE="$(ls -t ~/mc/conda-bld/*/libdiffpy*.bz2 | head -1)"
+  - $NOMC || ls -d "${MYCONDAPACKAGE}" >/dev/null
+  - $NOMC || source activate testenv
+  - $NOMC || conda install --yes "${MYCONDAPACKAGE}"
+  - $NOMC || conda install --yes cxxtest scons
+  - $NOMC || MYPREFIX="${HOME}/mc/envs/testenv"
+  - $NOMC || MYWORKDIR="${HOME}/mc/conda-bld/work"
+
+  - $NOAPT || sudo scons -C ~/pkgs/libObjCryst install
+  - $NOAPT || scons build=fast alltests
+  - $NOAPT || sudo scons build=fast install
+  - $NOAPT || MYPREFIX=/usr/local
+  - $NOAPT || MYWORKDIR=$PWD
+
+  # Ensure libdiffpy cannot be loaded from the work directory.
+  - scons build=fast -Q -C ${MYWORKDIR} --clean lib
+  - MYALLTESTSFAST=$(ls -t ${MYWORKDIR}/build/fast*/tests/alltests | head -1)
+  - MYINCLUDE="${MYPREFIX}/include"
+  - MYLIB="${MYPREFIX}/lib"
+  - MYVERSION="${MYINCLUDE}/diffpy/version.hpp"
+  - MYGIT_REV=$(grep '^#define DIFFPY_GIT_SHA' "$MYVERSION" | cut -d '"' -f 2)
+  - if [[ "${TRAVIS_COMMIT}" != "${MYGIT_REV}" ]]; then
+        echo "Version mismatch ${TRAVIS_COMMIT} vs ${MYGIT_REV}.";
+        exit 1;
+    fi
+
+  - $NOMC || export LIBRARY_PATH="${MYLIB}"
+  - $NOMC || export CPATH="${MYINCLUDE}"
+
+    # Mac OS X must use the same deployment target as conda-build.
+  - if $MYUSEMC && [[ "${TRAVIS_OS_NAME}" == osx ]]; then
+        export MACOSX_DEPLOYMENT_TARGET=10.6;
+        export DYLD_FALLBACK_LIBRARY_PATH="${MYLIB}";
+    fi
+
+    # Linux ld linker requires that libraries can be resolved at link time.
+  - if ${MYUSEMC} && [[ "${TRAVIS_OS_NAME}" == linux ]]; then
+        export LD_LIBRARY_PATH="${MYLIB}";
+    fi
+
+  - scons build=debug alltests
+
+
+before_script:
+
+
+script:
+  - scons build=debug -Q test
+  - scons build=debug enable_objcryst=false -Q test
+  - ${MYALLTESTSFAST}
+
+
+#after_success:
+# - pip install $MYPIPFLAGS codecov
+# - codecov
