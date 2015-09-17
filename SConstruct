@@ -73,7 +73,10 @@ vars.Update(env)
 env.Help(MY_SCONS_HELP % vars.GenerateHelpText(env))
 
 env['has_objcryst'] = None
-builddir = env.Dir('build/%s-%s' % (env['build'], platform.machine()))
+btags = [env['build'], platform.machine()]
+if env['profile']:  btags.append('profile')
+if env['coverage']:  btags.append('coverage')
+builddir = env.Dir('build/' + '-'.join(btags))
 
 Export('env')
 
