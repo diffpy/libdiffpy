@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/diffpy/libdiffpy.svg?branch=master)]
+(https://travis-ci.org/diffpy/libdiffpy)
+
 # libdiffpy
 
 C++ calculators of PDF, bond valence sum and other pair quantities
