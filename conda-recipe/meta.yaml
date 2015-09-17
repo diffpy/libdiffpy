@@ -26,6 +26,19 @@ requirements:
     - gsl
     - libobjcryst
 
+test:
+  requires:
+    - scons
+
+  commands:
+    # Run unit-test program sith the installed shared library.
+    # Ensure they do not use libdiffpy from the source directory.
+    - scons -C "$SRC_DIR" --clean lib
+    - export LD_LIBRARY_PATH="${PREFIX}/lib"                    # [linux]
+    - export DYLD_FALLBACK_LIBRARY_PATH="${PREFIX}/lib"         # [osx]
+    - ALLTESTSFAST=$(ls -t ${SRC_DIR}/build/fast*/tests/alltests | head -1)
+    - "${ALLTESTSFAST}"
+
 about:
   home: https://github.com/diffpy/libdiffpy
   summary: C++ calculators of PDF, bond valence sum and other pair quantities.
