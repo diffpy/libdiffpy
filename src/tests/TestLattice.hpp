@@ -17,9 +17,6 @@
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>
-#include <gsl/gsl_linalg.h>
-#include <gsl/gsl_matrix.h>
-#include <gsl/gsl_permutation.h>
 
 #include <diffpy/srreal/Lattice.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
