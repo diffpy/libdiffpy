@@ -38,10 +38,11 @@ before_install:
     esac
 
   - mkdir -p ~/pkgs/
-  - pushd ~/pkgs/
 
+  - $NOMC || pushd ~/pkgs/
   - $NOMC || wget --timestamping ${MYMCREPO}/${MYMCBUNDLE}
   - $NOMC || test -x ~/mc/bin/conda || bash ${MYMCBUNDLE} -b -f -p ~/mc
+  - $NOMC || popd
   - $NOMC || export PATH="${HOME}/mc/bin:${PATH}"
   - $NOMC || conda update conda --yes
   - $NOMC || conda install --yes python=${MYPYTHON_VERSION} conda-build
@@ -53,13 +54,16 @@ before_install:
   - $NOAPT || sudo apt-get update -qq
   - $NOAPT || sudo apt-get install -y
                   libgsl0-dev libboost-all-dev python-pip build-essential scons
+  - $NOAPT || scons sdist
+  - $NOAPT || MYTARBUNDLE="$(ls -t "${PWD}"/*.tar.gz | head -1)"
+  - $NOAPT || pushd ~/pkgs/
+  - $NOAPT || tar xzf "${MYTARBUNDLE}"
   - $NOAPT || wget --timestamping
                   https://github.com/CxxTest/cxxtest/releases/download/4.4/cxxtest-4.4.tar.gz
   - $NOAPT || tar xzf cxxtest-4.4.tar.gz
   - $NOAPT || export "CXXTEST=${PWD}/cxxtest-4.4"
   - $NOAPT || git clone https://github.com/diffpy/libObjCryst.git
-
-  - popd
+  - $NOAPT || popd
 
 install:
   - $NOMC || conda build conda-recipe
@@ -72,6 +76,7 @@ install:
   - $NOMC || MYWORKDIR="${HOME}/mc/conda-bld/work"
 
   - $NOAPT || sudo scons -C ~/pkgs/libObjCryst install
+  - $NOAPT || cd ~/pkgs/"$(basename "${MYTARBUNDLE}" .tar.gz)"/
   - $NOAPT || scons build=fast alltests
   - $NOAPT || sudo scons build=fast install
   - $NOAPT || MYPREFIX=/usr/local
