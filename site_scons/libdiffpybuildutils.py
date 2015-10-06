@@ -21,13 +21,19 @@ def gitinfo():
     if proc.wait():  return gitinfo()
     proc = Popen(['git', 'log', '-1', '--format=%H %ai'], **kw)
     glog = proc.stdout.read()
-    rv['version'] = '.'.join(desc.strip().split('-')[:2]).lstrip('v')
+    words = desc.strip().split('-')
+    vtag = words[0].lstrip('v')
+    vnum = int((words[1:2] or ['0'])[0])
     rv['commit'], rv['date'] = glog.strip().split(None, 1)
-    mx = re.search(r'(?m)^(\d+)\.(\d+)([ab]\d*)?(?:[.](\d+))?', rv['version'])
+    mx = re.match(r'^(\d+)\.(\d+)((?:[ab]|rc)\d*)?', vtag)
     rv['major'] = int(mx.group(1))
     rv['minor'] = int(mx.group(2))
     rv['prerelease'] = mx.group(3)
-    rv['number'] = mx.group(4) and int(mx.group(4)) or 0
+    rv['number'] = vnum
+    rv['version'] = vtag
+    numsep = rv['prerelease'] and '.dev' or '.'
+    if vnum:
+        rv['version'] += numsep + str(vnum)
     _cached_gitinfo = rv
     return gitinfo()
 
