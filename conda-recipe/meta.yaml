@@ -18,13 +18,13 @@ requirements:
     - boost 1.56.0 py27_2       # [osx]
     - gsl
     - cxxtest
-    - libobjcryst
+    - libobjcryst <2.0
 
   run:
     - boost                     # [linux]
     - boost 1.56.0              # [osx]
     - gsl
-    - libobjcryst
+    - libobjcryst <2.0
 
 test:
   requires:
