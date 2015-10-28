@@ -22,7 +22,12 @@ requirements:
 
   run:
     - boost                     # [linux]
-    - boost 1.56.0              # [osx]
+      # When package version includes build tag, its dependencies must be
+      # listed as well.  https://github.com/conda/conda-build/issues/563
+    - boost 1.56.0 py27_2       # [osx]
+    -   python                  # [osx]
+    -   bzip2 1.0.*             # [osx]
+    -   zlib 1.2.*              # [osx]
     - gsl
     - libobjcryst <2.0
 
