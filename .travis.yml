@@ -6,6 +6,10 @@ os:
   - linux
   - osx
 
+branches:
+  except:
+    - /^v[0-9]/
+
 env:
   global:
     - MYPYTHON_VERSION=2.7
