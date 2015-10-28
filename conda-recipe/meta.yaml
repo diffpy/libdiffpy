@@ -36,8 +36,8 @@ test:
     - scons
 
   commands:
-    # Run unit-test program sith the installed shared library.
-    # Ensure they do not use libdiffpy from the source directory.
+    # Run unit-test program with the installed shared library.
+    # Make sure tests cannot use library file from the source directory.
     - scons -C "$SRC_DIR" --clean lib
     - export LD_LIBRARY_PATH="${PREFIX}/lib"                    # [linux]
     - export DYLD_FALLBACK_LIBRARY_PATH="${PREFIX}/lib"         # [osx]
