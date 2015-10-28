@@ -71,10 +71,9 @@ before_install:
 
 install:
   - $NOMC || conda build conda-recipe
-  - $NOMC || MYCONDAPACKAGE="$(ls -t ~/mc/conda-bld/*/libdiffpy*.bz2 | head -1)"
-  - $NOMC || ls -d "${MYCONDAPACKAGE}" >/dev/null
+  - $NOMC || conda list --name=_test --export libdiffpy > /tmp/mypackage.txt
   - $NOMC || source activate testenv
-  - $NOMC || conda install --yes "${MYCONDAPACKAGE}"
+  - $NOMC || conda install --yes --use-local --file=/tmp/mypackage.txt
   - $NOMC || conda install --yes cxxtest scons
   - $NOMC || MYPREFIX="${HOME}/mc/envs/testenv"
   - $NOMC || MYWORKDIR="${HOME}/mc/conda-bld/work"
