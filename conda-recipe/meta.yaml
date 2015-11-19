@@ -8,28 +8,21 @@ source:
   git_url: ..
 
 build:
-  number: 0
+  number: 1
   binary_relocation: False      # [linux]
 
 requirements:
   build:
     - scons
-    - boost 1.57.0              # [linux]
-    - boost 1.56.0 py27_2       # [osx]
+    - boost-all 1.59.0
     - gsl
     - cxxtest
-    - libobjcryst <2.0
+    - libobjcryst
 
   run:
-    - boost 1.57.0              # [linux]
-      # When package version includes build tag, its dependencies must be
-      # listed as well.  https://github.com/conda/conda-build/issues/563
-    - boost 1.56.0 py27_2       # [osx]
-    -   python                  # [osx]
-    -   bzip2 1.0.*             # [osx]
-    -   zlib 1.2.*              # [osx]
+    - boost-serialization 1.59.0
     - gsl
-    - libobjcryst <2.0
+    - libobjcryst
 
 test:
   requires:
