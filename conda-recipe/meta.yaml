@@ -15,13 +15,13 @@ requirements:
   build:
     - scons
     - boost-all 1.59.0
-    - gsl
+    - gsl 2.1
     - cxxtest
     - libobjcryst
 
   run:
     - boost-all
-    - gsl
+    - gsl >=2.1
     - libobjcryst
 
 test:
