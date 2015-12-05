@@ -11,7 +11,7 @@ if [[ `uname` == Darwin ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH="${PREFIX}/lib"
 fi
 
-MYNCPU=$(( (CPU_COUNT > 4) ? 4 : CPU_COUNT ))
+MYNCPU=$(( (CPU_COUNT > 8) ? 8 : CPU_COUNT ))
 
 # Build the library and unit test program.
 scons -j $MYNCPU lib alltests
