@@ -4,7 +4,6 @@ export CPATH="${PREFIX}/include:${CPATH}"
 export LIBRARY_PATH="${PREFIX}/lib:${LIBRARY_PATH}"
 
 if [[ `uname` == Linux ]]; then
-    export LDFLAGS="${LDFLAGS} "'-Wl,-rpath,\\$$ORIGIN/.'
     export LD_LIBRARY_PATH="${PREFIX}/lib"
 fi
 
