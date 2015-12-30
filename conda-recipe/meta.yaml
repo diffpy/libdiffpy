@@ -19,7 +19,7 @@ requirements:
     - libobjcryst
 
   run:
-    - boost-all
+    - boost-all 1.59.0
     - gsl >=2.1
     - libobjcryst
 
