@@ -26,6 +26,7 @@ matrix:
       env: MYUSEMC=false
 
 before_install:
+  - umask 022
   - git fetch origin --tags
   - if ${MYUSEMC}; then
         NOAPT=true; NOMC=false;
@@ -51,7 +52,7 @@ before_install:
   - $NOMC || test -x ~/mc/bin/conda || bash ${MYMCBUNDLE} -b -f -p ~/mc
   - $NOMC || popd
   - $NOMC || export PATH="${HOME}/mc/bin:${PATH}"
-  - $NOMC || conda update conda --yes
+  - $NOMC || conda update --yes conda
   - $NOMC || conda install --yes python=${MYPYTHON_VERSION} conda-build
   - $NOMC || conda create --name=testenv --yes python=${MYPYTHON_VERSION}
   - $NOMC || conda config --add channels pavoljuhas/channel/dev
