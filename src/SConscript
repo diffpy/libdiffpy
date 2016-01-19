@@ -82,7 +82,7 @@ SConscript('diffpy/SConscript.version')
 
 # Path where datafiles should be installed
 env['runtimepath'] = os.path.join(
-        env['datadir'], 'diffpy/libdiffpy%i%i' % env['majorminor'])
+        env['datadir'], 'diffpy/libdiffpy-%i.%i' % env['majorminor'])
 SConscript('runtime/SConscript')
 
 # Load all other sconscripts that update lib_includes and lib_sources
