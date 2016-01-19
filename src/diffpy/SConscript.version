@@ -17,13 +17,18 @@ def parsemajorminor(hcode):
 def build_VersionCode(target, source, env):
     tplcode = source[0].get_contents()
     numversion = (1000000 * ginfo['major'] +
-            1000 * ginfo['minor'] + ginfo['number'])
+            1000 * ginfo['minor'] + ginfo['micro'] +
+            0.0001 * ginfo['number'])
+    libversion = "%.0f" % numversion
+    if ginfo['number']:
+        libversion = "%.4f" % numversion
     if ginfo['prerelease']:
-        numversion = "(-500 + %i)" % numversion
+        libversion = "(-0.5 + %s)" % libversion
     flds = {
-        'DIFFPY_VERSION' : numversion,
+        'DIFFPY_VERSION' : libversion,
         'DIFFPY_VERSION_MAJOR' : ginfo['major'],
         'DIFFPY_VERSION_MINOR' : ginfo['minor'],
+        'DIFFPY_VERSION_MICRO' : ginfo['micro'],
         'DIFFPY_VERSION_STR' : ginfo['version'],
         'DIFFPY_VERSION_DATE' : ginfo['date'],
         'DIFFPY_GIT_SHA' : ginfo['commit'],

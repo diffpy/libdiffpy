@@ -25,15 +25,15 @@ def gitinfo():
     vtag = words[0].lstrip('v')
     vnum = int((words[1:2] or ['0'])[0])
     rv['commit'], rv['date'] = glog.strip().split(None, 1)
-    mx = re.match(r'^(\d+)\.(\d+)((?:[ab]|rc)\d*)?', vtag)
+    mx = re.match(r'^(\d+)\.(\d+)(?:\.(\d+))?((?:[ab]|rc)\d*)?', vtag)
     rv['major'] = int(mx.group(1))
     rv['minor'] = int(mx.group(2))
-    rv['prerelease'] = mx.group(3)
+    rv['micro'] = int(mx.group(3) or 0)
+    rv['prerelease'] = mx.group(4)
     rv['number'] = vnum
     rv['version'] = vtag
-    numsep = rv['prerelease'] and '.dev' or '.'
     if vnum:
-        rv['version'] += numsep + str(vnum)
+        rv['version'] += '.post' + str(vnum)
     _cached_gitinfo = rv
     return gitinfo()
 
