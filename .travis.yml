@@ -1,17 +1,10 @@
 sudo: required
 
-language: generic
+language: cpp
 
 os:
   - linux
   - osx
-
-branches:
-  except:
-    - /^v[0-9]/
-
-git:
-  depth: 999999
 
 env:
   global:
@@ -24,6 +17,14 @@ matrix:
   exclude:
     - os: osx
       env: MYUSEMC=false
+
+git:
+  depth: 999999
+
+branches:
+  except:
+    - /^v[0-9]/
+
 
 before_install:
   - umask 022
