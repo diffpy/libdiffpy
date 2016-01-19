@@ -10,14 +10,16 @@ libdiffpy is a C++ library for calculating atomic pair distribution function
 distances and directions up to specified maximum distance.   The atomic
 structure models are represented by classes for non-periodic, periodic or
 structures with space group symmetries.  libdiffpy supports Crystal and
-Molecule classes from the ObjCryst crystallographic library.  Calculators
-support two evaluation models - BASIC, which performs a full pair-summation
-every time, and OPTIMIZED, which updates only pair contributions that have
-changed since the last evaluation.  libdiffpy supports object serialization
-and parallel computations using parallel map function.  PDF calculations can
-be performed in two modes - either as a real-space summation of peak profiles
-(PDFCalculator) or as a reciprocal-space Debye summation and Fourier transform
-of the total scattering structure function (DebyePDFCalculator).
+Molecule classes from the [ObjCryst crystallographic library](
+https://sourceforge.net/projects/objcryst).
+Calculators support two evaluation models - BASIC, which performs a full
+pair-summation every time, and OPTIMIZED, which updates only pair
+contributions that have changed since the last evaluation.  libdiffpy supports
+object serialization and parallel computations using parallel map function.
+PDF calculations can be performed in two modes - either as a real-space
+summation of peak profiles (PDFCalculator) or as a reciprocal-space Debye
+summation and Fourier transform of the total scattering structure function
+(DebyePDFCalculator).
 
 The calculator objects in libdiffpy share common procedure for iteration
 over atom pairs and only specialize the processing of pair contributions.
@@ -42,34 +44,39 @@ Recommended software:
   https://github.com/diffpy/libobjcryst
 * `cxxtest` - CxxTest Unit Testing Framework, http://cxxtest.com
 
-On Ubuntu Linux the required software can be installed using the
-system package manager:
+The required software is commonly available in the system package manager.
+For example, on Ubuntu Linux the required software can be installed using
 
 ```sh
 sudo apt-get install \
     build-essential scons libboost-dev libgsl0-dev
 ```
 
-For Mac OS X machine with the MacPorts package manager the installation
-command is
-
-```sh
-sudo port install scons boost gsl
-```
-
-For other packages see their project pages for installation instructions.
+libdiffpy is also available as a pre-compiled package for
+[Anaconda Python](https://www.continuum.io/downloads).  A Python
+interface to libdiffpy is provided by Anaconda package diffpy.srreal.
 
 
 ## INSTALLATION
 
-To build and install the libdiffpy library from sources, run
+### Installation from sources
+
+Use sources from the git repository or extract the latest source
+bundle from https://github.com/diffpy/libdiffpy/releases/latest.
+
+```sh
+tar xzf libdiffpy-VERSION.tar.gz
+cd libdiffpy-VERSION
+```
+
+To build and install the libdiffpy library use
 
 ```sh
 sudo scons -j4 install
 ```
 
 This installs libdiffpy for all users under the `/usr/local` directory.
-If administrator (root) access is not available, see the usage info from
+If administrator (root) access is not available, see the output from
 `scons --help` for options to install to a user-writable location.
 
 To verify libdiffpy installation, compile and run the included
@@ -83,8 +90,45 @@ c++ testlib.cpp -ldiffpy
 
 If compilation fails because of missing header files or missing libdiffpy
 library, adjust the `CPATH` and `LIBRARY_PATH` environment variables or
-use the `-I` or `-L` compiler options.  If the libdiffpy shared library
-cannot be found at runtime, adjust the `LD_LIBRARY_PATH` environment variable.
+use the `-I` or `-L` compiler options.  If the shared library libdiffpy
+is unavailable at runtime, add a `-Wl,-rpath,SomePath` option to the
+c++ command or adjust the `LD_LIBRARY_PATH` environment variable.
+
+### Installation for Anaconda Python
+
+The libdiffpy library can be installed from the "diffpy" channel
+of Anaconda packages
+
+```sh
+conda config --add channels diffpy
+conda install libdiffpy
+```
+
+libdiffpy is also included in the "diffpy-cmi" collection of packages
+for structure analysis
+
+```sh
+conda install diffpy-cmi
+```
+
+When compiling with the Anaconda version of libdiffpy it is essential to
+specify header path, library path and runtime path of the active Anaconda
+environment
+
+```sh
+# resolve prefix directory P of the active Anaconda environment
+P="$(conda info --json | grep default_prefix | cut -d\" -f4)"
+cd examples
+c++ testlib.cpp -I$P/include -L$P/lib -Wl,-rpath,$P/lib -ldiffpy
+./a.out
+```
+
+On Mac OS X the libdiffpy package is built for OS X version
+10.6 which may be incompatible with codes emitted on newer OS.
+To fix this add `-mmacosx-version-min=10.6` option to the
+c++ compiler or set it with an environment variable as
+`export MACOSX_DEPLOYMENT_TARGET=10.6`.
+
 
 ## DEVELOPMENT
 
