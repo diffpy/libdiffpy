@@ -16,19 +16,25 @@ def parsemajorminor(hcode):
 
 def build_VersionCode(target, source, env):
     tplcode = source[0].get_contents()
-    numversion = (1000000 * ginfo['major'] +
-            1000 * ginfo['minor'] + ginfo['micro'] +
-            0.0001 * ginfo['number'])
-    libversion = "%.0f" % numversion
-    if ginfo['number']:
-        libversion = "%.4f" % numversion
+    numversion = ginfo['major']
+    numversion = 1000 * numversion + ginfo['minor']
+    numversion = 1000 * numversion + ginfo['micro']
+    numversion = 1000 * numversion + ginfo['patchnumber']
+    # verify that formulas in version.tpl work as advertised
+    emsg = "Inconsistent value of DIFFPY_VERSION = %i" % numversion
+    assert numversion // 1000000000 == ginfo['major'], emsg
+    assert numversion // 1000000 % 1000 == ginfo['minor'], emsg
+    assert numversion // 1000 % 1000 == ginfo['micro'], emsg
+    assert numversion % 500 == ginfo['patchnumber'], emsg
+    libversion = str(numversion)
     if ginfo['prerelease']:
-        libversion = "(-0.5 + %s)" % libversion
+        libversion = "(-500 + %s)" % libversion
     flds = {
         'DIFFPY_VERSION' : libversion,
         'DIFFPY_VERSION_MAJOR' : ginfo['major'],
         'DIFFPY_VERSION_MINOR' : ginfo['minor'],
         'DIFFPY_VERSION_MICRO' : ginfo['micro'],
+        'DIFFPY_VERSION_PATCH' : ginfo['patchnumber'],
         'DIFFPY_VERSION_STR' : ginfo['version'],
         'DIFFPY_VERSION_DATE' : ginfo['date'],
         'DIFFPY_GIT_SHA' : ginfo['commit'],

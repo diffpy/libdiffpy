@@ -18,11 +18,16 @@
 
 #include <diffpy/version.hpp>
 
-const double libdiffpy_version_info::version = DIFFPY_VERSION;
+// Append LL suffix to the DIFFPY_VERSION number.
+#define APPEND(x, y) x ## y
+#define LL(x) APPEND(x, LL)
+
+const long long libdiffpy_version_info::version = LL(DIFFPY_VERSION);
 const char* libdiffpy_version_info::version_str = DIFFPY_VERSION_STR;
 const int libdiffpy_version_info::major = DIFFPY_VERSION_MAJOR;
 const int libdiffpy_version_info::minor = DIFFPY_VERSION_MINOR;
 const int libdiffpy_version_info::micro = DIFFPY_VERSION_MICRO;
+const int libdiffpy_version_info::patch = DIFFPY_VERSION_PATCH;
 const char* libdiffpy_version_info::date = DIFFPY_VERSION_DATE;
 const char* libdiffpy_version_info::git_sha = DIFFPY_GIT_SHA;
 

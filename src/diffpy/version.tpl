@@ -17,6 +17,7 @@
 *   DIFFPY_VERSION_MAJOR,
 *   DIFFPY_VERSION_MINOR,
 *   DIFFPY_VERSION_MICRO,
+*   DIFFPY_VERSION_PATCH,
 *   DIFFPY_VERSION_STR,
 *   DIFFPY_VERSION_DATE
 *   DIFFPY_GIT_SHA
@@ -32,15 +33,18 @@
 #define DIFFPY_VERSION_MAJOR ${DIFFPY_VERSION_MAJOR}
 #define DIFFPY_VERSION_MINOR ${DIFFPY_VERSION_MINOR}
 #define DIFFPY_VERSION_MICRO ${DIFFPY_VERSION_MICRO}
+// number of git commits since the last release tag
+#define DIFFPY_VERSION_PATCH ${DIFFPY_VERSION_PATCH}
 
-// round(DIFFPY_VERSION) / 1000000 is the major version
-// round(DIFFPY_VERSION) / 1000 % 1000 is the minor version
-// round(DIFFPY_VERSION) % 1000 is the micro version
-// round(DIFFPY_VERSION * 10000) % 1000
-//      is number of git commits since the last tag
+// DIFFPY_VERSION is an integer representation of a full version:
+//
+// DIFFPY_VERSION / 1000000000 is the major version number
+// DIFFPY_VERSION / 1000000 % 1000 is the minor version number
+// DIFFPY_VERSION / 1000 % 1000 is the micro version number
+// DIFFPY_VERSION % 500 is the patch number
 //
 // alpha and beta releases have smaller DIFFPY_VERSION than
-// a completed release.  Numerical comparison of DIFFPY_VERSION
+// a finalized release.  Numerical comparisons of DIFFPY_VERSION
 // values from two pre-releases may be inaccurate.
 
 #define DIFFPY_VERSION ${DIFFPY_VERSION}
@@ -62,11 +66,12 @@
 
 struct libdiffpy_version_info {
 
-    static const double version;
+    static const long long version;
     static const char* version_str;
     static const int major;
     static const int minor;
     static const int micro;
+    static const int patch;
     static const char* date;
     static const char* git_sha;
 

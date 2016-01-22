@@ -30,7 +30,7 @@ def gitinfo():
     rv['minor'] = int(mx.group(2))
     rv['micro'] = int(mx.group(3) or 0)
     rv['prerelease'] = mx.group(4)
-    rv['number'] = vnum
+    rv['patchnumber'] = vnum
     rv['version'] = vtag
     if vnum:
         rv['version'] += '.post' + str(vnum)
