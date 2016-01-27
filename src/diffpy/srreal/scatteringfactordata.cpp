@@ -65,13 +65,30 @@ class WaasKirfFormula
         }
 
         // methods
-        double atstol(double stol) const
+        double xrayatstol(double stol) const
         {
             double rv = c;
             for (int i = 0; i < WKTerms; ++i)
             {
                 rv += a[i] * exp(-b[i] * stol * stol);
             }
+            return rv;
+        }
+
+        double Z() const
+        {
+            double rv = c;
+            for (int i = 0; i < WKTerms; ++i)  rv += a[i];
+            return round(rv);
+        }
+
+        double electronatstol(double stol) const
+        {
+            using diffpy::mathutils::eps_eq;
+            using diffpy::mathutils::DOUBLE_MAX;
+            if (eps_eq(stol, 0.0))  return DOUBLE_MAX;
+            double rv = 0.023934 *
+                (this->Z() - this->xrayatstol(stol)) / (stol * stol);
             return rv;
         }
 
@@ -163,6 +180,36 @@ const SetOfWKFormulas& getWKFormulasSet()
     }
     return getWKFormulasSet();
 }
+
+
+SetOfWKFormulas::const_iterator findWKFormula(const string& smbl)
+{
+    using diffpy::srreal::atomBareSymbol;
+    using diffpy::srreal::atomValence;
+    WaasKirfFormula wk;
+    wk.symbol = smbl;
+    const SetOfWKFormulas& swk = getWKFormulasSet();
+    SetOfWKFormulas::const_iterator wkit = swk.find(wk);
+    if (wkit != swk.end())  return wkit;
+    // try again with an adjusted charge suffix
+    wk.symbol = atomBareSymbol(smbl);
+    int v = atomValence(smbl);
+    if (v == 0)  wkit = swk.find(wk);
+    else if (abs(v) == 1)
+    {
+        wk.symbol += ((v > 0) ? "1+" : "1-");
+        wkit = swk.find(wk);
+    }
+    // raise exception if no match
+    if (wkit == swk.end())
+    {
+        string emsg("Unknown atom or ion symbol '");
+        emsg += smbl + "'.";
+        throw invalid_argument(emsg);
+    }
+    return wkit;
+}
+
 
 // Electron numbers for elements and ions
 
@@ -305,7 +352,7 @@ namespace srreal {
 /// X-ray scattering factor of an element or ion a given Q
 double fxrayatq(const string& smbl, double q)
 {
-    double stol = q / (4 * M_PI);
+    const double stol = q / (4 * M_PI);
     return fxrayatstol(smbl, stol);
 }
 
@@ -313,43 +360,17 @@ double fxrayatq(const string& smbl, double q)
 /// X-ray scattering factor of an element or ion a given sin(theta)/lambda
 double fxrayatstol(const string& smbl, double stol)
 {
-    WaasKirfFormula wk;
-    wk.symbol = smbl;
-    const SetOfWKFormulas& swk = getWKFormulasSet();
-    SetOfWKFormulas::const_iterator wkit = swk.find(wk);
-    if (wkit == swk.end())
-    {
-        wk.symbol = atomBareSymbol(smbl);
-        int v = atomValence(smbl);
-        if (v == 0)  wkit = swk.find(wk);
-        if (abs(v) == 1)
-        {
-            wk.symbol += ((v > 0) ? "1+" : "1-");
-            wkit = swk.find(wk);
-        }
-    }
-    // raise exception if no match
-    if (wkit == swk.end())
-    {
-        string emsg("Unknown atom or ion symbol '");
-        emsg += smbl + "'.";
-        throw invalid_argument(emsg);
-    }
-    double rv = wkit->atstol(stol);
-    return rv;
+    SetOfWKFormulas::const_iterator wkit = findWKFormula(smbl);
+    return wkit->xrayatstol(stol);
 }
 
 
 /// Electron scattering factor of an element or ion a given Q
 double felectronatq(const string& smbl, double q)
 {
-    using namespace diffpy::mathutils;
-    // resolve Z first so that invalid symbol can throw an exception
-    double Z = round(fxrayatstol(smbl, 0.0));
-    if (eps_eq(q, 0.0))     return DOUBLE_MAX;
-    double stol = q / (4 * M_PI);
-    double rv = 0.023934 * (Z - fxrayatstol(smbl, stol)) / (stol * stol);
-    return rv;
+    const double stol = q / (4 * M_PI);
+    SetOfWKFormulas::const_iterator wkit = findWKFormula(smbl);
+    return wkit->electronatstol(stol);
 }
 
 

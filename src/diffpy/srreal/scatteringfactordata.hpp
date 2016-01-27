@@ -33,7 +33,6 @@ namespace srreal {
 /// X-ray scattering factor of an element or ion a given Q
 double fxrayatq(const std::string& smbl, double q);
 
-
 /// X-ray scattering factor of an element or ion a given sin(theta)/lambda
 double fxrayatstol(const std::string& smbl, double stol);
 
