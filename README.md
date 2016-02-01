@@ -7,7 +7,7 @@ C++ calculators of PDF, bond valence sum and other pair quantities
 
 libdiffpy is a C++ library for calculating atomic pair distribution function
 (PDF), bond valence sums, atom overlaps for a hard-sphere model, bond
-distances and directions up to specified maximum distance.   The atomic
+distances and directions up to a specified maximum distance.   The atomic
 structure models are represented by classes for non-periodic, periodic or
 structures with space group symmetries.  libdiffpy supports Crystal and
 Molecule classes from the [ObjCryst crystallographic library](
@@ -21,9 +21,9 @@ summation of peak profiles (PDFCalculator) or as a reciprocal-space Debye
 summation and Fourier transform of the total scattering structure function
 (DebyePDFCalculator).
 
-The calculator objects in libdiffpy share common procedure for iteration
+The calculator objects in libdiffpy share a common procedure for iteration
 over atom pairs and only specialize the processing of pair contributions.
-New calculator class can thus be readily defined for any quantity that is
+New calculator classes can thus be readily defined for any quantity that is
 obtained by iteration over atom pairs.
 
 For more information see user manual at
