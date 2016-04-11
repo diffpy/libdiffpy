@@ -91,8 +91,10 @@ class AtomicStructureAdapter : public StructureAdapter
         virtual StructureAdapterPtr clone() const;
         virtual BaseBondGeneratorPtr createBondGenerator() const;
         virtual int countSites() const;
+        // reusing StructureAdapter::numberDensity()
         virtual const std::string& siteAtomType(int idx) const;
         virtual const R3::Vector& siteCartesianPosition(int idx) const;
+        // reusing StructureAdapter::siteMultiplicity()
         virtual double siteOccupancy(int idx) const;
         virtual bool siteAnisotropy(int idx) const;
         virtual const R3::Matrix& siteCartesianUij(int idx) const;
