@@ -87,6 +87,12 @@ const R3::Vector& NoMetaStructureAdapter::siteCartesianPosition(
 }
 
 
+int NoMetaStructureAdapter::siteMultiplicity(int idx) const
+{
+    return msrcstructure->siteMultiplicity(idx);
+}
+
+
 double NoMetaStructureAdapter::siteOccupancy(int idx) const
 {
     return msrcstructure->siteOccupancy(idx);
