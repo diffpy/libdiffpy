@@ -50,7 +50,8 @@ Lattice::Lattice(double a0, double b0, double c0,
 void Lattice::setLatPar(double a0, double b0, double c0,
         double alpha0, double beta0, double gamma0)
 {
-    using namespace diffpy::mathutils;
+    using diffpy::mathutils::cosd;
+    using diffpy::mathutils::sind;
     ma = a0;
     mb = b0;
     mc = c0;
@@ -103,7 +104,7 @@ void Lattice::setLatBase(const R3::Vector& va0,
         const R3::Vector& vb0,
         const R3::Vector& vc0)
 {
-    using namespace diffpy::mathutils;
+    using diffpy::mathutils::acosd;
     R3::row(mbase, 0) = va0;
     R3::row(mbase, 1) = vb0;
     R3::row(mbase, 2) = vc0;
