@@ -43,7 +43,8 @@ LatticeParameters::LatticeParameters( double _a, double _b, double _c,
 
 void LatticeParameters::update()
 {
-    using namespace diffpy::mathutils;
+    using diffpy::mathutils::cosd;
+    using diffpy::mathutils::sind;
     ca = cosd(alpha); cb = cosd(beta); cg = cosd(gamma);
     sa = sind(alpha); sb = sind(beta); sg = sind(gamma);
     // Vunit is a volume of unit cell with a=b=c=1

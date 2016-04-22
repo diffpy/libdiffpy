@@ -52,6 +52,7 @@ void Lattice::setLatPar(double a0, double b0, double c0,
 {
     using diffpy::mathutils::cosd;
     using diffpy::mathutils::sind;
+    using diffpy::mathutils::acosd;
     ma = a0;
     mb = b0;
     mc = c0;
