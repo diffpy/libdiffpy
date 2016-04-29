@@ -647,13 +647,19 @@ void PDFCalculator::cacheStructureData()
 {
     int cntsites = this->countSites();
     // sfsite
+    boost::unordered_map<string, double> fcache;
     mstructure_cache.sfsite.resize(cntsites);
     const ScatteringFactorTablePtr sftable = this->getScatteringFactorTable();
     for (int i = 0; i < cntsites; ++i)
     {
         const string& smbl = mstructure->siteAtomType(i);
-        mstructure_cache.sfsite[i] = sftable->lookup(smbl) *
-            mstructure->siteOccupancy(i);
+        boost::unordered_map<string, double>::iterator ff = fcache.find(smbl);
+        if (ff == fcache.end())
+        {
+            const double value = sftable->lookup(smbl);
+            ff = fcache.insert(make_pair(smbl, value)).first;
+        }
+        mstructure_cache.sfsite[i] = ff->second * mstructure->siteOccupancy(i);
     }
     // sfaverage
     double totocc = mstructure->totalOccupancy();
