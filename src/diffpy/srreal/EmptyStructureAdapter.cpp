@@ -16,6 +16,8 @@
 *
 *****************************************************************************/
 
+#include <boost/make_shared.hpp>
+
 #include <diffpy/serialization.ipp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 

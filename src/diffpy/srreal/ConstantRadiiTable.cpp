@@ -22,7 +22,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <vector>
-#include <boost/smart_ptr/make_shared.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/serialization/export.hpp>
 
 #include <diffpy/serialization.ipp>
