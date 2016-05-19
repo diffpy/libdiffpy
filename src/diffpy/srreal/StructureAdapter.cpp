@@ -23,7 +23,6 @@
 #include <diffpy/serialization.ipp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
 
 using namespace std;
@@ -79,14 +78,6 @@ StructureAdapter::diff(StructureAdapterConstPtr other) const
 }
 
 // Routines ------------------------------------------------------------------
-
-StructureAdapterPtr emptyStructureAdapter()
-{
-    static StructureAdapterPtr stru(new AtomicStructureAdapter);
-    assert(stru && stru->countSites() == 0);
-    return stru;
-}
-
 
 double meanSquareDisplacement(const R3::Matrix& Uijcartn,
         const R3::Vector& s, bool anisotropy)
