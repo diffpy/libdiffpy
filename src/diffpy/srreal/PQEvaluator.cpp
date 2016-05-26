@@ -86,6 +86,12 @@ PQEvaluatorType PQEvaluatorBasic::typeintused() const
 }
 
 
+void PQEvaluatorBasic::validate(PairQuantity& pq) const
+{
+    return;
+}
+
+
 void PQEvaluatorBasic::updateValue(
         PairQuantity& pq, StructureAdapterPtr stru)
 {
@@ -159,6 +165,14 @@ bool PQEvaluatorBasic::isParallel() const
 PQEvaluatorType PQEvaluatorOptimized::typeint() const
 {
     return OPTIMIZED;
+}
+
+
+void PQEvaluatorOptimized::validate(PairQuantity& pq) const
+{
+    // Check if PairQuantity provides stashPartialValue.
+    pq.stashPartialValue();
+    pq.restorePartialValue();
 }
 
 

@@ -65,6 +65,7 @@ class PQEvaluatorBasic
         virtual PQEvaluatorType typeint() const;
         PQEvaluatorType typeintused() const;
         virtual void updateValue(PairQuantity&, StructureAdapterPtr);
+        virtual void validate(PairQuantity&) const;
         void setFlag(PQEvaluatorFlag flag, bool value);
         bool getFlag(PQEvaluatorFlag flag) const;
         void setupParallelRun(int cpuindex, int ncpu);
@@ -103,6 +104,7 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
 
         // methods
         virtual PQEvaluatorType typeint() const;
+        virtual void validate(PairQuantity&) const;
         virtual void updateValue(PairQuantity&, StructureAdapterPtr);
 
     private:

@@ -25,6 +25,7 @@
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
+#include <diffpy/srreal/OverlapCalculator.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -69,6 +70,7 @@ class TestPQEvaluator : public CxxTest::TestSuite
             mstru9 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
             mstru9->erase(9);
         }
+
 
         void test_PDF_change_atom()
         {
@@ -146,6 +148,16 @@ class TestPQEvaluator : public CxxTest::TestSuite
             QuantityType go = pdfco.getPDF();
             TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
             TS_ASSERT(allclose(gb, go));
+        }
+
+
+        void test_optimized_unsupported()
+        {
+            OverlapCalculator olc;
+            TS_ASSERT_EQUALS(BASIC, olc.getEvaluatorType());
+            TS_ASSERT_THROWS(
+                    olc.setEvaluatorType(OPTIMIZED), invalid_argument);
+            TS_ASSERT_EQUALS(BASIC, olc.getEvaluatorType());
         }
 
 };  // class TestPQEvaluator

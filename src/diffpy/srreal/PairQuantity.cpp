@@ -143,7 +143,20 @@ const double& PairQuantity::getRmax() const
 void PairQuantity::setEvaluatorType(PQEvaluatorType evtp)
 {
     if (mevaluator.get() && mevaluator->typeint() == evtp)  return;
-    mevaluator = createPQEvaluator(evtp, mevaluator);
+    PQEvaluatorPtr pqev = createPQEvaluator(evtp, mevaluator);
+    // validate the new evaluator object
+    try
+    {
+        pqev->validate(*this);
+    }
+    catch (logic_error e)
+    {
+        string emsg("EvaluatorType not supported.  ");
+        emsg += e.what();
+        throw invalid_argument(emsg);
+    }
+    // validator is good here, use it now.
+    mevaluator = pqev;
     this->resetValue();
 }
 
