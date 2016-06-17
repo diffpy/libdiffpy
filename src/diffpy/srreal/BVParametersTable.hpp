@@ -57,6 +57,7 @@ class BVParametersTable
         void resetCustom(const std::string& atom0, int valence0,
                 const std::string& atom1, int valence1);
         void resetAll();
+        const SetOfBVParam& getAllCustom() const;
         SetOfBVParam getAll() const;
 
     private:

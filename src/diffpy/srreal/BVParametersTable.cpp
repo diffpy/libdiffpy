@@ -118,6 +118,13 @@ void BVParametersTable::resetAll()
 }
 
 
+const BVParametersTable::SetOfBVParam&
+BVParametersTable::getAllCustom() const
+{
+    return mcustomtable;
+}
+
+
 BVParametersTable::SetOfBVParam
 BVParametersTable::getAll() const
 {

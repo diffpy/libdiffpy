@@ -135,6 +135,25 @@ class TestBVParametersTable : public CxxTest::TestSuite
         }
 
 
+        void test_getAllCustom()
+        {
+            TS_ASSERT(mbvtb->getAllCustom().empty());
+            BVParam mymgo("Mg", 2, "O", -2);
+            mbvtb->setCustom(mymgo);
+            TS_ASSERT_EQUALS(1u, mbvtb->getAllCustom().size());
+            const BVParam& bp = mbvtb->lookup("O2-", "Mg2+");
+            BVParametersTable::SetOfBVParam::const_iterator ii;
+            ii = mbvtb->getAllCustom().find(mymgo);
+            TS_ASSERT_DIFFERS(ii, mbvtb->getAllCustom().end());
+            TS_ASSERT_DIFFERS(&mymgo, &(*ii));
+            TS_ASSERT_EQUALS(&bp, &(*ii));
+            TS_ASSERT_EQUALS(mymgo, *ii);
+            // erase the only custom parameter
+            mbvtb->resetCustom(*ii);
+            TS_ASSERT(mbvtb->getAllCustom().empty());
+        }
+
+
         void test_getAll()
         {
             BVParametersTable::SetOfBVParam allpars0, allpars1;
