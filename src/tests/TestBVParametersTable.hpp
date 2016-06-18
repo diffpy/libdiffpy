@@ -70,6 +70,16 @@ class TestBVParametersTable : public CxxTest::TestSuite
         }
 
 
+        void test_atomvalence()
+        {
+            TS_ASSERT_EQUALS(0, mbvtb->getAtomValence("O"));
+            mbvtb->setAtomValence("O", -2);
+            TS_ASSERT_EQUALS(-2, mbvtb->getAtomValence("O"));
+            mbvtb->resetAtomValences();
+            TS_ASSERT_EQUALS(0, mbvtb->getAtomValence("O"));
+        }
+
+
         void test_lookup()
         {
             BVParam bp = mbvtb->lookup("Xx", 0, "Yy", 3);
@@ -90,6 +100,11 @@ class TestBVParametersTable : public CxxTest::TestSuite
             const BVParam& bnacl0 = mbvtb->lookup("Na", 1, "Cl", -1);
             TS_ASSERT_EQUALS(&bnacl0, &mbvtb->lookup("Na+", "Cl-"));
             TS_ASSERT_EQUALS(&bnacl0, &mbvtb->lookup("Cl1-", "Na1+"));
+            const BVParam& bpnone = BVParametersTable::none();
+            TS_ASSERT_EQUALS(&bpnone, &mbvtb->lookup("Na", "Cl"));
+            mbvtb->setAtomValence("Na", +1);
+            mbvtb->setAtomValence("Cl", -1);
+            TS_ASSERT_EQUALS(&bnacl0, &mbvtb->lookup("Na", "Cl"));
         }
 
 
@@ -201,6 +216,13 @@ class TestBVParametersTable : public CxxTest::TestSuite
             BVParametersTable tb2 = dumpandload(*mbvtb);
             TS_ASSERT_EQUALS(2u, tb2.getAllCustom().size());
             TS_ASSERT_EQUALS(mynacl, tb2.lookup("Cl-", "Na+"));
+            // check serialization of customized valences
+            tb2.setAtomValence("Na", 1);
+            tb2.setAtomValence("Cl", -1);
+            BVParametersTable tb3 = dumpandload(tb2);
+            TS_ASSERT_EQUALS(mynacl, tb3.lookup("Cl", "Na"));
+            const BVParam& bpnone = BVParametersTable::none();
+            TS_ASSERT_EQUALS(bpnone, mbvtb->lookup("Cl", "Na"));
         }
 
 };  // class TestBVParametersTable

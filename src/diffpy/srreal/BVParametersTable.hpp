@@ -82,11 +82,18 @@ class BVParametersTable
             void serialize(Archive& ar, const unsigned int version)
         {
             ar & mcustomtable;
+            if (version >= 1) {
+                ar & matomvalence;
+            }
         }
 
 };  // class BVParametersTable
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_VERSION(diffpy::srreal::BVParametersTable, 1)
 
 #endif  // BVPARAMETERSTABLE_HPP_INCLUDED
