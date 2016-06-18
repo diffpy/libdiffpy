@@ -16,11 +16,10 @@
 *
 *****************************************************************************/
 
-#include <stdexcept>
 #include <cxxtest/TestSuite.h>
 
-#include <diffpy/serialization.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
+#include "serialization_helpers.hpp"
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -183,13 +182,8 @@ class TestBVParametersTable : public CxxTest::TestSuite
             BVParam mymgo("O", -2, "Mg", 2, 3.456, 0.55, "pj2");
             mbvtb->setCustom(mynacl);
             mbvtb->setCustom(mymgo);
-            stringstream storage(ios::in | ios::out | ios::binary);
-            diffpy::serialization::oarchive oa(storage, ios::binary);
-            oa << mbvtb;
-            diffpy::serialization::iarchive ia(storage, ios::binary);
-            BVParametersTablePtr bvtb1;
-            TS_ASSERT(!bvtb1.get());
-            ia >> bvtb1;
+            // check serialization of shared pointers
+            BVParametersTablePtr bvtb1 = dumpandload(mbvtb);
             TS_ASSERT_DIFFERS(mbvtb.get(), bvtb1.get());
             TS_ASSERT_EQUALS(2.345,
                     bvtb1->lookup("Cl", -1, "Na", 1).mRo);
@@ -203,6 +197,10 @@ class TestBVParametersTable : public CxxTest::TestSuite
                     bvtb1->lookup("O", -2, "Mg", 2).mB);
             TS_ASSERT_EQUALS(string("pj2"),
                     bvtb1->lookup("O", -2, "Mg", 2).mref_id);
+            // check serialization of instances
+            BVParametersTable tb2 = dumpandload(*mbvtb);
+            TS_ASSERT_EQUALS(2u, tb2.getAllCustom().size());
+            TS_ASSERT_EQUALS(mynacl, tb2.lookup("Cl-", "Na+"));
         }
 
 };  // class TestBVParametersTable
