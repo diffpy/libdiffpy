@@ -186,11 +186,12 @@ void BVSCalculator::cacheStructureData()
     int cntsites = this->countSites();
     mstructure_cache.baresymbols.resize(cntsites);
     mstructure_cache.valences.resize(cntsites);
+    const BVParametersTable& bvtb = *(this->getBVParamTable());
     for (int i = 0; i < cntsites; ++i)
     {
         const string& smbl = mstructure->siteAtomType(i);
         mstructure_cache.baresymbols[i] = atomBareSymbol(smbl);
-        mstructure_cache.valences[i] = atomValence(smbl);
+        mstructure_cache.valences[i] = bvtb.getAtomValence(smbl);
     }
 }
 
