@@ -305,7 +305,6 @@ const Atom& AtomicStructureAdapter::operator[](int idx) const
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::Atom)
-BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::Atom)
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::AtomicStructureAdapter)
 BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::AtomicStructureAdapter)
 
