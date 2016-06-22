@@ -24,8 +24,10 @@
 
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
+#include <diffpy/srreal/PeriodicStructureAdapter.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/srreal/OverlapCalculator.hpp>
+#include "test_helpers.hpp"
 
 namespace diffpy {
 namespace srreal {
@@ -142,6 +144,34 @@ class TestPQEvaluator : public CxxTest::TestSuite
             mpdfco.eval(mstru10);
             TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru9)));
             TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
+        }
+
+
+        void test_PDF_type_mask()
+        {
+            mpdfcb.setTypeMask("O2-", "all", false);
+            mpdfco.setTypeMask("O2-", "all", false);
+            PeriodicStructureAdapterPtr litao =
+                boost::dynamic_pointer_cast<PeriodicStructureAdapter>(
+                        loadTestPeriodicStructure("LiTaO3.stru"));
+            TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(litao));
+            TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
+            QuantityType gb0 = mpdfcb.getPDF();
+            // change masked-away oxygen
+            Atom& o29 = litao->at(29);
+            TS_ASSERT_EQUALS("O2-", o29.atomtype);
+            o29.xyz_cartn = R3::Vector(0.1, 0.2, 0.3);
+            TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(litao));
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
+            QuantityType gb1 = mpdfcb.getPDF();
+            TS_ASSERT_EQUALS(gb0, gb1);
+            // change active lithium
+            Atom& li0 = litao->at(0);
+            li0.occupancy = 0.1;
+            TS_ASSERT(allclose(mzeros, this->pdfcdiff(litao)));
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
+            QuantityType gb2 = mpdfcb.getPDF();
+            TS_ASSERT(!allclose(gb0, gb2));
         }
 
 
