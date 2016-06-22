@@ -105,9 +105,9 @@ void PQEvaluatorBasic::updateValue(
     // split outer loop for many atoms.  The CPUs should have similar load.
     bool chop_outer = (mncpu <= ((cntsites - 1) * CPU_LOAD_VARIANCE + 1));
     bool chop_inner = !chop_outer;
-    bool hasmask = pq.hasMask();
+    const bool hasmask = pq.hasMask();
     if (!this->isParallel())  chop_outer = chop_inner = false;
-    bool usefullsum = this->getFlag(USEFULLSUM);
+    const bool usefullsum = this->getFlag(USEFULLSUM);
     for (int i0 = 0; i0 < cntsites; ++i0)
     {
         if (chop_outer && (n++ % mncpu))    continue;
@@ -182,7 +182,7 @@ void PQEvaluatorOptimized::updateValue(
     mtypeused = OPTIMIZED;
     // revert to normal calculation if there is no structure or
     // if PairQuantity uses mask
-    if (pq.ticker() >= mvalue_ticker || !mlast_structure || pq.hasPairMask())
+    if (pq.ticker() >= mvalue_ticker || !mlast_structure)
     {
         return this->updateValueCompletely(pq, stru);
     }
@@ -192,7 +192,7 @@ void PQEvaluatorOptimized::updateValue(
     {
         return this->updateValueCompletely(pq, stru);
     }
-    if (this->getFlag(FIXEDSITEINDEX) &&
+    if ((this->getFlag(FIXEDSITEINDEX) || pq.hasPairMask()) &&
             sd.diffmethod != StructureDifference::Method::SIDEBYSIDE)
     {
         return this->updateValueCompletely(pq, stru);
@@ -219,7 +219,7 @@ void PQEvaluatorOptimized::updateValue(
         anchors.end() : (anchors.begin() + sd.pop0.size());
     SiteIndices::const_iterator ii0;
     bool needsreselection = usefullsum;
-    const bool hastypemask = pq.hasTypeMask();
+    const bool hasmask = pq.hasMask();
     for (ii0 = anchors.begin(); ii0 != last_anchor; ++ii0)
     {
         if (n++ % mncpu)    continue;
@@ -237,8 +237,7 @@ void PQEvaluatorOptimized::updateValue(
         for (bnds0->rewind(); !bnds0->finished(); bnds0->next())
         {
             int i1 = bnds0->site1();
-            assert(hastypemask || pq.getPairMask(i0, i1));
-            if (hastypemask && !pq.getPairMask(i0, i1))   continue;
+            if (hasmask && !pq.getPairMask(i0, i1))   continue;
             const int summationscale = (usefullsum || i0 == i1) ? -1 : -2;
             pq.addPairContribution(*bnds0, summationscale);
         }
@@ -288,8 +287,7 @@ void PQEvaluatorOptimized::updateValue(
         for (bnds1->rewind(); !bnds1->finished(); bnds1->next())
         {
             int i1 = bnds1->site1();
-            assert(hastypemask || pq.getPairMask(i0, i1));
-            if (hastypemask && !pq.getPairMask(i0, i1))   continue;
+            if (hasmask && !pq.getPairMask(i0, i1))   continue;
             const int summationscale = (usefullsum || i0 == i1) ? +1 : +2;
             pq.addPairContribution(*bnds1, summationscale);
         }

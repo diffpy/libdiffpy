@@ -175,6 +175,41 @@ class TestPQEvaluator : public CxxTest::TestSuite
         }
 
 
+        void test_PDF_pair_mask()
+        {
+            mpdfcb.setPairMask(0, 3, false);
+            mpdfco.setPairMask(0, 3, false);
+            TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(mstru10));
+            TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
+            QuantityType gb0 = mpdfcb.getPDF();
+            // check structure with one changed atom
+            TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru10d1)));
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
+            QuantityType gb1 = mpdfcb.getPDF();
+            TS_ASSERT(!allclose(gb0, gb1));
+            // check structure with one removed atom
+            TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru9)));
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
+            QuantityType gb2 = mpdfcb.getPDF();
+            TS_ASSERT(!allclose(gb1, gb2));
+            // check full evaluation for structure with reversed atoms
+            mpdfco.eval(mstru10);
+            TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(mstru10r));
+            TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
+            QuantityType gb3 = mpdfcb.getPDF();
+            TS_ASSERT(allclose(gb0, gb3));
+            // check effect of pair mask updates
+            mpdfco.eval(mstru10r);
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
+            mpdfco.setPairMask(0, 3, false);
+            mpdfco.eval(mstru10r);
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
+            mpdfco.setPairMask(0, 3, true);
+            mpdfco.eval(mstru10r);
+            TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
+        }
+
+
         void test_optimized_unsupported()
         {
             OverlapCalculator olc;
