@@ -300,11 +300,14 @@ setTypeMask(string smbli, string smblj, bool mask)
     {
         const string& sk = (ALLATOMSSTR != smbli) ? smbli : smblj;
         TypeMaskStorage::iterator tpmsk;
+        TypeMaskStorage::iterator skip = mtypemask.find(smblij);
         for (tpmsk = mtypemask.begin(); tpmsk != mtypemask.end();)
         {
-            if (sk == tpmsk->first.first || sk == tpmsk->first.second)
+            const bool eraseitem = (tpmsk != skip) &&
+                (sk == tpmsk->first.first || sk == tpmsk->first.second);
+            if (eraseitem)
             {
-                modified = true;
+                if (mask != tpmsk->second)  modified = true;
                 tpmsk = mtypemask.erase(tpmsk);
             }
             else  ++tpmsk;

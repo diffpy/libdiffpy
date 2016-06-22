@@ -108,15 +108,23 @@ public:
         pcount.setTypeMask("A", "B", false);
         EventTicker et2 = pcount.ticker();
         TS_ASSERT_LESS_THAN(et1, et2);
-        pcount.setPairMask(0, 0, false);
+        pcount.setTypeMask("A", "all", false);
         EventTicker et3 = pcount.ticker();
         TS_ASSERT_LESS_THAN(et2, et3);
+        pcount.setTypeMask("A", "all", false);
+        TS_ASSERT_EQUALS(et3, pcount.ticker());
+        pcount.setTypeMask("A", "all", true);
+        EventTicker et4 = pcount.ticker();
+        TS_ASSERT_LESS_THAN(et3, et4);
         pcount.setPairMask(0, 0, false);
-        TS_ASSERT_EQUALS(et3, pcount.ticker());
+        EventTicker et5 = pcount.ticker();
+        TS_ASSERT_LESS_THAN(et4, et5);
+        pcount.setPairMask(0, 0, false);
+        TS_ASSERT_EQUALS(et5, pcount.ticker());
         pcount.setPairMask(0, 5, true);
-        TS_ASSERT_EQUALS(et3, pcount.ticker());
+        TS_ASSERT_EQUALS(et5, pcount.ticker());
         pcount.setPairMask(0, 5, false);
-        TS_ASSERT_LESS_THAN(et3, pcount.ticker());
+        TS_ASSERT_LESS_THAN(et5, pcount.ticker());
     }
 
 
