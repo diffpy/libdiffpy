@@ -195,6 +195,11 @@ void PairQuantity::invertMask()
 {
     mticker.click();
     mdefaultpairmask = !mdefaultpairmask;
+    boost::unordered_map<int, bool>::iterator mm;
+    for (mm = msiteallmask.begin(); mm != msiteallmask.end(); ++mm)
+    {
+        mm->second = !(mm->second);
+    }
     TypeMaskStorage::iterator tpmsk;
     for (tpmsk = mtypemask.begin(); tpmsk != mtypemask.end(); ++tpmsk)
     {
@@ -275,6 +280,9 @@ setTypeMask(string smbli, string smblj, bool mask)
         this->maskAllPairs(mask);
         return;
     }
+    // msiteallmask is only relevant for index-based masking.
+    // clean it up to avoid unexpected effects when switching to index masks.
+    msiteallmask.clear();
     bool modified = false;
     // when all is used, remove all typemask elements with the other type
     if (ALLATOMSSTR == smbli || ALLATOMSSTR == smblj)
@@ -359,7 +367,8 @@ int PairQuantity::countSites() const
 
 bool PairQuantity::hasMask() const
 {
-    bool rv = !(mdefaultpairmask && minvertpairmask.empty());
+    bool rv = !(mdefaultpairmask && minvertpairmask.empty() &&
+            msiteallmask.empty() && mtypemask.empty());
     return rv;
 }
 
