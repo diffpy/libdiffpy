@@ -41,16 +41,39 @@ class TestPQEvaluator : public CxxTest::TestSuite
 {
     private:
 
+        // data
         EpsilonEqual allclose;
+        PDFCalculator mpdfcb;
+        PDFCalculator mpdfco;
+        QuantityType mzeros;
         AtomicStructureAdapterPtr mstru10;
         AtomicStructureAdapterPtr mstru10d1;
         AtomicStructureAdapterPtr mstru10r;
         AtomicStructureAdapterPtr mstru9;
 
+        // methods
+        QuantityType pdfcdiff(StructureAdapterPtr stru)
+        {
+            mpdfcb.eval(stru);
+            mpdfco.eval(stru);
+            QuantityType gb = mpdfcb.getPDF();
+            QuantityType go = mpdfco.getPDF();
+            assert(mpdfcb.getRgrid() == mpdfco.getRgrid());
+            QuantityType rv(gb.size());
+            transform(gb.begin(), gb.end(), go.begin(),
+                    rv.begin(), minus<double>());
+            return rv;
+        }
+
      public:
 
         void setUp()
         {
+            // setup PDFCalculator instances and the zero vector for comparison
+            mpdfcb.setEvaluatorType(BASIC);
+            mpdfco.setEvaluatorType(OPTIMIZED);
+            mzeros.assign(mpdfcb.getRgrid().size(), 0.0);
+            // setup structure instances
             const int SZ = 10;
             mstru10 = boost::make_shared<AtomicStructureAdapter>();
             Atom ai;
@@ -74,80 +97,51 @@ class TestPQEvaluator : public CxxTest::TestSuite
 
         void test_PDF_change_atom()
         {
-            PDFCalculator pdfcb;
-            PDFCalculator pdfco;
-            pdfcb.setEvaluatorType(BASIC);
-            pdfco.setEvaluatorType(OPTIMIZED);
-            TS_ASSERT_EQUALS(NONE, pdfcb.getEvaluatorTypeUsed());
-            TS_ASSERT_EQUALS(NONE, pdfco.getEvaluatorTypeUsed());
-            pdfcb.eval(mstru10);
-            pdfco.eval(mstru10);
-            QuantityType gb = pdfcb.getPDF();
-            QuantityType go = pdfco.getPDF();
+            TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorType());
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorType());
+            TS_ASSERT_EQUALS(NONE, mpdfcb.getEvaluatorTypeUsed());
+            TS_ASSERT_EQUALS(NONE, mpdfco.getEvaluatorTypeUsed());
+            TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(mstru10));
+            // first call of mpdfco should use the BASIC evaluation
+            TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorTypeUsed());
+            TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
+            // verify there are some non-zero values in the PDF.
+            QuantityType gb = mpdfcb.getPDF();
             TS_ASSERT(!gb.empty());
-            TS_ASSERT_EQUALS(gb, go);
             int cnonzero = count_if(gb.begin(), gb.end(),
                     bind1st(not_equal_to<double>(), 0.0));
             TS_ASSERT(cnonzero);
-            TS_ASSERT_EQUALS(BASIC, pdfcb.getEvaluatorType());
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorType());
-            // first call of pdfco should use the BASIC evaluation
-            TS_ASSERT_EQUALS(BASIC, pdfcb.getEvaluatorTypeUsed());
-            TS_ASSERT_EQUALS(BASIC, pdfco.getEvaluatorTypeUsed());
             // test second call on the same structure
-            pdfco.eval(mstru10);
-            go = pdfco.getPDF();
-            TS_ASSERT_EQUALS(gb, go);
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
+            mpdfco.eval(mstru10);
+            TS_ASSERT_EQUALS(gb, mpdfco.getPDF());
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
             // test structure with one different atom
-            pdfcb.eval(mstru10d1);
-            pdfco.eval(mstru10d1);
-            QuantityType gb1 = pdfcb.getPDF();
-            QuantityType go1 = pdfco.getPDF();
+            TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru10d1)));
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
+            QuantityType gb1 = mpdfcb.getPDF();
             TS_ASSERT(!allclose(gb, gb1));
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
-            TS_ASSERT(allclose(gb1, go1));
             // change position of 1 atom
             mstru10d1->at(0).xyz_cartn[1] = 0.5;
-            pdfcb.eval(mstru10d1);
-            pdfco.eval(mstru10d1);
-            QuantityType gb2 = pdfcb.getPDF();
-            QuantityType go2 = pdfco.getPDF();
+            TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru10d1)));
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
+            QuantityType gb2 = mpdfcb.getPDF();
             TS_ASSERT(!allclose(gb1, gb2));
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
-            TS_ASSERT(allclose(gb2, go2));
         }
 
 
         void test_PDF_reverse_atoms()
         {
-            PDFCalculator pdfcb;
-            PDFCalculator pdfco;
-            pdfcb.setEvaluatorType(BASIC);
-            pdfco.setEvaluatorType(OPTIMIZED);
-            pdfcb.eval(mstru10);
-            pdfco.eval(mstru10);
-            pdfco.eval(mstru10r);
-            QuantityType gb = pdfcb.getPDF();
-            QuantityType go = pdfco.getPDF();
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
-            TS_ASSERT(allclose(gb, go));
+            mpdfco.eval(mstru10);
+            TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru10r)));
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
         }
 
 
         void test_PDF_remove_atom()
         {
-            PDFCalculator pdfcb;
-            PDFCalculator pdfco;
-            pdfcb.setEvaluatorType(BASIC);
-            pdfco.setEvaluatorType(OPTIMIZED);
-            pdfcb.eval(mstru9);
-            pdfco.eval(mstru10);
-            pdfco.eval(mstru9);
-            QuantityType gb = pdfcb.getPDF();
-            QuantityType go = pdfco.getPDF();
-            TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorTypeUsed());
-            TS_ASSERT(allclose(gb, go));
+            mpdfco.eval(mstru10);
+            TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru9)));
+            TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
         }
 
 
