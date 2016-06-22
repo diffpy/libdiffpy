@@ -111,8 +111,12 @@ public:
         pcount.setPairMask(0, 0, false);
         EventTicker et3 = pcount.ticker();
         TS_ASSERT_LESS_THAN(et2, et3);
-        pcount.setPairMask(0, 5, false);
+        pcount.setPairMask(0, 0, false);
         TS_ASSERT_EQUALS(et3, pcount.ticker());
+        pcount.setPairMask(0, 5, true);
+        TS_ASSERT_EQUALS(et3, pcount.ticker());
+        pcount.setPairMask(0, 5, false);
+        TS_ASSERT_LESS_THAN(et3, pcount.ticker());
     }
 
 

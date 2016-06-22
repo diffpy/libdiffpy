@@ -120,7 +120,7 @@ class PairQuantity : public diffpy::Attributes
 
         // methods
         void updateMaskData();
-        void setPairMaskValue(int i, int j, bool mask);
+        bool setPairMaskValue(int i, int j, bool mask);
 
         // serialization
         friend class boost::serialization::access;

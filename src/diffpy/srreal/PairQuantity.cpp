@@ -218,34 +218,45 @@ void PairQuantity::setPairMask(int i, int j, bool mask)
         this->maskAllPairs(mask);
         return;
     }
+    bool modified = false;
     // update ticker if we are switching from type-mask mode
     if (!mtypemask.empty())
     {
         mtypemask.clear();
-        mticker.click();
+        modified = true;
     }
     // handle one ALLATOMSINT argument
     if (ALLATOMSINT == i || ALLATOMSINT == j)
     {
         int k = (ALLATOMSINT != i) ? i : j;
-        msiteallmask[k] = mask;
+        pair<boost::unordered_map<int, bool>::iterator, bool> pmm;
+        pmm = msiteallmask.emplace(k, mask);
+        if (pmm.second || pmm.first->second != mask)  modified = true;
+        pmm.first->second = mask;
         int cntsites = this->countSites();
         for (int l = 0; l < cntsites; ++l)
         {
             this->setPairMaskValue(k, l, mask);
         }
+        if (modified)  mticker.click();
         return;
     }
     // here neither i nor j is ALLATOMSINT
-    if (msiteallmask.count(i) && mask != msiteallmask.at(i))
+    boost::unordered_map<int, bool>::iterator ii, jj;
+    ii = msiteallmask.find(i);
+    if (ii != msiteallmask.end() && mask != ii->second)
     {
-        msiteallmask.erase(i);
+        msiteallmask.erase(ii);
+        modified = true;
     }
-    if (msiteallmask.count(j) && mask != msiteallmask.at(j))
+    jj = msiteallmask.find(j);
+    if (jj != msiteallmask.end() && mask != jj->second)
     {
-        msiteallmask.erase(j);
+        msiteallmask.erase(jj);
+        modified = true;
     }
-    this->setPairMaskValue(i, j, mask);
+    modified = this->setPairMaskValue(i, j, mask) ? true : modified;
+    if (modified)  mticker.click();
 }
 
 
@@ -299,10 +310,11 @@ setTypeMask(string smbli, string smblj, bool mask)
             else  ++tpmsk;
         }
     }
-    modified = modified ||
-        !(mtypemask.count(smblij) && mtypemask.at(smblij) == mask);
+    pair<TypeMaskStorage::iterator, bool> pmm;
+    pmm = mtypemask.emplace(smblij, mask);
+    if (pmm.second || pmm.first->second != mask)  modified = true;
+    pmm.first->second = mask;
     if (modified)  mticker.click();
-    mtypemask[smblij] = mask;
 }
 
 
@@ -461,12 +473,15 @@ void PairQuantity::updateMaskData()
 }
 
 
-void PairQuantity::setPairMaskValue(int i, int j, bool mask)
+bool PairQuantity::setPairMaskValue(int i, int j, bool mask)
 {
     assert(i >= 0 && j >= 0);
     pair<int,int> ij = (i > j) ? make_pair(j, i) : make_pair(i, j);
-    if (mask == mdefaultpairmask)  minvertpairmask.erase(ij);
-    else    minvertpairmask.insert(ij);
+    bool rv;
+    rv = (mask == mdefaultpairmask) ?
+        minvertpairmask.erase(ij) :
+        minvertpairmask.insert(ij).second;
+    return rv;
 }
 
 // Other functions -----------------------------------------------------------
