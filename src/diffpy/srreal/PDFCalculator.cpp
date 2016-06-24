@@ -130,14 +130,27 @@ QuantityType PDFCalculator::getF() const
 
 QuantityType PDFCalculator::getExtendedPDF() const
 {
-    // we need a full range PDF to apply termination ripples correctly
     QuantityType rgrid_ext = this->getExtendedRgrid();
+    // Skip FFT when qmax is not specified and qmin does not exclude the
+    // the F(Q=Qstep) point (excluding F(0) == 0 makes no difference to G).
+    const bool skipfft =
+        !eps_lt(this->getQmax(), M_PI / this->getRstep()) &&
+        !(1 < pdfutils_qminSteps(this));
+    if (skipfft)
+    {
+        QuantityType rdfpr = this->getExtendedRDFperR();
+        QuantityType rdfprb = this->applyBaseline(rgrid_ext, rdfpr);
+        QuantityType pdf = this->applyEnvelopes(rgrid_ext, rdfprb);
+        return pdf;
+    }
+    // FFT required here
+    // we need a full range PDF to apply termination ripples correctly
     QuantityType f_ext = this->getExtendedF();
-    QuantityType pdf0 = fftftog(f_ext, this->getQstep());
+    QuantityType pdf1 = fftftog(f_ext, this->getQstep());
     // cut away the FFT padded points
-    assert(this->extendedRmaxSteps() <= int(pdf0.size()));
-    QuantityType pdf1(pdf0.begin() + this->extendedRminSteps(),
-            pdf0.begin() + this->extendedRmaxSteps());
+    assert(this->extendedRmaxSteps() <= int(pdf1.size()));
+    pdf1.erase(pdf1.begin() + this->extendedRmaxSteps(), pdf1.end());
+    pdf1.erase(pdf1.begin(), pdf1.begin() + this->extendedRminSteps());
     QuantityType pdf2 = this->applyEnvelopes(rgrid_ext, pdf1);
     return pdf2;
 }
