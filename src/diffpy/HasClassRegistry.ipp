@@ -106,6 +106,25 @@ HasClassRegistry<TBase>::isRegisteredType(const std::string& tp)
 
 
 template <class TBase>
+std::map<std::string, std::string>
+HasClassRegistry<TBase>::getAliasedTypes()
+{
+    using namespace std;
+    map<string, string> rv;
+    const RegistryStorage& reg = getRegistry();
+    typename RegistryStorage::const_iterator irg = reg.begin();
+    for (; irg != reg.end(); ++irg)
+    {
+        if (irg->first != irg->second->type())
+        {
+            rv[irg->first] = irg->second->type();
+        }
+    }
+    return rv;
+}
+
+
+template <class TBase>
 std::set<std::string>
 HasClassRegistry<TBase>::getRegisteredTypes()
 {

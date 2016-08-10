@@ -67,6 +67,9 @@ class HasClassRegistry
         /// Return true if string is a registered string type or its alias.
         static bool isRegisteredType(const std::string& tp);
 
+        /// Return a map of string aliases to standard type strings.
+        static std::map<std::string, std::string> getAliasedTypes();
+
         /// Return a set of all registered string types
         static std::set<std::string> getRegisteredTypes();
 
