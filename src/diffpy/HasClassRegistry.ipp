@@ -97,6 +97,15 @@ HasClassRegistry<TBase>::createByType(const std::string& tp)
 
 
 template <class TBase>
+bool
+HasClassRegistry<TBase>::isRegisteredType(const std::string& tp)
+{
+    const RegistryStorage& reg = getRegistry();
+    return reg.count(tp);
+}
+
+
+template <class TBase>
 std::set<std::string>
 HasClassRegistry<TBase>::getRegisteredTypes()
 {

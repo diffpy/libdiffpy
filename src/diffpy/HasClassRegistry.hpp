@@ -64,6 +64,9 @@ class HasClassRegistry
         /// Create new instance of a specified string type.
         static SharedPtr createByType(const std::string& tp);
 
+        /// Return true if string is a registered string type or its alias.
+        static bool isRegisteredType(const std::string& tp);
+
         /// Return a set of all registered string types
         static std::set<std::string> getRegisteredTypes();
 
