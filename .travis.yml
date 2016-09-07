@@ -27,6 +27,7 @@ branches:
 
 
 before_install:
+  - MYNAME=libdiffpy
   - umask 022
   - git fetch origin --tags
   - if ${MYUSEMC}; then
@@ -75,7 +76,7 @@ before_install:
 
 install:
   - $NOMC || conda build conda-recipe
-  - $NOMC || conda list --name=_test --export libdiffpy > /tmp/mypackage.txt
+  - $NOMC || conda list --name=_test --export ${MYNAME} > /tmp/mypackage.txt
   - $NOMC || source activate testenv
   - $NOMC || conda install --yes --use-local --file=/tmp/mypackage.txt
   - $NOMC || conda install --yes cxxtest scons
