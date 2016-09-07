@@ -11,7 +11,7 @@ install-include     install the C++ header files
 install-data        install data files used by the library
 alltests            build the unit test program "alltests"
 test                execute unit tests (requires the cxxtest framework)
-sdist               create source distribution tarball (requires git repo)
+sdist               create source distribution tarball from git repository
 
 Build configuration variables:
 %s
@@ -68,7 +68,7 @@ vars.Add(PathVariable('datadir',
     env['prefix'] + '/share',
     PathVariable.PathAccept))
 vars.Add(BoolVariable('enable_objcryst',
-    'enable objcryst support, when installed', True))
+    'enable objcryst support, when installed', None))
 vars.Update(env)
 env.Help(MY_SCONS_HELP % vars.GenerateHelpText(env))
 
