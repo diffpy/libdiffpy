@@ -21,6 +21,3 @@ scons test
 
 # Install the library.
 scons install prefix=$PREFIX
-
-grep '^#define DIFFPY_VERSION_STR' < "${PREFIX}/include/diffpy/version.hpp" |
-    cut -d '"' -f 2 > __conda_version__.txt
