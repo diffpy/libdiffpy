@@ -124,10 +124,10 @@ c++ testlib.cpp -I$P/include -L$P/lib -Wl,-rpath,$P/lib -ldiffpy
 ```
 
 On Mac OS X the libdiffpy package is built for OS X version
-10.6 which may be incompatible with codes emitted on newer OS.
-To fix this add `-mmacosx-version-min=10.6` option to the
+10.7 which may be incompatible with codes emitted on newer OS.
+To fix this add `-mmacosx-version-min=10.7` option to the
 c++ compiler or set it with an environment variable as
-`export MACOSX_DEPLOYMENT_TARGET=10.6`.
+`export MACOSX_DEPLOYMENT_TARGET=10.7`.
 
 
 ## DEVELOPMENT

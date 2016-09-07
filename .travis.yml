@@ -109,7 +109,7 @@ install:
 
     # Mac OS X must use the same deployment target as conda-build.
   - if $MYUSEMC && [[ "${TRAVIS_OS_NAME}" == osx ]]; then
-        export MACOSX_DEPLOYMENT_TARGET=10.6;
+        export MACOSX_DEPLOYMENT_TARGET=10.7;
         export DYLD_FALLBACK_LIBRARY_PATH="${MYLIB}";
     fi
 
