@@ -55,11 +55,16 @@ class HasClassRegistry
 
         // methods provided by HasClassRegistry
 
-        /// Add a prototype of this instance to the registry
+        /// Add a prototype of this instance to the registry.
         virtual bool registerThisType() const;
 
-        /// Make registered type tp available under a different alias
+        /// Make registered type tp available under a different alias.
         static bool aliasType(const std::string& tp, const std::string& al);
+
+        /// Clear registration of the specified type under its standard name
+        /// or any alias.  Return the number of unset names and aliases or
+        /// 0 if the specifed string type was not registered.
+        static int deregisterType(const std::string& tp);
 
         /// Create new instance of a specified string type.
         static SharedPtr createByType(const std::string& tp);

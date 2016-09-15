@@ -78,6 +78,27 @@ bool HasClassRegistry<TBase>::aliasType(const std::string& tp,
 
 
 template <class TBase>
+int HasClassRegistry<TBase>::deregisterType(const std::string& tp)
+{
+    RegistryStorage& reg = getRegistry();
+    typename RegistryStorage::iterator ii = reg.find(tp);
+    if (ii == reg.end())  return 0;
+    SharedPtr p = ii->second;
+    int rv = 0;
+    for (ii = reg.begin(); ii != reg.end();)
+    {
+        typename RegistryStorage::iterator jj = ii++;
+        if (jj->second == p)
+        {
+            reg.erase(jj);
+            ++rv;
+        }
+    }
+    return rv;
+}
+
+
+template <class TBase>
 typename HasClassRegistry<TBase>::SharedPtr
 HasClassRegistry<TBase>::createByType(const std::string& tp)
 {

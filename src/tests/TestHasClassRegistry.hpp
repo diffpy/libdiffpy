@@ -43,6 +43,25 @@ class TestHasClassRegistry : public CxxTest::TestSuite
             mpreg = msftb.get();
         }
 
+        void tearDown()
+        {
+            // restore SFTXray registration if removed in some test.
+            msftb->registerThisType();
+            TS_ASSERT(ScatteringFactorTable::isRegisteredType("X"));
+            TS_ASSERT(ScatteringFactorTable::isRegisteredType("xray"));
+        }
+
+
+        void test_deregisterType()
+        {
+            TS_ASSERT_EQUALS(0,
+                    ScatteringFactorTable::deregisterType("invalid"));
+            TS_ASSERT_EQUALS(2,
+                    ScatteringFactorTable::deregisterType("X"));
+            TS_ASSERT(!(mpreg->isRegisteredType("xray")));
+            TS_ASSERT(!(mpreg->isRegisteredType("X")));
+        }
+
 
         void test_isRegisteredType()
         {
