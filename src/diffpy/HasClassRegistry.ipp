@@ -35,9 +35,6 @@ bool HasClassRegistry<TBase>::registerThisType() const
     RegistryStorage& reg = getRegistry();
     if (reg.count(this->type()))
     {
-        // do nothing when registering the same class twice
-        const TBase& regprot = *(reg[this->type()]);
-        if (typeid(*this) == typeid(regprot))    return true;
         // raise exception if trying to register a different class
         ostringstream emsg;
         emsg << "Prototype type '" << this->type() <<
