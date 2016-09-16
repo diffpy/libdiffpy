@@ -35,9 +35,6 @@ bool HasClassRegistry<TBase>::registerThisType() const
     RegistryStorage& reg = getRegistry();
     if (reg.count(this->type()))
     {
-        // do nothing when registering the same class twice
-        const TBase& regprot = *(reg[this->type()]);
-        if (typeid(*this) == typeid(regprot))    return true;
         // raise exception if trying to register a different class
         ostringstream emsg;
         emsg << "Prototype type '" << this->type() <<
@@ -78,6 +75,27 @@ bool HasClassRegistry<TBase>::aliasType(const std::string& tp,
 
 
 template <class TBase>
+int HasClassRegistry<TBase>::deregisterType(const std::string& tp)
+{
+    RegistryStorage& reg = getRegistry();
+    typename RegistryStorage::iterator ii = reg.find(tp);
+    if (ii == reg.end())  return 0;
+    SharedPtr p = ii->second;
+    int rv = 0;
+    for (ii = reg.begin(); ii != reg.end();)
+    {
+        typename RegistryStorage::iterator jj = ii++;
+        if (jj->second == p)
+        {
+            reg.erase(jj);
+            ++rv;
+        }
+    }
+    return rv;
+}
+
+
+template <class TBase>
 typename HasClassRegistry<TBase>::SharedPtr
 HasClassRegistry<TBase>::createByType(const std::string& tp)
 {
@@ -92,6 +110,34 @@ HasClassRegistry<TBase>::createByType(const std::string& tp)
         throw invalid_argument(emsg.str());
     }
     SharedPtr rv = irg->second->create();
+    return rv;
+}
+
+
+template <class TBase>
+bool
+HasClassRegistry<TBase>::isRegisteredType(const std::string& tp)
+{
+    const RegistryStorage& reg = getRegistry();
+    return reg.count(tp);
+}
+
+
+template <class TBase>
+std::map<std::string, std::string>
+HasClassRegistry<TBase>::getAliasedTypes()
+{
+    using namespace std;
+    map<string, string> rv;
+    const RegistryStorage& reg = getRegistry();
+    typename RegistryStorage::const_iterator irg = reg.begin();
+    for (; irg != reg.end(); ++irg)
+    {
+        if (irg->first != irg->second->type())
+        {
+            rv[irg->first] = irg->second->type();
+        }
+    }
     return rv;
 }
 
