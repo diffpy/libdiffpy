@@ -41,6 +41,26 @@ const BVParam& BVParametersTable::none()
 
 // Public Methods ------------------------------------------------------------
 
+int BVParametersTable::getAtomValence(const string& smbl) const
+{
+    AtomTypeValence::const_iterator ii = matomvalence.find(smbl);
+    int rv = (ii != matomvalence.end()) ? ii->second : atomValence(smbl);
+    return rv;
+}
+
+
+void BVParametersTable::setAtomValence(const string& smbl, int value)
+{
+    matomvalence[smbl] = value;
+}
+
+
+void BVParametersTable::resetAtomValences()
+{
+    matomvalence.clear();
+}
+
+
 const BVParam& BVParametersTable::lookup(const BVParam& bpk) const
 {
     SetOfBVParam::const_iterator bpit;
@@ -66,9 +86,11 @@ const BVParam& BVParametersTable::lookup(const BVParam& bpk) const
 const BVParam&
 BVParametersTable::lookup(const string& smbl0, const string& smbl1) const
 {
+    const int v0 = this->getAtomValence(smbl0);
+    const int v1 = this->getAtomValence(smbl1);
     const BVParam& rv = this->lookup(
-            atomBareSymbol(smbl0), atomValence(smbl0),
-            atomBareSymbol(smbl1), atomValence(smbl1));
+            atomBareSymbol(smbl0), v0,
+            atomBareSymbol(smbl1), v1);
     return rv;
 }
 
@@ -115,6 +137,13 @@ void BVParametersTable::resetCustom(const string& atom0, int valence0,
 void BVParametersTable::resetAll()
 {
     mcustomtable.clear();
+}
+
+
+const BVParametersTable::SetOfBVParam&
+BVParametersTable::getAllCustom() const
+{
+    return mcustomtable;
 }
 
 
@@ -171,5 +200,6 @@ BVParametersTable::getStandardSetOfBVParam() const
 // Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::BVParametersTable)
+DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::BVParametersTable)
 
 // End of file

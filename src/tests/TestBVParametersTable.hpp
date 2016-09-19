@@ -16,11 +16,10 @@
 *
 *****************************************************************************/
 
-#include <stdexcept>
 #include <cxxtest/TestSuite.h>
 
-#include <diffpy/serialization.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
+#include "serialization_helpers.hpp"
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -71,6 +70,16 @@ class TestBVParametersTable : public CxxTest::TestSuite
         }
 
 
+        void test_atomvalence()
+        {
+            TS_ASSERT_EQUALS(0, mbvtb->getAtomValence("O"));
+            mbvtb->setAtomValence("O", -2);
+            TS_ASSERT_EQUALS(-2, mbvtb->getAtomValence("O"));
+            mbvtb->resetAtomValences();
+            TS_ASSERT_EQUALS(0, mbvtb->getAtomValence("O"));
+        }
+
+
         void test_lookup()
         {
             BVParam bp = mbvtb->lookup("Xx", 0, "Yy", 3);
@@ -91,6 +100,11 @@ class TestBVParametersTable : public CxxTest::TestSuite
             const BVParam& bnacl0 = mbvtb->lookup("Na", 1, "Cl", -1);
             TS_ASSERT_EQUALS(&bnacl0, &mbvtb->lookup("Na+", "Cl-"));
             TS_ASSERT_EQUALS(&bnacl0, &mbvtb->lookup("Cl1-", "Na1+"));
+            const BVParam& bpnone = BVParametersTable::none();
+            TS_ASSERT_EQUALS(&bpnone, &mbvtb->lookup("Na", "Cl"));
+            mbvtb->setAtomValence("Na", +1);
+            mbvtb->setAtomValence("Cl", -1);
+            TS_ASSERT_EQUALS(&bnacl0, &mbvtb->lookup("Na", "Cl"));
         }
 
 
@@ -135,6 +149,25 @@ class TestBVParametersTable : public CxxTest::TestSuite
         }
 
 
+        void test_getAllCustom()
+        {
+            TS_ASSERT(mbvtb->getAllCustom().empty());
+            BVParam mymgo("Mg", 2, "O", -2);
+            mbvtb->setCustom(mymgo);
+            TS_ASSERT_EQUALS(1u, mbvtb->getAllCustom().size());
+            const BVParam& bp = mbvtb->lookup("O2-", "Mg2+");
+            BVParametersTable::SetOfBVParam::const_iterator ii;
+            ii = mbvtb->getAllCustom().find(mymgo);
+            TS_ASSERT_DIFFERS(ii, mbvtb->getAllCustom().end());
+            TS_ASSERT_DIFFERS(&mymgo, &(*ii));
+            TS_ASSERT_EQUALS(&bp, &(*ii));
+            TS_ASSERT_EQUALS(mymgo, *ii);
+            // erase the only custom parameter
+            mbvtb->resetCustom(*ii);
+            TS_ASSERT(mbvtb->getAllCustom().empty());
+        }
+
+
         void test_getAll()
         {
             BVParametersTable::SetOfBVParam allpars0, allpars1;
@@ -164,13 +197,8 @@ class TestBVParametersTable : public CxxTest::TestSuite
             BVParam mymgo("O", -2, "Mg", 2, 3.456, 0.55, "pj2");
             mbvtb->setCustom(mynacl);
             mbvtb->setCustom(mymgo);
-            stringstream storage(ios::in | ios::out | ios::binary);
-            diffpy::serialization::oarchive oa(storage, ios::binary);
-            oa << mbvtb;
-            diffpy::serialization::iarchive ia(storage, ios::binary);
-            BVParametersTablePtr bvtb1;
-            TS_ASSERT(!bvtb1.get());
-            ia >> bvtb1;
+            // check serialization of shared pointers
+            BVParametersTablePtr bvtb1 = dumpandload(mbvtb);
             TS_ASSERT_DIFFERS(mbvtb.get(), bvtb1.get());
             TS_ASSERT_EQUALS(2.345,
                     bvtb1->lookup("Cl", -1, "Na", 1).mRo);
@@ -184,6 +212,17 @@ class TestBVParametersTable : public CxxTest::TestSuite
                     bvtb1->lookup("O", -2, "Mg", 2).mB);
             TS_ASSERT_EQUALS(string("pj2"),
                     bvtb1->lookup("O", -2, "Mg", 2).mref_id);
+            // check serialization of instances
+            BVParametersTable tb2 = dumpandload(*mbvtb);
+            TS_ASSERT_EQUALS(2u, tb2.getAllCustom().size());
+            TS_ASSERT_EQUALS(mynacl, tb2.lookup("Cl-", "Na+"));
+            // check serialization of customized valences
+            tb2.setAtomValence("Na", 1);
+            tb2.setAtomValence("Cl", -1);
+            BVParametersTable tb3 = dumpandload(tb2);
+            TS_ASSERT_EQUALS(mynacl, tb3.lookup("Cl", "Na"));
+            const BVParam& bpnone = BVParametersTable::none();
+            TS_ASSERT_EQUALS(bpnone, mbvtb->lookup("Cl", "Na"));
         }
 
 };  // class TestBVParametersTable

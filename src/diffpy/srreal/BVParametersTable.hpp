@@ -24,6 +24,7 @@
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include <diffpy/boostextensions/serialize_unordered_set.hpp>
+#include <diffpy/boostextensions/serialize_unordered_map.hpp>
 #include <diffpy/srreal/BVParam.hpp>
 
 namespace diffpy {
@@ -44,6 +45,9 @@ class BVParametersTable
         static const BVParam& none();
 
         // methods
+        int getAtomValence(const std::string&) const;
+        void setAtomValence(const std::string&, int value);
+        void resetAtomValences();
         const BVParam& lookup(const BVParam&) const;
         const BVParam& lookup(
                 const std::string& smbl0, const std::string& smbl1) const;
@@ -57,12 +61,17 @@ class BVParametersTable
         void resetCustom(const std::string& atom0, int valence0,
                 const std::string& atom1, int valence1);
         void resetAll();
+        const SetOfBVParam& getAllCustom() const;
         SetOfBVParam getAll() const;
 
     private:
 
+        // types
+        typedef boost::unordered_map<std::string, int> AtomTypeValence;
+
         // data
         SetOfBVParam mcustomtable;
+        AtomTypeValence matomvalence;
 
         // methods
         const SetOfBVParam& getStandardSetOfBVParam() const;
@@ -73,11 +82,18 @@ class BVParametersTable
             void serialize(Archive& ar, const unsigned int version)
         {
             ar & mcustomtable;
+            if (version >= 1) {
+                ar & matomvalence;
+            }
         }
 
 };  // class BVParametersTable
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_VERSION(diffpy::srreal::BVParametersTable, 1)
 
 #endif  // BVPARAMETERSTABLE_HPP_INCLUDED

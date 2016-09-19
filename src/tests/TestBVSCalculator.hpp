@@ -25,7 +25,10 @@
 
 using namespace std;
 using diffpy::srreal::BVSCalculator;
+using diffpy::srreal::BVParametersTablePtr;
 using diffpy::srreal::StructureAdapterPtr;
+using diffpy::srreal::PeriodicStructureAdapter;
+using diffpy::srreal::PeriodicStructureAdapterPtr;
 
 //////////////////////////////////////////////////////////////////////////////
 // class TestBVSCalculator
@@ -76,6 +79,39 @@ class TestBVSCalculator : public CxxTest::TestSuite
         }
 
 
+        void test_customAtomValences()
+        {
+            using diffpy::srreal::Atom;
+            const double eps = 1e-4;
+            mbvc->eval(mnacl);
+            TS_ASSERT_DELTA(0.01352, mbvc->bvrmsdiff(), eps);
+            BVParametersTablePtr bvtb = mbvc->getBVParamTable();
+            bvtb->setAtomValence("Cl1-", 0);
+            mbvc->eval(mnacl);
+            TS_ASSERT_EQUALS(0.0, mbvc->value()[0]);
+            TS_ASSERT_EQUALS(0.0, mbvc->value()[4]);
+            // create structure with bare atom symbols "Na", "Cl".
+            PeriodicStructureAdapterPtr naclbare =
+                boost::dynamic_pointer_cast<
+                PeriodicStructureAdapter>(mnacl->clone());
+            for (int i = 0; i < naclbare->countSites(); ++i)
+            {
+                Atom& a = naclbare->at(i);
+                a.atomtype = a.atomtype.substr(0, 2);
+            }
+            TS_ASSERT_EQUALS(string("Na"), naclbare->siteAtomType(0));
+            // verify valence sums are zero for a standard setup.
+            mbvc->eval(naclbare);
+            TS_ASSERT_EQUALS(0.0, mbvc->value()[0]);
+            TS_ASSERT_EQUALS(0.0, mbvc->value()[4]);
+            // verify valence sums with custom atom valences.
+            bvtb->setAtomValence("Na", +1);
+            bvtb->setAtomValence("Cl", -1);
+            mbvc->eval(naclbare);
+            TS_ASSERT_DELTA(0.01352, mbvc->bvrmsdiff(), eps);
+        }
+
+
         void test_setValencePrecision()
         {
             TS_ASSERT_THROWS(mbvc->setValencePrecision(0), invalid_argument);
@@ -97,6 +133,10 @@ class TestBVSCalculator : public CxxTest::TestSuite
             mbvc->setValencePrecision(1e-7);
             mbvc->setDoubleAttr("rmax", 5.0);
             TS_ASSERT_EQUALS(5.0, mbvc->getDoubleAttr("rmaxused"));
+            // check if value updates with changes in the table.
+            BVParametersTablePtr bvtb = mbvc->getBVParamTable();
+            bvtb->setCustom("Na", 1, "Cl", -1, 0.0, 0);
+            TS_ASSERT_EQUALS(0.0, mbvc->getDoubleAttr("rmaxused"));
         }
 
 
