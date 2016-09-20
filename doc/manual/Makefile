@@ -181,7 +181,7 @@ pseudoxml:
 GITREPOPATH = $(shell cd $(CURDIR) && git rev-parse --git-dir)
 GITREMOTE = origin
 GITREMOTEURL = $(shell git config --get remote.$(GITREMOTE).url)
-GITLASTCOMMIT = $(shell git rev-parse HEAD)
+GITLASTCOMMIT = $(shell git --short rev-parse HEAD)
 
 publish:
 	@test -d build/html || \
@@ -198,6 +198,6 @@ publish:
 	cd build/gh-pages && \
 	    git add --all . && \
 	    git diff --cached --quiet || \
-	    git commit -m "Synced with the source at $(GITLASTCOMMIT)."
+	    git commit -m "Sync with the source at $(GITLASTCOMMIT)."
 	cd build/gh-pages && \
 	    git push origin gh-pages
