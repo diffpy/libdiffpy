@@ -6,8 +6,10 @@ Import('env')
 
 def add_version_and_compress(target, source, env):
     import tarfile
+    import gzip
     tfin = tarfile.open(target[0].path)
-    tfout = tarfile.open(target[0].path + '.gz', 'w:gz')
+    fpout = gzip.GzipFile(target[0].path + '.gz', 'w', mtime=0)
+    tfout = tarfile.open(fileobj=fpout, mode='w')
     # copy archive members up to version.cpp
     tiiter = iter(tfin)
     for ti in tiiter:
@@ -25,6 +27,7 @@ def add_version_and_compress(target, source, env):
     for ti in tiiter:
         tfout.addfile(ti, tfin.extractfile(ti))
     tfout.close()
+    fpout.close()
     tfin.close()
     return
 
