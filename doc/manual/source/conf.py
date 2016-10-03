@@ -36,7 +36,6 @@ ab_authors = u'Pavol Juhás, Christopher L. Farrow, Simon J.L. Billinge group'
 # ones.
 extensions = [
     'sphinx.ext.intersphinx',
-    'sphinx.ext.pngmath',
     'sphinx.ext.ifconfig',
 ]
 
@@ -147,7 +146,7 @@ html_theme_options = {'collapsiblesidebar' : 'true'}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
