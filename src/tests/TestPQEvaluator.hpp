@@ -219,6 +219,15 @@ class TestPQEvaluator : public CxxTest::TestSuite
         }
 
 
+        void test_optimized_supported()
+        {
+            mpdfcb.eval(mstru10);
+            TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorTypeUsed());
+            mpdfcb.setEvaluatorType(OPTIMIZED);
+            TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorTypeUsed());
+        }
+
+
         void test_optimized_unsupported()
         {
             OverlapCalculator olc;

@@ -525,8 +525,6 @@ void PDFCalculator::restorePartialValue()
 {
     assert(!mstashedvalue.value.empty());
     assert(!mvalue.empty());
-    assert(!count_if(mvalue.begin(), mvalue.end(),
-                bind1st(not_equal_to<double>(), 0.0)));
     QuantityType::const_iterator si = mstashedvalue.value.begin();
     QuantityType::const_iterator slast = mstashedvalue.value.end();
     QuantityType::iterator ti = mvalue.begin();
