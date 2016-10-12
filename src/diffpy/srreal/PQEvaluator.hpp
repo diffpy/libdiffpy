@@ -42,7 +42,7 @@ class PairQuantity;
 
 typedef boost::shared_ptr<class PQEvaluatorBasic> PQEvaluatorPtr;
 
-enum PQEvaluatorType {NONE, BASIC, OPTIMIZED};
+enum PQEvaluatorType {NONE, BASIC, OPTIMIZED, CHECK};
 
 enum PQEvaluatorFlag {
     // sum over full matrix of atom pairs, use pair symmetry otherwise.
@@ -123,6 +123,27 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
             using boost::serialization::base_object;
             ar & base_object<PQEvaluatorBasic>(*this);
             ar & mlast_structure;
+        }
+};
+
+
+class PQEvaluatorCheck : public PQEvaluatorOptimized
+{
+    public:
+
+        // methods
+        virtual PQEvaluatorType typeint() const;
+        virtual void updateValue(PairQuantity&, StructureAdapterPtr);
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<PQEvaluatorOptimized>(*this);
         }
 };
 
