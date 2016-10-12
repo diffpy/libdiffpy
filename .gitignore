@@ -20,8 +20,8 @@
 build
 config.log
 errors.err
-sconscript.local
-sconsvars.py
+/sconscript.local
+/sconsvars.py
 tags
 
 # eclipse
