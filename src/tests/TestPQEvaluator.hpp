@@ -97,12 +97,21 @@ class TestPQEvaluator : public CxxTest::TestSuite
         }
 
 
+        void test_initial_evaluator_type_used()
+        {
+            PDFCalculator pdfc;
+            TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
+            pdfc.setEvaluatorType(OPTIMIZED);
+            TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
+            pdfc.setEvaluatorType(BASIC);
+            TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
+        }
+
+
         void test_PDF_change_atom()
         {
             TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorType());
             TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorType());
-            TS_ASSERT_EQUALS(NONE, mpdfcb.getEvaluatorTypeUsed());
-            TS_ASSERT_EQUALS(NONE, mpdfco.getEvaluatorTypeUsed());
             TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(mstru10));
             // first call of mpdfco should use the BASIC evaluation
             TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorTypeUsed());
