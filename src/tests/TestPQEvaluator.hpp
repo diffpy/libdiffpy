@@ -25,6 +25,7 @@
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/PeriodicStructureAdapter.hpp>
+#include <diffpy/srreal/PairCounter.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/srreal/OverlapCalculator.hpp>
 #include "test_helpers.hpp"
@@ -34,6 +35,17 @@ namespace srreal {
 
 using namespace std;
 using diffpy::mathutils::EpsilonEqual;
+
+// calculator with invalid support for OPTIMIZED evaluation
+
+class BadPairCounter : public PairCounter
+{
+    protected:
+
+        // intentionally faulty support for PQEvaluatorOptimized
+        virtual void stashPartialValue()  { }
+        virtual void restorePartialValue()  { }
+};
 
 //////////////////////////////////////////////////////////////////////////////
 // class TestPQEvaluator
@@ -102,6 +114,8 @@ class TestPQEvaluator : public CxxTest::TestSuite
             PDFCalculator pdfc;
             TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
             pdfc.setEvaluatorType(OPTIMIZED);
+            TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
+            pdfc.setEvaluatorType(CHECK);
             TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
             pdfc.setEvaluatorType(BASIC);
             TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
@@ -235,6 +249,42 @@ class TestPQEvaluator : public CxxTest::TestSuite
             TS_ASSERT_THROWS(
                     olc.setEvaluatorType(OPTIMIZED), invalid_argument);
             TS_ASSERT_EQUALS(BASIC, olc.getEvaluatorType());
+        }
+
+
+        void test_checkevaluator_unsupported()
+        {
+            OverlapCalculator olc;
+            TS_ASSERT_EQUALS(BASIC, olc.getEvaluatorType());
+            TS_ASSERT_THROWS(
+                    olc.setEvaluatorType(CHECK), invalid_argument);
+            TS_ASSERT_EQUALS(BASIC, olc.getEvaluatorType());
+        }
+
+
+        void test_checkevaluator_passes()
+        {
+            mpdfco.setEvaluatorType(CHECK);
+            TS_ASSERT_EQUALS(CHECK, mpdfco.getEvaluatorType());
+            mpdfco.eval(mstru10);
+            TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
+            mpdfco.eval(mstru10);
+            TS_ASSERT_EQUALS(CHECK, mpdfco.getEvaluatorTypeUsed());
+            mpdfco.eval(mstru9);
+            TS_ASSERT_EQUALS(CHECK, mpdfco.getEvaluatorTypeUsed());
+            mpdfco.eval(emptyStructureAdapter());
+            TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
+        }
+
+
+        void test_checkevaluator_fails()
+        {
+            BadPairCounter badcounter;
+            badcounter.setEvaluatorType(CHECK);
+            TS_ASSERT_EQUALS(45, badcounter(mstru10));
+            TS_ASSERT_EQUALS(BASIC, badcounter.getEvaluatorTypeUsed());
+            TS_ASSERT_THROWS(badcounter(mstru10), logic_error);
+            TS_ASSERT_EQUALS(CHECK, badcounter.getEvaluatorTypeUsed());
         }
 
 };  // class TestPQEvaluator
