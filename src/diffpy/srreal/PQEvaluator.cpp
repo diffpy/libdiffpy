@@ -324,6 +324,9 @@ class pqresults
         { }
 
 
+        virtual ~pqresults()  { }
+
+
         virtual bool compare(const PairQuantity& pq) const
         {
             QuantityType::const_iterator smx = max_element(
