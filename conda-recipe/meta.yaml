@@ -26,14 +26,11 @@ requirements:
 
 test:
   requires:
+    - cxxtest
     - scons
 
-  commands:
-    # Run unit-test program with the installed shared library.
-    # Make sure tests cannot use library file from the source directory.
-    - scons -C "$SRC_DIR" --clean lib
-    - ALLTESTSFAST=$(ls -t ${SRC_DIR}/build/fast*/tests/alltests | head -1)
-    - "${ALLTESTSFAST}"
+  # commands:
+    # Execute the run_test.sh script.
 
 about:
   home: https://github.com/diffpy/libdiffpy
