@@ -106,7 +106,8 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
 
         void test_typeid()
         {
-            TS_ASSERT(typeid(PeriodicStructureAdapter) == typeid(*m_ni));
+            StructureAdapter& r_ni = *m_ni;
+            TS_ASSERT(typeid(PeriodicStructureAdapter) == typeid(r_ni));
         }
 
 
@@ -280,8 +281,9 @@ class TestPeriodicStructureBondGenerator : public CxxTest::TestSuite
 
         void test_typeid()
         {
+            BaseBondGenerator& r_nibnds = *m_nibnds;
             TS_ASSERT(typeid(PeriodicStructureBondGenerator) ==
-                    typeid(*m_nibnds));
+                    typeid(r_nibnds));
         }
 
 

@@ -57,13 +57,17 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT(sfx0.get());
             TS_ASSERT(sfx1.get());
             TS_ASSERT_EQUALS(sfx0->type(), sfx1->type());
-            TS_ASSERT(typeid(*sfx0) == typeid(*sfx1));
+            ScatteringFactorTable& r_sfx0 = *sfx0;
+            ScatteringFactorTable& r_sfx1 = *sfx1;
+            TS_ASSERT(typeid(r_sfx0) == typeid(r_sfx1));
             sfn0 = ScatteringFactorTable::createByType("neutron");
             sfn1 = ScatteringFactorTable::createByType("N");
             TS_ASSERT(sfn0.get());
             TS_ASSERT(sfn1.get());
             TS_ASSERT_EQUALS(sfn0->type(), sfn1->type());
-            TS_ASSERT(typeid(*sfn0) == typeid(*sfn1));
+            ScatteringFactorTable& r_sfn0 = *sfn0;
+            ScatteringFactorTable& r_sfn1 = *sfn1;
+            TS_ASSERT(typeid(r_sfn0) == typeid(r_sfn1));
         }
 
 

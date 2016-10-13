@@ -111,7 +111,8 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
 
         void test_typeid()
         {
-            TS_ASSERT(typeid(CrystalStructureAdapter) == typeid(*m_ni));
+            StructureAdapter& r_ni = *m_ni;
+            TS_ASSERT(typeid(CrystalStructureAdapter) == typeid(r_ni));
         }
 
 
@@ -275,8 +276,9 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
 
         void test_typeid()
         {
+            BaseBondGenerator& r_nibnds = *m_nibnds;
             TS_ASSERT(typeid(CrystalStructureBondGenerator) ==
-                    typeid(*m_nibnds));
+                    typeid(r_nibnds));
         }
 
 
@@ -424,7 +426,8 @@ class TestObjCrystMoleculeAdapter : public CxxTest::TestSuite
 
         void test_typeid()
         {
-            TS_ASSERT(typeid(AtomicStructureAdapter) == typeid(*m_c60));
+            StructureAdapter& r_c60 = *m_c60;
+            TS_ASSERT(typeid(AtomicStructureAdapter) == typeid(r_c60));
         }
 
 
@@ -539,7 +542,8 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
 
         void test_typeid()
         {
-            TS_ASSERT(typeid(BaseBondGenerator) == typeid(*m_c60bnds));
+            BaseBondGenerator& r_c60bnds = *m_c60bnds;
+            TS_ASSERT(typeid(BaseBondGenerator) == typeid(r_c60bnds));
         }
 
 

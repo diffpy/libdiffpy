@@ -104,7 +104,8 @@ class TestNoMetaStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(56, pswtbare1->countSites());
             TS_ASSERT_EQUALS(string("Pb"), pswtbare1->siteAtomType(0));
             TS_ASSERT_EQUALS(string("Ti"), pswtbare1->siteAtomType(55));
-            TS_ASSERT(typeid(NoMetaStructureAdapter) == typeid(*pswtbare1));
+            StructureAdapter& r_pswtbare1 = *pswtbare1;
+            TS_ASSERT(typeid(NoMetaStructureAdapter) == typeid(r_pswtbare1));
         }
 
 };  // class TestNoMetaStructureAdapter
