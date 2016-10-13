@@ -9,6 +9,10 @@ env_test.Tool('cxxtest')
 lib_dir = libdiffpy[0].dir.abspath
 env_test.PrependUnique(LIBS='diffpy', LIBPATH=lib_dir, delete_existing=1)
 env_test.PrependUnique(LINKFLAGS="-Wl,-rpath,%r" % lib_dir)
+# Ensure shared libraries will be found for conda-build.
+if os.environ.get('CONDA_BUILD'):
+    conda_lib = os.environ['PREFIX'] + '/lib'
+    env_test.AppendUnique(LINKFLAGS="-Wl,-rpath,%r" % conda_lib)
 pat = 'diffpy|boost_serialization|ObjCryst'
 keeplibs = lambda s: re.search(pat, str(s))
 env_test.Replace(LIBS=filter(keeplibs, env_test['LIBS']))

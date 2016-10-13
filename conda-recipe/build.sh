@@ -7,10 +7,6 @@ if [[ `uname` == Linux ]]; then
     export LD_LIBRARY_PATH="${PREFIX}/lib"
 fi
 
-if [[ `uname` == Darwin ]]; then
-    export DYLD_FALLBACK_LIBRARY_PATH="${PREFIX}/lib"
-fi
-
 MYNCPU=$(( (CPU_COUNT > 8) ? 8 : CPU_COUNT ))
 
 # Apply sconscript.local customizations.

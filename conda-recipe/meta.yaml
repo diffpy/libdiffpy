@@ -32,8 +32,6 @@ test:
     # Run unit-test program with the installed shared library.
     # Make sure tests cannot use library file from the source directory.
     - scons -C "$SRC_DIR" --clean lib
-    - export LD_LIBRARY_PATH="${PREFIX}/lib"                    # [linux]
-    - export DYLD_FALLBACK_LIBRARY_PATH="${PREFIX}/lib"         # [osx]
     - ALLTESTSFAST=$(ls -t ${SRC_DIR}/build/fast*/tests/alltests | head -1)
     - "${ALLTESTSFAST}"
 
