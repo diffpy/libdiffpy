@@ -45,6 +45,8 @@ vars = Variables('sconsvars.py')
 
 vars.Add('tests',
     'Fixed-string patterns for selecting unit test sources.', None)
+vars.Add(BoolVariable('test_installed',
+    'build unit tests using the installed library.', False))
 vars.Add(EnumVariable('build',
     'compiler settings', 'fast',
     allowed_values=('debug', 'fast')))

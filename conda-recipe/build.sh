@@ -12,11 +12,8 @@ MYNCPU=$(( (CPU_COUNT > 8) ? 8 : CPU_COUNT ))
 # Apply sconscript.local customizations.
 cp ${RECIPE_DIR}/sconscript.local ./
 
-# Build the library and unit test program.
-scons -j $MYNCPU lib alltests
+# Build and install the library.
+scons -j $MYNCPU lib install prefix=$PREFIX
 
-# Execute unit tests.
-scons test
-
-# Install the library.
-scons install prefix=$PREFIX
+# Execute unit tests for the installed library.
+scons -j $MYNCPU test prefix=$PREFIX test_installed=yes
