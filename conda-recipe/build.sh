@@ -14,6 +14,3 @@ cp ${RECIPE_DIR}/sconscript.local ./
 
 # Build and install the library.
 scons -j $MYNCPU lib install prefix=$PREFIX
-
-# Execute unit tests for the installed library.
-scons -j $MYNCPU test prefix=$PREFIX test_installed=yes
