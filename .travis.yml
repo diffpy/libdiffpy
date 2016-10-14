@@ -79,22 +79,21 @@ install:
   - $NOMC || MYCONDATESTENV="$(ls -td ~/mc/conda-bld/conda-recipe_*/_t_env | head -1)"
   - $NOMC || source activate ${MYCONDATESTENV:?"conda test environment not found"}
   - $NOMC || conda list  --export ${MYNAME} > /tmp/mypackage.txt
+  - $NOMC || source activate root
+  - $NOMC || conda build purge
   - $NOMC || source activate testenv
   - $NOMC || conda install --yes --use-local --file=/tmp/mypackage.txt
   - $NOMC || conda install --yes cxxtest scons
   - $NOMC || MYPREFIX="${HOME}/mc/envs/testenv"
-  - $NOMC || MYWORKDIR="${HOME}/mc/conda-bld/work"
 
   - $NOAPT || sudo scons -C ~/pkgs/libobjcryst install
   - $NOAPT || cd ~/pkgs/"$(basename "${MYTARBUNDLE}" .tar.gz)"/
-  - $NOAPT || scons build=fast alltests
+  - $NOAPT || scons build=fast lib
   - $NOAPT || sudo scons build=fast install
+  - $NOAPT || scons -Q build=fast --clean lib
   - $NOAPT || MYPREFIX=/usr/local
-  - $NOAPT || MYWORKDIR=$PWD
 
-  # Ensure libdiffpy cannot be loaded from the work directory.
-  - scons build=fast -Q -C ${MYWORKDIR} --clean lib
-  - MYALLTESTSFAST=$(ls -t ${MYWORKDIR}/build/fast*/tests/alltests | head -1)
+  # Verify version of the installed library.
   - MYINCLUDE="${MYPREFIX}/include"
   - MYLIB="${MYPREFIX}/lib"
   - MYVERSION="${MYINCLUDE}/diffpy/version.hpp"
@@ -104,28 +103,28 @@ install:
         exit 1;
     fi
 
-  - $NOMC || export LIBRARY_PATH="${MYLIB}"
-  - $NOMC || export CPATH="${MYINCLUDE}"
-
-    # Mac OS X must use the same deployment target as conda-build.
+  # Mac OS X must use the same deployment target as conda-build.
   - if $MYUSEMC && [[ "${TRAVIS_OS_NAME}" == osx ]]; then
         export MACOSX_DEPLOYMENT_TARGET=10.7;
     fi
 
-    # Linux ld linker requires that libraries can be resolved at link time.
+  # Linux ld linker requires that libraries can be resolved at link time.
   - if ${MYUSEMC} && [[ "${TRAVIS_OS_NAME}" == linux ]]; then
         export LD_LIBRARY_PATH="${MYLIB}";
     fi
 
-  - scons build=debug alltests
+  - scons build=debug prefix="${MYPREFIX}" test_installed=true alltests
+  - scons build=fast prefix="${MYPREFIX}" test_installed=true alltests
+  - MYALLTESTSFAST=$(ls -t ${PWD}/build/fast*/tests/alltests | head -1)
 
 
 before_script:
 
 
 script:
-  - scons build=debug -Q test
-  - scons build=debug enable_objcryst=false -Q test
+  - scons -Q build=debug prefix="${MYPREFIX}" test_installed=true test
+  - scons -Q build=debug prefix="${MYPREFIX}" test_installed=true
+             enable_objcryst=false test
   - ${MYALLTESTSFAST}
 
 
