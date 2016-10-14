@@ -77,7 +77,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_THROWS(msftb->lookup(""), invalid_argument);
             TS_ASSERT_DELTA(6.0, msftb->lookup("C"), 0.01);
             msftb->setCustomAs("C", "C", 6.3);
-            TS_ASSERT_EQUALS(6.3, msftb->lookup("C"));
+            TS_ASSERT_DELTA(6.3, msftb->lookup("C"), meps);
             msftb->setCustomAs("C", "C", 6.4);
             TS_ASSERT_DELTA(6.4, msftb->lookup("C"), meps);
             TS_ASSERT_THROWS(msftb->lookup("Ccustom"), invalid_argument);
@@ -107,13 +107,13 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             msftb->setCustomAs("C", "C", 6.3);
             TS_ASSERT_EQUALS(1u, msftb->getCustomSymbols().size());
             TS_ASSERT_EQUALS(1u, msftb->getCustomSymbols().count("C"));
-            TS_ASSERT_EQUALS(6.3, msftb->lookup("C"));
+            TS_ASSERT_DELTA(6.3, msftb->lookup("C"), meps);
             ScatteringFactorTablePtr sftb1 = msftb->clone();
             msftb->resetCustom("C");
             TS_ASSERT(msftb->getCustomSymbols().empty());
             TS_ASSERT_EQUALS(1u, sftb1->getCustomSymbols().size());
             TS_ASSERT_EQUALS(1u, sftb1->getCustomSymbols().count("C"));
-            TS_ASSERT_EQUALS(6.3, sftb1->lookup("C"));
+            TS_ASSERT_DELTA(6.3, sftb1->lookup("C"), meps);
             sftb1->resetAll();
             TS_ASSERT(msftb->getCustomSymbols().empty());
         }
