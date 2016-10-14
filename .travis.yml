@@ -108,11 +108,6 @@ install:
         export MACOSX_DEPLOYMENT_TARGET=10.7;
     fi
 
-  # Linux ld linker requires that libraries can be resolved at link time.
-  - if ${MYUSEMC} && [[ "${TRAVIS_OS_NAME}" == linux ]]; then
-        export LD_LIBRARY_PATH="${MYLIB}";
-    fi
-
   - scons build=debug prefix="${MYPREFIX}" test_installed=true alltests
   - scons build=fast prefix="${MYPREFIX}" test_installed=true alltests
   - MYALLTESTSFAST=$(ls -t ${PWD}/build/fast*/tests/alltests | head -1)
