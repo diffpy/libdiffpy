@@ -107,6 +107,8 @@ install:
         export MACOSX_DEPLOYMENT_TARGET=10.7;
     fi
 
+  - $NOMC || export MYPREFIX
+  - $NOMC || cp .travis-sconscript.local sconscript.local
   - scons build=fast prefix="${MYPREFIX}" test_installed=true alltests
   - MYALLTESTSFAST=$(ls -t ${PWD}/build/fast*/tests/alltests | head -1)
   - scons build=debug lib alltests
