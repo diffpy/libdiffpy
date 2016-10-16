@@ -95,7 +95,6 @@ install:
 
   # Verify version of the installed library.
   - MYINCLUDE="${MYPREFIX}/include"
-  - MYLIB="${MYPREFIX}/lib"
   - MYVERSION="${MYINCLUDE}/diffpy/version.hpp"
   - MYGIT_REV=$(grep '^#define DIFFPY_GIT_SHA' "$MYVERSION" | cut -d '"' -f 2)
   - if [[ "${TRAVIS_COMMIT}" != "${MYGIT_REV}" ]]; then
@@ -108,18 +107,17 @@ install:
         export MACOSX_DEPLOYMENT_TARGET=10.7;
     fi
 
-  - scons build=debug prefix="${MYPREFIX}" test_installed=true alltests
   - scons build=fast prefix="${MYPREFIX}" test_installed=true alltests
   - MYALLTESTSFAST=$(ls -t ${PWD}/build/fast*/tests/alltests | head -1)
+  - scons build=debug lib alltests
 
 
 before_script:
 
 
 script:
-  - scons -Q build=debug prefix="${MYPREFIX}" test_installed=true test
-  - scons -Q build=debug prefix="${MYPREFIX}" test_installed=true
-             enable_objcryst=false test
+  - scons -Q build=debug test
+  - scons -Q build=debug enable_objcryst=false test
   - ${MYALLTESTSFAST}
 
 
