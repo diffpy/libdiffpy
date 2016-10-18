@@ -54,6 +54,7 @@ BaseDebyeSum::BaseDebyeSum()
     this->setQmax(DEFAULT_QGRID_QMAX);
     this->setQstep(DEFAULT_QGRID_QSTEP);
     this->setDebyePrecision(DEFAULT_DEBYE_PRECISION);
+    this->setEvaluatorType(OPTIMIZED);
     // attributes
     this->registerDoubleAttribute("debyeprecision", this,
             &BaseDebyeSum::getDebyePrecision,

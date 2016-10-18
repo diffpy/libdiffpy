@@ -102,6 +102,7 @@ class BondOp {
 BondCalculator::BondCalculator()
 {
     this->setRmax(DEFAULT_BONDCALCULATOR_RMAX);
+    this->setEvaluatorType(OPTIMIZED);
     mevaluator->setFlag(USEFULLSUM, true);
     mevaluator->setFlag(FIXEDSITEINDEX, true);
 }

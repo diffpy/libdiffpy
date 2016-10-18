@@ -57,6 +57,8 @@ PDFCalculator::PDFCalculator()
     // cache all internal data according to an empty structure.
     // this rebuilds mstructure_cache and mrlimits_cache.
     this->setStructure(mstructure);
+    // setup the OPTIMIZED evaluator last so that its validation passes.
+    this->setEvaluatorType(OPTIMIZED);
     // attributes
     this->registerDoubleAttribute("qmin", this,
             &PDFCalculator::getQmin, &PDFCalculator::setQmin);
