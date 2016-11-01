@@ -148,6 +148,14 @@ QuantityType PDFCalculator::getExtendedPDF() const
     // FFT required here
     // we need a full range PDF to apply termination ripples correctly
     QuantityType f_ext = this->getExtendedF();
+    // zero all F points at Q < Qmin
+    QuantityType::iterator ii_qmin =
+        f_ext.begin() + min(pdfutils_qminSteps(this), int(f_ext.size()));
+    fill(f_ext.begin(), ii_qmin, 0.0);
+    // zero all F points at Q >= Qmax
+    assert(pdfutils_qmaxSteps(this) <= int(f_ext.size()));
+    QuantityType::iterator ii_qmax = f_ext.begin() + pdfutils_qmaxSteps(this);
+    fill(ii_qmax, f_ext.end(), 0.0);
     QuantityType pdf1 = fftftog(f_ext, this->getQstep());
     // cut away the FFT padded points
     assert(this->extendedRmaxSteps() <= int(pdf1.size()));
@@ -206,14 +214,6 @@ QuantityType PDFCalculator::getExtendedF() const
     QuantityType rv = fftgtof(rdfperr_ext1, this->getRstep(), rmin_ext);
     assert(rv.empty() || eps_eq(M_PI,
                 this->getQstep() * rv.size() * this->getRstep()));
-    // zero all F points at Q < Qmin
-    QuantityType::iterator rvqmin =
-        rv.begin() + min(pdfutils_qminSteps(this), int(rv.size()));
-    fill(rv.begin(), rvqmin, 0.0);
-    // zero all F points at Q >= Qmax
-    assert(pdfutils_qmaxSteps(this) <= int(rv.size()));
-    QuantityType::iterator rvqmax = rv.begin() + pdfutils_qmaxSteps(this);
-    fill(rvqmax, rv.end(), 0.0);
     return rv;
 }
 
