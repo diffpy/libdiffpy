@@ -24,6 +24,7 @@
 #include <diffpy/srreal/ConstantPeakWidth.hpp>
 #include <diffpy/srreal/QResolutionEnvelope.hpp>
 #include <diffpy/serialization.hpp>
+#include "test_helpers.hpp"
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -192,7 +193,29 @@ class TestPDFCalculator : public CxxTest::TestSuite
 
         void test_getQstep()
         {
-            TS_ASSERT_DELTA(100 * M_PI / 1024, mpdfc->getQstep(), meps);
+            using diffpy::mathutils::DOUBLE_MAX;
+            const double qstep0 = 100 * M_PI / 1024;
+            const double qstep1 = 100 * M_PI / 2048;
+            const double qstep2 = 100 * M_PI / 4096;
+            const double qstep3 = M_PI / (1024 * 0.03);
+            TS_ASSERT_DELTA(qstep0, mpdfc->getQstep(), meps);
+            mpdfc->setRmax(20);
+            TS_ASSERT_DELTA(qstep1, mpdfc->getQstep(), meps);
+            mpdfc->setQmax(10);
+            TS_ASSERT_DELTA(qstep2, mpdfc->getQstep(), meps);
+            mpdfc->setRstep(0.03);
+            TS_ASSERT_DELTA(qstep3, mpdfc->getQstep(), meps);
+            // test qstep after evaluation of some structure.
+            StructureAdapterPtr catio3;
+            catio3 = loadTestPeriodicStructure("CaTiO3.stru");
+            mpdfc->eval(catio3);
+            TS_ASSERT_DELTA(qstep3, mpdfc->getQstep(), meps);
+            // now qstep is not updated because of non-trivial structure.
+            mpdfc->setRstep(0.01);
+            TS_ASSERT_DIFFERS(qstep2, mpdfc->getQstep());
+            // qstep is correct after calculation.
+            mpdfc->eval();
+            TS_ASSERT_DELTA(qstep2, mpdfc->getQstep(), meps);
         }
 
 

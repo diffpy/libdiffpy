@@ -36,6 +36,24 @@ using namespace std;
 using namespace diffpy::validators;
 using namespace diffpy::mathutils;
 
+// Local Helpers -------------------------------------------------------------
+
+namespace {
+
+/// Return true if qstep value can be cheaply recomputed in initial setup.
+template <class PDFC>
+bool _initialQstepUpdate(const PDFC* pc)
+{
+    // Check if we use the initial empty structure and constructor
+    // has completed, i.e., the last attribute is available.
+    const bool rv =
+        (pc->getStructure() == emptyStructureAdapter()) &&
+        pc->hasDoubleAttr("extendedrmax");
+    return rv;
+}
+
+}   // namespace
+
 // Constructor ---------------------------------------------------------------
 
 PDFCalculator::PDFCalculator()
@@ -260,6 +278,7 @@ void PDFCalculator::setQmax(double qmax)
     double qmax1 = (qmax > 0.0) ? qmax : DOUBLE_MAX;
     if (qmax1 < mqmax)  mticker.click();
     mqmax = qmax1;
+    if (_initialQstepUpdate(this))  this->resetValue();
 }
 
 
@@ -301,6 +320,7 @@ void PDFCalculator::setRmax(double rmax)
 {
     ensureNonNegative("Rmax", rmax);
     this->PairQuantity::setRmax(rmax);
+    if (_initialQstepUpdate(this))  this->resetValue();
 }
 
 
@@ -309,6 +329,7 @@ void PDFCalculator::setRstep(double rstep)
     ensureEpsilonPositive("Rstep", rstep);
     if (mrstep != rstep)  mticker.click();
     mrstep = rstep;
+    if (_initialQstepUpdate(this))  this->resetValue();
 }
 
 
