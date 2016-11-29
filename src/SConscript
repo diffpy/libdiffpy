@@ -15,9 +15,13 @@ env.PrependUnique(CPPPATH=Dir('.'))
 # ignore it in the system environment.
 env.PrependUnique(LIBPATH=env['ENV'].get('LIBRARY_PATH', '').split(':'))
 
-# Use Intel C++ compiler when it is available
-icpc = env.WhereIs('icpc')
-if icpc:
+# Use Intel C++ compiler if requested by the user.
+icpc = None
+if env['tool'] == 'intelc':
+    icpc = env.WhereIs('icpc')
+    if not icpc:
+        print("Cannot find the Intel C/C++ compiler 'icpc'.")
+        Exit(1)
     env.Tool('intelc', topdir=icpc[:icpc.rfind('/bin')])
 
 # Declare external libraries.
