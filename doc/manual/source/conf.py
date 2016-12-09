@@ -61,7 +61,8 @@ copyright = u'%Y, Brookhaven National Laboratory'
 from libdiffpybuildutils import gitinfo
 ginfo = gitinfo()
 # The short X.Y version.
-version = '%(major)i.%(minor)i' % ginfo
+vfmt = '%(major)i.%(minor)i' + ('.%(micro)i' if ginfo['micro'] else '')
+version = vfmt % ginfo
 # The full version, including alpha/beta/rc tags.
 release = ginfo['version']
 
