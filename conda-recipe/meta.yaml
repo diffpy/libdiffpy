@@ -28,6 +28,13 @@ test:
     - cxxtest
     - scons
 
+  source_files:
+    - SConstruct
+    - site_scons/
+    - src/SConscript
+    - src/SConscript.configure
+    - src/tests/
+
   # commands:
     # Execute the run_test.sh script.
 
