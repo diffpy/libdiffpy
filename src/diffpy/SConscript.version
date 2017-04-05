@@ -26,7 +26,7 @@ def build_VersionCode(target, source, env):
     assert numversion // 1000000 % 1000 == ginfo['minor'], emsg
     assert numversion // 1000 % 1000 == ginfo['micro'], emsg
     assert numversion % 500 == ginfo['patchnumber'], emsg
-    libversion = str(numversion)
+    libversion = str(numversion) + "LL"
     if ginfo['prerelease']:
         libversion = "(-500 + %s)" % libversion
     flds = {
