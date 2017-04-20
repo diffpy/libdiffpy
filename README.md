@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/diffpy/libdiffpy.svg?branch=master)]
-(https://travis-ci.org/diffpy/libdiffpy)
+[![Build Status](https://travis-ci.org/diffpy/libdiffpy.svg?branch=master)](https://travis-ci.org/diffpy/libdiffpy)
 
 # libdiffpy
 
