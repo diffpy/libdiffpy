@@ -11,12 +11,12 @@ if env['test_installed']:
     # build unit tests for the installed library
     env_test['CPPPATH'].remove(Dir('..'))
     env_test.PrependUnique(CPPPATH=env['includedir'], delete_existing=1)
-    env_test['lib_includes'] = []
     lib_dir = env['libdir']
 else:
-    # build unit tests for this code repository
+    # link unit tests with our library.
     Import('libdiffpy')
     lib_dir = libdiffpy[0].dir.abspath
+use_our_library = not env['test_installed']
 
 env_test.PrependUnique(LIBS='diffpy', LIBPATH=lib_dir, delete_existing=1)
 env_test.PrependUnique(LINKFLAGS="-Wl,-rpath,%r" % lib_dir)
@@ -54,10 +54,13 @@ test_helpers = thobj + ['objcryst_helpers.cpp']
 test_helpers = filter(srcsupported, test_helpers)
 
 alltests = env_test.CxxTest('alltests', test_sources + test_helpers)
-Alias('alltests', [alltests, env['lib_includes']])
+if use_our_library:
+    env_test.Depends(alltests, libdiffpy)
+
+env_test.Alias('alltests', alltests)
 
 # test -- alias for executing unit tests.
-test = env_test.Alias('test', 'alltests', alltests[0].abspath)
+test = env_test.Alias('test', alltests, alltests[0].abspath)
 AlwaysBuild(test)
 
 # vim: ft=python
