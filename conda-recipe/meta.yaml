@@ -14,12 +14,12 @@ build:
 requirements:
   build:
     - scons
-    - boost-all 1.59.0
+    - boost 1.61.0
     - gsl 2.1
     - libobjcryst 2015.1|2015.1.*
 
   run:
-    - boost-all 1.59.0
+    - boost 1.61.0
     - gsl >=2.1
     - libobjcryst 2015.1|2015.1.*
 
