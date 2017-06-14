@@ -9,7 +9,6 @@ env_test.Tool('cxxtest')
 
 if env['test_installed']:
     # build unit tests for the installed library
-    env_test['CPPPATH'].remove(Dir('..'))
     env_test.PrependUnique(CPPPATH=env['includedir'], delete_existing=1)
     lib_dir = env['libdir']
 else:
@@ -20,11 +19,6 @@ use_our_library = not env['test_installed']
 
 env_test.PrependUnique(LIBS='diffpy', LIBPATH=lib_dir, delete_existing=1)
 env_test.PrependUnique(LINKFLAGS="-Wl,-rpath,%r" % lib_dir)
-
-# Use only libraries needed for building the unit tests.
-pat = 'diffpy|boost_serialization|ObjCryst'
-keeplibs = lambda s: re.search(pat, str(s))
-env_test.Replace(LIBS=filter(keeplibs, env_test['LIBS']))
 
 # Targets --------------------------------------------------------------------
 

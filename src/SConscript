@@ -8,9 +8,6 @@ Import('env')
 flagnames = 'CFLAGS CXXFLAGS LDFLAGS'.split()
 env.MergeFlags([os.environ.get(n, '') for n in flagnames])
 
-# The directory of this SConscript should be searched first for any headers.
-env.PrependUnique(CPPPATH=Dir('.'))
-
 # Insert LIBRARY_PATH explicitly because some compilers
 # ignore it in the system environment.
 env.PrependUnique(LIBPATH=env['ENV'].get('LIBRARY_PATH', '').split(':'))
@@ -23,11 +20,6 @@ if env['tool'] == 'intelc':
         print("Cannot find the Intel C/C++ compiler 'icpc'.")
         Exit(1)
     env.Tool('intelc', topdir=icpc[:icpc.rfind('/bin')])
-
-# Declare external libraries.
-env.ParseConfig("gsl-config --cflags --libs")
-# dladdr in runtimepath.cpp requires the dl library.
-env.AppendUnique(LIBS=['dl'])
 
 fast_linkflags = ['-s']
 
@@ -90,6 +82,10 @@ if build_tests and env['test_installed']:
     SConscript('tests/SConscript')
     Return()
 
+# Here we do not test the installed library.  Any diffpy headers
+# should thus be looked up from our source tree.
+env.PrependUnique(CPPPATH=Dir('.'))
+
 # Load the version script first to resolve the majorminor tuple
 SConscript('diffpy/SConscript.version')
 
@@ -110,7 +106,15 @@ if 'sdist' in COMMAND_LINE_TARGETS:
 # Top Level Targets ----------------------------------------------------------
 
 # lib -- shared library object
-libdiffpy = env.SharedLibrary('diffpy', env['lib_sources'])
+
+# use new environment with extra libraries needed for libdiffpy.
+env_lib = env.Clone()
+# Setup GSL, the GNU Scientific library.
+env_lib.ParseConfig("gsl-config --cflags --libs")
+# The dladdr call in runtimepath.cpp requires the dl library.
+env_lib.AppendUnique(LIBS=['dl'])
+
+libdiffpy = env_lib.SharedLibrary('diffpy', env['lib_sources'])
 Export('libdiffpy')
 lib = Alias('lib', [libdiffpy, env['lib_includes']])
 Default(lib)
