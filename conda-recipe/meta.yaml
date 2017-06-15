@@ -15,12 +15,19 @@ requirements:
   build:
     - scons
     - boost 1.61.0
+    # Make sure this resolves to gsl from the diffpy channel.
+    # Stock gsl=2.2.1=0 depends on libgcc package which on
+    # Mac OS X shadows C++ system library with its own
+    # incompatible version.
     - gsl 2.1
+    #
     - libobjcryst >=2017.1.1,2017.1.*
 
   run:
     - boost 1.61.0
+    # Make sure this resolves to gsl from the diffpy channel.
     - gsl >=2.1
+    #
     - libobjcryst >=2017.1.1,2017.1.*
 
 test:
