@@ -10,6 +10,7 @@ env.Prepend(CCFLAGS='-isystem{}/include'.format(P))
 
 # Define path to the shared libraries from Anaconda environment.
 L = P + '/lib'
+env.Append(LIBPATH=L)
 env.Append(LINKFLAGS='-Wl,-rpath,{!r}'.format(L))
 
 # vim: ft=python
