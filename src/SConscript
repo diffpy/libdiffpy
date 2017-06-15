@@ -30,15 +30,6 @@ if env['PLATFORM'] == 'darwin':
     env.AppendUnique(SHLINKFLAGS='-headerpad_max_install_names')
     fast_linkflags[:] = []
 
-# configure version specific options.
-skip_configure = (GetOption('clean') or GetOption('help') or
-        (['sdist'] == list(COMMAND_LINE_TARGETS)))
-if not skip_configure:
-    SConscript('SConscript.configure')
-elif GetOption('clean'):
-    # make sure ObjCryst files will be also cleaned
-    env['has_objcryst'] = True
-
 # Compiler specific options
 if icpc:
     # options for Intel C++ compiler on hpc dev-intel07
@@ -66,6 +57,16 @@ if env['coverage']:
     env.Append(CCFLAGS=['--coverage', '-O0'])
     env.Append(LINKFLAGS='--coverage')
 
+# configure boost and ObjCryst libraries unless non-relevant.
+skip_configure = (GetOption('clean') or GetOption('help') or
+                  (['sdist'] == list(COMMAND_LINE_TARGETS)))
+if not skip_configure:
+    SConscript('SConscript.configure')
+
+# when cleaning make sure to also purge ObjCryst files
+if GetOption('clean'):
+    env['has_objcryst'] = True
+
 # Define lists for storing library source and include files.
 env['lib_includes'] = []
 env['lib_sources'] = []
@@ -73,14 +74,19 @@ env['lib_datafiles'] = []
 
 # Subsidiary SConscripts -----------------------------------------------------
 
-# Determine if unit tests need to be built.
-build_tests = set(('test', 'alltests')).intersection(COMMAND_LINE_TARGETS)
+# The targets that concern unit tests.
+targets_that_test = set(('test', 'alltests'))
 
 # Short circuit if we test an already installed library.  Do not define
 # any further targets as they may conflict with the installed files.
-if build_tests and env['test_installed']:
+if env['test_installed']:
     SConscript('tests/SConscript')
+    if not targets_that_test.issuperset(COMMAND_LINE_TARGETS):
+        print('Warning: only test targets are available when '
+              '"test_installed=True".')
     Return()
+
+assert not env['test_installed']
 
 # Here we do not test the installed library.  Any diffpy headers
 # should thus be looked up from our source tree.
@@ -121,8 +127,7 @@ Default(lib)
 
 # Define targets related to testing.  Do so only when testing is requested.
 # This enables library build on machines without cxxtest.
-if build_tests:
-    assert not env['test_installed']
+if targets_that_test.intersection(COMMAND_LINE_TARGETS):
     SConscript('tests/SConscript')
 
 # Installation targets.
