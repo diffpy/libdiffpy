@@ -42,37 +42,49 @@ env.EnsureSConsVersion(0, 98, 1)
 # Customizable compile variables
 vars = Variables('sconsvars.py')
 
-vars.Add('tests',
-    'Fixed-string patterns for selecting unit test sources.', None)
-vars.Add(BoolVariable('test_installed',
-    'build unit tests using the installed library.', False))
-vars.Add(EnumVariable('build',
-    'compiler settings', 'fast',
-    allowed_values=('debug', 'fast')))
-vars.Add(EnumVariable('tool',
-    'C++ compiler toolkit to be used', 'default',
-    allowed_values=('default', 'intelc')))
-vars.Add(BoolVariable('profile',
-    'build with profiling information', False))
-vars.Add(BoolVariable('coverage',
-    'build for code coverage analysis', False))
-vars.Add(PathVariable('prefix',
-    'installation prefix directory', '/usr/local'))
+vars.Add(PathVariable(
+    'prefix',
+    'installation prefix directory',
+    '/usr/local'))
 vars.Update(env)
-vars.Add(PathVariable('libdir',
-    'object code library directory [prefix/lib]',
+vars.Add(PathVariable(
+    'libdir',
+    'installation directory for compiled library [prefix/lib]',
     env['prefix'] + '/lib',
     PathVariable.PathAccept))
-vars.Add(PathVariable('includedir',
+vars.Add(PathVariable(
+    'includedir',
     'installation directory for C++ header files [prefix/include]',
     env['prefix'] + '/include',
     PathVariable.PathAccept))
-vars.Add(PathVariable('datadir',
+vars.Add(PathVariable(
+    'datadir',
     'installation directory for architecture independent data [prefix/share]',
     env['prefix'] + '/share',
     PathVariable.PathAccept))
-vars.Add(BoolVariable('enable_objcryst',
+vars.Add(EnumVariable(
+    'build',
+    'compiler settings',
+    'fast', allowed_values=('debug', 'fast')))
+vars.Add(EnumVariable(
+    'tool',
+    'C++ compiler toolkit to be used',
+    'default', allowed_values=('default', 'intelc')))
+vars.Add(BoolVariable(
+    'enable_objcryst',
     'enable objcryst support, when installed', None))
+vars.Add(BoolVariable(
+    'profile',
+    'build with profiling information', False))
+vars.Add(BoolVariable(
+    'coverage',
+    'build for code coverage analysis', False))
+vars.Add(
+    'tests',
+    'fixed-string patterns for selecting unit tests', None)
+vars.Add(BoolVariable(
+    'test_installed',
+    'build tests using the installed library.', False))
 vars.Update(env)
 env.Help(MY_SCONS_HELP % vars.GenerateHelpText(env))
 
