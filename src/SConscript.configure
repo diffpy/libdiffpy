@@ -65,7 +65,7 @@ if conf.env.get('enable_objcryst', True):
         language='C++', autoadd=True)
     objcryst_requested = conf.env.get('enable_objcryst', False)
     if objcryst_requested and not conf.env['has_objcryst']:
-        print('Adjust compiler paths or build with "enable_objcryst=False".')
+        print("Adjust compiler paths or build with 'enable_objcryst=False'.")
         Exit(1)
 
 env = conf.Finish()
