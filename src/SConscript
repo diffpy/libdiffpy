@@ -44,6 +44,9 @@ else:
 # Configure build variants
 if env['build'] == 'debug':
     env.Append(CCFLAGS='-g')
+elif env['build'] == 'coverage':
+    env.Append(CCFLAGS=['-g', '--coverage', '-O0'])
+    env.Append(LINKFLAGS='--coverage')
 elif env['build'] == 'fast':
     env.AppendUnique(CCFLAGS=['-O3'] + fast_optimflags)
     env.AppendUnique(CPPDEFINES={'NDEBUG' : None})
@@ -53,9 +56,6 @@ if env['profile']:
     env.AppendUnique(CCFLAGS='-pg')
     env.AppendUnique(LINKFLAGS='-pg')
 
-if env['coverage']:
-    env.Append(CCFLAGS=['--coverage', '-O0'])
-    env.Append(LINKFLAGS='--coverage')
 
 # configure boost and ObjCryst libraries unless non-relevant.
 skip_configure = (GetOption('clean') or GetOption('help') or

@@ -65,7 +65,7 @@ vars.Add(PathVariable(
 vars.Add(EnumVariable(
     'build',
     'compiler settings',
-    'fast', allowed_values=('debug', 'fast')))
+    'fast', allowed_values=('fast', 'debug', 'coverage')))
 vars.Add(EnumVariable(
     'tool',
     'C++ compiler toolkit to be used',
@@ -76,9 +76,6 @@ vars.Add(BoolVariable(
 vars.Add(BoolVariable(
     'profile',
     'build with profiling information', False))
-vars.Add(BoolVariable(
-    'coverage',
-    'build for code coverage analysis', False))
 vars.Add(
     'tests',
     'fixed-string patterns for selecting unit tests', None)
@@ -91,7 +88,6 @@ env.Help(MY_SCONS_HELP % vars.GenerateHelpText(env))
 env['has_objcryst'] = None
 btags = [env['build'], platform.machine()]
 if env['profile']:  btags.append('profile')
-if env['coverage']:  btags.append('coverage')
 builddir = env.Dir('build/' + '-'.join(btags))
 
 Export('env')
