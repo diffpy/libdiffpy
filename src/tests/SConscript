@@ -30,13 +30,17 @@ def srcincluded(f):
     fl = str(f).lower()
     rv = srcsupported(f)
     rv = rv and f.srcnode().isfile()
-    if env_test.get('tests') is not None:
-        rv = rv and any(t.lower() in fl
-                for t in Split(env_test['tests']))
+    if env_test.get('tests'):
+        tpatterns = Split(env_test['tests'].lower().replace(',', ' '))
+        rv = rv and any(tp in fl for tp in tpatterns)
     return rv
 
 # alltests -- the unit test driver source files
-test_sources = filter(srcincluded, GlobSources('Test*.hpp'))
+test_sources = [f for f in GlobSources('Test*.hpp') if srcincluded(f)]
+if not test_sources:
+    ts = env_test.get('tests', '')
+    print("Cannot find any test matching 'tests={}'.".format(ts))
+    Exit(1)
 
 # Define the DIFFPYTESTSDIRPATH macro required for test_helpers.cpp
 thisdir = Dir('.').srcnode().abspath
