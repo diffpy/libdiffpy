@@ -16,28 +16,28 @@ def parsemajorminor(hcode):
 
 def build_VersionCode(target, source, env):
     tplcode = source[0].get_contents()
-    numversion = ginfo['major']
-    numversion = 1000 * numversion + ginfo['minor']
-    numversion = 1000 * numversion + ginfo['micro']
-    numversion = 1000 * numversion + ginfo['patchnumber']
+    numversion = gver['major']
+    numversion = 1000 * numversion + gver['minor']
+    numversion = 1000 * numversion + gver['micro']
+    numversion = 1000 * numversion + gver['patchnumber']
     # verify that formulas in version.tpl work as advertised
     emsg = "Inconsistent value of DIFFPY_VERSION = %i" % numversion
-    assert numversion // 1000000000 == ginfo['major'], emsg
-    assert numversion // 1000000 % 1000 == ginfo['minor'], emsg
-    assert numversion // 1000 % 1000 == ginfo['micro'], emsg
-    assert numversion % 500 == ginfo['patchnumber'], emsg
+    assert numversion // 1000000000 == gver['major'], emsg
+    assert numversion // 1000000 % 1000 == gver['minor'], emsg
+    assert numversion // 1000 % 1000 == gver['micro'], emsg
+    assert numversion % 500 == gver['patchnumber'], emsg
     libversion = str(numversion) + "LL"
-    if ginfo['prerelease']:
+    if gver['prerelease']:
         libversion = "(-500 + %s)" % libversion
     flds = {
         'DIFFPY_VERSION' : libversion,
-        'DIFFPY_VERSION_MAJOR' : ginfo['major'],
-        'DIFFPY_VERSION_MINOR' : ginfo['minor'],
-        'DIFFPY_VERSION_MICRO' : ginfo['micro'],
-        'DIFFPY_VERSION_PATCH' : ginfo['patchnumber'],
-        'DIFFPY_VERSION_STR' : ginfo['version'],
-        'DIFFPY_VERSION_DATE' : ginfo['date'],
-        'DIFFPY_GIT_SHA' : ginfo['commit'],
+        'DIFFPY_VERSION_MAJOR' : gver['major'],
+        'DIFFPY_VERSION_MINOR' : gver['minor'],
+        'DIFFPY_VERSION_MICRO' : gver['micro'],
+        'DIFFPY_VERSION_PATCH' : gver['patchnumber'],
+        'DIFFPY_VERSION_STR' : gver['version'],
+        'DIFFPY_VERSION_DATE' : gver['date'],
+        'DIFFPY_GIT_SHA' : gver['commit'],
     }
     versiontemplate = string.Template(tplcode)
     versioncode = versiontemplate.safe_substitute(flds)
@@ -65,26 +65,16 @@ env.Append(BUILDERS={'BuildFeaturesCode' :
 
 vhpp = File('version.hpp')
 
-MY_GIT_MISSING_ERROR_MSG = """
-Cannot determine libdiffpy version.  Compile from a git repository
-or use a source archive from
-
-    https://github.com/diffpy/libdiffpy/releases
-"""
-
 # If version.hpp exists do not use git
 if os.path.isfile(str(vhpp.srcnode())):
     majorminor = parsemajorminor(vhpp.srcnode().get_contents())
 else:
-    from libdiffpybuildutils import gitinfo
+    from libdiffpybuildutils import getversion
     vtpl = File('version.tpl')
-    ginfo = gitinfo()
-    if not ginfo:
-        print MY_GIT_MISSING_ERROR_MSG
-        Exit(1)
+    gver = getversion()
     vhpp, = env.BuildVersionCode(['version.hpp'], vtpl)
-    env.Depends(vhpp, env.Value(ginfo['version'] + ginfo['commit']))
-    majorminor = (ginfo['major'], ginfo['minor'])
+    env.Depends(vhpp, env.Value(gver['version'] + gver['commit']))
+    majorminor = (gver['major'], gver['minor'])
 
 fhpp, = env.BuildFeaturesCode(['features.tpl'])
 env.Depends(fhpp, env.Value(env['has_objcryst']))

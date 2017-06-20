@@ -11,7 +11,7 @@ def add_version_and_compress(target, source, env):
     fpout = gzip.GzipFile(target[0].path + '.gz', 'w', mtime=0)
     tfout = tarfile.open(fileobj=fpout, mode='w')
     # copy archive members up to version.cpp
-    tiiter = iter(tfin)
+    tiiter = (t for t in tfin if not t.name.endswith('/version.tpl'))
     for ti in tiiter:
         tfout.addfile(ti, tfin.extractfile(ti))
         if ti.name.endswith('diffpy/version.cpp'):

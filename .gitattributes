@@ -3,4 +3,4 @@
 /.travis*  export-ignore
 /conda-recipe/  export-ignore
 /doc  export-ignore
-/src/diffpy/version.tpl  export-ignore
+gitarchive.cfg  export-subst
