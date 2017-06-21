@@ -1,6 +1,3 @@
-import os
-import re
-
 Import('env', 'GlobSources')
 
 # Environment for building unit test driver
