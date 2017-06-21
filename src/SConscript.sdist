@@ -39,13 +39,18 @@ def die_without_git(target, source, env):
 
 
 def generate_sdist_actions(target, source, env, for_signature):
-    actions = []
+    env.SetDefault(SDIST_ATTRIBUTES='site_scons/.gitattributes')
     ginfo = gitinfo()
-    if not ginfo:  return [die_without_git]
+    if not ginfo:
+        return [die_without_git]
+    actions = []
+    actions.append('echo "gitarchive.cfg -export-subst" > $SDIST_ATTRIBUTES')
     prefix = 'libdiffpy-%(version)s/' % ginfo
     gitcmd = ('git -c tar.umask=0022 archive '
+              '--worktree-attributes '
               '--prefix=%s --output=$TARGET HEAD') % prefix
     actions.append(gitcmd)
+    actions.append(Delete('$SDIST_ATTRIBUTES'))
     actions.append(add_version_and_compress)
     actions.append(Delete('$TARGET'))
     dst = '${TARGET.base}-%(version)s${TARGET.suffix}.gz' % ginfo
