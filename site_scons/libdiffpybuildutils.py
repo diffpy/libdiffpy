@@ -66,7 +66,7 @@ def getversion():
         afb = FALLBACK_VERSION
         gfb = gi['version'].split('.post')[0] + '.post0'
         emsg = "Inconsistent FALLBACK_VERSION {!r}.  Git tag suggests {!r}."
-        assert gfb == afb, emgs.format(afb, gfb)
+        assert gfb == afb, emsg.format(afb, gfb)
         rv.update(gi)
     else:
         # Not a git repository.  Require that gitarchive.cfg is expanded.
