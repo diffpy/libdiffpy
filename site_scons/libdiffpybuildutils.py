@@ -8,11 +8,15 @@ import re
 
 MYDIR = os.path.dirname(os.path.abspath(__file__))
 
-GIT_MISSING_ERROR_MSG = """
+EMSG_GIT_MISSING = """
 Cannot determine libdiffpy version.  Compile from a git repository
 or use a source archive from
 
     https://github.com/diffpy/libdiffpy/releases
+"""
+
+EMSG_BAD_FALLBACK_VERSION = """
+Inconsistent FALLBACK_VERSION {} vs {} from git tag.
 """
 
 
@@ -65,12 +69,13 @@ def getversion():
     if gi:
         afb = FALLBACK_VERSION
         gfb = gi['version'].split('.post')[0] + '.post0'
-        emsg = "Inconsistent FALLBACK_VERSION {!r}.  Git tag suggests {!r}."
-        assert gfb == afb, emsg.format(afb, gfb)
+        if gfb != afb:
+            raise RuntimeError(EMSG_BAD_FALLBACK_VERSION.format(afb, gfb))
         rv.update(gi)
     else:
         # Not a git repository.  Require that gitarchive.cfg is expanded.
-        assert '$Format:' not in ga['commit'], GIT_MISSING_ERROR_MSG
+        if '$Format:' in ga['commit']:
+            raise RuntimeError(EMSG_GIT_MISSING)
         rv['commit'] = ga['commit']
         rv['date'] = ga['date']
         # First assume we have an undetermined post-release.  Keep version
