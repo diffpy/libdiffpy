@@ -75,10 +75,9 @@ before_install:
   - $NOAPT || popd
 
 install:
-  - $NOMC || conda build --dirty conda-recipe
-  - $NOMC || MYCONDATESTENV="$(ls -td ~/mc/conda-bld/${MYNAME}_*/_t_env | head -1)"
-  - $NOMC || source activate ${MYCONDATESTENV:?"conda test environment not found"}
-  - $NOMC || conda list  --export ${MYNAME} > /tmp/mypackage.txt
+  - $NOMC || conda build conda-recipe
+  - $NOMC || conda render --output conda-recipe |
+                sed 's,.*/,,; s/[.]tar[.]bz2$//; s/-/=/g' > /tmp/mypackage.txt
   - $NOMC || source activate root
   - $NOMC || conda build purge
   - $NOMC || source activate testenv
