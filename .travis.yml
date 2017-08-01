@@ -111,6 +111,7 @@ install:
   - scons build=fast prefix="${MYPREFIX}" test_installed=true alltests
   - MYALLTESTSFAST=$(ls -t ${PWD}/build/fast*/tests/alltests | head -1)
   - scons build=debug lib alltests
+  - scons build=coverage lib alltests
 
 
 before_script:
@@ -120,8 +121,9 @@ script:
   - scons -Q build=debug test
   - scons -Q build=debug enable_objcryst=false test
   - ${MYALLTESTSFAST}
+  - scons -Q build=coverage test
 
 
-#after_success:
-# - pip install $MYPIPFLAGS codecov
-# - codecov
+after_success:
+  - pip install $MYPIPFLAGS codecov
+  - codecov

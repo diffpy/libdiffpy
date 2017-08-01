@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/diffpy/libdiffpy.svg?branch=master)](https://travis-ci.org/diffpy/libdiffpy)
+[![codecov](https://codecov.io/gh/diffpy/libdiffpy/branch/master/graph/badge.svg)](https://codecov.io/gh/diffpy/libdiffpy)
 
 # libdiffpy
 
