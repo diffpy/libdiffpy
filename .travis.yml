@@ -28,6 +28,8 @@ branches:
 
 before_install:
   - MYNAME=libdiffpy
+    # travis virtual hosts have 2 cores as per https://goo.gl/DQy4oW
+  - MYNCPU=2
   - umask 022
   - git fetch origin --tags
   - if ${MYUSEMC}; then
@@ -85,9 +87,9 @@ install:
   - $NOMC || conda install --yes cxxtest scons
   - $NOMC || MYPREFIX="${HOME}/mc/envs/testenv"
 
-  - $NOAPT || sudo scons -C ~/pkgs/libobjcryst install
+  - $NOAPT || sudo scons -j $MYNCPU -C ~/pkgs/libobjcryst install
   - $NOAPT || cd ~/pkgs/"$(basename "${MYTARBUNDLE}" .tar.gz)"/
-  - $NOAPT || scons build=fast lib
+  - $NOAPT || scons -j $MYNCPU build=fast lib
   - $NOAPT || sudo scons build=fast install
   - $NOAPT || scons -Q build=fast --clean lib
   - $NOAPT || MYPREFIX=/usr/local
@@ -108,10 +110,10 @@ install:
 
   - $NOMC || export MYPREFIX
   - $NOMC || cp .travis-sconscript.local sconscript.local
-  - scons build=fast prefix="${MYPREFIX}" test_installed=true alltests
+  - scons -j $MYNCPU build=fast prefix="${MYPREFIX}" test_installed=true alltests
   - MYALLTESTSFAST=$(ls -t ${PWD}/build/fast*/tests/alltests | head -1)
-  - scons build=debug lib alltests
-  - scons build=coverage lib alltests
+  - scons -j $MYNCPU build=debug lib alltests
+  - scons -j $MYNCPU build=coverage lib alltests
 
 
 before_script:
