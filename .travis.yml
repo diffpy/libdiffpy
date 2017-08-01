@@ -1,3 +1,4 @@
+dist: trusty
 sudo: required
 
 language: cpp
@@ -64,15 +65,12 @@ before_install:
   - $NOAPT || test "${TRAVIS_OS_NAME}" = "linux"
   - $NOAPT || sudo apt-get update -qq
   - $NOAPT || sudo apt-get install -y
-                  libgsl0-dev libboost-all-dev python-pip build-essential scons
+                  libgsl0-dev libboost-all-dev python-pip
+                  build-essential scons cxxtest
   - $NOAPT || scons sdist
   - $NOAPT || MYTARBUNDLE="$(ls -t "${PWD}"/*.tar.gz | head -1)"
   - $NOAPT || pushd ~/pkgs
   - $NOAPT || tar xzf "${MYTARBUNDLE}"
-  - $NOAPT || wget --timestamping
-                  https://github.com/CxxTest/cxxtest/releases/download/4.4/cxxtest-4.4.tar.gz
-  - $NOAPT || tar xzf cxxtest-4.4.tar.gz
-  - $NOAPT || export "CXXTEST=${PWD}/cxxtest-4.4"
   - $NOAPT || git clone https://github.com/diffpy/libobjcryst.git
   - $NOAPT || popd
 
