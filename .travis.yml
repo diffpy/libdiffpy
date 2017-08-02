@@ -14,11 +14,6 @@ env:
     - MYUSEMC=true
     - MYUSEMC=false
 
-matrix:
-  exclude:
-    - os: osx
-      env: MYUSEMC=false
-
 git:
   depth: 999999
 
@@ -33,10 +28,14 @@ before_install:
   - MYNCPU=2
   - umask 022
   - git fetch origin --tags
+  - NOSYS=true; NOAPT=true; NOBREW=true; NOMC=true
   - if ${MYUSEMC}; then
-        NOAPT=true; NOMC=false;
-    else
-        NOAPT=false; NOMC=true;
+        NOMC=false;
+    elif [[ ${TRAVIS_OS_NAME} == linux ]]; then
+        NOAPT=false; NOSYS=false;
+        MYPIPFLAGS="--user";
+    elif [[ ${TRAVIS_OS_NAME} == osx ]]; then
+        NOBREW=false; NOSYS=false;
         MYPIPFLAGS="--user";
     fi
   - MYMCREPO=https://repo.continuum.io/miniconda
@@ -62,17 +61,26 @@ before_install:
   - $NOMC || conda create --name=testenv --yes python=${MYPYTHON_VERSION}
   - $NOMC || conda config --add channels diffpy
 
-  - $NOAPT || test "${TRAVIS_OS_NAME}" = "linux"
+  - $NOAPT || test "${TRAVIS_OS_NAME}" = "linux" || exit $?
   - $NOAPT || sudo apt-get update -qq
   - $NOAPT || sudo apt-get install -y
                   libgsl0-dev libboost-all-dev python-pip
                   build-essential scons cxxtest
-  - $NOAPT || scons sdist
-  - $NOAPT || MYTARBUNDLE="$(ls -t "${PWD}"/*.tar.gz | head -1)"
-  - $NOAPT || pushd ~/pkgs
-  - $NOAPT || tar xzf "${MYTARBUNDLE}"
-  - $NOAPT || git clone https://github.com/diffpy/libobjcryst.git
-  - $NOAPT || popd
+
+  - $NOBREW || test "${TRAVIS_OS_NAME}" = "osx" || exit $?
+  - $NOBREW || brew update
+  - $NOBREW || brew install gsl
+  - $NOBREW || brew install scons
+  - $NOBREW || brew install cxxtest
+  - $NOBREW || export CXXTEST="$(brew --prefix cxxtest)"/libexec/bin/cxxtestgen
+
+  - $NOSYS || scons sdist
+  - $NOSYS || MYTARBUNDLE="$(ls -t "${PWD}"/*.tar.gz | head -1)"
+  - $NOSYS || pushd ~/pkgs
+  - $NOSYS || tar xzf "${MYTARBUNDLE}"
+  - $NOSYS || git clone https://github.com/diffpy/libobjcryst.git
+  - $NOSYS || popd
+
 
 install:
   - $NOMC || conda build conda-recipe
@@ -85,12 +93,14 @@ install:
   - $NOMC || conda install --yes cxxtest scons
   - $NOMC || MYPREFIX="${HOME}/mc/envs/testenv"
 
-  - $NOAPT || sudo scons -j $MYNCPU -C ~/pkgs/libobjcryst install
-  - $NOAPT || cd ~/pkgs/"$(basename "${MYTARBUNDLE}" .tar.gz)"
-  - $NOAPT || scons -j $MYNCPU build=fast lib
-  - $NOAPT || sudo scons build=fast install
-  - $NOAPT || scons -Q build=fast --clean lib
-  - $NOAPT || MYPREFIX=/usr/local
+  - MYSUDO=
+  - $NOAPT || MYSUDO=sudo
+  - $NOSYS || $MYSUDO scons -j $MYNCPU -C ~/pkgs/libobjcryst install
+  - $NOSYS || cd ~/pkgs/"$(basename "${MYTARBUNDLE}" .tar.gz)"
+  - $NOSYS || scons -j $MYNCPU build=fast lib
+  - $NOSYS || $MYSUDO scons build=fast install
+  - $NOSYS || scons -Q build=fast --clean lib
+  - $NOSYS || MYPREFIX=/usr/local
 
   # Verify version of the installed library.
   - MYINCLUDE="${MYPREFIX}/include"
