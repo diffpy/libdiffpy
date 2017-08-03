@@ -121,7 +121,9 @@ install:
   - scons -j $MYNCPU build=fast prefix="${MYPREFIX}" test_installed=true alltests
   - MYALLTESTSFAST=$(ls -t ${PWD}/build/fast*/tests/alltests | head -1)
   - scons -j $MYNCPU build=debug lib alltests
-  - scons -j $MYNCPU build=coverage lib alltests
+  # APT and BREW jobs test builds from expanded source archive, but codecov
+  # requires compilation from a git repository.  Tell scons to do so.
+  - scons -j $MYNCPU -C $TRAVIS_BUILD_DIR build=coverage lib alltests
 
 
 before_script:
@@ -133,9 +135,10 @@ script:
   - scons -Q build=debug test
   - scons -Q build=debug enable_objcryst=false test
   - ${MYALLTESTSFAST}
-  - scons -Q build=coverage test
+  - scons -j $MYNCPU -C $TRAVIS_BUILD_DIR build=coverage test
 
 
 after_success:
+  - cd $TRAVIS_BUILD_DIR
   - pip install $MYPIPFLAGS codecov
   - codecov
