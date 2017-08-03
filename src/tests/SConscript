@@ -52,6 +52,9 @@ alltests = env_test.CxxTest('alltests', test_sources + test_helpers)
 if use_our_library:
     env_test.Depends(alltests, libdiffpy)
 
+# Clean up .gcda and .gcno files from coverage analysis.
+env_test.Clean(alltests, Glob('*.gc??'))
+
 env_test.Alias('alltests', alltests)
 
 # test -- alias for executing unit tests.
