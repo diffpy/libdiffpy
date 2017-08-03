@@ -45,6 +45,7 @@ else:
 if env['build'] == 'debug':
     env.Append(CCFLAGS='-g')
 elif env['build'] == 'coverage':
+    env.CacheDir(None)
     env.Append(CCFLAGS=['-g', '--coverage', '-O0'])
     env.Append(LINKFLAGS='--coverage')
 elif env['build'] == 'fast':
