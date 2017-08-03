@@ -125,6 +125,8 @@ install:
 
 
 before_script:
+  - $NOBREW || USER_BASE="$(python -c 'import site; print(site.USER_BASE)')"
+  - $NOBREW || PATH="${USER_BASE}/bin:${PATH}"
 
 
 script:
