@@ -12,6 +12,7 @@ install-data        install data files used by the library
 alltests            build the unit test program "alltests"
 test                execute unit tests (requires the cxxtest framework)
 sdist               create source distribution tarball from git repository
+zerocounters        remove cumulative coverage-count data
 
 Build configuration variables:
 %s

@@ -168,4 +168,20 @@ Alias('install-data', InstallAs(data_targets, env['lib_datafiles']))
 # install
 Alias('install', ['install-lib', 'install-include', 'install-data'])
 
+# Coverage related targets.
+
+# zerocounters
+cdatadirs = ['diffpy', 'diffpy/srreal', 'tests']
+cdatafiles = [f for d in cdatadirs for f in Glob(d + '/*.gcda')]
+zerocounters = Alias('zerocounters', [], [Delete(f) for f in cdatafiles])
+Ignore(cdatadirs, cdatafiles)
+AlwaysBuild(zerocounters)
+
+# when both 'test' and 'zerocounters' are requested, make sure
+# to build them in correct order.
+require_ordered_targets = ('test' in COMMAND_LINE_TARGETS and
+                           'zerocounters' in COMMAND_LINE_TARGETS)
+if require_ordered_targets:
+    Depends('test', zerocounters)
+
 # vim: ft=python
