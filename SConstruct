@@ -24,7 +24,7 @@ import os
 import platform
 
 def subdictionary(d, keyset):
-    return dict([kv for kv in d.items() if kv[0] in keyset])
+    return dict(kv for kv in d.items() if kv[0] in keyset)
 
 # copy system environment variables related to compilation
 DefaultEnvironment(ENV=subdictionary(os.environ, '''
