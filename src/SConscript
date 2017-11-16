@@ -140,33 +140,38 @@ if targets_that_test.intersection(COMMAND_LINE_TARGETS):
 prefix = env['prefix']
 
 # install-lib
-libinstall = env.Install(env['libdir'], libdiffpy)
+install_lib = env.Install(env['libdir'], libdiffpy)
 if env['PLATFORM'] == 'darwin':
     # DARWIN_INSTALL_NAME can be pre-set in sconscript.local
     env.SetDefault(DARWIN_INSTALL_NAME='$TARGET.abspath')
-    env.AddPostAction(libinstall,
-            'install_name_tool -id $DARWIN_INSTALL_NAME $TARGET')
+    env.AddPostAction(install_lib,
+                      'install_name_tool -id $DARWIN_INSTALL_NAME $TARGET')
 if env['PLATFORM'] == 'posix' and WhereIs('ldconfig'):
-    opts = ''
-    if os.getuid() != 0:  opts = '-n'
-    env.AddPostAction(libinstall,
-            'ldconfig %s $TARGET.dir' % opts)
-Alias('install-lib', libinstall)
+    opts = '' if os.getuid() == 0 else '-n'
+    env.AddPostAction(install_lib,
+                      'ldconfig %s $TARGET.dir' % opts)
+Alias('install-lib', install_lib)
 
-# install-includes
+# install-include
 ninc = len(Dir('.').path) + 1
 inc_target_path = lambda f: os.path.join(env['includedir'], f.path[ninc:])
-include_targets = map(inc_target_path, env['lib_includes'])
-Alias('install-include', InstallAs(include_targets, env['lib_includes']))
+include_targets = [inc_target_path(f) for f in env['lib_includes']]
+install_include = InstallAs(include_targets, env['lib_includes'])
+Alias('install-include', install_include)
 
 # install-data
 nrt = len(Dir('runtime').path) + 1
 data_target_path = lambda f: os.path.join(env['runtimepath'], f.path[nrt:])
-data_targets = map(data_target_path, env['lib_datafiles'])
-Alias('install-data', InstallAs(data_targets, env['lib_datafiles']))
+data_targets = [data_target_path(f) for f in env['lib_datafiles']]
+install_data = InstallAs(data_targets, env['lib_datafiles'])
+Alias('install-data', install_data)
 
 # install
 Alias('install', ['install-lib', 'install-include', 'install-data'])
+# do not install headers and data when shared library cannot be installed.
+if 'install' in COMMAND_LINE_TARGETS:
+    Requires(install_include, install_lib)
+    Requires(install_data, install_lib)
 
 # Coverage related targets.
 
