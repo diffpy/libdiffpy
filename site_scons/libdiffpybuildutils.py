@@ -57,13 +57,13 @@ def getversion():
     in gitarchive.cfg.  Use expanded data from gitarchive.cfg when
     these sources are from git archive bundle.
     """
-    from ConfigParser import RawConfigParser
     from fallback_version import FALLBACK_VERSION
     gitarchivecfgfile = os.path.join(MYDIR, 'gitarchive.cfg')
     assert os.path.isfile(gitarchivecfgfile)
-    cp = RawConfigParser()
-    cp.read(gitarchivecfgfile)
-    ga = cp.defaults()
+    with open(gitarchivecfgfile) as fp:
+        gacontent = fp.read()
+    gaitems = re.findall(r'^(\w+) *= *(\S.*?)\s*$', gacontent, re.M)
+    ga = dict(gaitems)
     gi = gitinfo()
     rv = {}
     if gi:
