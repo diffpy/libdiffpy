@@ -13,6 +13,7 @@ build:
 
 requirements:
   build:
+    - python
     - scons
     - boost 1.61.0
     # Make sure this resolves to gsl from the diffpy channel.
