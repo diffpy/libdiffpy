@@ -67,6 +67,14 @@ before_install:
                   build-essential scons cxxtest
 
   - $NOBREW || test "${TRAVIS_OS_NAME}" = "osx" || exit $?
+
+    # Add homebrew site-packages to Python path.
+  - $NOBREW || MYPYUSITE="${HOME}/Library/Python/2.7/lib/python/site-packages"
+  - $NOBREW || MYPTHFILE="${MYPYUSITE}/homebrew.pth"
+  - $NOBREW || MYPYBREW=/usr/local/lib/python2.7/site-packages
+  - $NOBREW || mkdir -p "${MYPYUSITE}"
+  - $NOBREW || echo "import site; site.addsitedir('$MYPYBREW')" > ${MYPTHFILE}
+
   - $NOBREW || brew update
   - $NOBREW || brew install gsl
   - $NOBREW || brew install scons
