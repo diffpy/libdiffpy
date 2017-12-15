@@ -5,7 +5,7 @@ def srcsupported(f):
     rv = rv and f.srcnode().isfile()
     return rv
 
-env['lib_includes'] += filter(srcsupported, GlobSources('*.[hi]pp'))
-env['lib_sources'] += filter(srcsupported, GlobSources('*.cpp'))
+env['lib_includes'] += [f for f in GlobSources('*.[hi]pp') if srcsupported(f)]
+env['lib_sources'] += [f for f in GlobSources('*.cpp') if srcsupported(f)]
 
 # vim: ft=python
