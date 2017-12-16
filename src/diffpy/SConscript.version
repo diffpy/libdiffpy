@@ -25,7 +25,7 @@ def parsemajorminor(hcode):
 
 
 def build_VersionCode(target, source, env):
-    tplcode = source[0].get_contents()
+    tplcode = source[0].get_text_contents()
     numversion = gver['major']
     numversion = 1000 * numversion + gver['minor']
     numversion = 1000 * numversion + gver['micro']
@@ -51,7 +51,8 @@ def build_VersionCode(target, source, env):
     }
     versiontemplate = string.Template(tplcode)
     versioncode = versiontemplate.safe_substitute(flds)
-    open(target[0].path, 'w').write(versioncode)
+    with open(target[0].path, 'w') as fp:
+        fp.write(versioncode)
     return None
 
 env.Append(BUILDERS={'BuildVersionCode' :
@@ -59,13 +60,14 @@ env.Append(BUILDERS={'BuildVersionCode' :
 
 
 def build_FeaturesCode(target, source, env):
-    tplcode = source[0].get_contents()
+    tplcode = source[0].get_text_contents()
     flds = {
         'DIFFPY_HAS_OBJCRYST' : int(env['has_objcryst']),
     }
     codetemplate = string.Template(tplcode)
     codetext = codetemplate.safe_substitute(flds)
-    open(target[0].path, 'w').write(codetext)
+    with open(target[0].path, 'w') as fp:
+        fp.write(codetext)
     return None
 
 env.Append(BUILDERS={'BuildFeaturesCode' :

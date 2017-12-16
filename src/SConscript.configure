@@ -6,7 +6,7 @@ def CheckBoostVersion(context, version):
     '''Check if Boost Library is at least of specified version
     '''
     # Boost versions are in format major.minor.subminor
-    v_arr = map(int, version.split("."))
+    v_arr = [int(n) for n in version.split(".")]
     version_n = sum([(v * n) for v, n in zip(v_arr, (1e5, 1e2, 1))])
     context.Message('Checking for Boost version >= %s... ' % (version))
     rv = context.TryCompile('\n'.join([

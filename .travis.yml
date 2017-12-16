@@ -8,11 +8,10 @@ os:
   - osx
 
 env:
-  global:
-    - MYPYTHON_VERSION=2.7
-  matrix:
-    - MYUSEMC=true
-    - MYUSEMC=false
+  - MYUSEMC=true MYPYTHON_VERSION=2.7
+  - MYUSEMC=true MYPYTHON_VERSION=3.5
+  - MYUSEMC=true MYPYTHON_VERSION=3.6
+  - MYUSEMC=false
 
 git:
   depth: 999999
@@ -68,6 +67,14 @@ before_install:
                   build-essential scons cxxtest
 
   - $NOBREW || test "${TRAVIS_OS_NAME}" = "osx" || exit $?
+
+    # Add homebrew site-packages to Python path.
+  - $NOBREW || MYPYUSITE="${HOME}/Library/Python/2.7/lib/python/site-packages"
+  - $NOBREW || MYPTHFILE="${MYPYUSITE}/homebrew.pth"
+  - $NOBREW || MYPYBREW=/usr/local/lib/python2.7/site-packages
+  - $NOBREW || mkdir -p "${MYPYUSITE}"
+  - $NOBREW || echo "import site; site.addsitedir('$MYPYBREW')" > ${MYPTHFILE}
+
   - $NOBREW || brew update
   - $NOBREW || brew install gsl
   - $NOBREW || brew install scons
@@ -83,8 +90,8 @@ before_install:
 
 
 install:
-  - $NOMC || conda build conda-recipe
-  - $NOMC || conda render --output conda-recipe |
+  - $NOMC || conda build --python=${MYPYTHON_VERSION} conda-recipe
+  - $NOMC || conda render --python=${MYPYTHON_VERSION} --output conda-recipe |
                 sed 's,.*/,,; s/[.]tar[.]bz2$//; s/-/=/g' > /tmp/mypackage.txt
   - $NOMC || source activate root
   - $NOMC || conda build purge
