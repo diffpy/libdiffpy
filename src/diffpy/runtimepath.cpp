@@ -185,7 +185,7 @@ runtime_error LineReader::format_error(
 istream& operator>> (istream& fp, LineReader& line)
 {
     getline(fp, line.line);
-    line.lineno++;
+    if (fp)  line.lineno++;
     istringstream fpline(line.line);
     line.words.clear();
     string w;
