@@ -52,7 +52,7 @@ class LineReader
         bool isblank() const;
         size_t wcount() const;
         std::runtime_error format_error(
-                const std::string& filename, std::string edetail="");
+                const std::string& filename, const std::string& edetail);
 
         // data
         int lineno;

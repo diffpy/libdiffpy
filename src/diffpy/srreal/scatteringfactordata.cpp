@@ -157,7 +157,7 @@ const SetOfWKFormulas& getWKFormulasSet()
             fp >> line;
             if (line.wcount() != 11)
             {
-                throw line.format_error("Expected 11 values.");
+                throw line.format_error(wkfile, "Expected 11 values.");
             }
             istringstream fpline(line.line);
             fpline >>
@@ -237,7 +237,7 @@ ElectronNumberStorage& getElectronNumberTable()
             fpline >> element >> z;
             if (!fpline)
             {
-                throw line.format_error(
+                throw line.format_error(ionfile,
                         "Expected at least 2 columns for (symbol, Z).");
             }
             entable->insert(ENPair(element, z));
@@ -252,9 +252,9 @@ ElectronNumberStorage& getElectronNumberTable()
         if (entable->size() < mintablesize)
         {
             ostringstream emsg;
-            emsg << "Incomplete file, expected " << mintablesize <<
-                " items, loaded " << entable->size() << ".";
-            throw line.format_error(emsg.str());
+            emsg << "Incomplete file.  Expected " << mintablesize <<
+                " items loaded " << entable->size() << ".";
+            throw line.format_error(ionfile, emsg.str());
         }
     }
     return *entable;

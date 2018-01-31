@@ -170,7 +170,8 @@ size_t LineReader::wcount() const
 }
 
 
-runtime_error LineReader::format_error(const string& filename, string edetail)
+runtime_error LineReader::format_error(
+        const string& filename, const string& edetail)
 {
     ostringstream emsg;
     emsg << "Invalid data format in " <<
