@@ -248,7 +248,7 @@ ElectronNumberStorage& getElectronNumberTable()
                 entable->insert(ENPair(smbl.str(), z - v));
             }
         }
-        const size_t mintablesize = 435;
+        const size_t mintablesize = 447;
         if (entable->size() < mintablesize)
         {
             ostringstream emsg;
