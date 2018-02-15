@@ -18,11 +18,34 @@
 
 #include <diffpy/srreal/ConstantPeakWidth.hpp>
 #include <diffpy/serialization.ipp>
+#include <diffpy/validators.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 using namespace std;
+
+// Local Helpers -------------------------------------------------------------
+
+namespace {
+
+using diffpy::mathutils::GAUSS_SIGMA_TO_FWHM;
+using diffpy::validators::ensureNonNegative;
+
+double getuisowidth(const ConstantPeakWidth* ppwm)
+{
+    const double rmsd = ppwm->getWidth() / GAUSS_SIGMA_TO_FWHM;
+    return 0.5 * rmsd * rmsd;
+}
+
+void setuisowidth(ConstantPeakWidth* ppwm, const double& uiso)
+{
+    ensureNonNegative("uisowidth", uiso);
+    const double fwhm = GAUSS_SIGMA_TO_FWHM * sqrt(2.0 * uiso);
+    ppwm->setWidth(fwhm);
+}
+
+}   // namespace
 
 // Constructors --------------------------------------------------------------
 
@@ -30,6 +53,8 @@ ConstantPeakWidth::ConstantPeakWidth() : mwidth(0.0)
 {
     this->registerDoubleAttribute("width", this,
             &ConstantPeakWidth::getWidth, &ConstantPeakWidth::setWidth);
+    this->registerDoubleAttribute("uisowidth", this,
+            &getuisowidth, &setuisowidth);
 }
 
 
