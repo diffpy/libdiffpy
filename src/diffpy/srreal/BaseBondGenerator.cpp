@@ -30,18 +30,22 @@ namespace srreal {
 
 // Constructor ---------------------------------------------------------------
 
-BaseBondGenerator::BaseBondGenerator(StructureAdapterConstPtr stru)
+BaseBondGenerator::BaseBondGenerator(StructureAdapterConstPtr stru) :
+    msite_anchor(0),
+    mrmin(0.0),
+    mrmax(DEFAULT_BONDGENERATOR_RMAX),
+    mstructure(stru),
+    mr0(R3::zerovector),
+    mr1(R3::zerovector),
+    mr01(R3::zerovector),
+    mdistance(0.0)
 {
-    msite_anchor = 0;
     int cnt = stru->countSites();
     msite_all.resize(cnt);
     for (int i = 0; i != cnt; ++i)  msite_all[i] = i;
     msite_first = msite_all.begin();
     msite_last = msite_all.end();
-    msite_current = msite_first;
-    mstructure = stru;
-    this->setRmin(0.0);
-    this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
+    this->setFinishedFlag();
 }
 
 // Public Methods ------------------------------------------------------------

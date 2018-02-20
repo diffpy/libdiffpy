@@ -36,12 +36,13 @@ const string PairQuantity::ALLATOMSSTR = "all";
 
 // Constructor ---------------------------------------------------------------
 
-PairQuantity::PairQuantity() : mstructure(emptyStructureAdapter())
+PairQuantity::PairQuantity() :
+    mstructure(emptyStructureAdapter()),
+    mrmin(0.0),
+    mrmax(DEFAULT_BONDGENERATOR_RMAX),
+    mdefaultpairmask(true)
 {
-    this->setRmin(0.0);
-    this->setRmax(DEFAULT_BONDGENERATOR_RMAX);
     this->setEvaluatorType(BASIC);
-    this->maskAllPairs(true);
     // attributes
     this->registerDoubleAttribute("rmin", this,
             &PairQuantity::getRmin, &PairQuantity::setRmin);

@@ -56,19 +56,19 @@ bool _initialQstepUpdate(const PDFC* pc)
 
 // Constructor ---------------------------------------------------------------
 
-PDFCalculator::PDFCalculator()
+PDFCalculator::PDFCalculator() :
+    mqmin(0.0),
+    mqmax(DOUBLE_MAX),
+    mrstep(DEFAULT_PDFCALCULATOR_RSTEP),
+    mmaxextension(DEFAULT_PDFCALCULATOR_MAXEXTENSION)
 {
     // default configuration
+    mrmax = DEFAULT_PDFCALCULATOR_RMAX;
     this->setPeakWidthModelByType("jeong");
     this->setPeakProfileByType("gaussian");
     this->getPeakProfile()->setPrecision(DEFAULT_PEAKPRECISION);
     this->setBaselineByType("linear");
     this->setScatteringFactorTableByType("xray");
-    this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
-    this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
-    this->setQmin(0.0);
-    this->setQmax(DOUBLE_MAX);
-    this->setMaxExtension(DEFAULT_PDFCALCULATOR_MAXEXTENSION);
     // envelopes
     this->addEnvelopeByType("scale");
     this->addEnvelopeByType("qresolution");

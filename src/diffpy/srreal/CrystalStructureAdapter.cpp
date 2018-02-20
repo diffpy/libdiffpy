@@ -45,10 +45,9 @@ const double DEFAULT_SYMMETRY_PRECISION = 5e-5;
 
 CrystalStructureAdapter::CrystalStructureAdapter() :
     PeriodicStructureAdapter(),
+    msymmetry_precision(DEFAULT_SYMMETRY_PRECISION),
     msymmetry_cached(false)
-{
-    this->setSymmetryPrecision(DEFAULT_SYMMETRY_PRECISION);
-}
+{ }
 
 // Public Methods ------------------------------------------------------------
 

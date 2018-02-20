@@ -38,18 +38,18 @@ const double DEFAULT_DEBYEPDFCALCULATOR_QMAX = 25.0;
 
 // Constructor ---------------------------------------------------------------
 
-DebyePDFCalculator::DebyePDFCalculator()
+DebyePDFCalculator::DebyePDFCalculator() :
+    mqminpdf(0.0),
+    moptimumqstep(false),
+    mrstep(DEFAULT_PDFCALCULATOR_RSTEP),
+    mmaxextension(DEFAULT_PDFCALCULATOR_MAXEXTENSION),
+    mrcalclosteps(0),
+    mrcalchisteps(0),
+    mrlimits_are_cached(false)
 {
-    // initializations
-    mrcalclosteps = 0;
-    mrcalchisteps = 0;
-    mrlimits_are_cached = false;
     // default configuration
     this->setScatteringFactorTableByType("xray");
-    this->setRstep(DEFAULT_PDFCALCULATOR_RSTEP);
     this->setRmax(DEFAULT_PDFCALCULATOR_RMAX);
-    this->setMaxExtension(DEFAULT_PDFCALCULATOR_MAXEXTENSION);
-    this->setQmin(0.0);
     this->setQmax(DEFAULT_DEBYEPDFCALCULATOR_QMAX);
     this->setOptimumQstep();
     // envelopes

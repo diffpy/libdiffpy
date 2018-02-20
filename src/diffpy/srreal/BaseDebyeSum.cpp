@@ -46,14 +46,15 @@ const double DEFAULT_DEBYE_PRECISION = 1e-6;
 
 // Constructor ---------------------------------------------------------------
 
-BaseDebyeSum::BaseDebyeSum()
+BaseDebyeSum::BaseDebyeSum() :
+    mqmin(0.0),
+    mqmax(DEFAULT_QGRID_QMAX),
+    mqstep(DEFAULT_QGRID_QSTEP),
+    mdebyeprecision(DEFAULT_DEBYE_PRECISION)
 {
+    mstructure_cache.totaloccupancy = 0.0;
     // default configuration
     this->setPeakWidthModelByType("jeong");
-    this->setQmin(0.0);
-    this->setQmax(DEFAULT_QGRID_QMAX);
-    this->setQstep(DEFAULT_QGRID_QSTEP);
-    this->setDebyePrecision(DEFAULT_DEBYE_PRECISION);
     this->setEvaluatorType(OPTIMIZED);
     // attributes
     this->registerDoubleAttribute("debyeprecision", this,
