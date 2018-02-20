@@ -202,6 +202,8 @@ double BVSCalculator::rmaxFromPrecision(double eps) const
     // build a set of unique (symbol, valence) pairs
     typedef boost::unordered_set< pair<string, int> > SymbolValenceSet;
     SymbolValenceSet allsymvals;
+    assert(int(mstructure_cache.baresymbols.size()) == this->countSites());
+    assert(int(mstructure_cache.valences.size()) == this->countSites());
     for (int i = 0; i < this->countSites(); ++i)
     {
         allsymvals.insert(make_pair(mstructure_cache.baresymbols[i],
