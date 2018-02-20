@@ -410,19 +410,23 @@ class TestObjCrystMoleculeAdapter : public CxxTest::TestSuite
 {
     private:
 
-        auto_ptr<Molecule> mmol_c60;
+        Molecule* mmol_c60;
         StructureAdapterPtr m_c60;
 
     public:
 
         void setUp()
         {
-            if (!mmol_c60.get())
-            {
-                mmol_c60.reset(makeC60Molecule());
-                m_c60 = createStructureAdapter(*mmol_c60);
-            }
+            mmol_c60 = makeC60Molecule();
+            m_c60 = createStructureAdapter(*mmol_c60);
         }
+
+        void tearDown()
+        {
+            Crystal* crst = &(mmol_c60->GetCrystal());
+            delete crst;
+        }
+
 
         void test_typeid()
         {
@@ -524,7 +528,7 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
 {
     private:
 
-        auto_ptr<Molecule> mmol_c60;
+        Molecule* mmol_c60;
         StructureAdapterPtr m_c60;
         BaseBondGeneratorPtr m_c60bnds;
 
@@ -532,13 +536,17 @@ class TestObjCrystMoleculeBondGenerator : public CxxTest::TestSuite
 
         void setUp()
         {
-            if (!m_c60.get())
-            {
-                mmol_c60.reset(makeC60Molecule());
-                m_c60 = createStructureAdapter(*mmol_c60);
-            }
+            mmol_c60 = makeC60Molecule();
+            m_c60 = createStructureAdapter(*mmol_c60);
             m_c60bnds = m_c60->createBondGenerator();
         }
+
+        void tearDown()
+        {
+            Crystal* crst = &(mmol_c60->GetCrystal());
+            delete crst;
+        }
+
 
         void test_typeid()
         {
