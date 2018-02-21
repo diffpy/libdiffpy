@@ -55,7 +55,7 @@ before_install:
   - $NOMC || wget --timestamping ${MYMCREPO}/${MYMCBUNDLE}
   - $NOMC || test -x ~/mc/bin/conda || bash ${MYMCBUNDLE} -b -f -p ~/mc
   - $NOMC || popd
-  - $NOMC || source ~/mc/bin/activate root
+  - $NOMC || source ~/mc/bin/activate base
   - $NOMC || conda update --yes conda
   - $NOMC || conda install --yes conda-build jinja2
   - $NOMC || conda create --name=testenv --yes python=${MYPYTHON_VERSION}
@@ -94,7 +94,7 @@ install:
   - $NOMC || conda build --python=${MYPYTHON_VERSION} conda-recipe
   - $NOMC || conda render --python=${MYPYTHON_VERSION} --output conda-recipe |
                 sed 's,.*/,,; s/[.]tar[.]bz2$//; s/-/=/g' > /tmp/mypackage.txt
-  - $NOMC || source activate root
+  - $NOMC || source activate base
   - $NOMC || conda build purge
   - $NOMC || source activate testenv
   - $NOMC || conda install --yes --use-local --file=/tmp/mypackage.txt
