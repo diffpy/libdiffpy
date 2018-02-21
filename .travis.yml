@@ -23,6 +23,7 @@ branches:
 
 before_install:
   - MYNAME=libdiffpy
+  - MYCOMMIT="$(git rev-parse HEAD)"
     # travis virtual hosts have 2 cores as per https://goo.gl/DQy4oW
   - MYNCPU=2
   - umask 022
@@ -113,8 +114,8 @@ install:
   - MYINCLUDE="${MYPREFIX}/include"
   - MYVERSION="${MYINCLUDE}/diffpy/version.hpp"
   - MYGIT_REV=$(grep '^#define DIFFPY_GIT_SHA' "$MYVERSION" | cut -d '"' -f 2)
-  - if [[ "${TRAVIS_COMMIT}" != "${MYGIT_REV}" ]]; then
-        echo "Version mismatch ${TRAVIS_COMMIT} vs ${MYGIT_REV}.";
+  - if [[ "${MYCOMMIT}" != "${MYGIT_REV}" ]]; then
+        echo "Version mismatch ${MYCOMMIT} vs ${MYGIT_REV}.";
         exit 1;
     fi
 
