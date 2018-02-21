@@ -34,7 +34,7 @@ def gitinfo():
     if proc.wait():
         _cached_gitinfo = {}
         return gitinfo()
-    proc = Popen(['git', 'log', '-1', '--format=%H %ai'], **kw)
+    proc = Popen(['git', 'log', '-1', '--format=%H %ci'], **kw)
     glog = proc.stdout.read()
     words = desc.strip().split('-')
     vtag = words[0].lstrip('v')

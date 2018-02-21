@@ -23,6 +23,7 @@ branches:
 
 before_install:
   - MYNAME=libdiffpy
+  - MYCOMMIT="$(git rev-parse HEAD)"
     # travis virtual hosts have 2 cores as per https://goo.gl/DQy4oW
   - MYNCPU=2
   - umask 022
@@ -54,7 +55,7 @@ before_install:
   - $NOMC || wget --timestamping ${MYMCREPO}/${MYMCBUNDLE}
   - $NOMC || test -x ~/mc/bin/conda || bash ${MYMCBUNDLE} -b -f -p ~/mc
   - $NOMC || popd
-  - $NOMC || source ~/mc/bin/activate root
+  - $NOMC || source ~/mc/bin/activate base
   - $NOMC || conda update --yes conda
   - $NOMC || conda install --yes conda-build jinja2
   - $NOMC || conda create --name=testenv --yes python=${MYPYTHON_VERSION}
@@ -93,7 +94,7 @@ install:
   - $NOMC || conda build --python=${MYPYTHON_VERSION} conda-recipe
   - $NOMC || conda render --python=${MYPYTHON_VERSION} --output conda-recipe |
                 sed 's,.*/,,; s/[.]tar[.]bz2$//; s/-/=/g' > /tmp/mypackage.txt
-  - $NOMC || source activate root
+  - $NOMC || source activate base
   - $NOMC || conda build purge
   - $NOMC || source activate testenv
   - $NOMC || conda install --yes --use-local --file=/tmp/mypackage.txt
@@ -113,8 +114,8 @@ install:
   - MYINCLUDE="${MYPREFIX}/include"
   - MYVERSION="${MYINCLUDE}/diffpy/version.hpp"
   - MYGIT_REV=$(grep '^#define DIFFPY_GIT_SHA' "$MYVERSION" | cut -d '"' -f 2)
-  - if [[ "${TRAVIS_COMMIT}" != "${MYGIT_REV}" ]]; then
-        echo "Version mismatch ${TRAVIS_COMMIT} vs ${MYGIT_REV}.";
+  - if [[ "${MYCOMMIT}" != "${MYGIT_REV}" ]]; then
+        echo "Version mismatch ${MYCOMMIT} vs ${MYGIT_REV}.";
         exit 1;
     fi
 
