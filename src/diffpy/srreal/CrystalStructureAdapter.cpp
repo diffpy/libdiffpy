@@ -85,6 +85,9 @@ CrystalStructureAdapter::diff(StructureAdapterConstPtr other) const
     if (!cother)  return sd;
     // compare symmetry operations in both adapters
     assert(cother == sd.stru1);
+    const bool sameprecision = (
+            this->getSymmetryPrecision() == cother->getSymmetryPrecision());
+    if (!sameprecision)  return sd;
     if (msymops != cother->msymops)  return sd;
     sd = this->PeriodicStructureAdapter::diff(other);
     return sd;

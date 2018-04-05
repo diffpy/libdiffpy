@@ -24,6 +24,7 @@
 
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
 #include <diffpy/srreal/PointsInSphere.hpp>
+#include <diffpy/srreal/StructureDifference.hpp>
 #include "serialization_helpers.hpp"
 #include "objcryst_helpers.hpp"
 #include <ObjCryst/ObjCryst/Crystal.h>
@@ -64,6 +65,17 @@ double testmsd1(const Tstru& stru, const Tbnds& bnds)
     bool anisotropy1 = stru->siteAnisotropy(bnds->site1());
     double rv = meanSquareDisplacement(
             bnds->Ucartesian1(), bnds->r01(), anisotropy1);
+    return rv;
+}
+
+
+double diffdegree(StructureAdapterPtr stru0, StructureAdapterPtr stru1)
+{
+    StructureDifference sd = stru0->diff(stru1);
+    double tot = 0.0;
+    if (stru0)  tot += stru0->countSites();
+    if (stru1)  tot += stru1->countSites();
+    double rv = (sd.pop0.size() + sd.add1.size()) / (tot ? tot : 1.0);
     return rv;
 }
 
@@ -197,6 +209,28 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
         }
 
 
+        void test_diff()
+        {
+            StructureAdapterPtr acto = m_catio3;
+            CrystalStructureAdapterPtr ccto(
+                boost::dynamic_pointer_cast<CrystalStructureAdapter>(acto));
+            StructureAdapterPtr acto2 = acto->clone();
+            CrystalStructureAdapterPtr ccto2(
+                boost::dynamic_pointer_cast<CrystalStructureAdapter>(acto2));
+            TS_ASSERT_EQUALS(0.0, diffdegree(acto, acto));
+            TS_ASSERT_EQUALS(1.0, diffdegree(acto, StructureAdapterPtr()));
+            TS_ASSERT_EQUALS(0.0, diffdegree(acto, acto2));
+            TS_ASSERT_EQUALS(0.0, diffdegree(acto, ccto2));
+            const double symprec = ccto2->getSymmetryPrecision();
+            ccto2->setSymmetryPrecision(0.010723);
+            TS_ASSERT_EQUALS(1.0, diffdegree(acto, acto2));
+            ccto2->setSymmetryPrecision(symprec);
+            TS_ASSERT_EQUALS(0.0, diffdegree(acto, acto2));
+            ccto2->clearSymOps();
+            TS_ASSERT_EQUALS(1.0, diffdegree(acto, acto2));
+        }
+
+
         void test_getLattice()
         {
             CrystalStructureAdapter* pkbise =
@@ -244,8 +278,6 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(L.beta(), L1.beta());
             TS_ASSERT_EQUALS(L.gamma(), L1.gamma());
         }
-
-
 
 };  // class TestObjCrystStructureAdapter
 
