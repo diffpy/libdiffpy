@@ -78,6 +78,7 @@ before_install:
 
   - $NOBREW || brew update
   - $NOBREW || brew install gsl
+  - $NOBREW || brew unlink python
   - $NOBREW || brew install scons
   - $NOBREW || brew install cxxtest
   - $NOBREW || export CXXTEST="$(brew --prefix cxxtest)"/libexec/bin/cxxtestgen
