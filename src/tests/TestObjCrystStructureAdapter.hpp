@@ -247,6 +247,31 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
         }
 
 
+        void test_getEquivalentAtoms()
+        {
+            diffpy::mathutils::EpsilonEqual allclose;
+            auto_ptr<Crystal> crst(loadTestCrystal("NH4Br.cif"));
+            StructureAdapterPtr adpt = createStructureAdapter(*crst);
+            CrystalStructureAdapterPtr cadpt =
+                boost::dynamic_pointer_cast<CrystalStructureAdapter>(adpt);
+            TS_ASSERT_EQUALS(2, cadpt->countSites());
+            TS_ASSERT_EQUALS(4, cadpt->totalOccupancy());
+            CrystalStructureAdapter::AtomVector eq0, eq1;
+            eq0 = cadpt->getEquivalentAtoms(0);
+            TS_ASSERT_EQUALS(2, eq0.size());
+            cadpt->toFractional(eq0[0]);
+            cadpt->toFractional(eq0[1]);
+            TS_ASSERT(allclose(R3::Vector(0, 0.5, 0.03), eq0[0].xyz_cartn));
+            TS_ASSERT(allclose(R3::Vector(0.5, 0, 0.97), eq0[1].xyz_cartn));
+            eq1 = cadpt->getEquivalentAtoms(1);
+            TS_ASSERT_EQUALS(2, eq1.size());
+            cadpt->toFractional(eq1[0]);
+            cadpt->toFractional(eq1[1]);
+            TS_ASSERT(allclose(R3::Vector(0, 0, 0.5), eq1[0].xyz_cartn));
+            TS_ASSERT(allclose(R3::Vector(0.5, 0.5, 0.5), eq1[1].xyz_cartn));
+        }
+
+
         void test_serialization()
         {
             stringstream storage(ios::in | ios::out | ios::binary);
