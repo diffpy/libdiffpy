@@ -56,6 +56,34 @@ getUij(const ObjCryst::ScatteringPower* sp)
 }
 
 
+bool isGetInversionCenterDoubled()
+{
+    static int value_cached = 0;
+    const int BIT_CACHED = 1;
+    const int BIT_VALUE = 2;
+    // short circuit when the flag is already cached
+    if (BIT_CACHED & value_cached) {
+        const bool rv = BIT_VALUE & value_cached;
+        return rv;
+    }
+    ObjCryst::SpaceGroup sg129("P 4/n m m :1");
+    const CrystVector_REAL xyzinv = sg129.GetInversionCenter();
+    if (0.5 == xyzinv(0) && 0.5 == xyzinv(1) && 0 == xyzinv(2)) {
+        value_cached |= BIT_VALUE;
+    }
+    else if (0.25 == xyzinv(0) && 0.25 == xyzinv(1) && 0 == xyzinv(2)) {
+        value_cached &= ~BIT_VALUE;
+    }
+    else {
+        const char* emsg =
+            "Unexpected value of ObjCryst::SpaceGroup::GetInversionCenter()";
+        throw logic_error(emsg);
+    }
+    value_cached |= BIT_CACHED;
+    return isGetInversionCenterDoubled();
+}
+
+
 CrystalStructureAdapter::SymOpVector
 fetchSymmetryOperations(const ObjCryst::SpaceGroup& spacegroup)
 {
@@ -97,29 +125,18 @@ fetchSymmetryOperations(const ObjCryst::SpaceGroup& spacegroup)
     {
         assert(spacegroup.IsCentrosymmetric());
         assert(nbsym == 2 * last);
-        bool noCenter = false, noTransl = true, noIdentical = true;
-        CrystMatrix_REAL xyzinv = spacegroup.GetAllSymmetrics(
-                0.0, 0.0, 0.0, noCenter, noTransl, noIdentical);
-        // check if symmetry center is away from the origin
-        diffpy::mathutils::EpsilonEqual allclose;
-        R3::Vector dxyz = R3::zerovector;
-        for (int i = 0; i < xyzinv.rows(); ++i)
-        {
-            using mathutils::eps_eq;
-            R3::Vector xyzi(
-                    round(xyzinv(i, 0) / 0.5),
-                    round(xyzinv(i, 1) / 0.5),
-                    round(xyzinv(i, 2) / 0.5));
-            if (eps_eq(0.0, R3::norm(xyzi)))  continue;
-            // here we found inversion center at non-origin location
-            dxyz = xyzi - R3::floor(xyzi);
-            break;
-        }
+        CrystVector_REAL xyzinv = spacegroup.GetInversionCenter();
+        // get tinv the overall translation associated with inversion center.
+        // fox-objcryst 2017.2 returns doubled coordinates for the inversion
+        // center so the tinv is the same.  Expect fixup which will require
+        // doubling the tinv value here.
+        R3::Vector tinv(xyzinv(0), xyzinv(1), xyzinv(2));
+        tinv *= isGetInversionCenterDoubled() ? 1.0 : 2.0;
+        // now apply the inversion center here
         for (int i = 0, j = last; i < last; ++i, ++j)
         {
-            rv[j] = rv[i];
-            rv[j].R *= -1;
-            rv[j].t = dxyz - rv[j].t;
+            rv[j].R = -1 * rv[i].R;
+            rv[j].t = tinv - rv[i].t;
         }
         last *= 2;
     }
