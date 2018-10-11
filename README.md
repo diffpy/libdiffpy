@@ -53,7 +53,7 @@ sudo apt-get install \
 ```
 
 libdiffpy is also available as a pre-compiled package for
-[Anaconda Python](https://www.continuum.io/downloads).  A Python
+[Anaconda Python](https://www.anaconda.com/download).  A Python
 interface to libdiffpy is provided by Anaconda package diffpy.srreal.
 
 
