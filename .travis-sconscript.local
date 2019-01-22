@@ -4,9 +4,11 @@ Import('env')
 
 import os
 
+env.Replace(CXX=os.environ['CXX'])
+
 # Silence copious warnings from the boost headers.
 P = os.environ['MYPREFIX']
-env.Prepend(CCFLAGS='-isystem{}/include'.format(P))
+env.Prepend(CCFLAGS=['-isystem{}/include'.format(P)])
 
 # Define path to the shared libraries from Anaconda environment.
 L = P + '/lib'

@@ -42,9 +42,13 @@ before_install:
   - MYMCREPO=https://repo.anaconda.com/miniconda
   - case ${TRAVIS_OS_NAME} in
     linux)
-        MYMCBUNDLE=Miniconda3-latest-Linux-x86_64.sh ;;
+        MYMCBUNDLE=Miniconda3-latest-Linux-x86_64.sh;
+        MYCXXCOMPILER=gxx_linux-64
+        ;;
     osx)
-        MYMCBUNDLE=Miniconda3-latest-MacOSX-x86_64.sh ;;
+        MYMCBUNDLE=Miniconda3-latest-MacOSX-x86_64.sh;
+        MYCXXCOMPILER=clangxx_osx-64
+        ;;
     *)
         echo "Unsupported operating system." >&2;
         exit 2 ;;
@@ -59,7 +63,7 @@ before_install:
   - $NOMC || source ~/mc/bin/activate base
   - $NOMC || conda update --yes conda
   - $NOMC || conda install --yes conda-build jinja2
-  - $NOMC || conda create --name=testenv --yes python=${MYPYTHON_VERSION}
+  - $NOMC || conda create --name=testenv --yes $MYCXXCOMPILER
   - $NOMC || conda config --add channels diffpy
   # FIXME - keep just the "diffpy" channel for public release.
   - $NOMC || conda config --add channels diffpy/channel/dev
