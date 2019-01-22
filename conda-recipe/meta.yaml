@@ -17,7 +17,7 @@ requirements:
     - python
     - scons
   host:
-    - libboost 1.67.0
+    - libboost {{ boost }}
     # Make sure this resolves to gsl from the diffpy channel.
     # Stock gsl=2.2.1=0 depends on libgcc package which on
     # Mac OS X shadows C++ system library with its own
@@ -28,7 +28,7 @@ requirements:
 
   run:
     # NOTE libobjcryst is implicitly added by libobjcryst run_exports
-    - libboost 1.67.0
+    - libboost
     # Make sure this resolves to gsl from the diffpy channel.
     - gsl >=2.1
 

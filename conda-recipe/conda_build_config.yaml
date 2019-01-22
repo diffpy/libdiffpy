@@ -1,0 +1,5 @@
+boost:
+  - 1.67
+
+pin_run_as_build:
+  libboost: x.x
