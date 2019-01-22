@@ -121,11 +121,6 @@ install:
         exit 1;
     fi
 
-  # Mac OS X must use the same deployment target as conda-build.
-  - if $MYUSEMC && [[ "${TRAVIS_OS_NAME}" == osx ]]; then
-        export MACOSX_DEPLOYMENT_TARGET=10.7;
-    fi
-
   - $NOMC || export MYPREFIX
   - $NOMC || cp .travis-sconscript.local sconscript.local
   - scons -j $MYNCPU build=fast prefix="${MYPREFIX}" test_installed=true alltests
