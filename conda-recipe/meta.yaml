@@ -13,6 +13,7 @@ build:
 
 requirements:
   build:
+    - {{ compiler('cxx') }}
     - python
     - scons
   host:
@@ -34,6 +35,7 @@ requirements:
 
 test:
   requires:
+    - {{ compiler('cxx') }}
     - cxxtest
     - scons
 
@@ -52,6 +54,3 @@ about:
   summary: C++ calculators of PDF, bond valence sum and other pair quantities.
   license: Modified BSD License
   license_file: LICENSE.txt
-
-# See http://docs.continuum.io/conda/build.html
-# for more information about meta.yaml.
