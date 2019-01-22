@@ -18,19 +18,13 @@ requirements:
     - scons
   host:
     - libboost {{ boost }}
-    # Make sure this resolves to gsl from the diffpy channel.
-    # Stock gsl=2.2.1=0 depends on libgcc package which on
-    # Mac OS X shadows C++ system library with its own
-    # incompatible version.
-    - gsl 2.1
-    #
+    - gsl {{ gsl }}
     - libobjcryst >=2017.1.1
 
   run:
     # NOTE libobjcryst is implicitly added by libobjcryst run_exports
     - libboost
-    # Make sure this resolves to gsl from the diffpy channel.
-    - gsl >=2.1
+    - {{ pin_compatible('gsl', min_pin='x.x', max_pin='x') }}
 
 test:
   requires:
