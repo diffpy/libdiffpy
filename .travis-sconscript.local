@@ -4,7 +4,21 @@ Import('env')
 
 import os
 
+# Workaround: DEBUG_CPPFLAGS is defined on Linux, but not on Mac OS X.
+# Make sure it is always sensibly defined.
+os.environ.setdefault('DEBUG_CPPFLAGS', os.environ['CPPFLAGS'])
+
+# Apply environment settings for Anaconda compilers
 env.Replace(CXX=os.environ['CXX'])
+if env['build'] == 'fast':
+    env.MergeFlags(os.environ['CFLAGS'])
+    env.MergeFlags(os.environ['CPPFLAGS'])
+    env.MergeFlags(os.environ['CXXFLAGS'])
+else:
+    env.MergeFlags(os.environ['DEBUG_CFLAGS'])
+    env.MergeFlags(os.environ['DEBUG_CPPFLAGS'])
+    env.MergeFlags(os.environ['DEBUG_CXXFLAGS'])
+env.MergeFlags(os.environ['LDFLAGS'])
 
 # Silence copious warnings from the boost headers.
 P = os.environ['MYPREFIX']
