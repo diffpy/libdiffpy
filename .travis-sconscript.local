@@ -28,5 +28,7 @@ env.Prepend(CCFLAGS=['-isystem{}/include'.format(P)])
 L = P + '/lib'
 env.Append(LIBPATH=L)
 env.Append(LINKFLAGS='-Wl,-rpath,{!r}'.format(L))
+if env['PLATFORM'] == 'posix':
+    env.Append(LINKFLAGS='-Wl,-rpath-link,{!r}'.format(L))
 
 # vim: ft=python
