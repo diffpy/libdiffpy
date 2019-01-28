@@ -122,6 +122,8 @@ install:
     fi
 
   - $NOMC || export MYPREFIX
+  # drop linker flags that spuriously remove linkage with libgslcblas
+  - $NOMC || LDFLAGS="${LDFLAGS/-Wl,-dead_strip_dylibs/}"
   - $NOMC || cp .travis-sconscript.local sconscript.local
   - scons -j $MYNCPU build=fast prefix="${MYPREFIX}" test_installed=true alltests
   - MYALLTESTSFAST=$(ls -t ${PWD}/build/fast*/tests/alltests | head -1)
