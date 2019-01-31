@@ -4,10 +4,6 @@ Import('env')
 
 # Build environment configuration --------------------------------------------
 
-# Apply CFLAGS, CXXFLAGS, LDFLAGS from the system environment.
-flagnames = 'CFLAGS CXXFLAGS LDFLAGS'.split()
-env.MergeFlags([os.environ.get(n, '') for n in flagnames])
-
 # Insert LIBRARY_PATH explicitly because some compilers
 # ignore it in the system environment.
 env.PrependUnique(LIBPATH=env['ENV'].get('LIBRARY_PATH', '').split(':'))

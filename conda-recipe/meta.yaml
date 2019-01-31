@@ -13,27 +13,22 @@ build:
 
 requirements:
   build:
+    - {{ compiler('cxx') }}
     - python
     - scons
   host:
-    - libboost 1.67.0
-    # Make sure this resolves to gsl from the diffpy channel.
-    # Stock gsl=2.2.1=0 depends on libgcc package which on
-    # Mac OS X shadows C++ system library with its own
-    # incompatible version.
-    - gsl 2.1
-    #
-    - libobjcryst >=2017.1.1,2017.1.*
+    - libboost {{ boost }}
+    - gsl {{ gsl }}
+    - libobjcryst >=2017.1.1
 
   run:
-    - libboost 1.67.0
-    # Make sure this resolves to gsl from the diffpy channel.
-    - gsl >=2.1
-    #
-    - libobjcryst >=2017.1.1,2017.1.*
+    # NOTE libobjcryst is implicitly added by libobjcryst run_exports
+    - libboost
+    - {{ pin_compatible('gsl', min_pin='x.x', max_pin='x') }}
 
 test:
   requires:
+    - {{ compiler('cxx') }}
     - cxxtest
     - scons
 
@@ -52,6 +47,3 @@ about:
   summary: C++ calculators of PDF, bond valence sum and other pair quantities.
   license: Modified BSD License
   license_file: LICENSE.txt
-
-# See http://docs.continuum.io/conda/build.html
-# for more information about meta.yaml.
