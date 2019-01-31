@@ -79,7 +79,7 @@ vhpp = File('version.hpp')
 
 # If version.hpp exists do not use git
 if os.path.isfile(str(vhpp.srcnode())):
-    majorminor = parsemajorminor(vhpp.srcnode().get_contents())
+    majorminor = parsemajorminor(vhpp.srcnode().get_text_contents())
 else:
     vtpl = File('version.tpl')
     gver = get_version_or_die()

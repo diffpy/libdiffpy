@@ -62,8 +62,8 @@ env.Append(BUILDERS={'BuildSourceDistribution' :
     Builder(generator=generate_sdist_actions, suffix='.tar')})
 
 # build node for version.hpp
-vhpp = filter(lambda f: str(f).endswith('diffpy/version.hpp'),
-        env['lib_includes'])[0]
+vhpp = next(f for f in env['lib_includes']
+            if str(f).endswith('diffpy/version.hpp'))
 
 sdist = Alias('sdist', env.BuildSourceDistribution('#/libdiffpy', vhpp))
 AlwaysBuild(sdist)
