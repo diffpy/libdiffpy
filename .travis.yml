@@ -1,6 +1,3 @@
-dist: trusty
-sudo: required
-
 language: cpp
 
 os:
@@ -9,9 +6,13 @@ os:
 
 env:
   - MYUSEMC=true MYPYTHON_VERSION=2.7
-  - MYUSEMC=true MYPYTHON_VERSION=3.5
-  - MYUSEMC=true MYPYTHON_VERSION=3.6
+  - MYUSEMC=true MYPYTHON_VERSION=3.7
   - MYUSEMC=false
+
+matrix:
+  exclude:
+    - os: osx
+      env: MYUSEMC=true MYPYTHON_VERSION=2.7
 
 git:
   depth: 999999
@@ -38,12 +39,12 @@ before_install:
         NOBREW=false; NOSYS=false;
         MYPIPFLAGS="--user";
     fi
-  - MYMCREPO=https://repo.continuum.io/miniconda
+  - MYMCREPO=https://repo.anaconda.com/miniconda
   - case ${TRAVIS_OS_NAME} in
     linux)
-        MYMCBUNDLE=Miniconda2-latest-Linux-x86_64.sh ;;
+        MYMCBUNDLE=Miniconda3-latest-Linux-x86_64.sh ;;
     osx)
-        MYMCBUNDLE=Miniconda2-latest-MacOSX-x86_64.sh ;;
+        MYMCBUNDLE=Miniconda3-latest-MacOSX-x86_64.sh ;;
     *)
         echo "Unsupported operating system." >&2;
         exit 2 ;;
@@ -60,6 +61,8 @@ before_install:
   - $NOMC || conda install --yes conda-build jinja2
   - $NOMC || conda create --name=testenv --yes python=${MYPYTHON_VERSION}
   - $NOMC || conda config --add channels diffpy
+  # FIXME - keep just the "diffpy" channel for public release.
+  - $NOMC || conda config --add channels diffpy/channel/dev
 
   - $NOAPT || test "${TRAVIS_OS_NAME}" = "linux" || exit $?
   - $NOAPT || sudo apt-get update -qq
@@ -118,11 +121,6 @@ install:
   - if [[ "${MYCOMMIT}" != "${MYGIT_REV}" ]]; then
         echo "Version mismatch ${MYCOMMIT} vs ${MYGIT_REV}.";
         exit 1;
-    fi
-
-  # Mac OS X must use the same deployment target as conda-build.
-  - if $MYUSEMC && [[ "${TRAVIS_OS_NAME}" == osx ]]; then
-        export MACOSX_DEPLOYMENT_TARGET=10.7;
     fi
 
   - $NOMC || export MYPREFIX
