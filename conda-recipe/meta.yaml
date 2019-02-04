@@ -21,7 +21,7 @@ requirements:
   host:
     - libboost {{ boost }}
     - gsl {{ gsl }}
-    - libobjcryst >=2017.1.1
+    - libobjcryst {{ libobjcryst }}
 
   run:
     # NOTE libobjcryst is implicitly added by libobjcryst run_exports
