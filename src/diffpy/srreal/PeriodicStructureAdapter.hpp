@@ -22,8 +22,6 @@
 #ifndef PERIODICSTRUCTUREADAPTER_HPP_INCLUDED
 #define PERIODICSTRUCTUREADAPTER_HPP_INCLUDED
 
-#include <boost/scoped_ptr.hpp>
-
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/Lattice.hpp>
 
@@ -94,7 +92,7 @@ class PeriodicStructureBondGenerator : public BaseBondGenerator
 
         // data
         const PeriodicStructureAdapter* mpstructure;
-        boost::scoped_ptr<PointsInSphere> msphere;
+        std::unique_ptr<PointsInSphere> msphere;
         R3::Vector mrcsphere;
 
         // methods

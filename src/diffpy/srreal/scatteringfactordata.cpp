@@ -27,7 +27,6 @@
 #include <sstream>
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include <diffpy/srreal/scatteringfactordata.hpp>
 #include <diffpy/srreal/AtomUtils.hpp>
@@ -127,7 +126,7 @@ const SetOfWKFormulas& getWKFormulasSet()
 {
     using namespace diffpy::runtimepath;
     using diffpy::validators::ensureFileOK;
-    static boost::scoped_ptr<SetOfWKFormulas> the_set;
+    static unique_ptr<SetOfWKFormulas> the_set;
     if (the_set)  return *the_set;
     the_set.reset(new SetOfWKFormulas);
     string wkfile = datapath("f0_WaasKirf.dat");
@@ -219,7 +218,7 @@ ElectronNumberStorage& getElectronNumberTable()
 {
     using namespace diffpy::runtimepath;
     using diffpy::validators::ensureFileOK;
-    static boost::scoped_ptr<ElectronNumberStorage> entable;
+    static unique_ptr<ElectronNumberStorage> entable;
     typedef ElectronNumberStorage::value_type ENPair;
     if (!entable)
     {
@@ -269,7 +268,7 @@ const NeutronBCStorage& getNeutronBCTable()
     using namespace diffpy::runtimepath;
     using diffpy::validators::ensureFileOK;
     typedef NeutronBCStorage::value_type BCPair;
-    static boost::scoped_ptr<NeutronBCStorage> bctable;
+    static unique_ptr<NeutronBCStorage> bctable;
     if (bctable)  return *bctable;
     bctable.reset(new NeutronBCStorage);
     string nsffile = datapath("nsftable.dat");
