@@ -193,7 +193,6 @@ class TestPDFCalculator : public CxxTest::TestSuite
 
         void test_getQstep()
         {
-            using diffpy::mathutils::DOUBLE_MAX;
             const double qstep0 = 100 * M_PI / 1024;
             const double qstep1 = 100 * M_PI / 2048;
             const double qstep2 = 100 * M_PI / 4096;
