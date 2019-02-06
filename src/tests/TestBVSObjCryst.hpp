@@ -35,8 +35,8 @@ class TestBVSObjCryst : public CxxTest::TestSuite
 {
     private:
 
-        auto_ptr<ObjCryst::Crystal> mnacl;
-        auto_ptr<BVSCalculator> mbvc;
+        unique_ptr<ObjCryst::Crystal> mnacl;
+        unique_ptr<BVSCalculator> mbvc;
 
     public:
 
@@ -62,7 +62,7 @@ class TestBVSObjCryst : public CxxTest::TestSuite
 
         void test_NaCl_mixed()
         {
-            auto_ptr<ObjCryst::Crystal> nacl_mixed;
+            unique_ptr<ObjCryst::Crystal> nacl_mixed;
             nacl_mixed.reset(loadTestCrystal("NaCl_mixed.cif"));
             mbvc->eval(*mnacl);
             BVSCalculator bvc;

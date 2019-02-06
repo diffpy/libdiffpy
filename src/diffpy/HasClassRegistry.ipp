@@ -163,7 +163,7 @@ template <class TBase>
 typename HasClassRegistry<TBase>::RegistryStorage&
 HasClassRegistry<TBase>::getRegistry()
 {
-    static std::auto_ptr<RegistryStorage> the_registry;
+    static std::unique_ptr<RegistryStorage> the_registry;
     if (!the_registry.get())
     {
         the_registry.reset(new RegistryStorage());

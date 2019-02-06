@@ -92,11 +92,11 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
 {
     private:
 
-        auto_ptr<Crystal> mcryst_ni;
+        unique_ptr<Crystal> mcryst_ni;
         StructureAdapterPtr m_ni;
-        auto_ptr<Crystal> mcryst_kbise;
+        unique_ptr<Crystal> mcryst_kbise;
         StructureAdapterPtr m_kbise;
-        auto_ptr<Crystal> mcryst_catio3;
+        unique_ptr<Crystal> mcryst_catio3;
         StructureAdapterPtr m_catio3;
 
     public:
@@ -250,7 +250,7 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
         void test_getEquivalentAtoms()
         {
             diffpy::mathutils::EpsilonEqual allclose;
-            auto_ptr<Crystal> crst(loadTestCrystal("NH4Br.cif"));
+            unique_ptr<Crystal> crst(loadTestCrystal("NH4Br.cif"));
             StructureAdapterPtr adpt = createStructureAdapter(*crst);
             CrystalStructureAdapterPtr cadpt =
                 boost::dynamic_pointer_cast<CrystalStructureAdapter>(adpt);
@@ -314,7 +314,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
 {
     private:
 
-        auto_ptr<Crystal> mcryst_ni;
+        unique_ptr<Crystal> mcryst_ni;
         StructureAdapterPtr m_ni;
         BaseBondGeneratorPtr m_nibnds;
 
@@ -365,7 +365,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
 
         void test_bondCountWurtzite()
         {
-            auto_ptr<Crystal> wurtzite(loadTestCrystal("ZnS_wurtzite.cif"));
+            unique_ptr<Crystal> wurtzite(loadTestCrystal("ZnS_wurtzite.cif"));
             StructureAdapterPtr stru = createStructureAdapter(*wurtzite);
             BaseBondGeneratorPtr bnds = stru->createBondGenerator();
             TS_ASSERT_EQUALS(2, stru->countSites());
@@ -402,7 +402,7 @@ class TestObjCrystStructureBondGenerator : public CxxTest::TestSuite
             const string tantalum = "Ta5+";
             const string oxygen = "O2-";
             const double epsu = 1e-5;
-            auto_ptr<Crystal> litao3(loadTestCrystal("LiTaO3.cif"));
+            unique_ptr<Crystal> litao3(loadTestCrystal("LiTaO3.cif"));
             StructureAdapterPtr stru = createStructureAdapter(*litao3);
             TS_ASSERT_EQUALS(3, stru->countSites());
             BaseBondGeneratorPtr bnds = stru->createBondGenerator();
