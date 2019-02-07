@@ -216,6 +216,7 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
 
         void test_DBPDF_change_atom()
         {
+            using std::placeholders::_1;
             mpdfc->setQmin(1.0);
             DebyePDFCalculator pdfcb = *mpdfc;
             DebyePDFCalculator pdfco = *mpdfc;
@@ -231,7 +232,7 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
             TS_ASSERT(!gb.empty());
             TS_ASSERT_EQUALS(gb, go);
             int cnonzero = count_if(gb.begin(), gb.end(),
-                    bind1st(not_equal_to<double>(), 0.0));
+                    bind(not_equal_to<double>(), _1, 0.0));
             TS_ASSERT(cnonzero);
             TS_ASSERT_EQUALS(BASIC, pdfcb.getEvaluatorType());
             TS_ASSERT_EQUALS(OPTIMIZED, pdfco.getEvaluatorType());

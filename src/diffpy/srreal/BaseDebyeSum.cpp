@@ -230,6 +230,7 @@ double BaseDebyeSum::sfAverageAtkQ(int kq) const
 
 void BaseDebyeSum::cacheStructureData()
 {
+    using std::placeholders::_1;
     int cntsites = this->countSites();
     const int nqpts = pdfutils_qmaxSteps(this);
     QuantityType zeros(nqpts, 0.0);
@@ -284,9 +285,9 @@ void BaseDebyeSum::cacheStructureData()
         }
     }
     const double& totocc = mstructure_cache.totaloccupancy;
-    double tosc = eps_gt(totocc, 0.0) ? (1.0 / totocc) : 1.0;
+    const double tosc = eps_gt(totocc, 0.0) ? (1.0 / totocc) : 1.0;
     transform(sfak.begin(), sfak.end(), sfak.begin(),
-            bind1st(multiplies<double>(), tosc));
+            bind(multiplies<double>(), tosc, _1));
 }
 
 }   // namespace srreal
