@@ -35,7 +35,7 @@ http://www.diffpy.org/doc/libdiffpy.
 libdiffpy library requires C++ compiler and the following software:
 
 * `scons` - software constructions tool (1.0 or later)
-* `libboost-dev` - Boost C++ libraries development files (1.43 or later)
+* `libboost-dev` - Boost C++ libraries development files (1.56 or later)
 * `GSL` - GNU Scientific Library for C
 
 Recommended software:
