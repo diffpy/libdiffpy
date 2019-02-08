@@ -73,6 +73,11 @@ before_install:
   - $NOAPT || sudo apt-get install -y
                   libgsl0-dev libboost-all-dev python-pip
                   build-essential scons cxxtest
+  # update to libboost1.58
+  - $NOAPT || sudo add-apt-repository ppa:kzemek/boost --yes
+  - $NOAPT || sudo apt-get update -qq
+  - $NOAPT || sudo apt-get install -y
+                  libboost1.58-dev libboost-serialization1.58-dev
 
   - $NOBREW || test "${TRAVIS_OS_NAME}" = "osx" || exit $?
 
