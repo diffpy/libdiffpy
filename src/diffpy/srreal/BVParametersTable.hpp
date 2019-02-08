@@ -39,7 +39,7 @@ class BVParametersTable
 
         // types
         typedef boost::unordered_set<BVParam,
-                boost::hash<BVParam>, BVParam::HashEqual> SetOfBVParam;
+            BVParam::BondHash, BVParam::BondEqual> SetOfBVParam;
 
         // static methods
         static const BVParam& none();
