@@ -12,7 +12,6 @@ env_rt.AppendUnique(CPPDEFINES=dict(DIFFPYRUNTIMERELPATH=rtrp))
 rtso = env_rt.SharedObject('runtimepath', 'runtimepath.cpp')
 env['lib_sources'] += rtso
 
-SConscript('boostextensions/SConscript')
 SConscript('srreal/SConscript')
 
 # vim: ft=python
