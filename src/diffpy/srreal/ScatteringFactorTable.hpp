@@ -22,11 +22,12 @@
 #ifndef SCATTERINGFACTORTABLE_HPP_INCLUDED
 #define SCATTERINGFACTORTABLE_HPP_INCLUDED
 
-#include <boost/unordered_set.hpp>
+#include <unordered_set>
+
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/split_free.hpp>
+#include <boost/serialization/unordered_map.hpp>
 
-#include <diffpy/boostextensions/serialize_unordered_map.hpp>
 #include <diffpy/HasClassRegistry.hpp>
 #include <diffpy/EventTicker.hpp>
 
@@ -50,9 +51,9 @@ class ScatteringFactorTable :
                 double value, double q=0.0);
         void resetCustom(const std::string& smbl);
         void resetAll();
-        boost::unordered_set<std::string> getCustomSymbols() const;
+        std::unordered_set<std::string> getCustomSymbols() const;
 
-        typedef boost::unordered_map<std::string,
+        typedef std::unordered_map<std::string,
                 std::pair<std::string, double> > CustomDataStorage;
         virtual eventticker::EventTicker& ticker() const  { return mticker; }
 

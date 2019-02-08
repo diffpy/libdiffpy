@@ -234,7 +234,7 @@ void BaseDebyeSum::cacheStructureData()
     int cntsites = this->countSites();
     const int nqpts = pdfutils_qmaxSteps(this);
     QuantityType zeros(nqpts, 0.0);
-    boost::unordered_map<string,int> atomtypeidx;
+    unordered_map<string,int> atomtypeidx;
     // sftypeatkq
     mstructure_cache.typeofsite.clear();
     mstructure_cache.typeofsite.reserve(cntsites);

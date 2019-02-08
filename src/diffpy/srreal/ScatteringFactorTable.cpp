@@ -102,9 +102,9 @@ void ScatteringFactorTable::resetAll()
 }
 
 
-boost::unordered_set<string> ScatteringFactorTable::getCustomSymbols() const
+unordered_set<string> ScatteringFactorTable::getCustomSymbols() const
 {
-    boost::unordered_set<string> rv;
+    unordered_set<string> rv;
     CustomDataStorage::const_iterator csft;
     for (csft = mcustom.begin(); csft != mcustom.end(); ++csft)
     {

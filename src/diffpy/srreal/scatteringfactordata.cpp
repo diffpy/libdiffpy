@@ -25,8 +25,8 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
-#include <boost/unordered_set.hpp>
-#include <boost/unordered_map.hpp>
+#include <unordered_set>
+#include <unordered_map>
 
 #include <diffpy/srreal/scatteringfactordata.hpp>
 #include <diffpy/srreal/AtomUtils.hpp>
@@ -111,15 +111,19 @@ class wksmbl_equal :
 };
 
 
-size_t hash_value(const WaasKirfFormula& wk)
+class wksmbl_hash
 {
-    boost::hash<string> hasher;
-    return hasher(wk.symbol);
-}
+    public:
+        size_t operator()(const WaasKirfFormula& wk) const
+        {
+            hash<string> hasher;
+            return hasher(wk.symbol);
+        }
+};
 
 
-typedef boost::unordered_set<WaasKirfFormula,
-        boost::hash<WaasKirfFormula>, wksmbl_equal> SetOfWKFormulas;
+typedef unordered_set<WaasKirfFormula,
+        wksmbl_hash, wksmbl_equal> SetOfWKFormulas;
 
 
 const SetOfWKFormulas& getWKFormulasSet()
@@ -212,7 +216,7 @@ SetOfWKFormulas::const_iterator findWKFormula(const string& smbl)
 
 // Electron numbers for elements and ions
 
-typedef boost::unordered_map<string,int> ElectronNumberStorage;
+typedef unordered_map<string,int> ElectronNumberStorage;
 
 ElectronNumberStorage& getElectronNumberTable()
 {
@@ -261,7 +265,7 @@ ElectronNumberStorage& getElectronNumberTable()
 
 // Neutron scattering lengths
 
-typedef boost::unordered_map<string,double> NeutronBCStorage;
+typedef unordered_map<string,double> NeutronBCStorage;
 
 const NeutronBCStorage& getNeutronBCTable()
 {

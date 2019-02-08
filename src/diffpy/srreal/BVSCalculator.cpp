@@ -200,7 +200,10 @@ double BVSCalculator::rmaxFromPrecision(double eps) const
 {
     const BVParametersTable& bvtb = *(this->getBVParamTable());
     // build a set of unique (symbol, valence) pairs
-    typedef boost::unordered_set< pair<string, int> > SymbolValenceSet;
+    typedef std::unordered_set<
+        pair<string, int>,
+        boost::hash< pair<string, int> >
+            > SymbolValenceSet;
     SymbolValenceSet allsymvals;
     assert(int(mstructure_cache.baresymbols.size()) == this->countSites());
     assert(int(mstructure_cache.valences.size()) == this->countSites());

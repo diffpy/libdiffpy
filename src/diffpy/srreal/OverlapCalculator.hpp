@@ -19,6 +19,8 @@
 #ifndef OVERLAPCALCULATOR_HPP_INCLUDED
 #define OVERLAPCALCULATOR_HPP_INCLUDED
 
+#include <boost/serialization/list.hpp>
+
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/AtomRadiiTable.hpp>
 
@@ -62,14 +64,14 @@ class OverlapCalculator : public PairQuantity
         /// gradients of totalSquareOverlap at each site in the structure
         std::vector<R3::Vector> gradients() const;
         /// indices of the neighboring sites
-        boost::unordered_set<int> getNeighborSites(int i) const;
+        std::unordered_set<int> getNeighborSites(int i) const;
         /// coordination number at each site of the structure
         QuantityType coordinations() const;
         /// coordination number split per each type of neighboring atoms
-        boost::unordered_map<std::string,double>
+        std::unordered_map<std::string,double>
             coordinationByTypes(int i) const;
         /// sets of site inidices per each sites neighborhood in the structure
-        std::vector< boost::unordered_set<int> > neighborhoods() const;
+        std::vector< std::unordered_set<int> > neighborhoods() const;
 
         // access and configuration of the atom radii
         void setAtomRadiiTable(AtomRadiiTablePtr);
@@ -93,7 +95,7 @@ class OverlapCalculator : public PairQuantity
 
         // types
         enum OverlapFlag {ALLVALUES, OVERLAPPING};
-        typedef boost::unordered_map<int, std::list<int> > NeighborIdsStorage;
+        typedef std::unordered_map<int, std::list<int> > NeighborIdsStorage;
 
         // methods
         int count() const;
