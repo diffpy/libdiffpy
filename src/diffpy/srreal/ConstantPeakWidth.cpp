@@ -17,7 +17,7 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/ConstantPeakWidth.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 namespace srreal {
@@ -87,5 +87,10 @@ bool reg_ConstantPeakWidth = ConstantPeakWidth().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ConstantPeakWidth)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::ConstantPeakWidth)
 
 // End of file

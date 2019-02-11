@@ -20,7 +20,7 @@
 
 #include <diffpy/srreal/JeongPeakWidth.hpp>
 #include <diffpy/mathutils.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 namespace srreal {
@@ -142,5 +142,10 @@ bool reg_JeongPeakWidth = JeongPeakWidth().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::JeongPeakWidth)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::JeongPeakWidth)
 
 // End of file

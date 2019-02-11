@@ -59,10 +59,28 @@ class JeongPeakWidth : public DebyeWallerPeakWidth
 
         // methods
         double msdSharpeningRatio(const double& r) const;
+
+        // serialization
+        friend class boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<DebyeWallerPeakWidth>(*this);
+            ar & mdelta1;
+            ar & mdelta2;
+            ar & mqbroad;
+        }
+
 };
 
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::JeongPeakWidth)
 
 #endif  // JEONGPEAKWIDTH_HPP_INCLUDED

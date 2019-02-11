@@ -16,8 +16,6 @@
 *
 *****************************************************************************/
 
-#include <boost/serialization/export.hpp>
-
 #include <diffpy/srreal/PeakWidthModel.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 #include <diffpy/validators.hpp>
@@ -71,6 +69,9 @@ eventticker::EventTicker& PeakWidthModelOwner::ticker() const
 }   // namespace srreal
 }   // namespace diffpy
 
-DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PeakWidthModelPtr)
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PeakWidthModel)
+DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::PeakWidthModel)
 
 // End of file
