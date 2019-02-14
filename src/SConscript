@@ -125,9 +125,10 @@ libdiffpy = env_lib.SharedLibrary('diffpy', env['lib_sources'])
 # Clean up .gcda and .gcno files from coverage analysis.
 env_lib.Clean(libdiffpy, Glob('diffpy/*.gc??'))
 env_lib.Clean(libdiffpy, Glob('diffpy/srreal/*.gc??'))
+env_lib.Depends(libdiffpy, env['lib_includes'])
 Export('libdiffpy')
 
-lib = Alias('lib', [libdiffpy, env['lib_includes']])
+lib = Alias('lib', [libdiffpy])
 Default(lib)
 
 # Define targets related to testing.  Do so only when testing is requested.
