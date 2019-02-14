@@ -417,7 +417,7 @@ void PQEvaluatorCheck::updateValue(
 {
     this->PQEvaluatorOptimized::updateValue(pq, stru);
     if (mtypeused == BASIC)  return;
-    boost::scoped_ptr<pqresults> results(create_pqresults(pq));
+    unique_ptr<pqresults> results(create_pqresults(pq));
     this->PQEvaluatorBasic::updateValue(pq, stru);
     mtypeused = CHECK;
     if (!results->compare(pq))

@@ -124,6 +124,7 @@ class TestPQEvaluator : public CxxTest::TestSuite
 
         void test_PDF_change_atom()
         {
+            using std::placeholders::_1;
             TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorType());
             TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorType());
             TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(mstru10));
@@ -134,7 +135,7 @@ class TestPQEvaluator : public CxxTest::TestSuite
             QuantityType gb = mpdfcb.getPDF();
             TS_ASSERT(!gb.empty());
             int cnonzero = count_if(gb.begin(), gb.end(),
-                    bind1st(not_equal_to<double>(), 0.0));
+                    bind(not_equal_to<double>(), _1, 0.0));
             TS_ASSERT(cnonzero);
             // test second call on the same structure
             mpdfco.eval(mstru10);

@@ -18,7 +18,6 @@
 
 #include <cassert>
 #include <fstream>
-#include <boost/scoped_ptr.hpp>
 
 #include <diffpy/serialization.ipp>
 #include <diffpy/runtimepath.hpp>
@@ -165,7 +164,7 @@ BVParametersTable::getStandardSetOfBVParam() const
 {
     using namespace diffpy::runtimepath;
     using diffpy::validators::ensureFileOK;
-    static boost::scoped_ptr<SetOfBVParam> the_set;
+    static unique_ptr<SetOfBVParam> the_set;
     if (!the_set)
     {
         the_set.reset(new SetOfBVParam);

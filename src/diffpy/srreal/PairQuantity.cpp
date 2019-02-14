@@ -196,7 +196,7 @@ void PairQuantity::invertMask()
 {
     mticker.click();
     mdefaultpairmask = !mdefaultpairmask;
-    boost::unordered_map<int, bool>::iterator mm;
+    unordered_map<int, bool>::iterator mm;
     for (mm = msiteallmask.begin(); mm != msiteallmask.end(); ++mm)
     {
         mm->second = !(mm->second);
@@ -230,7 +230,7 @@ void PairQuantity::setPairMask(int i, int j, bool mask)
     if (ALLATOMSINT == i || ALLATOMSINT == j)
     {
         int k = (ALLATOMSINT != i) ? i : j;
-        pair<boost::unordered_map<int, bool>::iterator, bool> pmm;
+        pair<unordered_map<int, bool>::iterator, bool> pmm;
         pmm = msiteallmask.emplace(k, mask);
         if (pmm.second || pmm.first->second != mask)  modified = true;
         pmm.first->second = mask;
@@ -243,7 +243,7 @@ void PairQuantity::setPairMask(int i, int j, bool mask)
         return;
     }
     // here neither i nor j is ALLATOMSINT
-    boost::unordered_map<int, bool>::iterator ii, jj;
+    unordered_map<int, bool>::iterator ii, jj;
     ii = msiteallmask.find(i);
     if (ii != msiteallmask.end() && mask != ii->second)
     {
@@ -425,7 +425,7 @@ void PairQuantity::updateMaskData()
     // Propagate masks with ALLATOMSINT to all valid indices.
     if (mtypemask.empty())
     {
-        boost::unordered_map<int, bool>::const_iterator ia;
+        unordered_map<int, bool>::const_iterator ia;
         for (ia = msiteallmask.begin(); ia != msiteallmask.end(); ++ia)
         {
             for (int j = 0; j < cntsites; ++j)
@@ -438,7 +438,7 @@ void PairQuantity::updateMaskData()
     else
     {
         // build a list of indices per each unique atom type
-        boost::unordered_map< string, list<int> >  siteindices;
+        unordered_map< string, list<int> >  siteindices;
         for (int i = 0; i < cntsites; ++i)
         {
             const string& smbl = mstructure->siteAtomType(i);

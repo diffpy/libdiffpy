@@ -107,9 +107,21 @@ void BVParam::setFromCifLine(const std::string& cifline)
     *this = bp1;
 }
 
-// class BVParam::HashEqual --------------------------------------------------
+// class BVParam::BondHash ---------------------------------------------------
 
-bool BVParam::HashEqual::operator()(
+size_t BVParam::BondHash::operator()(const BVParam& bp) const
+{
+    size_t seed = 0;
+    boost::hash_combine(seed, bp.matom0);
+    boost::hash_combine(seed, bp.mvalence0);
+    boost::hash_combine(seed, bp.matom1);
+    boost::hash_combine(seed, bp.mvalence1);
+    return seed;
+}
+
+// class BVParam::BondEqual --------------------------------------------------
+
+bool BVParam::BondEqual::operator()(
         const BVParam& bp0, const BVParam& bp1) const
 {
     return (&bp0 == &bp1) || (
@@ -118,18 +130,6 @@ bool BVParam::HashEqual::operator()(
         bp0.matom0 == bp1.matom0 &&
         bp0.matom1 == bp1.matom1);
 }
-
-// Functions -----------------------------------------------------------------
-
-size_t hash_value(const BVParam& bp)
-{
-    size_t seed = 0;
-    boost::hash_combine(seed, bp.matom0);
-    boost::hash_combine(seed, bp.mvalence0);
-    boost::hash_combine(seed, bp.matom1);
-    boost::hash_combine(seed, bp.mvalence1);
-    return seed;
-};
 
 }   // namespace srreal
 }   // namespace diffpy

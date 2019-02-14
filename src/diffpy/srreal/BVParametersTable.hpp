@@ -23,8 +23,8 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/shared_ptr.hpp>
-#include <diffpy/boostextensions/serialize_unordered_set.hpp>
-#include <diffpy/boostextensions/serialize_unordered_map.hpp>
+#include <boost/serialization/unordered_set.hpp>
+#include <boost/serialization/unordered_map.hpp>
 #include <diffpy/srreal/BVParam.hpp>
 
 namespace diffpy {
@@ -38,8 +38,8 @@ class BVParametersTable
     public:
 
         // types
-        typedef boost::unordered_set<BVParam,
-                boost::hash<BVParam>, BVParam::HashEqual> SetOfBVParam;
+        typedef std::unordered_set<BVParam,
+            BVParam::BondHash, BVParam::BondEqual> SetOfBVParam;
 
         // static methods
         static const BVParam& none();
@@ -67,7 +67,7 @@ class BVParametersTable
     private:
 
         // types
-        typedef boost::unordered_map<std::string, int> AtomTypeValence;
+        typedef std::unordered_map<std::string, int> AtomTypeValence;
 
         // data
         SetOfBVParam mcustomtable;

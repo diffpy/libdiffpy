@@ -1,6 +1,0 @@
-Import('env', 'GlobSources')
-
-env['lib_includes'] += GlobSources('*.[hi]pp')
-env['lib_sources'] += GlobSources('*.cpp')
-
-# vim: ft=python

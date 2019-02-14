@@ -18,6 +18,9 @@
 
 #include <cxxtest/TestSuite.h>
 
+#include <algorithm>
+#include <functional>
+
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/PeriodicStructureAdapter.hpp>
 #include <diffpy/srreal/OverlapCalculator.hpp>
@@ -226,6 +229,57 @@ class TestOverlapCalculator : public CxxTest::TestSuite
                 xyzc0[i] -= dx;
             }
             TS_ASSERT_DELTA(0.0, R3::norm(g0 - g0n), 1e-6);
+        }
+
+
+        void test_getNeighborSites()
+        {
+            molc->eval(mnacl);
+            auto nbsites = molc->getNeighborSites(0);
+            TS_ASSERT_EQUALS(3u, nbsites.size());
+            for (int j = 5; j < 8; ++j) {
+                TS_ASSERT(nbsites.count(j));
+            }
+        }
+
+
+        void test_coordinations()
+        {
+            using std::placeholders::_1;
+            molc->eval(mnacl);
+            auto cnums = molc->coordinations();
+            TS_ASSERT_EQUALS(8u, cnums.size());
+            auto eq6 = bind(equal_to<double>(), _1, 6.0);
+            TS_ASSERT(all_of(cnums.begin(), cnums.end(), eq6));
+        }
+
+
+        void test_coordinationByTypes()
+        {
+            molc->eval(mnacl);
+            auto cbtb0 = molc->coordinationByTypes(0);
+            auto cbtb3 = molc->coordinationByTypes(3);
+            auto cbtb5 = molc->coordinationByTypes(5);
+            TS_ASSERT_EQUALS(1u, cbtb0.size())
+            TS_ASSERT_EQUALS(1u, cbtb5.size())
+            TS_ASSERT_EQUALS(cbtb0, cbtb3);
+            TS_ASSERT_EQUALS(6, cbtb0.at("Cl1-"));
+            TS_ASSERT_EQUALS(6, cbtb5.at("Na1+"));
+        }
+
+
+        void test_neighborhoods()
+        {
+            molc->eval(mnacl);
+            auto nbhood = molc->neighborhoods();
+            TS_ASSERT_EQUALS(1u, nbhood.size());
+            TS_ASSERT_EQUALS(8u, nbhood[0].size());
+            molc->getAtomRadiiTable()->resetAll();
+            molc->eval(mnacl);
+            auto nbsep = molc->neighborhoods();
+            TS_ASSERT_EQUALS(8u, nbsep.size());
+            int nb5site = *(nbsep[5].begin());
+            TS_ASSERT_EQUALS(5, nb5site);
         }
 
 

@@ -25,9 +25,9 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
-#include <boost/unordered_set.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
+#include <unordered_set>
+#include <unordered_map>
 
 #include <diffpy/srreal/scatteringfactordata.hpp>
 #include <diffpy/srreal/AtomUtils.hpp>
@@ -112,22 +112,26 @@ class wksmbl_equal :
 };
 
 
-size_t hash_value(const WaasKirfFormula& wk)
+class wksmbl_hash
 {
-    boost::hash<string> hasher;
-    return hasher(wk.symbol);
-}
+    public:
+        size_t operator()(const WaasKirfFormula& wk) const
+        {
+            hash<string> hasher;
+            return hasher(wk.symbol);
+        }
+};
 
 
-typedef boost::unordered_set<WaasKirfFormula,
-        boost::hash<WaasKirfFormula>, wksmbl_equal> SetOfWKFormulas;
+typedef unordered_set<WaasKirfFormula,
+        wksmbl_hash, wksmbl_equal> SetOfWKFormulas;
 
 
 const SetOfWKFormulas& getWKFormulasSet()
 {
     using namespace diffpy::runtimepath;
     using diffpy::validators::ensureFileOK;
-    static boost::scoped_ptr<SetOfWKFormulas> the_set;
+    static unique_ptr<SetOfWKFormulas> the_set;
     if (the_set)  return *the_set;
     the_set.reset(new SetOfWKFormulas);
     string wkfile = datapath("f0_WaasKirf.dat");
@@ -213,13 +217,13 @@ SetOfWKFormulas::const_iterator findWKFormula(const string& smbl)
 
 // Electron numbers for elements and ions
 
-typedef boost::unordered_map<string,int> ElectronNumberStorage;
+typedef unordered_map<string,int> ElectronNumberStorage;
 
 ElectronNumberStorage& getElectronNumberTable()
 {
     using namespace diffpy::runtimepath;
     using diffpy::validators::ensureFileOK;
-    static boost::scoped_ptr<ElectronNumberStorage> entable;
+    static unique_ptr<ElectronNumberStorage> entable;
     typedef ElectronNumberStorage::value_type ENPair;
     if (!entable)
     {
@@ -262,14 +266,14 @@ ElectronNumberStorage& getElectronNumberTable()
 
 // Neutron scattering lengths
 
-typedef boost::unordered_map<string,double> NeutronBCStorage;
+typedef unordered_map<string,double> NeutronBCStorage;
 
 const NeutronBCStorage& getNeutronBCTable()
 {
     using namespace diffpy::runtimepath;
     using diffpy::validators::ensureFileOK;
     typedef NeutronBCStorage::value_type BCPair;
-    static boost::scoped_ptr<NeutronBCStorage> bctable;
+    static unique_ptr<NeutronBCStorage> bctable;
     if (bctable)  return *bctable;
     bctable.reset(new NeutronBCStorage);
     string nsffile = datapath("nsftable.dat");

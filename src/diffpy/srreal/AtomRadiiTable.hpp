@@ -28,8 +28,8 @@
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/unordered_map.hpp>
 
-#include <diffpy/boostextensions/serialize_unordered_map.hpp>
 #include <diffpy/HasClassRegistry.hpp>
 
 namespace diffpy {
@@ -41,7 +41,7 @@ class AtomRadiiTable :
     public:
 
         // types
-        typedef boost::unordered_map<std::string,double> CustomRadiiStorage;
+        typedef std::unordered_map<std::string,double> CustomRadiiStorage;
 
         // methods
         /// fast value lookup, which does not change the table.

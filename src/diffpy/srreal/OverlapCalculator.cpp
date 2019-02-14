@@ -196,10 +196,10 @@ double OverlapCalculator::flipDiffTotal(int i, int j) const
     double rv = 0.0;
     const list<int>& ineighbors = this->getNeighborIds(i);
     const list<int>& jneighbors = this->getNeighborIds(j);
-    boost::unordered_set<int> allids;
+    unordered_set<int> allids;
     allids.insert(ineighbors.begin(), ineighbors.end());
     allids.insert(jneighbors.begin(), jneighbors.end());
-    boost::unordered_set<int>::const_iterator idx;
+    unordered_set<int>::const_iterator idx;
     for (idx = allids.begin(); idx != allids.end(); ++idx)
     {
         int i1 = int(this->subvalue(SITE0_OFFSET, *idx));
@@ -246,9 +246,9 @@ vector<R3::Vector> OverlapCalculator::gradients() const
 }
 
 
-boost::unordered_set<int> OverlapCalculator::getNeighborSites(int i) const
+unordered_set<int> OverlapCalculator::getNeighborSites(int i) const
 {
-    boost::unordered_set<int> rv;
+    unordered_set<int> rv;
     const list<int>& ineighbors = this->getNeighborIds(i);
     list<int>::const_iterator idx;
     for (idx = ineighbors.begin(); idx != ineighbors.end(); ++idx)
@@ -280,10 +280,10 @@ QuantityType OverlapCalculator::coordinations() const
 }
 
 
-boost::unordered_map<string,double>
+unordered_map<string,double>
 OverlapCalculator::coordinationByTypes(int i) const
 {
-    boost::unordered_map<string,double> rv;
+    unordered_map<string,double> rv;
     const list<int>& ineighbors = this->getNeighborIds(i);
     list<int>::const_iterator idx;
     for (idx = ineighbors.begin(); idx != ineighbors.end(); ++idx)
@@ -310,10 +310,10 @@ OverlapCalculator::coordinationByTypes(int i) const
 }
 
 
-vector< boost::unordered_set<int> > OverlapCalculator::neighborhoods() const
+vector< unordered_set<int> > OverlapCalculator::neighborhoods() const
 {
     int cntsites = this->countSites();
-    typedef boost::unordered_set<int> SiteSet;
+    typedef unordered_set<int> SiteSet;
     typedef std::vector< boost::shared_ptr<SiteSet> > SiteSetPointers;
     SiteSetPointers rvptr(cntsites);
     int n = this->count();
@@ -350,8 +350,8 @@ vector< boost::unordered_set<int> > OverlapCalculator::neighborhoods() const
         if (rvptr[i].get())  continue;
         rvptr[i].reset(new SiteSet(&i, &i + 1));
     }
-    boost::unordered_set<const SiteSet*> duplicate;
-    vector< boost::unordered_set<int> > rv;
+    unordered_set<const SiteSet*> duplicate;
+    vector< unordered_set<int> > rv;
     SiteSetPointers::const_iterator ssp;
     for (ssp = rvptr.begin(); ssp != rvptr.end(); ++ssp)
     {

@@ -681,13 +681,13 @@ void PDFCalculator::cacheStructureData()
 {
     int cntsites = this->countSites();
     // sfsite
-    boost::unordered_map<string, double> fcache;
+    unordered_map<string, double> fcache;
     mstructure_cache.sfsite.resize(cntsites);
     const ScatteringFactorTablePtr sftable = this->getScatteringFactorTable();
     for (int i = 0; i < cntsites; ++i)
     {
         const string& smbl = mstructure->siteAtomType(i);
-        boost::unordered_map<string, double>::iterator ff = fcache.find(smbl);
+        unordered_map<string, double>::iterator ff = fcache.find(smbl);
         if (ff == fcache.end())
         {
             const double value = sftable->lookup(smbl);
@@ -707,11 +707,10 @@ void PDFCalculator::cacheStructureData()
     mstructure_cache.totaloccupancy = totocc;
     // active occupancy
     double invmasktotal = 0.0;
-    boost::unordered_set< std::pair<int,int> >::const_iterator ij;
-    for (ij = minvertpairmask.begin(); ij != minvertpairmask.end(); ++ij)
+    for (auto&& ij : minvertpairmask)
     {
-        const int& i = ij->first;
-        const int& j = ij->second;
+        const int& i = ij.first;
+        const int& j = ij.second;
         bool outofbounds = (i < 0 || i >= cntsites || j < 0 || j >= cntsites);
         if (outofbounds)  continue;
         int sumscale = (i == j) ? 1 : 2;

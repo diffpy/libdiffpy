@@ -46,8 +46,8 @@ conf = Configure(env, custom_tests={
     'CheckBoostVersion' : CheckBoostVersion,
     })
 
-# libdiffpy uses boost_serialization features that appeared in 1.43.0.
-boost_required = '1.43.0'
+# serialization of unordered_map requires boost 1.56.0
+boost_required = '1.56.0'
 if not conf.CheckBoostVersion(boost_required):
     print('This software requires Boost %s or later.' % boost_required)
     Exit(1)

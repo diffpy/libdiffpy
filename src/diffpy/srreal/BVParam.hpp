@@ -55,8 +55,15 @@ class BVParam
         double mB;
         std::string mref_id;
 
-        // comparison binary_function for unordered_set hasher
-        class HashEqual : public std::binary_function<BVParam,BVParam,bool>
+        // hash function for cation-anion bond type only
+        class BondHash
+        {
+            public:
+                size_t operator()(const BVParam&) const;
+        };
+
+        // equality test for cation-anion bond type
+        class BondEqual
         {
             public:
                 bool operator()(const BVParam& bp0, const BVParam& bp1) const;
@@ -79,10 +86,6 @@ class BVParam
         }
 
 };  // class BVParam
-
-// Functions -----------------------------------------------------------------
-
-size_t hash_value(const BVParam& bp);
 
 }   // namespace srreal
 }   // namespace diffpy
