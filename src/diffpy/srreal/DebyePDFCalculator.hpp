@@ -56,7 +56,7 @@ namespace diffpy {
 namespace srreal {
 
 class DebyePDFCalculator :
-    public virtual BaseDebyeSum,
+    public BaseDebyeSum,
     public ScatteringFactorTableOwner,
     public PDFEnvelopeOwner
 {

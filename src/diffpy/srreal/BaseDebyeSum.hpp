@@ -27,8 +27,8 @@ namespace diffpy {
 namespace srreal {
 
 class BaseDebyeSum :
-    public virtual PairQuantity,
-    public virtual PeakWidthModelOwner
+    public PairQuantity,
+    public PeakWidthModelOwner
 {
     public:
 
