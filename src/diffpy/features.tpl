@@ -25,6 +25,9 @@
 # define DIFFPY_HAS_OBJCRYST
 #endif
 
+// FIXME -- temporary feature, remove when released
+#define DIFFPY_DEV_PEAKWIDTHMODEL_SERIALIZATION
+
 #endif  // FEATURES_HPP_INCLUDED
 
 // vim:ft=cpp:
