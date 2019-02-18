@@ -19,6 +19,7 @@
 #include <cxxtest/TestSuite.h>
 
 #include <diffpy/srreal/PeakWidthModel.hpp>
+#include <diffpy/srreal/ConstantPeakWidth.hpp>
 #include <diffpy/srreal/DebyeWallerPeakWidth.hpp>
 #include <diffpy/srreal/JeongPeakWidth.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
@@ -38,6 +39,8 @@ class TestPeakWidthModel : public CxxTest::TestSuite
     private:
 
         // data
+        PeakWidthModelPtr mcnpw;
+        ConstantPeakWidth* mccnpw;
         PeakWidthModelPtr mdwpw;
         PeakWidthModelPtr mjepw;
         JeongPeakWidth* mcjepw;
@@ -60,6 +63,8 @@ class TestPeakWidthModel : public CxxTest::TestSuite
 
         void setUp()
         {
+            mcnpw = PeakWidthModel::createByType("constant");
+            mccnpw = static_cast<ConstantPeakWidth*>(mcnpw.get());
             mdwpw = PeakWidthModel::createByType("debye-waller");
             mjepw = PeakWidthModel::createByType("jeong");
             mcjepw = static_cast<JeongPeakWidth*>(mjepw.get());
@@ -69,6 +74,7 @@ class TestPeakWidthModel : public CxxTest::TestSuite
 
         void test_clone()
         {
+            TS_ASSERT_EQUALS(mcnpw->type(), mcnpw->clone()->type());
             TS_ASSERT_EQUALS(mdwpw->type(), mdwpw->clone()->type());
             TS_ASSERT_EQUALS(mjepw->type(), mjepw->clone()->type());
         }
@@ -121,6 +127,53 @@ class TestPeakWidthModel : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(2.2, pwm2->getDoubleAttr("delta2"));
             TS_ASSERT_EQUALS(0.03, pwm2->getDoubleAttr("qbroad"));
         }
+
+
+        void test_CPWM_attributes()
+        {
+            TS_ASSERT_EQUALS("constant", mcnpw->type());
+            TS_ASSERT(mcnpw->hasDoubleAttr("width"));
+            TS_ASSERT(mcnpw->hasDoubleAttr("uisowidth"));
+            TS_ASSERT_EQUALS(2, mcnpw->namesOfDoubleAttributes().size());
+            mccnpw->setWidth(0.1);
+            TS_ASSERT_EQUALS(0.1, mcnpw->getDoubleAttr("width"));
+            TS_ASSERT_EQUALS(0.1, mcnpw->maxWidth(dimer(), 0, 4));
+            const double uw0 = mcnpw->getDoubleAttr("uisowidth");
+            mccnpw->setWidth(2 * mccnpw->getWidth());
+            TS_ASSERT_DELTA(4 * uw0, mcnpw->getDoubleAttr("uisowidth"), meps);
+        }
+
+
+        void test_CPWM_uisowidth()
+        {
+            StructureAdapterPtr adpt = dimer();
+            BaseBondGeneratorPtr bnds = adpt->createBondGenerator();
+            PeakWidthModelPtr dwpw(new DebyeWallerPeakWidth);
+            bnds->setRmax(2.0);
+            bnds->rewind();
+            const double w0 = dwpw->calculate(*bnds);
+            TS_ASSERT_EQUALS(0.0, mcnpw->calculate(*bnds));
+            mcnpw->setDoubleAttr("uisowidth", tuiso);
+            TS_ASSERT_DELTA(w0, mcnpw->calculate(*bnds), meps);
+            mcnpw->setDoubleAttr("uisowidth", -tuiso);
+            TS_ASSERT_DELTA(-tuiso, mcnpw->getDoubleAttr("uisowidth"), meps);
+            TS_ASSERT_DELTA(-w0, mcnpw->getDoubleAttr("width"), meps);
+        }
+
+
+        void test_CPWM_serialization()
+        {
+            PeakWidthModelPtr pwm1 = dumpandload(mcnpw);
+            TS_ASSERT_EQUALS("constant", pwm1->type());
+            TS_ASSERT_EQUALS(0.0, pwm1->getDoubleAttr("width"));
+            mcnpw->setDoubleAttr("width", 0.1);
+            double uw0 = mcnpw->getDoubleAttr("uisowidth");
+            PeakWidthModelPtr pwm2 = dumpandload(mcnpw);
+            TS_ASSERT_EQUALS(0.1, pwm2->getDoubleAttr("width"));
+            TS_ASSERT_DELTA(uw0, pwm2->getDoubleAttr("uisowidth"), meps);
+        }
+
+
 
 };  // class TestPeakWidthModel
 
