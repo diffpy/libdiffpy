@@ -29,6 +29,8 @@ using namespace std;
 namespace {
 
 using diffpy::mathutils::GAUSS_SIGMA_TO_FWHM;
+const double UtoB = 8 * M_PI * M_PI;
+
 
 double getuisowidth(const ConstantPeakWidth* ppwm)
 {
@@ -45,6 +47,17 @@ void setuisowidth(ConstantPeakWidth* ppwm, const double& uiso)
     ppwm->setWidth(fwhm);
 }
 
+
+double getbisowidth(const ConstantPeakWidth* ppwm)
+{
+    return UtoB * getuisowidth(ppwm);
+}
+
+void setbisowidth(ConstantPeakWidth* ppwm, const double& biso)
+{
+    setuisowidth(ppwm, biso / UtoB);
+}
+
 }   // namespace
 
 // Constructors --------------------------------------------------------------
@@ -53,6 +66,8 @@ ConstantPeakWidth::ConstantPeakWidth() : mwidth(0.0)
 {
     this->registerDoubleAttribute("width", this,
             &ConstantPeakWidth::getWidth, &ConstantPeakWidth::setWidth);
+    this->registerDoubleAttribute("bisowidth", this,
+            &getbisowidth, &setbisowidth);
     this->registerDoubleAttribute("uisowidth", this,
             &getuisowidth, &setuisowidth);
 }

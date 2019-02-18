@@ -29,6 +29,7 @@ namespace diffpy {
 namespace srreal {
 
 const double tuiso = 0.004;
+const double UtoB = 8 * M_PI * M_PI;
 
 //////////////////////////////////////////////////////////////////////////////
 // class TestPeakWidthModel
@@ -133,14 +134,28 @@ class TestPeakWidthModel : public CxxTest::TestSuite
         {
             TS_ASSERT_EQUALS("constant", mcnpw->type());
             TS_ASSERT(mcnpw->hasDoubleAttr("width"));
+            TS_ASSERT(mcnpw->hasDoubleAttr("bisowidth"));
             TS_ASSERT(mcnpw->hasDoubleAttr("uisowidth"));
-            TS_ASSERT_EQUALS(2, mcnpw->namesOfDoubleAttributes().size());
+            TS_ASSERT_EQUALS(3, mcnpw->namesOfDoubleAttributes().size());
             mccnpw->setWidth(0.1);
             TS_ASSERT_EQUALS(0.1, mcnpw->getDoubleAttr("width"));
             TS_ASSERT_EQUALS(0.1, mcnpw->maxWidth(dimer(), 0, 4));
+            const double bw0 = mcnpw->getDoubleAttr("bisowidth");
             const double uw0 = mcnpw->getDoubleAttr("uisowidth");
             mccnpw->setWidth(2 * mccnpw->getWidth());
+            TS_ASSERT_DELTA(bw0, UtoB * uw0, meps);
+            TS_ASSERT_DELTA(4 * bw0, mcnpw->getDoubleAttr("bisowidth"), meps);
             TS_ASSERT_DELTA(4 * uw0, mcnpw->getDoubleAttr("uisowidth"), meps);
+        }
+
+
+        void test_CPWM_bisowidth()
+        {
+            const double biso = UtoB * tuiso;
+            mcnpw->setDoubleAttr("bisowidth", biso);
+            TS_ASSERT_DELTA(tuiso, mcnpw->getDoubleAttr("uisowidth"), meps);
+            mcnpw->setDoubleAttr("uisowidth", -tuiso);
+            TS_ASSERT_DELTA(-biso, mcnpw->getDoubleAttr("bisowidth"), meps);
         }
 
 
