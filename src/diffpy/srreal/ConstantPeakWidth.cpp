@@ -24,12 +24,52 @@ namespace srreal {
 
 using namespace std;
 
+// Local Helpers -------------------------------------------------------------
+
+namespace {
+
+using diffpy::mathutils::GAUSS_SIGMA_TO_FWHM;
+const double UtoB = 8 * M_PI * M_PI;
+
+
+double getuisowidth(const ConstantPeakWidth* ppwm)
+{
+    const double rmsd = ppwm->getWidth() / GAUSS_SIGMA_TO_FWHM;
+    const int pm = (rmsd >= 0) ? +1 : -1;
+    return pm * 0.5 * rmsd * rmsd;
+}
+
+void setuisowidth(ConstantPeakWidth* ppwm, const double& uiso)
+{
+    const int pm = (uiso >= 0) ? +1 : -1;
+    const double uisoplus = pm * uiso;
+    const double fwhm = pm * GAUSS_SIGMA_TO_FWHM * sqrt(2.0 * uisoplus);
+    ppwm->setWidth(fwhm);
+}
+
+
+double getbisowidth(const ConstantPeakWidth* ppwm)
+{
+    return UtoB * getuisowidth(ppwm);
+}
+
+void setbisowidth(ConstantPeakWidth* ppwm, const double& biso)
+{
+    setuisowidth(ppwm, biso / UtoB);
+}
+
+}   // namespace
+
 // Constructors --------------------------------------------------------------
 
 ConstantPeakWidth::ConstantPeakWidth() : mwidth(0.0)
 {
     this->registerDoubleAttribute("width", this,
             &ConstantPeakWidth::getWidth, &ConstantPeakWidth::setWidth);
+    this->registerDoubleAttribute("bisowidth", this,
+            &getbisowidth, &setbisowidth);
+    this->registerDoubleAttribute("uisowidth", this,
+            &getuisowidth, &setuisowidth);
 }
 
 
