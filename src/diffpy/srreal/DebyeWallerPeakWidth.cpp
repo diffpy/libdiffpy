@@ -19,7 +19,7 @@
 
 #include <diffpy/srreal/DebyeWallerPeakWidth.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 namespace srreal {
@@ -74,5 +74,10 @@ bool reg_DebyeWallerPeakWidth = DebyeWallerPeakWidth().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::DebyeWallerPeakWidth)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::DebyeWallerPeakWidth)
 
 // End of file
