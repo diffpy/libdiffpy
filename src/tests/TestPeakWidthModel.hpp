@@ -74,9 +74,9 @@ class TestPeakWidthModel : public CxxTest::TestSuite
 
         void test_clone()
         {
-            TS_ASSERT_EQUALS(mcnpw->type(), mcnpw->clone()->type());
-            TS_ASSERT_EQUALS(mdwpw->type(), mdwpw->clone()->type());
-            TS_ASSERT_EQUALS(mjepw->type(), mjepw->clone()->type());
+            TS_ASSERT_EQUALS("constant", mcnpw->clone()->type());
+            TS_ASSERT_EQUALS("debye-waller", mdwpw->clone()->type());
+            TS_ASSERT_EQUALS("jeong", mjepw->clone()->type());
         }
 
 
