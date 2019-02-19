@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 #include <diffpy/srreal/QResolutionEnvelope.hpp>
 
 using namespace std;
@@ -84,5 +84,10 @@ bool reg_QResolutionEnvelope = QResolutionEnvelope().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::QResolutionEnvelope)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::QResolutionEnvelope)
 
 // End of file
