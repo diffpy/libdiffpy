@@ -17,6 +17,7 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/LinearBaseline.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 
@@ -80,5 +81,10 @@ bool reg_LinearBaseline = LinearBaseline().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::LinearBaseline)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::LinearBaseline)
 
 // End of file

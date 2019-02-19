@@ -22,11 +22,10 @@
 #ifndef PDFBASELINE_HPP_INCLUDED
 #define PDFBASELINE_HPP_INCLUDED
 
-#include <string>
-#include <set>
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/map.hpp>
-#include <boost/serialization/split_free.hpp>
+#include <boost/serialization/assume_abstract.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
@@ -42,7 +41,17 @@ class PDFBaseline :
     public HasClassRegistry<PDFBaseline>
 {
     public:
+
+        // methods
         virtual double operator()(const double& r) const = 0;
+
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)  { }
+
 };
 
 typedef PDFBaseline::SharedPtr PDFBaselinePtr;
@@ -52,45 +61,6 @@ typedef PDFBaseline::SharedPtr PDFBaselinePtr;
 
 // Serialization -------------------------------------------------------------
 
-namespace boost {
-namespace serialization {
-
-template<class Archive>
-void save(Archive& ar,
-        const diffpy::srreal::PDFBaselinePtr& ptr, const unsigned int version)
-{
-    using namespace diffpy::attributes;
-    std::string tp;
-    AttributesDataMap dt;
-    if (ptr.get())
-    {
-        tp = ptr->type();
-        dt = saveAttributesData(*ptr);
-    }
-    ar & tp & dt;
-}
-
-
-template<class Archive>
-void load(Archive& ar,
-        diffpy::srreal::PDFBaselinePtr& ptr, const unsigned int version)
-{
-    using namespace diffpy::attributes;
-    using namespace diffpy::srreal;
-    std::string tp;
-    AttributesDataMap dt;
-    ar & tp & dt;
-    if (!tp.empty())
-    {
-        ptr = PDFBaseline::createByType(tp);
-        loadAttributesData(*ptr, dt);
-    }
-    else  ptr.reset();
-}
-
-}   // namespace serialization
-}   // namespace boost
-
-BOOST_SERIALIZATION_SPLIT_FREE(diffpy::srreal::PDFBaselinePtr)
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::PDFBaseline)
 
 #endif  // PDFBASELINE_HPP_INCLUDED
