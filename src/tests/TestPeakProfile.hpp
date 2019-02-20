@@ -58,19 +58,21 @@ class TestPeakProfile : public CxxTest::TestSuite
             double Afwhm1 = 2 * sqrt(M_LN2 / M_PI);
             const PeakProfile& pkgauss = *mpkgauss;
             TS_ASSERT_DELTA(Afwhm1, pkgauss(0, 1), meps);
-            TS_ASSERT_DELTA(Afwhm1 / 2, pkgauss(1, 1), meps);
-            TS_ASSERT_DELTA(Afwhm1 / 2, pkgauss(-1, 1), meps);
+            TS_ASSERT_DELTA(Afwhm1 / 2, pkgauss(+0.5, 1), meps);
+            TS_ASSERT_DELTA(Afwhm1 / 2, pkgauss(-0.5, 1), meps);
         }
 
 
         void test_xboundlo()
         {
-            double epsy = 1e-8;
+            const double epsy = 1e-8;
             mpkgauss->setPrecision(epsy);
-            double xblo1 = mpkgauss->xboundlo(1);
-            double xblo3 = mpkgauss->xboundlo(3);
-            TS_ASSERT_DELTA(epsy, (*mpkgauss)(xblo1, 1), meps);
-            TS_ASSERT_DELTA(epsy, (*mpkgauss)(xblo3, 3), meps);
+            const double Afwhm1 = 2 * sqrt(M_LN2 / M_PI);
+            const double xblo1 = mpkgauss->xboundlo(1);
+            const double Afwhm3 = Afwhm1 / 3;
+            const double xblo3 = mpkgauss->xboundlo(3);
+            TS_ASSERT_DELTA(epsy, (*mpkgauss)(xblo1, 1) / Afwhm1, meps);
+            TS_ASSERT_DELTA(epsy, (*mpkgauss)(xblo3, 3) / Afwhm3, meps);
             TS_ASSERT(xblo1 < 0);
             TS_ASSERT(xblo3 < 0);
             mpkgauss->setPrecision(10);
@@ -83,12 +85,14 @@ class TestPeakProfile : public CxxTest::TestSuite
 
         void test_xboundhi()
         {
-            double epsy = 1e-8;
+            const double epsy = 1e-8;
             mpkgauss->setPrecision(epsy);
-            double xbhi1 = mpkgauss->xboundhi(1);
-            double xbhi3 = mpkgauss->xboundhi(3);
-            TS_ASSERT_DELTA(epsy, (*mpkgauss)(xbhi1, 1), meps);
-            TS_ASSERT_DELTA(epsy, (*mpkgauss)(xbhi3, 3), meps);
+            const double Afwhm1 = 2 * sqrt(M_LN2 / M_PI);
+            const double xbhi1 = mpkgauss->xboundhi(1);
+            const double Afwhm3 = Afwhm1 / 3;
+            const double xbhi3 = mpkgauss->xboundhi(3);
+            TS_ASSERT_DELTA(epsy, (*mpkgauss)(xbhi1, 1) / Afwhm1, meps);
+            TS_ASSERT_DELTA(epsy, (*mpkgauss)(xbhi3, 3) / Afwhm3, meps);
             TS_ASSERT(xbhi1 > 0);
             TS_ASSERT(xbhi3 > 0);
         }
