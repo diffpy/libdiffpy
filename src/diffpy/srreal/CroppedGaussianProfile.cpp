@@ -32,9 +32,10 @@ namespace srreal {
 
 // Constructors --------------------------------------------------------------
 
-CroppedGaussianProfile::CroppedGaussianProfile()
+CroppedGaussianProfile::CroppedGaussianProfile() : mscale(0.0)
 {
-    mscale = 1.0;
+    // refresh mscale
+    this->setPrecision(this->getPrecision());
 }
 
 
