@@ -79,7 +79,6 @@ before_install:
 
   - $NOBREW || brew update
   - $NOBREW || brew install gsl
-  - $NOBREW || brew upgrade python
   - $NOBREW || brew install scons
   - $NOBREW || brew install cxxtest
   - $NOBREW || PATH="$(brew --prefix python)/libexec/bin:${PATH}"
