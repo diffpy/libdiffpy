@@ -135,6 +135,7 @@ void PDFEnvelopeOwner::clearEnvelopes()
 
 // Serialization -------------------------------------------------------------
 
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PDFEnvelope)
 DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::PDFEnvelope)
 
 // End of file

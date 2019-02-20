@@ -37,7 +37,6 @@ class QResolutionEnvelope : public PDFEnvelope
         virtual PDFEnvelopePtr clone() const;
 
         // methods
-
         virtual const std::string& type() const;
         virtual double operator()(const double& r) const;
         void setQdamp(double sc);
@@ -48,9 +47,24 @@ class QResolutionEnvelope : public PDFEnvelope
         // data
         double mqdamp;
 
+        // serialization
+        friend class boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<PDFEnvelope>(*this);
+            ar & mqdamp;
+        }
+
 };  // class QResolutionEnvelope
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::QResolutionEnvelope)
 
 #endif  // QRESOLUTIONENVELOPE_HPP_INCLUDED

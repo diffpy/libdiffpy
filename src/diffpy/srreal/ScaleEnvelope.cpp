@@ -17,7 +17,7 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/ScaleEnvelope.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 
@@ -80,5 +80,10 @@ bool reg_ScaleEnvelope = ScaleEnvelope().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ScaleEnvelope)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::ScaleEnvelope)
 
 // End of file

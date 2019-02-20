@@ -39,9 +39,25 @@ class ZeroBaseline : public PDFBaseline
         const std::string& type() const;
         double operator()(const double& r) const;
 
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<PDFBaseline>(*this);
+        }
+
 };  // class ZeroBaseline
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::ZeroBaseline)
 
 #endif  // ZEROBASELINE_HPP_INCLUDED

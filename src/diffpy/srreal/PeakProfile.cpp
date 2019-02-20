@@ -16,8 +16,6 @@
 *
 *****************************************************************************/
 
-#include <boost/serialization/export.hpp>
-
 #include <diffpy/srreal/PeakProfile.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 #include <diffpy/serialization.ipp>
@@ -58,6 +56,9 @@ const double& PeakProfile::getPrecision() const
 }   // namespace srreal
 }   // namespace diffpy
 
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PeakProfile)
 DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::PeakProfile)
 
 // End of file

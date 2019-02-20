@@ -21,6 +21,7 @@
 
 #include <diffpy/srreal/GaussianProfile.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 
@@ -97,5 +98,10 @@ bool reg_GaussianProfile = GaussianProfile().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::GaussianProfile)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::GaussianProfile)
 
 // End of file

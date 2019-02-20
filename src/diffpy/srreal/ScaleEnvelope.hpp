@@ -47,9 +47,24 @@ class ScaleEnvelope : public PDFEnvelope
         // data
         double mscale;
 
+        // serialization
+        friend class boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<PDFEnvelope>(*this);
+            ar & mscale;
+        }
+
 };  // class ScaleEnvelope
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::ScaleEnvelope)
 
 #endif  // SCALEENVELOPE_HPP_INCLUDED

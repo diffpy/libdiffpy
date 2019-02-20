@@ -17,7 +17,7 @@
 *****************************************************************************/
 
 #include <diffpy/srreal/StepCutEnvelope.hpp>
-#include <diffpy/serialization.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 
@@ -80,5 +80,10 @@ bool reg_StepCutEnvelope = StepCutEnvelope().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::StepCutEnvelope)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::StepCutEnvelope)
 
 // End of file

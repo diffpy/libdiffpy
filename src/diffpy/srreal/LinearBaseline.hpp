@@ -47,9 +47,24 @@ class LinearBaseline : public PDFBaseline
         // data
         double mslope;
 
+        // serialization
+        friend class boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<PDFBaseline>(*this);
+            ar & mslope;
+        }
+
 };  // class LinearBaseline
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::LinearBaseline)
 
 #endif  // LINEARBASELINE_HPP_INCLUDED

@@ -46,9 +46,24 @@ class GaussianProfile : public PeakProfile
         // data
         double mhalfboundrel;
 
+        // serialization
+        friend class boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<PeakProfile>(*this);
+            ar & mhalfboundrel;
+        }
+
 };
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::GaussianProfile)
 
 #endif  // GAUSSIANPROFILE_HPP_INCLUDED

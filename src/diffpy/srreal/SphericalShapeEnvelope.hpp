@@ -39,7 +39,6 @@ class SphericalShapeEnvelope : public PDFEnvelope
         virtual PDFEnvelopePtr clone() const;
 
         // methods
-
         virtual const std::string& type() const;
         virtual double operator()(const double& r) const;
         void setSPDiameter(double spd);
@@ -50,9 +49,24 @@ class SphericalShapeEnvelope : public PDFEnvelope
         // data
         double mspdiameter;
 
+        // serialization
+        friend class boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<PDFEnvelope>(*this);
+            ar & mspdiameter;
+        }
+
 };  // class SphericalShapeEnvelope
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::SphericalShapeEnvelope)
 
 #endif  // SPHERICALSHAPEENVELOPE_HPP_INCLUDED

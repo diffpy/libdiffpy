@@ -23,6 +23,7 @@
 #include <gsl/gsl_sf_erf.h>
 
 #include <diffpy/srreal/CroppedGaussianProfile.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 
@@ -31,9 +32,10 @@ namespace srreal {
 
 // Constructors --------------------------------------------------------------
 
-CroppedGaussianProfile::CroppedGaussianProfile()
+CroppedGaussianProfile::CroppedGaussianProfile() : mscale(0.0)
 {
-    mscale = 1.0;
+    // refresh mscale
+    this->setPrecision(this->getPrecision());
 }
 
 
@@ -87,5 +89,10 @@ bool reg_CroppedGaussianProfile = CroppedGaussianProfile().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::CroppedGaussianProfile)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::CroppedGaussianProfile)
 
 // End of file

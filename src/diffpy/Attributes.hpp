@@ -191,12 +191,6 @@ void registerBaseDoubleAttribute(Attributes* obj,
 
 void throwDoubleAttributeReadOnly();
 
-typedef std::map<std::string, double> AttributesDataMap;
-
-AttributesDataMap saveAttributesData(const Attributes& obj);
-
-void loadAttributesData(Attributes& obj, const AttributesDataMap& data);
-
 }   // namespace attributes
 }   // namespace diffpy
 
