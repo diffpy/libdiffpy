@@ -23,6 +23,7 @@
 #include <gsl/gsl_sf_erf.h>
 
 #include <diffpy/srreal/CroppedGaussianProfile.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 
@@ -87,5 +88,10 @@ bool reg_CroppedGaussianProfile = CroppedGaussianProfile().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::CroppedGaussianProfile)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::CroppedGaussianProfile)
 
 // End of file

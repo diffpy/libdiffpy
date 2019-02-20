@@ -45,9 +45,24 @@ class CroppedGaussianProfile : public GaussianProfile
         // data
         double mscale;
 
+        // serialization
+        friend class boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<GaussianProfile>(*this);
+            ar & mscale;
+        }
+
 };
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::CroppedGaussianProfile)
 
 #endif  // CROPPEDGAUSSIANPROFILE_HPP_INCLUDED
