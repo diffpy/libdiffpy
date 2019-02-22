@@ -80,7 +80,11 @@ void PDFEnvelopeOwner::popEnvelope(PDFEnvelopePtr envlp)
     EnvelopeStorage::iterator evit = menvelope.begin();
     for (; evit != menvelope.end(); ++evit)
     {
-        if (evit->second == envlp)  menvelope.erase(evit);
+        if (evit->second == envlp)
+        {
+            menvelope.erase(evit);
+            break;
+        }
     }
 }
 
