@@ -84,12 +84,12 @@ int HasClassRegistry<TBase>::deregisterType(const std::string& tp)
     int rv = 0;
     for (ii = reg.begin(); ii != reg.end();)
     {
-        typename RegistryStorage::iterator jj = ii++;
-        if (jj->second == p)
+        if (ii->second == p)
         {
-            reg.erase(jj);
+            ii = reg.erase(ii);
             ++rv;
         }
+        else ++ii;
     }
     return rv;
 }
