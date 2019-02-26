@@ -29,6 +29,7 @@ template class HasClassRegistry<srreal::PDFBaseline>;
 
 // Serialization -------------------------------------------------------------
 
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PDFBaseline)
 DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::PDFBaseline)
 
 // End of file
