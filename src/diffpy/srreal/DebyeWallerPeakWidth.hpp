@@ -40,6 +40,8 @@ class DebyeWallerPeakWidth : public PeakWidthModel
         virtual double maxWidth(StructureAdapterPtr,
                 double rmin, double rmax) const;
 
+    private:
+
         // serialization
         friend class boost::serialization::access;
 

@@ -51,6 +51,8 @@ class PDFEnvelope :
         // methods
         virtual double operator()(const double& r) const = 0;
 
+    private:
+
         // serialization
         friend class boost::serialization::access;
         template<class Archive>

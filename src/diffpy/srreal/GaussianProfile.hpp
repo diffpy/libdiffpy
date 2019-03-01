@@ -46,6 +46,8 @@ class GaussianProfile : public PeakProfile
         // data
         double mhalfboundrel;
 
+    private:
+
         // serialization
         friend class boost::serialization::access;
 
