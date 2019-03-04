@@ -25,8 +25,10 @@
 #include <unordered_set>
 
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/split_free.hpp>
+#include <boost/serialization/assume_abstract.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/unordered_map.hpp>
+#include <boost/serialization/export.hpp>
 
 #include <diffpy/HasClassRegistry.hpp>
 #include <diffpy/EventTicker.hpp>
@@ -63,9 +65,16 @@ class ScatteringFactorTable :
         CustomDataStorage mcustom;
         mutable eventticker::EventTicker mticker;
 
-        // serialization helpers for accessing mcustom
-        friend const CustomDataStorage& getsftcustomdata(const SharedPtr&);
-        friend void setsftcustomdata(SharedPtr&, const CustomDataStorage&);
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            ar & mcustom & mticker;
+        }
+
 };
 
 typedef ScatteringFactorTable::SharedPtr ScatteringFactorTablePtr;
@@ -97,72 +106,11 @@ class ScatteringFactorTableOwner
         }
 };
 
-// serialization helpers for accessing ScatteringFactorTable data
-
-inline
-const ScatteringFactorTable::CustomDataStorage&
-getsftcustomdata(const ScatteringFactorTablePtr& ptr)
-{
-    return ptr->mcustom;
-}
-
-
-inline
-void setsftcustomdata(ScatteringFactorTablePtr& ptr,
-        const ScatteringFactorTable::CustomDataStorage& dt)
-{
-    ptr->mcustom = dt;
-}
-
 }   // namespace srreal
 }   // namespace diffpy
 
 // Serialization -------------------------------------------------------------
 
-namespace boost {
-namespace serialization {
-
-template<class Archive>
-void save(Archive& ar,
-        const diffpy::srreal::ScatteringFactorTablePtr& ptr,
-        const unsigned int version)
-{
-    using namespace diffpy::srreal;
-    std::string tp;
-    ScatteringFactorTable::CustomDataStorage dt;
-    diffpy::eventticker::EventTicker tc;
-    if (ptr.get())
-    {
-        tp = ptr->type();
-        dt = getsftcustomdata(ptr);
-        tc = ptr->ticker();
-    }
-    ar & tp & dt & tc;
-}
-
-
-template<class Archive>
-void load(Archive& ar,
-        diffpy::srreal::ScatteringFactorTablePtr& ptr,
-        const unsigned int version)
-{
-    using namespace diffpy::srreal;
-    std::string tp;
-    ScatteringFactorTable::CustomDataStorage dt;
-    diffpy::eventticker::EventTicker tc;
-    ar & tp & dt & tc;
-    if (!tp.empty())
-    {
-        ptr = ScatteringFactorTable::createByType(tp);
-        setsftcustomdata(ptr, dt);
-        ptr->ticker() = tc;
-    }
-    else  ptr.reset();
-}
-
-}   // namespace serialization
-}   // namespace boost
-
-BOOST_SERIALIZATION_SPLIT_FREE(diffpy::srreal::ScatteringFactorTablePtr)
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(diffpy::srreal::ScatteringFactorTable)
 
 #endif  // SCATTERINGFACTORTABLE_HPP_INCLUDED

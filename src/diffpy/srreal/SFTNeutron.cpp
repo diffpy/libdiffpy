@@ -23,6 +23,7 @@
 
 #include <diffpy/srreal/SFTNeutron.hpp>
 #include <diffpy/srreal/scatteringfactordata.hpp>
+#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 namespace srreal {
@@ -71,3 +72,8 @@ bool reg_SFTNeutron = SFTNeutron().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::SFTNeutron)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::SFTNeutron)

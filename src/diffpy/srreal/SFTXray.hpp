@@ -39,10 +39,26 @@ class SFTXray : public ScatteringFactorTable
         // method overloads
         double standardLookup(const std::string& smbl, double q) const;
 
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<ScatteringFactorTable>(*this);
+        }
+
 };  // class SFTXray
 
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::SFTXray)
 
 #endif  // SFTXRAY_HPP_INCLUDED

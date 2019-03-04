@@ -40,10 +40,26 @@ class SFTNeutron : public ScatteringFactorTable
         // method overloads
         double standardLookup(const std::string& smbl, double q) const;
 
+    private:
+
+        // serialization
+        friend class boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, const unsigned int version)
+        {
+            using boost::serialization::base_object;
+            ar & base_object<ScatteringFactorTable>(*this);
+        }
+
 };  // class SFTNeutron
 
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+BOOST_CLASS_EXPORT_KEY(diffpy::srreal::SFTNeutron)
 
 #endif  // SFTNEUTRON_HPP_INCLUDED
