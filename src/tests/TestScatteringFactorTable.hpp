@@ -119,6 +119,18 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
         }
 
 
+        void test_ticker()
+        {
+            using diffpy::eventticker::EventTicker;
+            msftb = ScatteringFactorTable::createByType("X");
+            EventTicker e0 = msftb->ticker();
+            TS_ASSERT_EQUALS(e0, msftb->clone()->ticker());
+            TS_ASSERT_EQUALS(e0, dumpandload(msftb)->ticker());
+            msftb->setCustomAs("C", "C", 6.1);
+            TS_ASSERT_LESS_THAN(e0, msftb->ticker());
+        }
+
+
         void test_SFTXray()
         {
             msftb = ScatteringFactorTable::createByType("X");
@@ -131,6 +143,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_DELTA(74.0, msftb->lookup("W"), 0.04);
             TS_ASSERT_DELTA(88.0, msftb->lookup("Ra"), 0.04);
             TS_ASSERT_EQUALS(msftb->lookup("Si"), msftb->lookup("Si0+"));
+            TS_ASSERT_EQUALS("xray", msftb->clone()->type());
         }
 
 
@@ -145,6 +158,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_DELTA(0.832158, msftb->lookup("Na", 5), 1e-5);
             TS_ASSERT_THROWS(msftb->lookup("H4+"), invalid_argument);
             TS_ASSERT_THROWS(msftb->lookup("H4+", 3), invalid_argument);
+            TS_ASSERT_EQUALS("electron", msftb->clone()->type());
         }
 
 
@@ -157,6 +171,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_DELTA(6.6484, msftb->lookup("C"), mtol);
             TS_ASSERT_EQUALS(msftb->lookup("Na"), msftb->lookup("Na1+"));
             TS_ASSERT_EQUALS(msftb->lookup("Ge"), msftb->lookup("Ge0+"));
+            TS_ASSERT_EQUALS("neutron", msftb->clone()->type());
         }
 
 
@@ -170,6 +185,7 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(68.0, msftb->lookup("W6+"));
             TS_ASSERT_THROWS(msftb->lookup("H4+"), invalid_argument);
             TS_ASSERT_THROWS(msftb->lookup("O3+"), invalid_argument);
+            TS_ASSERT_EQUALS("electronnumber", msftb->clone()->type());
         }
 
 
@@ -186,6 +202,8 @@ class TestScatteringFactorTable : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(string("neutron"), sftb1->type());
             sftb1 = dumpandload(ScatteringFactorTable::createByType("X"));
             TS_ASSERT_EQUALS(string("xray"), sftb1->type());
+            sftb1 = dumpandload(ScatteringFactorTable::createByType("E"));
+            TS_ASSERT_EQUALS(string("electron"), sftb1->type());
         }
 
 };

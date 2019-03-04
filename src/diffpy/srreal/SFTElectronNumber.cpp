@@ -21,6 +21,7 @@
 
 #include <diffpy/srreal/SFTElectronNumber.hpp>
 #include <diffpy/srreal/scatteringfactordata.hpp>
+#include <diffpy/serialization.ipp>
 
 using namespace std;
 
@@ -70,3 +71,8 @@ bool reg_SFTElectronNumber = SFTElectronNumber().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::SFTElectronNumber)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::SFTElectronNumber)

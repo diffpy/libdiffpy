@@ -16,8 +16,6 @@
 *
 *****************************************************************************/
 
-#include <boost/serialization/export.hpp>
-
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 #include <diffpy/HasClassRegistry.ipp>
 #include <diffpy/validators.hpp>
@@ -162,6 +160,8 @@ eventticker::EventTicker& ScatteringFactorTableOwner::ticker() const
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
 
 DIFFPY_INSTANTIATE_PTR_SERIALIZATION(diffpy::srreal::ScatteringFactorTable)
 DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ScatteringFactorTableOwner)

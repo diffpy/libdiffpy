@@ -22,6 +22,7 @@
 
 #include <diffpy/srreal/SFTXray.hpp>
 #include <diffpy/srreal/scatteringfactordata.hpp>
+#include <diffpy/serialization.ipp>
 
 namespace diffpy {
 namespace srreal {
@@ -70,3 +71,8 @@ bool reg_SFTXray = SFTXray().registerThisType();
 
 }   // namespace srreal
 }   // namespace diffpy
+
+// Serialization -------------------------------------------------------------
+
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::SFTXray)
+BOOST_CLASS_EXPORT_IMPLEMENT(diffpy::srreal::SFTXray)
