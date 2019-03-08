@@ -40,7 +40,7 @@ libdiffpy library requires C++ compiler and the following software:
 
 Recommended software:
 
-* `libobjcryst` - C++ library of free objects for crystallography,
+* `libobjcryst` - C++ library for free objects for crystallography,
   https://github.com/diffpy/libobjcryst
 * `cxxtest` - CxxTest Unit Testing Framework, http://cxxtest.com
 
@@ -123,11 +123,9 @@ c++ testlib.cpp -I$P/include -L$P/lib -Wl,-rpath,$P/lib -ldiffpy
 ./a.out
 ```
 
-On Mac OS X the libdiffpy package is built for OS X version
-10.9 which may be incompatible with codes emitted on newer OS.
-To fix this add `-mmacosx-version-min=10.9` option to the
-c++ compiler or set it with an environment variable as
-`export MACOSX_DEPLOYMENT_TARGET=10.9`.
+Note the Anaconda package for libdiffpy is built with C++ compilers
+provided by Anaconda.  This may cause incompatibility with system C++.
+In such case please use Anaconda C++ compiler to link with libdiffpy.
 
 
 ## DEVELOPMENT
