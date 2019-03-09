@@ -58,6 +58,7 @@ Table of contents
    :titlesonly:
 
    license
+   release
 
 ========================================================================
 Indices
