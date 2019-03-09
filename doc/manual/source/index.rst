@@ -34,22 +34,15 @@ New calculator class can thus be readily defined for any quantity that is
 obtained by iteration over atom pairs.
 
 
-===================
-Disclaimer
-===================
-
-.. literalinclude:: ../../../LICENSE.txt
-
 ================
-Acknowledgments
+Authors
 ================
 
-Developers
------------
-
-libdiffpy is developed and maintained by
-
-.. literalinclude:: ../../../AUTHORS.txt
+This code was written by members of the Billinge Group at Columbia
+University and Brookhaven National Laboratory including Pavol Juhás,
+Christopher Farrow and Simon Billinge.
+For a full list of contributors see
+https://github.com/diffpy/libdiffpy/graphs/contributors.
 
 ======================================
 Installation
