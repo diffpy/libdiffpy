@@ -89,7 +89,9 @@ class StructureAdapter :
 
         /// this method allows custom special configuration for a concrete
         /// pair of StructureAdapter and PairQuantity objects.
-        virtual void customPQConfig(PairQuantity* pq) const  { }
+        virtual void customPQConfig(PairQuantity* pq) const
+            __attribute__ ((deprecated))
+        { }
 
         /// Return difference from the other StructureAdapter
         virtual StructureDifference diff(StructureAdapterConstPtr) const;
