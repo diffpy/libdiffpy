@@ -37,13 +37,14 @@ ab_authors = u'Pavol Juhás, Christopher L. Farrow, Simon J.L. Billinge group'
 extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.ifconfig',
+    'm2r',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
