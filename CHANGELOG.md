@@ -1,6 +1,6 @@
 # Release notes
 
-## Unreleased - Version 1.4.0
+## Version 1.4.0 -- 2019-03-09
 
 Notable differences from version 1.3.4.
 
