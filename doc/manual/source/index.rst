@@ -5,14 +5,13 @@
 
 
 ####################################################
-libdiffpy's documentation
+libdiffpy documentation
 ####################################################
 
-Software version |release|.
-
-Last updated |today|.
-
 libdiffpy - C++ calculators of PDF, bond valence sum and other pair quantities
+
+| Software version |release|.
+| Last updated |today|.
 
 libdiffpy is a C++ library for calculating atomic pair distribution function
 (PDF), bond valence sums, atom overlaps for a hard-sphere model, bond
@@ -48,15 +47,21 @@ https://github.com/diffpy/libdiffpy/graphs/contributors.
 Installation
 ======================================
 
-See the `README.rst <https://github.com/diffpy/libdiffpy#requirements>`_
+See the `README <https://github.com/diffpy/libdiffpy#requirements>`_
 file included with the distribution.
 
 ======================================
-API and Index
+Table of contents
 ======================================
 
 .. toctree::
-   :maxdepth: 3
-   
+   :titlesonly:
+
+   license
+
+========================================================================
+Indices
+========================================================================
+
 * :ref:`genindex`
 * :ref:`search`
