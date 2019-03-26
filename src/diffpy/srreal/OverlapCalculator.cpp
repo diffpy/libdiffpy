@@ -316,6 +316,23 @@ vector< unordered_set<int> > OverlapCalculator::neighborhoods() const
     typedef unordered_set<int> SiteSet;
     typedef std::vector< boost::shared_ptr<SiteSet> > SiteSetPointers;
     SiteSetPointers rvptr(cntsites);
+    // helper function that initializes neighbor set at site i
+    auto initsiteset = [&](int i, int& counter) {
+        if (!rvptr[i]) {
+            rvptr[i].reset(new SiteSet(&i, &i + 1));
+            ++counter;
+        }
+    };
+    // create self-neighborhoods unless prohibited by mask
+    for (int j0 = 0, cnt = 0; j0 < cntsites && cnt < cntsites; ++j0)
+    {
+        for (int j1 = j0; j1 < cntsites; ++j1)
+        {
+            if (!this->getPairMask(j0, j1))  continue;
+            initsiteset(j0, cnt);
+            initsiteset(j1, cnt);
+        }
+    }
     int n = this->count();
     for (int index = 0; index < n; ++index)
     {
@@ -323,16 +340,6 @@ vector< unordered_set<int> > OverlapCalculator::neighborhoods() const
         if (olp <= 0.0)  continue;
         int j0 = int(this->subvalue(SITE0_OFFSET, index));
         int j1 = int(this->subvalue(SITE1_OFFSET, index));
-        if (!rvptr[j0].get())
-        {
-            rvptr[j0].reset(new SiteSet);
-            rvptr[j0]->insert(j0);
-        }
-        if (!rvptr[j1].get())
-        {
-            rvptr[j0]->insert(j1);
-            rvptr[j1] = rvptr[j0];
-        }
         assert(rvptr[j0].get() && rvptr[j1].get());
         if (rvptr[j0].get() == rvptr[j1].get())  continue;
         // here we need to unify the j0 and j1 sets
@@ -344,18 +351,12 @@ vector< unordered_set<int> > OverlapCalculator::neighborhoods() const
             rvptr[*idx1] = rvptr[j0];
         }
     }
-    // replace any unassigned items with a self-neighborhoods
-    for (int i = 0; i < cntsites; ++i)
-    {
-        if (rvptr[i].get())  continue;
-        rvptr[i].reset(new SiteSet(&i, &i + 1));
-    }
     unordered_set<const SiteSet*> duplicate;
     vector< unordered_set<int> > rv;
     SiteSetPointers::const_iterator ssp;
     for (ssp = rvptr.begin(); ssp != rvptr.end(); ++ssp)
     {
-        if (duplicate.count(ssp->get()))  continue;
+        if (!ssp->get() || duplicate.count(ssp->get()))  continue;
         duplicate.insert(ssp->get());
         rv.push_back(**ssp);
     }
