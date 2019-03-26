@@ -270,16 +270,35 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 
         void test_neighborhoods()
         {
+            auto tb = molc->getAtomRadiiTable();
             molc->eval(mnacl);
             auto nbhood = molc->neighborhoods();
             TS_ASSERT_EQUALS(1u, nbhood.size());
             TS_ASSERT_EQUALS(8u, nbhood[0].size());
-            molc->getAtomRadiiTable()->resetAll();
+            tb->resetAll();
             molc->eval(mnacl);
             auto nbsep = molc->neighborhoods();
             TS_ASSERT_EQUALS(8u, nbsep.size());
             int nb5site = *(nbsep[5].begin());
             TS_ASSERT_EQUALS(5, nb5site);
+            molc->maskAllPairs(false);
+            molc->eval(mnacl);
+            auto nbdark = molc->neighborhoods();
+            TS_ASSERT(nbdark.empty());
+            molc->setTypeMask("Na1+", "Na1+", true);
+            molc->eval(mnacl);
+            auto nbnanasep = molc->neighborhoods();
+            TS_ASSERT_EQUALS(4u, nbnanasep.size());
+            int nb3site = *(nbnanasep[3].begin());
+            TS_ASSERT_EQUALS(3, nb3site);
+            tb->setCustom("Na1+", 5);
+            tb->setCustom("Cl1-", 5);
+            molc->eval(mnacl);
+            auto nbnana = molc->neighborhoods();
+            TS_ASSERT_EQUALS(1u, nbnana.size());
+            TS_ASSERT_EQUALS(4u, nbnana[0].size());
+            TS_ASSERT(nbnana[0].count(0));
+            TS_ASSERT(!nbnana[0].count(4));
         }
 
 
