@@ -344,18 +344,33 @@ vector< unordered_set<int> > OverlapCalculator::neighborhoods() const
             rvptr[*idx1] = rvptr[j0];
         }
     }
-    // replace any unassigned items with a self-neighborhoods
-    for (int i = 0; i < cntsites; ++i)
+    // helper function that initializes neighbor set at site i
+    auto initsiteset = [&](int i, int& counter) {
+        if (!rvptr[i]) {
+            rvptr[i].reset(new SiteSet(&i, &i + 1));
+            ++counter;
+        }
+    };
+    // count initialized items in rvptr
+    int cnt = count_if(rvptr.begin(), rvptr.end(),
+            [](SiteSetPointers::value_type& p) { return bool(p); });
+    // create self-neighborhoods unless prohibited by mask
+    for (int j0 = 0; j0 < cntsites && cnt < cntsites; ++j0)
     {
-        if (rvptr[i].get())  continue;
-        rvptr[i].reset(new SiteSet(&i, &i + 1));
+        for (int j1 = j0; j1 < cntsites; ++j1)
+        {
+            if (rvptr[j0] && rvptr[j1])  continue;
+            if (!this->getPairMask(j0, j1))  continue;
+            initsiteset(j0, cnt);
+            initsiteset(j1, cnt);
+        }
     }
     unordered_set<const SiteSet*> duplicate;
     vector< unordered_set<int> > rv;
     SiteSetPointers::const_iterator ssp;
     for (ssp = rvptr.begin(); ssp != rvptr.end(); ++ssp)
     {
-        if (duplicate.count(ssp->get()))  continue;
+        if (!ssp->get() || duplicate.count(ssp->get()))  continue;
         duplicate.insert(ssp->get());
         rv.push_back(**ssp);
     }
