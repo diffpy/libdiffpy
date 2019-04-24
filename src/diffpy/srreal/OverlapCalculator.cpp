@@ -424,6 +424,7 @@ void OverlapCalculator::resetValue()
 
 void OverlapCalculator::configureBondGenerator(BaseBondGenerator& bnds) const
 {
+    bnds.setRmin(this->getRmin());
     bnds.setRmax(this->getRmaxUsed());
 }
 
