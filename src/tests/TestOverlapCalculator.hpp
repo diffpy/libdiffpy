@@ -54,6 +54,31 @@ class TestOverlapCalculator : public CxxTest::TestSuite
         }
 
 
+        void test_rmin()
+        {
+            molc->eval(mnacl);
+            TS_ASSERT(molc->distances().size());
+            double tot = molc->totalSquareOverlap();
+            TS_ASSERT_LESS_THAN(0.0, tot);
+            molc->setRmin(10);
+            molc->eval();
+            TS_ASSERT(molc->distances().empty());
+            TS_ASSERT_EQUALS(0.0, molc->totalSquareOverlap());
+            molc->setRmin(2);
+            molc->eval();
+            TS_ASSERT_EQUALS(tot, molc->totalSquareOverlap());
+        }
+
+
+        void test_rmax()
+        {
+            molc->setRmax(2.5);
+            molc->eval(mnacl);
+            TS_ASSERT(molc->distances().empty())
+            TS_ASSERT_EQUALS(0.0, molc->totalSquareOverlap());
+        }
+
+
         void test_lineNoTouch()
         {
             AtomicStructureAdapterPtr stru(new AtomicStructureAdapter);
