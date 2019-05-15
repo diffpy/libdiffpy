@@ -23,7 +23,12 @@
 #include <cmath>
 #include <set>
 
+#include <ObjCryst/version.h>
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
+
+#if LIBOBJCRYST_VERSION < 2017002001000LL
+#error libdiffpy requires libobjcryst 2017.2.1 or later.
+#endif
 
 using namespace std;
 
