@@ -31,7 +31,7 @@
 // Resolve DIFFPYTESTSDIRPATH ------------------------------------------------
 
 #ifndef DIFFPYTESTSDIRPATH
-#error "Compiler must define the DIFFPYTESTSDIRPATH macro."
+#error Compiler must define the DIFFPYTESTSDIRPATH macro.
 #endif
 #define STRINGIFY(m) STRINGIFY_BRAIN_DAMAGE(m)
 #define STRINGIFY_BRAIN_DAMAGE(m) #m

@@ -23,7 +23,12 @@
 #include <cmath>
 #include <set>
 
+#include <ObjCryst/version.h>
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
+
+#if LIBOBJCRYST_VERSION < 2017002001000LL
+#error libdiffpy requires libobjcryst 2017.2.1 or later.
+#endif
 
 using namespace std;
 
@@ -53,34 +58,6 @@ getUij(const ObjCryst::ScatteringPower* sp)
         Uij(1,2) = Uij(2,1) = sp->GetBij(2,3) * BtoU;
     }
     return Uij;
-}
-
-
-bool isGetInversionCenterDoubled()
-{
-    static int value_cached = 0;
-    const int BIT_CACHED = 1;
-    const int BIT_VALUE = 2;
-    // short circuit when the flag is already cached
-    if (BIT_CACHED & value_cached) {
-        const bool rv = BIT_VALUE & value_cached;
-        return rv;
-    }
-    ObjCryst::SpaceGroup sg129("P 4/n m m :1");
-    const CrystVector_REAL xyzinv = sg129.GetInversionCenter();
-    if (0.5 == xyzinv(0) && 0.5 == xyzinv(1) && 0 == xyzinv(2)) {
-        value_cached |= BIT_VALUE;
-    }
-    else if (0.25 == xyzinv(0) && 0.25 == xyzinv(1) && 0 == xyzinv(2)) {
-        value_cached &= ~BIT_VALUE;
-    }
-    else {
-        const char* emsg =
-            "Unexpected value of ObjCryst::SpaceGroup::GetInversionCenter()";
-        throw logic_error(emsg);
-    }
-    value_cached |= BIT_CACHED;
-    return isGetInversionCenterDoubled();
 }
 
 
@@ -126,12 +103,10 @@ fetchSymmetryOperations(const ObjCryst::SpaceGroup& spacegroup)
         assert(spacegroup.IsCentrosymmetric());
         assert(nbsym == 2 * last);
         CrystVector_REAL xyzinv = spacegroup.GetInversionCenter();
-        // get tinv the overall translation associated with inversion center.
-        // fox-objcryst 2017.2 returns doubled coordinates for the inversion
-        // center so the tinv is the same.  Expect fixup which will require
-        // doubling the tinv value here.
+        // tinv is the overall translation associated with inversion center.
+        // it is double the inversion center position.
         R3::Vector tinv(xyzinv(0), xyzinv(1), xyzinv(2));
-        tinv *= isGetInversionCenterDoubled() ? 1.0 : 2.0;
+        tinv *= 2.0;
         // now apply the inversion center here
         for (int i = 0, j = last; i < last; ++i, ++j)
         {
