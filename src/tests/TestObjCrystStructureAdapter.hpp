@@ -247,17 +247,6 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
         }
 
 
-        void test_objcryst_inversion_center()
-        {
-            // verify ObjCryst bug in SpaceGroup.GetInversionCenter is fixed
-            ObjCryst::SpaceGroup sg129("P 4/n m m :1");
-            const CrystVector_REAL xyzinv = sg129.GetInversionCenter();
-            TS_ASSERT_EQUALS(0.25, xyzinv(0));
-            TS_ASSERT_EQUALS(0.25, xyzinv(1));
-            TS_ASSERT_EQUALS(0.0, xyzinv(2));
-        }
-
-
         void test_getEquivalentAtoms()
         {
             diffpy::mathutils::EpsilonEqual allclose;
