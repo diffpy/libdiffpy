@@ -30,7 +30,7 @@ using namespace std;
 // Constructors --------------------------------------------------------------
 
 JeongPeakWidth::JeongPeakWidth() :
-    mdelta1(0.0), mdelta2(0.0), mqbroad(0.0)
+    mdelta1(0.0), mdelta2(0.0), mqbroad(0.0), mqbroad_new(0.0)
 {
     this->registerDoubleAttribute("delta1",
             this, &JeongPeakWidth::getDelta1, &JeongPeakWidth::setDelta1);
