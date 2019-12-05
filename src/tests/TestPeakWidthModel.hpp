@@ -141,7 +141,7 @@ class TestPeakWidthModel : public CxxTest::TestSuite
             TS_ASSERT(mcnpw->hasDoubleAttr("width"));
             TS_ASSERT(mcnpw->hasDoubleAttr("bisowidth"));
             TS_ASSERT(mcnpw->hasDoubleAttr("uisowidth"));
-            TS_ASSERT_EQUALS(4, mcnpw->namesOfDoubleAttributes().size());
+            TS_ASSERT_EQUALS(3, mcnpw->namesOfDoubleAttributes().size());
             mccnpw->setWidth(0.1);
             TS_ASSERT_EQUALS(0.1, mcnpw->getDoubleAttr("width"));
             TS_ASSERT_EQUALS(0.1, mcnpw->maxWidth(dimer(), 0, 4));
