@@ -80,8 +80,7 @@ double JeongPeakWidth::calculate(const BaseBondGenerator& bnds) const
 double JeongPeakWidth::maxWidth(StructureAdapterPtr stru,
         double rmin, double rmax) const
 {
-    double maxwidth0 = this->DebyeWallerPeakWidth::maxWidth(stru, rmin, rmax) +
-    pow(this->getQbroad_new()*r, 2);
+    double maxwidth0 = this->DebyeWallerPeakWidth::maxWidth(stru, rmin, rmax);
     double maxmsdsharp = max(
             this->msdSharpeningRatio(rmin),
             this->msdSharpeningRatio(rmax));
