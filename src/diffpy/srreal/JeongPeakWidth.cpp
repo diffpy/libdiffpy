@@ -38,6 +38,8 @@ JeongPeakWidth::JeongPeakWidth() :
             this, &JeongPeakWidth::getDelta2, &JeongPeakWidth::setDelta2);
     this->registerDoubleAttribute("qbroad",
             this, &JeongPeakWidth::getQbroad, &JeongPeakWidth::setQbroad);
+    this->registerDoubleAttribute("qbroad_new",
+            this, &JeongPeakWidth::getQbroad_new, &JeongPeakWidth::setQbroad_new);
 }
 
 
@@ -69,7 +71,8 @@ double JeongPeakWidth::calculate(const BaseBondGenerator& bnds) const
     double corr = this->msdSharpeningRatio(r);
     // avoid calculating square root of negative value
     double fwhm = (corr <= 0) ? 0.0 :
-        (sqrt(corr) * this->DebyeWallerPeakWidth::calculate(bnds));
+        (sqrt(corr) * this->DebyeWallerPeakWidth::calculate(bnds) +
+        pow(this->getQbroad_new()*r, 2));
     return fwhm;
 }
 
@@ -77,7 +80,8 @@ double JeongPeakWidth::calculate(const BaseBondGenerator& bnds) const
 double JeongPeakWidth::maxWidth(StructureAdapterPtr stru,
         double rmin, double rmax) const
 {
-    double maxwidth0 = this->DebyeWallerPeakWidth::maxWidth(stru, rmin, rmax);
+    double maxwidth0 = this->DebyeWallerPeakWidth::maxWidth(stru, rmin, rmax) +
+    pow(this->getQbroad_new()*r, 2);
     double maxmsdsharp = max(
             this->msdSharpeningRatio(rmin),
             this->msdSharpeningRatio(rmax));
@@ -115,6 +119,19 @@ void JeongPeakWidth::setDelta2(double delta2)
 const double& JeongPeakWidth::getQbroad() const
 {
     return mqbroad;
+}
+
+
+const double& JeongPeakWidth::getQbroad_new() const
+{
+    return mqbroad_new;
+}
+
+
+void JeongPeakWidth::setQbroad_new(double qbroad_new)
+{
+    if (mqbroad_new != qbroad_new)  mticker.click();
+    mqbroad_new = qbroad_new;
 }
 
 
