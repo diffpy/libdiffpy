@@ -85,7 +85,7 @@ double JeongPeakWidth::maxWidth(StructureAdapterPtr stru,
             this->msdSharpeningRatio(rmin),
             this->msdSharpeningRatio(rmax));
     // if the sharpening factor is larger than 1 adjust the maximum width
-    double rv = maxwidth0 * sqrt(max(1.0, maxmsdsharp));
+    double rv = maxwidth0 * sqrt(max(1.0, maxmsdsharp))+ pow(this->getQbroad_new()*rmax, 2);
     return rv;
 }
 
