@@ -55,15 +55,18 @@ class TestPDFCalculator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(0.0, jpw0->getDoubleAttr("delta1"));
             TS_ASSERT_EQUALS(0.0, jpw0->getDoubleAttr("delta2"));
             TS_ASSERT_EQUALS(0.0, jpw0->getDoubleAttr("qbroad"));
+            TS_ASSERT_EQUALS(0.0, jpw0->getDoubleAttr("qbroad_new"));
             JeongPeakWidth jpw;
             jpw.setDelta1(1.0);
             jpw.setDelta2(2.0);
             jpw.setQbroad(3.0);
+            jpw.setQbroad_new(4.0);
             mpdfc->setPeakWidthModel(jpw.clone());
             const PeakWidthModelPtr& jpw1 = mpdfc->getPeakWidthModel();
             TS_ASSERT_EQUALS(1.0, jpw1->getDoubleAttr("delta1"));
             TS_ASSERT_EQUALS(2.0, jpw1->getDoubleAttr("delta2"));
             TS_ASSERT_EQUALS(3.0, jpw1->getDoubleAttr("qbroad"));
+            TS_ASSERT_EQUALS(4.0, jpw1->getDoubleAttr("qbroad_new"));
         }
 
 

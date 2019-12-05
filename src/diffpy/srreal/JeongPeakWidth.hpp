@@ -49,6 +49,8 @@ class JeongPeakWidth : public DebyeWallerPeakWidth
         void setDelta2(double);
         const double& getQbroad() const;
         void setQbroad(double);
+        const double& getQbroad_new() const;
+        void setQbroad_new(double);
 
     private:
 
@@ -56,6 +58,7 @@ class JeongPeakWidth : public DebyeWallerPeakWidth
         double mdelta1;
         double mdelta2;
         double mqbroad;
+        double mqbroad_new;
 
         // methods
         double msdSharpeningRatio(const double& r) const;
@@ -71,6 +74,7 @@ class JeongPeakWidth : public DebyeWallerPeakWidth
             ar & mdelta1;
             ar & mdelta2;
             ar & mqbroad;
+            ar & mqbroad_new;
         }
 
 };
