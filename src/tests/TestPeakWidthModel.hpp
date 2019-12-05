@@ -88,11 +88,11 @@ class TestPeakWidthModel : public CxxTest::TestSuite
             mcjepw->setDelta1(0.1);
             mcjepw->setDelta2(0.2);
             mcjepw->setQbroad(0.3);
-            mcjepw->setQbroad_new(0.003);
+            mcjepw->setQbroad_new(0.4);
             TS_ASSERT_EQUALS(0.1, mjepw->getDoubleAttr("delta1"));
             TS_ASSERT_EQUALS(0.2, mjepw->getDoubleAttr("delta2"));
             TS_ASSERT_EQUALS(0.3, mjepw->getDoubleAttr("qbroad"));
-            TS_ASSERT_EQUALS(0.003, mjepw->getDoubleAttr("qbroad_new"));
+            TS_ASSERT_EQUALS(0.4, mjepw->getDoubleAttr("qbroad_new"));
         }
 
 
@@ -110,7 +110,7 @@ class TestPeakWidthModel : public CxxTest::TestSuite
             TS_ASSERT_DELTA(0.5 * w, mjepw->calculate(*bnds), meps);
             mcjepw->setDelta2(0);
             mcjepw->setQbroad(sqrt(3));
-            mcjepw->setQbroad_new(sqrt(3));
+            mcjepw->setQbroad_new(0);
             TS_ASSERT_DELTA(2 * w, mjepw->calculate(*bnds), meps);
         }
 
