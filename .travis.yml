@@ -147,3 +147,7 @@ after_success:
   - cd $TRAVIS_BUILD_DIR
   - pip install $MYPIPFLAGS codecov
   - codecov
+  -
+deploy:
+  - provider: releases
+  - draft: true

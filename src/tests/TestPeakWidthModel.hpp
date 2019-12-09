@@ -84,13 +84,15 @@ class TestPeakWidthModel : public CxxTest::TestSuite
         void test_attributes()
         {
             TS_ASSERT_EQUALS(0, mdwpw->namesOfDoubleAttributes().size());
-            TS_ASSERT_EQUALS(3, mjepw->namesOfDoubleAttributes().size());
+            TS_ASSERT_EQUALS(4, mjepw->namesOfDoubleAttributes().size());
             mcjepw->setDelta1(0.1);
             mcjepw->setDelta2(0.2);
             mcjepw->setQbroad(0.3);
+            mcjepw->setQbroad_seperable(0.4);
             TS_ASSERT_EQUALS(0.1, mjepw->getDoubleAttr("delta1"));
             TS_ASSERT_EQUALS(0.2, mjepw->getDoubleAttr("delta2"));
             TS_ASSERT_EQUALS(0.3, mjepw->getDoubleAttr("qbroad"));
+            TS_ASSERT_EQUALS(0.4, mjepw->getDoubleAttr("qbroad_seperable"));
         }
 
 
@@ -108,6 +110,7 @@ class TestPeakWidthModel : public CxxTest::TestSuite
             TS_ASSERT_DELTA(0.5 * w, mjepw->calculate(*bnds), meps);
             mcjepw->setDelta2(0);
             mcjepw->setQbroad(sqrt(3));
+            mcjepw->setQbroad_seperable(0);
             TS_ASSERT_DELTA(2 * w, mjepw->calculate(*bnds), meps);
         }
 
@@ -121,12 +124,14 @@ class TestPeakWidthModel : public CxxTest::TestSuite
             mcjepw->setDelta1(1.1);
             mcjepw->setDoubleAttr("delta2", 2.2);
             mcjepw->setDoubleAttr("qbroad", 0.03);
+            mcjepw->setDoubleAttr("qbroad_seperable", 0.003);
             PeakWidthModelPtr pwm2 = dumpandload(mjepw);
             JeongPeakWidth* cpwm2 = dynamic_cast<JeongPeakWidth*>(pwm2.get());
             TS_ASSERT(cpwm2);
             TS_ASSERT_EQUALS(1.1, pwm2->getDoubleAttr("delta1"));
             TS_ASSERT_EQUALS(2.2, pwm2->getDoubleAttr("delta2"));
             TS_ASSERT_EQUALS(0.03, pwm2->getDoubleAttr("qbroad"));
+            TS_ASSERT_EQUALS(0.003, pwm2->getDoubleAttr("qbroad_seperable"));
         }
 
 

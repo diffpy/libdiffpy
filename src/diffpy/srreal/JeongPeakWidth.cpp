@@ -30,7 +30,7 @@ using namespace std;
 // Constructors --------------------------------------------------------------
 
 JeongPeakWidth::JeongPeakWidth() :
-    mdelta1(0.0), mdelta2(0.0), mqbroad(0.0)
+    mdelta1(0.0), mdelta2(0.0), mqbroad(0.0), mqbroad_seperable(0.0)
 {
     this->registerDoubleAttribute("delta1",
             this, &JeongPeakWidth::getDelta1, &JeongPeakWidth::setDelta1);
@@ -38,6 +38,8 @@ JeongPeakWidth::JeongPeakWidth() :
             this, &JeongPeakWidth::getDelta2, &JeongPeakWidth::setDelta2);
     this->registerDoubleAttribute("qbroad",
             this, &JeongPeakWidth::getQbroad, &JeongPeakWidth::setQbroad);
+    this->registerDoubleAttribute("qbroad_seperable",
+            this, &JeongPeakWidth::getQbroad_seperable, &JeongPeakWidth::setQbroad_seperable);
 }
 
 
@@ -69,7 +71,8 @@ double JeongPeakWidth::calculate(const BaseBondGenerator& bnds) const
     double corr = this->msdSharpeningRatio(r);
     // avoid calculating square root of negative value
     double fwhm = (corr <= 0) ? 0.0 :
-        (sqrt(corr) * this->DebyeWallerPeakWidth::calculate(bnds));
+        (sqrt(corr) * this->DebyeWallerPeakWidth::calculate(bnds) +
+        pow(this->getQbroad_seperable()*r, 2));
     return fwhm;
 }
 
@@ -82,7 +85,7 @@ double JeongPeakWidth::maxWidth(StructureAdapterPtr stru,
             this->msdSharpeningRatio(rmin),
             this->msdSharpeningRatio(rmax));
     // if the sharpening factor is larger than 1 adjust the maximum width
-    double rv = maxwidth0 * sqrt(max(1.0, maxmsdsharp));
+    double rv = maxwidth0 * sqrt(max(1.0, maxmsdsharp))+ pow(this->getQbroad_seperable()*rmax, 2);
     return rv;
 }
 
@@ -115,6 +118,19 @@ void JeongPeakWidth::setDelta2(double delta2)
 const double& JeongPeakWidth::getQbroad() const
 {
     return mqbroad;
+}
+
+
+const double& JeongPeakWidth::getQbroad_seperable() const
+{
+    return mqbroad_seperable;
+}
+
+
+void JeongPeakWidth::setQbroad_seperable(double qbroad_seperable)
+{
+    if (mqbroad_seperable != qbroad_seperable)  mticker.click();
+    mqbroad_seperable = qbroad_seperable;
 }
 
 
