@@ -46,6 +46,13 @@ conf = Configure(env, custom_tests={
     'CheckBoostVersion' : CheckBoostVersion,
     })
 
+# Add Conda include and library paths
+import os
+conda_prefix = Environment(ENV=os.environ)['ENV'].get('CONDA_PREFIX')
+if conda_prefix:
+    env.Append(CPPPATH=[os.path.join(conda_prefix, 'include')])
+    env.Append(LIBPATH=[os.path.join(conda_prefix, 'lib')])
+
 # serialization of unordered_map requires boost 1.56.0
 boost_required = '1.56.0'
 if not conf.CheckBoostVersion(boost_required):
