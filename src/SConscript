@@ -49,19 +49,19 @@ if env['PLATFORM'] == "win32":
     if env['tool'] == 'clang':
         # clang++ on Windows
         env['CC'] = 'clang'
-        env['CCFLAGS'] = ['-O3', '-ffast-math', '-std=c++14', '-m64', '-DBUILD_DLL']
+        env['CCFLAGS'] = ['-O3', '-ffast-math', '-std=c++14', '-m64', '-DBUILD_DLL', '-DREAL=double']
         env.PrependUnique(CPPDEFINES='_USE_MATH_DEFINES')
         env['LINKFLAGS']= ['-fuse-ld=lld-link', '-m64', '-lstdc++']
 
     elif env['tool'] == 'gcc':
         # MinGW
-        env.PrependUnique(CCFLAGS=['-O3', '-std=c++14', '-m64', '-DBUILD_DLL'])
+        env.PrependUnique(CCFLAGS=['-O3', '-std=c++14', '-m64', '-DBUILD_DLL', '-DREAL=double'])
         env.PrependUnique(CPPDEFINES='_USE_MATH_DEFINES')
         env.AppendUnique(LINKFLAGS='-m64')
         
     else:
         # Visual c++
-        env.PrependUnique(CCFLAGS=['/Ox', '/EHsc', '/MD', '/std:c++14', '/Wall', '/DBUILD_DLL'])
+        env.PrependUnique(CCFLAGS=['/Ox', '/EHsc', '/MD', '/std:c++14', '/Wall', '/DBUILD_DLL', '/DREAL=double'])
         env.AppendUnique(CPPDEFINES=[{'NDEBUG': None}, '_USE_MATH_DEFINES'])
         env.AppendUnique(LINKFLAGS=['/OPT:NOREF', '/OPT:NOICF'])
 
@@ -74,7 +74,7 @@ else:
         fast_optimflags = ['-fast', '-no-ipo']
     else:
         # g++ options
-        env.PrependUnique(CCFLAGS=['-Wall'])
+        env.PrependUnique(CCFLAGS=['-Wall', '-DREAL=double'])
         fast_optimflags = ['-ffast-math']
 
     # Configure build variants
