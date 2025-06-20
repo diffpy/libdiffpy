@@ -49,7 +49,7 @@ if 'PREFIX' in os.environ:
     vars.Add(PathVariable(
         'prefix',
         'installation prefix directory',
-        os.environ['prefix']))
+        os.environ['PREFIX']))
     vars.Update(env)
 elif 'CONDA_PREFIX' in os.environ:
     vars.Add(PathVariable(
