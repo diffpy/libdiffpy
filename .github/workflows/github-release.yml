@@ -1,0 +1,67 @@
+name: "Tag-based Release with SHA256"
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout libdiffpy
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check permission
+        id: perm
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.actor
+            });
+            return data.permission
+
+      - name: Fail if not maintainer/admin
+        if: ${{ steps.perm.outputs.result != 'maintain' && steps.perm.outputs.result != 'admin' }}
+        run: |
+          echo "${{ github.actor }} is not a maintainer or admin"
+          exit 1
+
+      - name: Download tarball
+        run: |
+          curl -L "https://codeload.github.com/${{ github.repository }}/tar.gz/${{ github.ref_name }}" \
+            -o source.tar.gz
+
+      - name: Compute SHA256
+        id: sha
+        run: |
+          shasum=$(openssl sha256 source.tar.gz | awk '{print $2}')
+          echo "sha=$shasum" >> $GITHUB_OUTPUT
+
+      - name: Get tag message
+        id: tagmsg
+        run: |
+          TAG=${GITHUB_REF##*/}
+          message=$(git tag -l --format='%(contents)' "$TAG")
+          echo "tag_message<<EOF" >> $GITHUB_OUTPUT
+          echo "$message" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            ${{ steps.tagmsg.outputs.tag_message }}
+
+            SHA256 (tar.gz): ${{ steps.sha.outputs.sha }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
