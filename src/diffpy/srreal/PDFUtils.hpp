@@ -1,23 +1,23 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2009 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* Various common routines useful for PDF calculation:
-*     meanSquareDisplacement
-*     maxUii
-*     fftftog  and  fftgtof
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2009 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * Various common routines useful for PDF calculation:
+ *     meanSquareDisplacement
+ *     maxUii
+ *     fftftog  and  fftgtof
+ *
+ *****************************************************************************/
 
 #ifndef PDFUTILS_HPP_INCLUDED
 #define PDFUTILS_HPP_INCLUDED
@@ -45,23 +45,31 @@ const double DEFAULT_QGRID_QMAX = 10.0;
 const double DEFAULT_QGRID_QSTEP = 0.05;
 
 /// fast Fourier transformation converting G(r) to F(Q)
-DLL_EXPORT QuantityType fftgtof(const QuantityType& g, double rstep, double rmin=0.0);
+DLL_EXPORT QuantityType fftgtof(const QuantityType& g, double rstep,
+                                double rmin = 0.0);
 
 /// fast Fourier transformation converting F(Q) to G(r)
-DLL_EXPORT QuantityType fftftog(const QuantityType& f, double qstep, double qmin=0.0);
+DLL_EXPORT QuantityType fftftog(const QuantityType& f, double qstep,
+                                double qmin = 0.0);
 
 /// shared methods for PDFCalculator and DebyePDFCalculator
-template <class T> QuantityType pdfutils_getQgrid(const T* pdfc);
-template <class T> int pdfutils_qminSteps(const T* pdfc);
-template <class T> int pdfutils_qmaxSteps(const T* pdfc);
-template <class T> QuantityType pdfutils_getRgrid(const T* pdfc);
+template <class T>
+QuantityType pdfutils_getQgrid(const T* pdfc);
+template <class T>
+int pdfutils_qminSteps(const T* pdfc);
+template <class T>
+int pdfutils_qmaxSteps(const T* pdfc);
+template <class T>
+QuantityType pdfutils_getRgrid(const T* pdfc);
 int pdfutils_rminSteps(const double& rmin, const double& rstep);
-template <class T> int pdfutils_rminSteps(const T* pdfc);
+template <class T>
+int pdfutils_rminSteps(const T* pdfc);
 int pdfutils_rmaxSteps(const double& rmax, const double& rstep);
-template <class T> int pdfutils_rmaxSteps(const T* pdfc);
+template <class T>
+int pdfutils_rmaxSteps(const T* pdfc);
 
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 // Implementation ------------------------------------------------------------
 

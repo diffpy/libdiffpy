@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2011 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class AtomRadiiTable -- storage of empirical atomic radii
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2011 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class AtomRadiiTable -- storage of empirical atomic radii
+ *
+ *****************************************************************************/
 
 #include <algorithm>
 #include <cctype>
@@ -37,97 +37,75 @@ using namespace std;
 
 // Public Methods ------------------------------------------------------------
 
-double AtomRadiiTable::lookup(const string& smbl) const
-{
-    CustomRadiiStorage::const_iterator tb;
-    tb = mcustomradius.find(smbl);
-    if (tb != mcustomradius.end())  return tb->second;
-    return this->standardLookup(smbl);
+double AtomRadiiTable::lookup(const string& smbl) const {
+  CustomRadiiStorage::const_iterator tb;
+  tb = mcustomradius.find(smbl);
+  if (tb != mcustomradius.end()) return tb->second;
+  return this->standardLookup(smbl);
 }
 
-
-void AtomRadiiTable::setCustom(const string& smbl, double radius)
-{
-    mcustomradius[smbl] = radius;
+void AtomRadiiTable::setCustom(const string& smbl, double radius) {
+  mcustomradius[smbl] = radius;
 }
 
-
-void AtomRadiiTable::fromString(const string& s)
-{
-    // create deblanked string
-    string s1;
-    remove_copy_if(s.begin(), s.end(), back_inserter(s1), ::isspace);
-    // replace commas with space so we can use the split function
-    replace(s1.begin(), s1.end(), ',', ' ');
-    istringstream ss1(s1);
-    CustomRadiiStorage rds;
-    for (string w; ss1 >> w;)
-    {
-        string::size_type p = w.find(':');
-        if (p == string::npos)
-        {
-            ostringstream emsg;
-            emsg << "Invalid radius specification, missing ':' in '" <<
-                w << "'.";
-            throw invalid_argument(emsg.str());
-        }
-        string smbl = w.substr(0, p);
-        double value;
-        istringstream ssv(w.substr(p + 1));
-        if (!(ssv >> value))
-        {
-            ostringstream emsg;
-            emsg << "Invalid floating point number in '" << w << "'.";
-            throw invalid_argument(emsg.str());
-        }
-        rds[smbl] = value;
+void AtomRadiiTable::fromString(const string& s) {
+  // create deblanked string
+  string s1;
+  remove_copy_if(s.begin(), s.end(), back_inserter(s1), ::isspace);
+  // replace commas with space so we can use the split function
+  replace(s1.begin(), s1.end(), ',', ' ');
+  istringstream ss1(s1);
+  CustomRadiiStorage rds;
+  for (string w; ss1 >> w;) {
+    string::size_type p = w.find(':');
+    if (p == string::npos) {
+      ostringstream emsg;
+      emsg << "Invalid radius specification, missing ':' in '" << w << "'.";
+      throw invalid_argument(emsg.str());
     }
-    // everything worked up to here, we can do the assignment
-    CustomRadiiStorage::const_iterator kv = rds.begin();
-    for (; kv != rds.end(); ++kv)  mcustomradius[kv->first] = kv->second;
-}
-
-
-void AtomRadiiTable::resetCustom(const string& smbl)
-{
-    mcustomradius.erase(smbl);
-}
-
-
-void AtomRadiiTable::resetAll()
-{
-    mcustomradius.clear();
-}
-
-
-const AtomRadiiTable::CustomRadiiStorage&
-AtomRadiiTable::getAllCustom() const
-{
-    return mcustomradius;
-}
-
-
-string AtomRadiiTable::toString(string separator) const
-{
-    CustomRadiiStorage::const_iterator tb;
-    vector<string> symbols;
-    for (tb = mcustomradius.begin(); tb != mcustomradius.end(); ++tb)
-    {
-        symbols.push_back(tb->first);
+    string smbl = w.substr(0, p);
+    double value;
+    istringstream ssv(w.substr(p + 1));
+    if (!(ssv >> value)) {
+      ostringstream emsg;
+      emsg << "Invalid floating point number in '" << w << "'.";
+      throw invalid_argument(emsg.str());
     }
-    sort(symbols.begin(), symbols.end());
-    ostringstream rv;
-    vector<string>::const_iterator smbi;
-    for (smbi = symbols.begin(); smbi != symbols.end(); ++smbi)
-    {
-        if (smbi != symbols.begin())  rv << separator;
-        rv << *smbi << ':' << mcustomradius.at(*smbi);
-    }
-    return rv.str();
+    rds[smbl] = value;
+  }
+  // everything worked up to here, we can do the assignment
+  CustomRadiiStorage::const_iterator kv = rds.begin();
+  for (; kv != rds.end(); ++kv) mcustomradius[kv->first] = kv->second;
 }
 
-}   // srreal
-}   // diffpy
+void AtomRadiiTable::resetCustom(const string& smbl) {
+  mcustomradius.erase(smbl);
+}
+
+void AtomRadiiTable::resetAll() { mcustomradius.clear(); }
+
+const AtomRadiiTable::CustomRadiiStorage& AtomRadiiTable::getAllCustom() const {
+  return mcustomradius;
+}
+
+string AtomRadiiTable::toString(string separator) const {
+  CustomRadiiStorage::const_iterator tb;
+  vector<string> symbols;
+  for (tb = mcustomradius.begin(); tb != mcustomradius.end(); ++tb) {
+    symbols.push_back(tb->first);
+  }
+  sort(symbols.begin(), symbols.end());
+  ostringstream rv;
+  vector<string>::const_iterator smbi;
+  for (smbi = symbols.begin(); smbi != symbols.end(); ++smbi) {
+    if (smbi != symbols.begin()) rv << separator;
+    rv << *smbi << ':' << mcustomradius.at(*smbi);
+  }
+  return rv.str();
+}
+
+}  // namespace srreal
+}  // namespace diffpy
 
 // Serialization -------------------------------------------------------------
 

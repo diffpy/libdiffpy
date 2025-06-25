@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2009 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class PDFEnvelope -- abstract base class for PDF envelope functions
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2009 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class PDFEnvelope -- abstract base class for PDF envelope functions
+ *
+ *****************************************************************************/
 
 #include <sstream>
 #include <stdexcept>
@@ -39,103 +39,79 @@ namespace srreal {
 
 // public methods
 
-QuantityType PDFEnvelopeOwner::applyEnvelopes(
-        const QuantityType& x, const QuantityType& y) const
-{
-    assert(x.size() == y.size());
-    QuantityType z = y;
-    EnvelopeStorage::const_iterator evit;
-    for (evit = menvelope.begin(); evit != menvelope.end(); ++evit)
-    {
-        PDFEnvelope& fenvelope = *(evit->second);
-        QuantityType::const_iterator xi = x.begin();
-        QuantityType::iterator zi = z.begin();
-        for (; xi != x.end(); ++xi, ++zi)
-        {
-            *zi *= fenvelope(*xi);
-        }
+QuantityType PDFEnvelopeOwner::applyEnvelopes(const QuantityType& x,
+                                              const QuantityType& y) const {
+  assert(x.size() == y.size());
+  QuantityType z = y;
+  EnvelopeStorage::const_iterator evit;
+  for (evit = menvelope.begin(); evit != menvelope.end(); ++evit) {
+    PDFEnvelope& fenvelope = *(evit->second);
+    QuantityType::const_iterator xi = x.begin();
+    QuantityType::iterator zi = z.begin();
+    for (; xi != x.end(); ++xi, ++zi) {
+      *zi *= fenvelope(*xi);
     }
-    return z;
+  }
+  return z;
 }
 
-
-void PDFEnvelopeOwner::addEnvelope(PDFEnvelopePtr envlp)
-{
-    ensureNonNull("PDFEnvelope", envlp);
-    menvelope[envlp->type()] = envlp;
+void PDFEnvelopeOwner::addEnvelope(PDFEnvelopePtr envlp) {
+  ensureNonNull("PDFEnvelope", envlp);
+  menvelope[envlp->type()] = envlp;
 }
 
-
-void PDFEnvelopeOwner::addEnvelopeByType(const string& tp)
-{
-    // this throws invalid_argument for invalid type
-    PDFEnvelopePtr envlp = PDFEnvelope::createByType(tp);
-    // we get here only when createByType was successful
-    menvelope[envlp->type()] = envlp;
+void PDFEnvelopeOwner::addEnvelopeByType(const string& tp) {
+  // this throws invalid_argument for invalid type
+  PDFEnvelopePtr envlp = PDFEnvelope::createByType(tp);
+  // we get here only when createByType was successful
+  menvelope[envlp->type()] = envlp;
 }
 
-
-void PDFEnvelopeOwner::popEnvelope(PDFEnvelopePtr envlp)
-{
-    EnvelopeStorage::iterator evit = menvelope.begin();
-    for (; evit != menvelope.end(); ++evit)
-    {
-        if (evit->second == envlp)
-        {
-            menvelope.erase(evit);
-            break;
-        }
+void PDFEnvelopeOwner::popEnvelope(PDFEnvelopePtr envlp) {
+  EnvelopeStorage::iterator evit = menvelope.begin();
+  for (; evit != menvelope.end(); ++evit) {
+    if (evit->second == envlp) {
+      menvelope.erase(evit);
+      break;
     }
+  }
 }
 
-
-void PDFEnvelopeOwner::popEnvelopeByType(const string& tp)
-{
-    menvelope.erase(tp);
+void PDFEnvelopeOwner::popEnvelopeByType(const string& tp) {
+  menvelope.erase(tp);
 }
 
-
-const PDFEnvelopePtr& PDFEnvelopeOwner::getEnvelopeByType(const string& tp) const
-{
-    // call non-constant method
-    const PDFEnvelopePtr& rv =
-        const_cast<PDFEnvelopeOwner*>(this)->getEnvelopeByType(tp);
-    return rv;
+const PDFEnvelopePtr& PDFEnvelopeOwner::getEnvelopeByType(
+  const string& tp) const {
+  // call non-constant method
+  const PDFEnvelopePtr& rv =
+    const_cast<PDFEnvelopeOwner*>(this)->getEnvelopeByType(tp);
+  return rv;
 }
 
-
-PDFEnvelopePtr& PDFEnvelopeOwner::getEnvelopeByType(const string& tp)
-{
-    if (!menvelope.count(tp))
-    {
-        ostringstream emsg;
-        emsg << "Invalid or missing PDFEnvelope type '" << tp << "'.";
-        throw invalid_argument(emsg.str());
-    }
-    PDFEnvelopePtr& rv = menvelope[tp];
-    return rv;
+PDFEnvelopePtr& PDFEnvelopeOwner::getEnvelopeByType(const string& tp) {
+  if (!menvelope.count(tp)) {
+    ostringstream emsg;
+    emsg << "Invalid or missing PDFEnvelope type '" << tp << "'.";
+    throw invalid_argument(emsg.str());
+  }
+  PDFEnvelopePtr& rv = menvelope[tp];
+  return rv;
 }
 
-
-set<string> PDFEnvelopeOwner::usedEnvelopeTypes() const
-{
-    set<string> rv;
-    EnvelopeStorage::const_iterator evit;
-    for (evit = menvelope.begin(); evit != menvelope.end(); ++evit)
-    {
-        rv.insert(rv.end(), evit->first);
-    }
-    return rv;
+set<string> PDFEnvelopeOwner::usedEnvelopeTypes() const {
+  set<string> rv;
+  EnvelopeStorage::const_iterator evit;
+  for (evit = menvelope.begin(); evit != menvelope.end(); ++evit) {
+    rv.insert(rv.end(), evit->first);
+  }
+  return rv;
 }
 
+void PDFEnvelopeOwner::clearEnvelopes() { menvelope.clear(); }
 
-void PDFEnvelopeOwner::clearEnvelopes()
-{
-    menvelope.clear();
-}
-
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 // Serialization -------------------------------------------------------------
 

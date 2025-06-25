@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         Complex Modeling Initiative
-*                   (c) 2013 Brookhaven Science Associates,
-*                   Brookhaven National Laboratory.
-*                   All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE.txt for license information.
-*
-******************************************************************************
-*
-* Small routines related to atom properties.
-*
-*****************************************************************************/
+ *
+ * libdiffpy         Complex Modeling Initiative
+ *                   (c) 2013 Brookhaven Science Associates,
+ *                   Brookhaven National Laboratory.
+ *                   All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * Small routines related to atom properties.
+ *
+ *****************************************************************************/
 
 #ifndef ATOMUTILS_HPP_INCLUDED
 #define ATOMUTILS_HPP_INCLUDED
@@ -31,7 +31,7 @@ std::string atomBareSymbol(const std::string& atomtype);
 /// Return valence of possibly ionic symbol such as "S2-" or "Cl-".
 int atomValence(const std::string& atomtype);
 
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 #endif  // ATOMUTILS_HPP_INCLUDED

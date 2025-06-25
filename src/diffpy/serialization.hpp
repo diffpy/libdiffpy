@@ -1,26 +1,26 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2010 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* Declaration of template functions:
-*   diffpy::serialization_tostring
-*   diffpy::serialization_fromstring
-*
-* Shared definitions of serialization archive types:
-*   diffpy::serialization::iarchive
-*   diffpy::serialization::oarchive
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2010 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * Declaration of template functions:
+ *   diffpy::serialization_tostring
+ *   diffpy::serialization_fromstring
+ *
+ * Shared definitions of serialization archive types:
+ *   diffpy::serialization::iarchive
+ *   diffpy::serialization::oarchive
+ *
+ *****************************************************************************/
 
 #ifndef SERIALIZATION_HPP_INCLUDED
 #define SERIALIZATION_HPP_INCLUDED
@@ -42,8 +42,8 @@ namespace serialization {
 typedef ::boost::archive::binary_iarchive iarchive;
 typedef ::boost::archive::binary_oarchive oarchive;
 
-}   // namespace serialization
-}   // namespace diffpy
+}  // namespace serialization
+}  // namespace diffpy
 
 // Pull in the inline definitions and macro logic
 #include "serialization.ipp"

@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2009 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class PairCounter -- concrete counter of pairs in a structure.
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2009 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class PairCounter -- concrete counter of pairs in a structure.
+ *
+ *****************************************************************************/
 
 #ifndef PAIRCOUNTER_HPP_INCLUDED
 #define PAIRCOUNTER_HPP_INCLUDED
@@ -24,35 +24,30 @@
 namespace diffpy {
 namespace srreal {
 
-class PairCounter : public PairQuantity
-{
-    public:
+class PairCounter : public PairQuantity {
+ public:
+  // constructor
+  PairCounter();
 
-        // constructor
-        PairCounter();
+  // methods
+  template <class T>
+  int operator()(const T&);
 
-        // methods
-        template <class T> int operator()(const T&);
-
-    protected:
-
-        // methods
-        virtual void addPairContribution(const BaseBondGenerator&, int);
-
+ protected:
+  // methods
+  virtual void addPairContribution(const BaseBondGenerator&, int);
 };
 
 // Public Template Methods ---------------------------------------------------
 
 template <class T>
-int PairCounter::operator()(const T& stru)
-{
-    this->eval(stru);
-    int cnt = int(this->value().front());
-    return cnt;
+int PairCounter::operator()(const T& stru) {
+  this->eval(stru);
+  int cnt = int(this->value().front());
+  return cnt;
 }
 
-
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 #endif  // PAIRCOUNTER_HPP_INCLUDED

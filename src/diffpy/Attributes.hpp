@@ -1,21 +1,21 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2009 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class Attributes - interface for calling setter and getter methods using
-*   their string names.
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2009 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class Attributes - interface for calling setter and getter methods using
+ *   their string names.
+ *
+ *****************************************************************************/
 
 #ifndef ATTRIBUTES_HPP_INCLUDED
 #define ATTRIBUTES_HPP_INCLUDED
@@ -37,39 +37,30 @@ class Attributes;
 /// @brief custom exception for Attributes-related errors.  This is
 /// thrown for invalid names or for attempts to set a read-only attribute.
 
-class DoubleAttributeError : public std::runtime_error
-{
-    public:
-        DoubleAttributeError(const std::string msg="") :
-            std::runtime_error(msg)
-        { }
+class DoubleAttributeError : public std::runtime_error {
+ public:
+  DoubleAttributeError(const std::string msg = "") : std::runtime_error(msg) {}
 };
 
 /// @class BaseDoubleAttribute
 /// @brief abstract base class for accessing a particular double attribute
 
-class DLL_EXPORT BaseDoubleAttribute
-{
-    public:
-
-        virtual ~BaseDoubleAttribute() { }
-        virtual double getValue(const Attributes* obj) const = 0;
-        virtual void setValue(Attributes* obj, double value) = 0;
-        virtual bool isreadonly() const = 0;
+class DLL_EXPORT BaseDoubleAttribute {
+ public:
+  virtual ~BaseDoubleAttribute() {}
+  virtual double getValue(const Attributes* obj) const = 0;
+  virtual void setValue(Attributes* obj, double value) = 0;
+  virtual bool isreadonly() const = 0;
 };
 
+class BaseAttributesVisitor {
+ public:
+  virtual ~BaseAttributesVisitor() {}
 
-class BaseAttributesVisitor
-{
-    public:
-
-        virtual ~BaseAttributesVisitor() { }
-
-        virtual void visit(const Attributes& a) = 0;
-        virtual void visit(Attributes& a)
-        {
-            visit(static_cast<const Attributes&>(a));
-        }
+  virtual void visit(const Attributes& a) = 0;
+  virtual void visit(Attributes& a) {
+    visit(static_cast<const Attributes&>(a));
+  }
 };
 
 /// @class Attributes
@@ -77,124 +68,106 @@ class BaseAttributesVisitor
 /// should derive from Attributes and register their setter and
 /// getter methods in their constructors.
 
-class DLL_EXPORT Attributes
-{
-    public:
+class DLL_EXPORT Attributes {
+ public:
+  // class is virtual
+  virtual ~Attributes() {}
 
-        // class is virtual
-        virtual ~Attributes()  { }
+  // assignments in derived classes should not change mdoubleattrs
+  // mdoubleattrs should be only changed via registerDoubleAttribute
+  Attributes& operator=(const Attributes& other) { return *this; }
 
-        // assignments in derived classes should not change mdoubleattrs
-        // mdoubleattrs should be only changed via registerDoubleAttribute
-        Attributes& operator=(const Attributes& other)  { return *this; }
+  // methods
+  double getDoubleAttr(const std::string& name) const;
+  void setDoubleAttr(const std::string& name, double value);
+  bool hasDoubleAttr(const std::string& name) const;
+  std::set<std::string> namesOfDoubleAttributes() const;
+  std::set<std::string> namesOfWritableDoubleAttributes() const;
+  // visitors
+  virtual void accept(BaseAttributesVisitor& v) { v.visit(*this); }
+  virtual void accept(BaseAttributesVisitor& v) const { v.visit(*this); }
 
-        // methods
-        double getDoubleAttr(const std::string& name) const;
-        void setDoubleAttr(const std::string& name, double value);
-        bool hasDoubleAttr(const std::string& name) const;
-        std::set<std::string> namesOfDoubleAttributes() const;
-        std::set<std::string> namesOfWritableDoubleAttributes() const;
-        // visitors
-        virtual void accept(BaseAttributesVisitor& v)  { v.visit(*this); }
-        virtual void accept(BaseAttributesVisitor& v) const  { v.visit(*this); }
+ protected:
+  friend DLL_EXPORT void registerBaseDoubleAttribute(
+    Attributes*, const std::string&, attributes::BaseDoubleAttribute* pa);
+  template <class T, class Getter>
+  void registerDoubleAttribute(const std::string& name, T* obj, Getter);
+  template <class T, class Getter, class Setter>
+  void registerDoubleAttribute(const std::string& name, T* obj, Getter, Setter);
 
-    protected:
+ private:
+  // types
+  typedef std::map<std::string,
+                   boost::shared_ptr<attributes::BaseDoubleAttribute> >
+    DoubleAttributeStorage;
+  // data
+  DoubleAttributeStorage mdoubleattrs;
 
-        friend DLL_EXPORT void registerBaseDoubleAttribute(Attributes*,
-                const std::string&, attributes::BaseDoubleAttribute* pa);
-        template <class T, class Getter>
-            void registerDoubleAttribute(const std::string& name, T* obj, Getter);
-        template <class T, class Getter, class Setter>
-            void registerDoubleAttribute(const std::string& name, T* obj, Getter, Setter);
+  // methods
+  void checkAttributeName(const std::string& name) const;
 
-    private:
+  // visitor classes
 
-        // types
-        typedef std::map<std::string,
-                boost::shared_ptr<attributes::BaseDoubleAttribute> >
-                    DoubleAttributeStorage;
-        // data
-        DoubleAttributeStorage mdoubleattrs;
+  class CountDoubleAttrVisitor : public BaseAttributesVisitor {
+   public:
+    CountDoubleAttrVisitor(const std::string& name);
+    virtual void visit(const Attributes& a);
+    int count() const;
 
-        // methods
-        void checkAttributeName(const std::string& name) const;
+   private:
+    // data
+    const std::string& mname;
+    int mcount;
+  };
 
-        // visitor classes
+  class GetDoubleAttrVisitor : public BaseAttributesVisitor {
+   public:
+    GetDoubleAttrVisitor(const std::string& name);
+    virtual void visit(const Attributes& a);
+    double getValue() const;
 
-        class CountDoubleAttrVisitor : public BaseAttributesVisitor
-        {
-            public:
+   private:
+    // data
+    const std::string& mname;
+    double mvalue;
+  };
 
-                CountDoubleAttrVisitor(const std::string& name);
-                virtual void visit(const Attributes& a);
-                int count() const;
+  class SetDoubleAttrVisitor : public BaseAttributesVisitor {
+   public:
+    SetDoubleAttrVisitor(const std::string& name, double value);
+    virtual void visit(const Attributes& a);
+    virtual void visit(Attributes& a);
 
-            private:
+   private:
+    // data
+    const std::string& mname;
+    double mvalue;
+  };
 
-                // data
-                const std::string& mname;
-                int mcount;
-        };
+  class NamesOfDoubleAttributesVisitor : public BaseAttributesVisitor {
+   public:
+    NamesOfDoubleAttributesVisitor(bool excludereadonly);
+    virtual void visit(const Attributes& a);
+    const std::set<std::string>& names() const;
 
-
-        class GetDoubleAttrVisitor : public BaseAttributesVisitor
-        {
-            public:
-
-                GetDoubleAttrVisitor(const std::string& name);
-                virtual void visit(const Attributes& a);
-                double getValue() const;
-
-            private:
-
-                // data
-                const std::string& mname;
-                double mvalue;
-        };
-
-
-        class SetDoubleAttrVisitor : public BaseAttributesVisitor
-        {
-            public:
-
-                SetDoubleAttrVisitor(const std::string& name, double value);
-                virtual void visit(const Attributes& a);
-                virtual void visit(Attributes& a);
-
-            private:
-
-                // data
-                const std::string& mname;
-                double mvalue;
-        };
-
-
-        class NamesOfDoubleAttributesVisitor : public BaseAttributesVisitor
-        {
-            public:
-
-                NamesOfDoubleAttributesVisitor(bool excludereadonly);
-                virtual void visit(const Attributes& a);
-                const std::set<std::string>& names() const;
-
-            private:
-
-                // data
-                bool mexcludereadonly;
-                std::set<std::string> mnames;
-        };
+   private:
+    // data
+    bool mexcludereadonly;
+    std::set<std::string> mnames;
+  };
 
 };  // class Attributes
 
 // non-member helpers
 
 DLL_EXPORT void registerBaseDoubleAttribute(Attributes* obj,
-        const std::string& name, BaseDoubleAttribute* pa);
+                                            const std::string& name,
+                                            BaseDoubleAttribute* pa);
 
 DLL_EXPORT void throwDoubleAttributeReadOnly();
 
-}   // namespace attributes
-}   // namespace diffpy
+}  // namespace attributes
+}  // namespace diffpy
 
 // Implementation ------------------------------------------------------------
 
@@ -202,8 +175,8 @@ DLL_EXPORT void throwDoubleAttributeReadOnly();
 
 // make selected classes visible in diffpy namespace
 namespace diffpy {
-    using attributes::Attributes;
-    using attributes::BaseAttributesVisitor;
-}
+using attributes::Attributes;
+using attributes::BaseAttributesVisitor;
+}  // namespace diffpy
 
 #endif  // ATTRIBUTES_HPP_INCLUDED
