@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2009 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class PeakProfile -- base class for calculation of peak profiles.
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2009 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class PeakProfile -- base class for calculation of peak profiles.
+ *
+ *****************************************************************************/
 
 #include <diffpy/srreal/PeakProfile.hpp>
 #include <diffpy/HasClassRegistry.ipp>
@@ -33,28 +33,23 @@ namespace srreal {
 
 // Constructors --------------------------------------------------------------
 
-PeakProfile::PeakProfile() : mprecision(0.0)
-{
-    this->registerDoubleAttribute("peakprecision",
-            this, &PeakProfile::getPrecision, &PeakProfile::setPrecision);
+PeakProfile::PeakProfile() : mprecision(0.0) {
+  this->registerDoubleAttribute("peakprecision", this,
+                                &PeakProfile::getPrecision,
+                                &PeakProfile::setPrecision);
 }
 
 // Public Methods ------------------------------------------------------------
 
-void PeakProfile::setPrecision(double eps)
-{
-    if (mprecision != eps)  mticker.click();
-    mprecision = eps;
+void PeakProfile::setPrecision(double eps) {
+  if (mprecision != eps) mticker.click();
+  mprecision = eps;
 }
 
+const double& PeakProfile::getPrecision() const { return mprecision; }
 
-const double& PeakProfile::getPrecision() const
-{
-    return mprecision;
-}
-
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 // Serialization -------------------------------------------------------------
 

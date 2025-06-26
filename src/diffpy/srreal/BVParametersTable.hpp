@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2010 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class BVParametersTable -- table of bond valence sum parameters
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2010 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class BVParametersTable -- table of bond valence sum parameters
+ *
+ *****************************************************************************/
 
 #ifndef BVPARAMETERSTABLE_HPP_INCLUDED
 #define BVPARAMETERSTABLE_HPP_INCLUDED
@@ -34,65 +34,60 @@ namespace srreal {
 
 typedef boost::shared_ptr<class BVParametersTable> BVParametersTablePtr;
 
-class DLL_EXPORT BVParametersTable
-{
+class DLL_EXPORT BVParametersTable {
+ public:
+  // types
+  typedef std::unordered_set<BVParam, BVParam::BondHash, BVParam::BondEqual>
+    SetOfBVParam;
 
-    public:
+  // static methods
+  static const BVParam& none();
 
-        // types
-        typedef std::unordered_set<BVParam,
-            BVParam::BondHash, BVParam::BondEqual> SetOfBVParam;
+  // methods
+  int getAtomValence(const std::string&) const;
+  void setAtomValence(const std::string&, int value);
+  void resetAtomValences();
+  const BVParam& lookup(const BVParam&) const;
+  const BVParam& lookup(const std::string& smbl0,
+                        const std::string& smbl1) const;
+  const BVParam& lookup(const std::string& atom0, int valence0,
+                        const std::string& atom1, int valence1) const;
+  void setCustom(const BVParam&);
+  void setCustom(const std::string& atom0, int valence0,
+                 const std::string& atom1, int valence1, double Ro, double b,
+                 std::string ref_id = "");
+  void resetCustom(const BVParam&);
+  void resetCustom(const std::string& atom0, int valence0,
+                   const std::string& atom1, int valence1);
+  void resetAll();
+  const SetOfBVParam& getAllCustom() const;
+  SetOfBVParam getAll() const;
 
-        // static methods
-        static const BVParam& none();
+ private:
+  // types
+  typedef std::unordered_map<std::string, int> AtomTypeValence;
 
-        // methods
-        int getAtomValence(const std::string&) const;
-        void setAtomValence(const std::string&, int value);
-        void resetAtomValences();
-        const BVParam& lookup(const BVParam&) const;
-        const BVParam& lookup(
-                const std::string& smbl0, const std::string& smbl1) const;
-        const BVParam& lookup(const std::string& atom0, int valence0,
-                const std::string& atom1, int valence1) const;
-        void setCustom(const BVParam&);
-        void setCustom(const std::string& atom0, int valence0,
-                const std::string& atom1, int valence1,
-                double Ro, double b, std::string ref_id="");
-        void resetCustom(const BVParam&);
-        void resetCustom(const std::string& atom0, int valence0,
-                const std::string& atom1, int valence1);
-        void resetAll();
-        const SetOfBVParam& getAllCustom() const;
-        SetOfBVParam getAll() const;
+  // data
+  SetOfBVParam mcustomtable;
+  AtomTypeValence matomvalence;
 
-    private:
+  // methods
+  const SetOfBVParam& getStandardSetOfBVParam() const;
 
-        // types
-        typedef std::unordered_map<std::string, int> AtomTypeValence;
-
-        // data
-        SetOfBVParam mcustomtable;
-        AtomTypeValence matomvalence;
-
-        // methods
-        const SetOfBVParam& getStandardSetOfBVParam() const;
-
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & mcustomtable;
-            if (version >= 1) {
-                ar & matomvalence;
-            }
-        }
+  // serialization
+  friend class boost::serialization::access;
+  template <class Archive>
+  void serialize(Archive& ar, const unsigned int version) {
+    ar & mcustomtable;
+    if (version >= 1) {
+      ar & matomvalence;
+    }
+  }
 
 };  // class BVParametersTable
 
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 // Serialization -------------------------------------------------------------
 

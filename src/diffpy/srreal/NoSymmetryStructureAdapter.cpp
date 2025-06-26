@@ -1,28 +1,28 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2010 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class NoSymmetryStructureAdapter -- StructureAdapter class that removes
-*     any symmetry expansions (rotations or periodic translations) from
-*     another StructureAdapter instance.  This can be used to use only
-*     the asymmetric unit from any adapter to crystal structure.
-*
-* class NoSymmetryBondGenerator -- bond generator
-*
-* nosymmetry -- factory function that creates a NoSymmetryStructureAdapter
-*     instance inside StructureAdapterPtr
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2010 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class NoSymmetryStructureAdapter -- StructureAdapter class that removes
+ *     any symmetry expansions (rotations or periodic translations) from
+ *     another StructureAdapter instance.  This can be used to use only
+ *     the asymmetric unit from any adapter to crystal structure.
+ *
+ * class NoSymmetryBondGenerator -- bond generator
+ *
+ * nosymmetry -- factory function that creates a NoSymmetryStructureAdapter
+ *     instance inside StructureAdapterPtr
+ *
+ *****************************************************************************/
 
 #include <diffpy/serialization.ipp>
 #include <diffpy/srreal/StructureDifference.hpp>
@@ -38,124 +38,94 @@ namespace srreal {
 // Constructor ---------------------------------------------------------------
 
 NoSymmetryStructureAdapter::NoSymmetryStructureAdapter(
-        StructureAdapterPtr srcstructure)
-{
-    boost::shared_ptr<NoSymmetryStructureAdapter> nmptr =
-        boost::dynamic_pointer_cast<NoSymmetryStructureAdapter>(srcstructure);
-    if (nmptr)  srcstructure = nmptr->getSourceStructure();
-    msrcstructure = srcstructure.get() ?
-        srcstructure : emptyStructureAdapter();
+  StructureAdapterPtr srcstructure) {
+  boost::shared_ptr<NoSymmetryStructureAdapter> nmptr =
+    boost::dynamic_pointer_cast<NoSymmetryStructureAdapter>(srcstructure);
+  if (nmptr) srcstructure = nmptr->getSourceStructure();
+  msrcstructure = srcstructure.get() ? srcstructure : emptyStructureAdapter();
 }
 
 // Public Methods ------------------------------------------------------------
 
-StructureAdapterPtr NoSymmetryStructureAdapter::clone() const
-{
-    boost::shared_ptr<NoSymmetryStructureAdapter>
-        rv(new NoSymmetryStructureAdapter);
-    if (msrcstructure)  rv->msrcstructure = msrcstructure->clone();
-    return rv;
+StructureAdapterPtr NoSymmetryStructureAdapter::clone() const {
+  boost::shared_ptr<NoSymmetryStructureAdapter> rv(
+    new NoSymmetryStructureAdapter);
+  if (msrcstructure) rv->msrcstructure = msrcstructure->clone();
+  return rv;
 }
 
-
-BaseBondGeneratorPtr NoSymmetryStructureAdapter::createBondGenerator() const
-{
-    BaseBondGeneratorPtr bnds(new BaseBondGenerator(shared_from_this()));
-    return bnds;
+BaseBondGeneratorPtr NoSymmetryStructureAdapter::createBondGenerator() const {
+  BaseBondGeneratorPtr bnds(new BaseBondGenerator(shared_from_this()));
+  return bnds;
 }
 
-
-int NoSymmetryStructureAdapter::countSites() const
-{
-    return msrcstructure->countSites();
+int NoSymmetryStructureAdapter::countSites() const {
+  return msrcstructure->countSites();
 }
 
+double NoSymmetryStructureAdapter::numberDensity() const { return 0.0; }
 
-double NoSymmetryStructureAdapter::numberDensity() const
-{
-    return 0.0;
+const std::string& NoSymmetryStructureAdapter::siteAtomType(int idx) const {
+  return msrcstructure->siteAtomType(idx);
 }
-
-
-const std::string& NoSymmetryStructureAdapter::siteAtomType(int idx) const
-{
-    return msrcstructure->siteAtomType(idx);
-}
-
 
 const R3::Vector& NoSymmetryStructureAdapter::siteCartesianPosition(
-        int idx) const
-{
-    return msrcstructure->siteCartesianPosition(idx);
+  int idx) const {
+  return msrcstructure->siteCartesianPosition(idx);
 }
 
-
-double NoSymmetryStructureAdapter::siteOccupancy(int idx) const
-{
-    return msrcstructure->siteOccupancy(idx);
+double NoSymmetryStructureAdapter::siteOccupancy(int idx) const {
+  return msrcstructure->siteOccupancy(idx);
 }
 
-
-bool NoSymmetryStructureAdapter::siteAnisotropy(int idx) const
-{
-    return msrcstructure->siteAnisotropy(idx);
+bool NoSymmetryStructureAdapter::siteAnisotropy(int idx) const {
+  return msrcstructure->siteAnisotropy(idx);
 }
 
-
-const R3::Matrix& NoSymmetryStructureAdapter::siteCartesianUij(int idx) const
-{
-    return msrcstructure->siteCartesianUij(idx);
+const R3::Matrix& NoSymmetryStructureAdapter::siteCartesianUij(int idx) const {
+  return msrcstructure->siteCartesianUij(idx);
 }
 
-
-void NoSymmetryStructureAdapter::customPQConfig(PairQuantity* pq) const
-{
-    msrcstructure->customPQConfig(pq);
+void NoSymmetryStructureAdapter::customPQConfig(PairQuantity* pq) const {
+  msrcstructure->customPQConfig(pq);
 }
 
-
-StructureDifference
-NoSymmetryStructureAdapter::diff(StructureAdapterConstPtr other) const
-{
-    StructureDifference sd = this->StructureAdapter::diff(other);
-    if (sd.stru0 == sd.stru1)  return sd;
-    typedef boost::shared_ptr<const class NoSymmetryStructureAdapter> PPtr;
-    PPtr pother = boost::dynamic_pointer_cast<PPtr::element_type>(other);
-    if (!pother)  return sd;
-    sd = this->getSourceStructure()->diff(pother->getSourceStructure());
-    assert(sd.stru0 == this->getSourceStructure());
-    assert(sd.stru1 == pother->getSourceStructure());
-    sd.stru0 = this->shared_from_this();
-    sd.stru1 = other;
-    return sd;
+StructureDifference NoSymmetryStructureAdapter::diff(
+  StructureAdapterConstPtr other) const {
+  StructureDifference sd = this->StructureAdapter::diff(other);
+  if (sd.stru0 == sd.stru1) return sd;
+  typedef boost::shared_ptr<const class NoSymmetryStructureAdapter> PPtr;
+  PPtr pother = boost::dynamic_pointer_cast<PPtr::element_type>(other);
+  if (!pother) return sd;
+  sd = this->getSourceStructure()->diff(pother->getSourceStructure());
+  assert(sd.stru0 == this->getSourceStructure());
+  assert(sd.stru1 == pother->getSourceStructure());
+  sd.stru0 = this->shared_from_this();
+  sd.stru1 = other;
+  return sd;
 }
 
-
-StructureAdapterPtr
-NoSymmetryStructureAdapter::getSourceStructure()
-{
-    return msrcstructure;
+StructureAdapterPtr NoSymmetryStructureAdapter::getSourceStructure() {
+  return msrcstructure;
 }
 
-
-StructureAdapterConstPtr
-NoSymmetryStructureAdapter::getSourceStructure() const
-{
-    return msrcstructure;
+StructureAdapterConstPtr NoSymmetryStructureAdapter::getSourceStructure()
+  const {
+  return msrcstructure;
 }
 
 // Routines ------------------------------------------------------------------
 
-StructureAdapterPtr nosymmetry(StructureAdapterPtr stru)
-{
-    StructureAdapterPtr rv =
-        boost::dynamic_pointer_cast<NoSymmetryStructureAdapter>(stru) ? stru :
-        StructureAdapterPtr(new NoSymmetryStructureAdapter(stru));
-    return rv;
+StructureAdapterPtr nosymmetry(StructureAdapterPtr stru) {
+  StructureAdapterPtr rv =
+    boost::dynamic_pointer_cast<NoSymmetryStructureAdapter>(stru)
+      ? stru
+      : StructureAdapterPtr(new NoSymmetryStructureAdapter(stru));
+  return rv;
 }
 
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 // Serialization -------------------------------------------------------------
 

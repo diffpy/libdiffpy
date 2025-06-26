@@ -1,0 +1,84 @@
+default_language_version:
+  python: python3
+
+exclude: (?x)^.*\.(cif|dat)$
+
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+  autofix_prs: true
+  autoupdate_branch: "pre-commit-autoupdate"
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+  autoupdate_schedule: monthly
+  skip: [no-commit-to-branch]
+  submodules: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-added-large-files
+
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        files: \.py$
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+        files: \.py$
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        files: \.py$
+
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v20.1.6
+    hooks:
+      - id: clang-format
+        name: clang-format (C/C++)
+        files: \.(c|cpp|cc|cxx|h|hpp|hh)$
+
+  # Add this back after maintainance
+  # - repo: https://github.com/cpplint/cpplint
+  #   rev: 2.0.2
+  #   hooks:
+  #     - id: cpplint
+  #       name: cpplint (C/C++)
+  #       files: \.(c|cc|cpp|cxx|h|hh|hpp|hxx)$
+  #       args:
+  #       - --filter=
+  #           -whitespace/line_length
+  #           ,-legal/copyright
+  #           ,-build/header_guard
+  #           ,-build/include_order
+  #           ,-build/include_what_you_use
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        additional_dependencies:
+          - tomli
+        args:
+          - "--ignore-words=./.codespell/ignore_words.txt"
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: no-commit-to-branch
+        name: Prevent commit to main branch
+        args: ["--branch", "main"]
+        stages: [pre-commit]

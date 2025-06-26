@@ -45,7 +45,7 @@ int electronnumber(const std::string& smbl);
 /// Coherent scattering length of an element or isotope in fm
 double bcneutron(const std::string& smbl);
 
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 #endif  // SCATTERINGFACTORS_HPP_INCLUDED

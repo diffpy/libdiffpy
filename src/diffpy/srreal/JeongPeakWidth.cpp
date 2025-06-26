@@ -1,22 +1,22 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2009 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Christopher Farrow, Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class DebyeWallerPeakWidth -- peak width model based on
-*      I.-K. Jeong, et al., Phys. Rev. B 67, 104301 (2003)
-*      http://link.aps.org/doi/10.1103/PhysRevB.67.104301
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2009 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Christopher Farrow, Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class DebyeWallerPeakWidth -- peak width model based on
+ *      I.-K. Jeong, et al., Phys. Rev. B 67, 104301 (2003)
+ *      http://link.aps.org/doi/10.1103/PhysRevB.67.104301
+ *
+ *****************************************************************************/
 
 #include <diffpy/srreal/JeongPeakWidth.hpp>
 #include <diffpy/mathutils.hpp>
@@ -29,135 +29,105 @@ using namespace std;
 
 // Constructors --------------------------------------------------------------
 
-JeongPeakWidth::JeongPeakWidth() :
-    mdelta1(0.0), mdelta2(0.0), mqbroad(0.0), mqbroad_seperable(0.0)
-{
-    this->registerDoubleAttribute("delta1",
-            this, &JeongPeakWidth::getDelta1, &JeongPeakWidth::setDelta1);
-    this->registerDoubleAttribute("delta2",
-            this, &JeongPeakWidth::getDelta2, &JeongPeakWidth::setDelta2);
-    this->registerDoubleAttribute("qbroad",
-            this, &JeongPeakWidth::getQbroad, &JeongPeakWidth::setQbroad);
-    this->registerDoubleAttribute("qbroad_seperable",
-            this, &JeongPeakWidth::getQbroad_seperable, &JeongPeakWidth::setQbroad_seperable);
+JeongPeakWidth::JeongPeakWidth()
+    : mdelta1(0.0), mdelta2(0.0), mqbroad(0.0), mqbroad_seperable(0.0) {
+  this->registerDoubleAttribute("delta1", this, &JeongPeakWidth::getDelta1,
+                                &JeongPeakWidth::setDelta1);
+  this->registerDoubleAttribute("delta2", this, &JeongPeakWidth::getDelta2,
+                                &JeongPeakWidth::setDelta2);
+  this->registerDoubleAttribute("qbroad", this, &JeongPeakWidth::getQbroad,
+                                &JeongPeakWidth::setQbroad);
+  this->registerDoubleAttribute("qbroad_seperable", this,
+                                &JeongPeakWidth::getQbroad_seperable,
+                                &JeongPeakWidth::setQbroad_seperable);
 }
 
-
-PeakWidthModelPtr JeongPeakWidth::create() const
-{
-    PeakWidthModelPtr rv(new JeongPeakWidth());
-    return rv;
+PeakWidthModelPtr JeongPeakWidth::create() const {
+  PeakWidthModelPtr rv(new JeongPeakWidth());
+  return rv;
 }
 
-
-PeakWidthModelPtr JeongPeakWidth::clone() const
-{
-    PeakWidthModelPtr rv(new JeongPeakWidth(*this));
-    return rv;
+PeakWidthModelPtr JeongPeakWidth::clone() const {
+  PeakWidthModelPtr rv(new JeongPeakWidth(*this));
+  return rv;
 }
 
 // Public Methods ------------------------------------------------------------
 
-const string& JeongPeakWidth::type() const
-{
-    static const string rv = "jeong";
-    return rv;
+const string& JeongPeakWidth::type() const {
+  static const string rv = "jeong";
+  return rv;
 }
 
-
-double JeongPeakWidth::calculate(const BaseBondGenerator& bnds) const
-{
-    double r = bnds.distance();
-    double corr = this->msdSharpeningRatio(r);
-    // avoid calculating square root of negative value
-    double fwhm = (corr <= 0) ? 0.0 :
-        (sqrt(corr) * this->DebyeWallerPeakWidth::calculate(bnds) +
-        pow(this->getQbroad_seperable()*r, 2));
-    return fwhm;
+double JeongPeakWidth::calculate(const BaseBondGenerator& bnds) const {
+  double r = bnds.distance();
+  double corr = this->msdSharpeningRatio(r);
+  // avoid calculating square root of negative value
+  double fwhm = (corr <= 0)
+                  ? 0.0
+                  : (sqrt(corr) * this->DebyeWallerPeakWidth::calculate(bnds) +
+                     pow(this->getQbroad_seperable() * r, 2));
+  return fwhm;
 }
 
-
-double JeongPeakWidth::maxWidth(StructureAdapterPtr stru,
-        double rmin, double rmax) const
-{
-    double maxwidth0 = this->DebyeWallerPeakWidth::maxWidth(stru, rmin, rmax);
-    double maxmsdsharp = max(
-            this->msdSharpeningRatio(rmin),
-            this->msdSharpeningRatio(rmax));
-    // if the sharpening factor is larger than 1 adjust the maximum width
-    double rv = maxwidth0 * sqrt(max(1.0, maxmsdsharp))+ pow(this->getQbroad_seperable()*rmax, 2);
-    return rv;
+double JeongPeakWidth::maxWidth(StructureAdapterPtr stru, double rmin,
+                                double rmax) const {
+  double maxwidth0 = this->DebyeWallerPeakWidth::maxWidth(stru, rmin, rmax);
+  double maxmsdsharp =
+    max(this->msdSharpeningRatio(rmin), this->msdSharpeningRatio(rmax));
+  // if the sharpening factor is larger than 1 adjust the maximum width
+  double rv = maxwidth0 * sqrt(max(1.0, maxmsdsharp)) +
+              pow(this->getQbroad_seperable() * rmax, 2);
+  return rv;
 }
 
-const double& JeongPeakWidth::getDelta1() const
-{
-    return mdelta1;
+const double& JeongPeakWidth::getDelta1() const { return mdelta1; }
+
+void JeongPeakWidth::setDelta1(double delta1) {
+  if (mdelta1 != delta1) mticker.click();
+  mdelta1 = delta1;
 }
 
+const double& JeongPeakWidth::getDelta2() const { return mdelta2; }
 
-void JeongPeakWidth::setDelta1(double delta1)
-{
-    if (mdelta1 != delta1)  mticker.click();
-    mdelta1 = delta1;
+void JeongPeakWidth::setDelta2(double delta2) {
+  if (mdelta2 != delta2) mticker.click();
+  mdelta2 = delta2;
 }
 
+const double& JeongPeakWidth::getQbroad() const { return mqbroad; }
 
-const double& JeongPeakWidth::getDelta2() const
-{
-    return mdelta2;
+const double& JeongPeakWidth::getQbroad_seperable() const {
+  return mqbroad_seperable;
 }
 
-
-void JeongPeakWidth::setDelta2(double delta2)
-{
-    if (mdelta2 != delta2)  mticker.click();
-    mdelta2 = delta2;
+void JeongPeakWidth::setQbroad_seperable(double qbroad_seperable) {
+  if (mqbroad_seperable != qbroad_seperable) mticker.click();
+  mqbroad_seperable = qbroad_seperable;
 }
 
-
-const double& JeongPeakWidth::getQbroad() const
-{
-    return mqbroad;
-}
-
-
-const double& JeongPeakWidth::getQbroad_seperable() const
-{
-    return mqbroad_seperable;
-}
-
-
-void JeongPeakWidth::setQbroad_seperable(double qbroad_seperable)
-{
-    if (mqbroad_seperable != qbroad_seperable)  mticker.click();
-    mqbroad_seperable = qbroad_seperable;
-}
-
-
-void JeongPeakWidth::setQbroad(double qbroad)
-{
-    if (mqbroad != qbroad)  mticker.click();
-    mqbroad = qbroad;
+void JeongPeakWidth::setQbroad(double qbroad) {
+  if (mqbroad != qbroad) mticker.click();
+  mqbroad = qbroad;
 }
 
 // Private Methods -----------------------------------------------------------
 
-double JeongPeakWidth::msdSharpeningRatio(const double& r) const
-{
-    using diffpy::mathutils::DOUBLE_EPS;
-    // avoid division by zero
-    if (r < DOUBLE_EPS)  return 0.0;
-    double rv = 1.0 - this->getDelta1()/r - this->getDelta2()/pow(r, 2) +
-         pow(this->getQbroad()*r, 2);
-    return rv;
+double JeongPeakWidth::msdSharpeningRatio(const double& r) const {
+  using diffpy::mathutils::DOUBLE_EPS;
+  // avoid division by zero
+  if (r < DOUBLE_EPS) return 0.0;
+  double rv = 1.0 - this->getDelta1() / r - this->getDelta2() / pow(r, 2) +
+              pow(this->getQbroad() * r, 2);
+  return rv;
 }
 
 // Registration --------------------------------------------------------------
 
 bool reg_JeongPeakWidth = JeongPeakWidth().registerThisType();
 
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 // Serialization -------------------------------------------------------------
 

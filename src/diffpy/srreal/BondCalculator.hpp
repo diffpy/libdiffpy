@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2011 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class BondCalculator -- bond distance calculator
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2011 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class BondCalculator -- bond distance calculator
+ *
+ *****************************************************************************/
 
 #ifndef BONDCALCULATOR_HPP_INCLUDED
 #define BONDCALCULATOR_HPP_INCLUDED
@@ -26,109 +26,97 @@
 namespace diffpy {
 namespace srreal {
 
-class DLL_EXPORT BondCalculator : public PairQuantity
-{
-    public:
+class DLL_EXPORT BondCalculator : public PairQuantity {
+ public:
+  // constructor
+  BondCalculator();
 
-        // constructor
-        BondCalculator();
+  // methods
+  template <class T>
+  QuantityType operator()(const T&);
+  QuantityType distances() const;
+  std::vector<R3::Vector> directions() const;
+  SiteIndices sites0() const;
+  SiteIndices sites1() const;
+  std::vector<std::string> types0() const;
+  std::vector<std::string> types1() const;
+  void filterCone(R3::Vector coneaxis, double degrees);
+  void filterOff();
 
-        // methods
-        template <class T> QuantityType operator()(const T&);
-        QuantityType distances() const;
-        std::vector<R3::Vector> directions() const;
-        SiteIndices sites0() const;
-        SiteIndices sites1() const;
-        std::vector<std::string> types0() const;
-        std::vector<std::string> types1() const;
-        void filterCone(R3::Vector coneaxis, double degrees);
-        void filterOff();
+  // PairQuantity overloads
+  virtual std::string getParallelData() const;
 
-        // PairQuantity overloads
-        virtual std::string getParallelData() const;
+ protected:
+  // PairQuantity overloads
+  virtual void resetValue();
+  virtual void addPairContribution(const BaseBondGenerator&, int);
+  virtual void executeParallelMerge(const std::string& pdata);
+  virtual void finishValue();
 
-    protected:
+  // support for PQEvaluatorOptimized
+  virtual void stashPartialValue();
+  virtual void restorePartialValue();
 
-        // PairQuantity overloads
-        virtual void resetValue();
-        virtual void addPairContribution(const BaseBondGenerator&, int);
-        virtual void executeParallelMerge(const std::string& pdata);
-        virtual void finishValue();
+  friend class BondOp;
+  class BondEntry {
+   public:
+    double distance;
+    int site0;
+    int site1;
+    double direction0;
+    double direction1;
+    double direction2;
 
-        // support for PQEvaluatorOptimized
-        virtual void stashPartialValue();
-        virtual void restorePartialValue();
+   private:
+    friend class boost::serialization::access;
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+      ar & distance & site0 & site1;
+      ar & direction0 & direction1 & direction2;
+    }
+  };
 
-        friend class BondOp;
-        class BondEntry {
+  typedef std::vector<BondEntry> BondDataStorage;
 
-            public:
+ private:
+  // serialization
+  friend class boost::serialization::access;
+  template <class Archive>
+  void serialize(Archive& ar, const unsigned int version) {
+    using boost::serialization::base_object;
+    ar& base_object<PairQuantity>(*this);
+    ar & mbonds;
+    ar & mfilter_directions;
+    ar & mfilter_degrees;
+  }
 
-                double distance;
-                int site0;
-                int site1;
-                double direction0;
-                double direction1;
-                double direction2;
+  // methods
+  int count() const;
+  bool checkConeFilters(const R3::Vector& ru01) const;
 
-            private:
-
-                friend class boost::serialization::access;
-                template<class Archive>
-                void serialize(Archive& ar, const unsigned int version)
-                {
-                    ar & distance & site0 & site1;
-                    ar & direction0 & direction1 & direction2;
-                }
-
-        };
-
-        typedef std::vector<BondEntry> BondDataStorage;
-
-    private:
-
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
-        {
-            using boost::serialization::base_object;
-            ar & base_object<PairQuantity>(*this);
-            ar & mbonds;
-            ar & mfilter_directions;
-            ar & mfilter_degrees;
-        }
-
-        // methods
-        int count() const;
-        bool checkConeFilters(const R3::Vector& ru01) const;
-
-        // data
-        std::vector<R3::Vector> mfilter_directions;
-        std::vector<double> mfilter_degrees;
-        BondDataStorage mbonds;
-        BondDataStorage mpopbonds;
-        BondDataStorage maddbonds;
-        // support for PQEvaluatorOptimized
-        struct {
-            BondDataStorage bonds;
-            BondDataStorage popbonds;
-        } mstashedvalue;
-
+  // data
+  std::vector<R3::Vector> mfilter_directions;
+  std::vector<double> mfilter_degrees;
+  BondDataStorage mbonds;
+  BondDataStorage mpopbonds;
+  BondDataStorage maddbonds;
+  // support for PQEvaluatorOptimized
+  struct {
+    BondDataStorage bonds;
+    BondDataStorage popbonds;
+  } mstashedvalue;
 };
 
 // Public Template Methods ---------------------------------------------------
 
 template <class T>
-QuantityType BondCalculator::operator()(const T& stru)
-{
-    this->eval(stru);
-    return this->distances();
+QuantityType BondCalculator::operator()(const T& stru) {
+  this->eval(stru);
+  return this->distances();
 }
 
-
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 // Serialization -------------------------------------------------------------
 

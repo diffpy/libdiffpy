@@ -1,0 +1,10 @@
+# Please include explanations for each ignored word (lowercase).
+# See https://docs.openverse.org/meta/codespell.html for docs.
+
+# src/diffpy/srreal/BaseDebyeSum.cpp:231,233
+# variable name
+multipl
+
+# src/tests/TestScatteringFactorTable.hpp:73-80
+# Custom alias name of C in test
+Ccustom

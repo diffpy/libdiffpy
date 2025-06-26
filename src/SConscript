@@ -58,14 +58,14 @@ if env['PLATFORM'] == "win32":
         env.PrependUnique(CCFLAGS=['-O3', '-std=c++14', '-m64', '-DBUILD_DLL', '-DREAL=double'])
         env.PrependUnique(CPPDEFINES='_USE_MATH_DEFINES')
         env.AppendUnique(LINKFLAGS='-m64')
-        
+
     else:
         # Visual c++
         env.PrependUnique(CCFLAGS=['/Ox', '/EHsc', '/MD', '/std:c++14', '/Wall', '/DBUILD_DLL', '/DREAL=double'])
         env.AppendUnique(CPPDEFINES=[{'NDEBUG': None}, '_USE_MATH_DEFINES'])
         env.AppendUnique(LINKFLAGS=['/OPT:NOREF', '/OPT:NOICF'])
 
-else: 
+else:
     env.PrependUnique(CXXFLAGS='-std=c++11')
     if env['tool'] == 'intelc':
         # options for Intel C++ compiler on hpc dev-intel07

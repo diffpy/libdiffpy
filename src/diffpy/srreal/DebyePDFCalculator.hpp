@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2010 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas, Chris Farrow
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class DebyePDFCalculator -- calculate PDF from the Debye equation.
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2010 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas, Chris Farrow
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class DebyePDFCalculator -- calculate PDF from the Debye equation.
+ *
+ *****************************************************************************/
 
 // Comments from Chris Farrow's sources for PDFNanoProfile:
 //
@@ -57,106 +57,100 @@
 namespace diffpy {
 namespace srreal {
 
-class DLL_EXPORT DebyePDFCalculator :
-    public BaseDebyeSum,
-    public ScatteringFactorTableOwner,
-    public PDFEnvelopeOwner
-{
-    public:
+class DLL_EXPORT DebyePDFCalculator : public BaseDebyeSum,
+                                      public ScatteringFactorTableOwner,
+                                      public PDFEnvelopeOwner {
+ public:
+  // constructor
+  DebyePDFCalculator();
 
-        // constructor
-        DebyePDFCalculator();
+  // PairQuantity overloads
+  virtual eventticker::EventTicker& ticker() const;
 
-        // PairQuantity overloads
-        virtual eventticker::EventTicker& ticker() const;
+  // results
+  /// PDF on the specified r-grid
+  QuantityType getPDF() const;
+  QuantityType getRDF() const;
+  QuantityType getRDFperR() const;
 
-        // results
-        /// PDF on the specified r-grid
-        QuantityType getPDF() const;
-        QuantityType getRDF() const;
-        QuantityType getRDFperR() const;
+  // Q-range configuration
+  void setQmin(double);
+  const double& getQmin() const;
+  void setQmax(double);
+  void setQstep(double);
+  void setOptimumQstep();
+  bool isOptimumQstep() const;
 
-        // Q-range configuration
-        void setQmin(double);
-        const double& getQmin() const;
-        void setQmax(double);
-        void setQstep(double);
-        void setOptimumQstep();
-        bool isOptimumQstep() const;
+  // R-range methods
+  QuantityType getRgrid() const;
+  // R-range configuration
+  virtual void setRmin(double);
+  virtual void setRmax(double);
+  void setRstep(double);
+  const double& getRstep() const;
+  /// maximum total extension of the r-range accounting for both
+  /// termination ripples and peak tails
+  void setMaxExtension(double);
+  /// maximum total extension of the r-range accounting for both
+  /// termination ripples and peak tails
+  const double& getMaxExtension() const;
 
-        // R-range methods
-        QuantityType getRgrid() const;
-        // R-range configuration
-        virtual void setRmin(double);
-        virtual void setRmax(double);
-        void setRstep(double);
-        const double& getRstep() const;
-        /// maximum total extension of the r-range accounting for both
-        /// termination ripples and peak tails
-        void setMaxExtension(double);
-        /// maximum total extension of the r-range accounting for both
-        /// termination ripples and peak tails
-        const double& getMaxExtension() const;
+ protected:
+  // Attributes overload to direct visitors around data structures
+  virtual void accept(diffpy::BaseAttributesVisitor& v);
+  virtual void accept(diffpy::BaseAttributesVisitor& v) const;
 
-    protected:
+  // BaseDebyeSum overloads
+  virtual void resetValue();
+  virtual void configureBondGenerator(BaseBondGenerator&) const;
+  virtual double sfSiteAtQ(int, const double& Q) const;
 
-        // Attributes overload to direct visitors around data structures
-        virtual void accept(diffpy::BaseAttributesVisitor& v);
-        virtual void accept(diffpy::BaseAttributesVisitor& v) const;
+ private:
+  // methods
+  QuantityType getPDFAtQmin(double qmin) const;
+  void updateQstep();
+  /// complete lower bound extension of the calculated grid
+  double rcalclo() const;
+  /// complete upper bound extension of the calculated grid
+  double rcalchi() const;
+  /// r-range extension to allow propagation of termination ripples
+  double extFromTerminationRipples() const;
+  /// r-range extension to account for tails from out-of-range peaks
+  double extFromPeakTails() const;
+  void cacheRlimitsData() const;
 
-        // BaseDebyeSum overloads
-        virtual void resetValue();
-        virtual void configureBondGenerator(BaseBondGenerator&) const;
-        virtual double sfSiteAtQ(int, const double& Q) const;
+  // data
+  double mqminpdf;
+  bool moptimumqstep;
+  double mrstep;
+  double mmaxextension;
+  mutable int mrcalclosteps;
+  mutable int mrcalchisteps;
+  mutable bool mrlimits_are_cached;
 
-    private:
-
-        // methods
-        QuantityType getPDFAtQmin(double qmin) const;
-        void updateQstep();
-        /// complete lower bound extension of the calculated grid
-        double rcalclo() const;
-        /// complete upper bound extension of the calculated grid
-        double rcalchi() const;
-        /// r-range extension to allow propagation of termination ripples
-        double extFromTerminationRipples() const;
-        /// r-range extension to account for tails from out-of-range peaks
-        double extFromPeakTails() const;
-        void cacheRlimitsData() const;
-
-        // data
-        double mqminpdf;
-        bool moptimumqstep;
-        double mrstep;
-        double mmaxextension;
-        mutable int mrcalclosteps;
-        mutable int mrcalchisteps;
-        mutable bool mrlimits_are_cached;
-
-        // serialization
-        friend class boost::serialization::access;
-        template<class Archive>
-            void serialize(Archive& ar, const unsigned int version)
-        {
-            using boost::serialization::base_object;
-            ar & base_object<BaseDebyeSum>(*this);
-            ar & base_object<ScatteringFactorTableOwner>(*this);
-            ar & base_object<PDFEnvelopeOwner>(*this);
-            ar & mqminpdf;
-            ar & moptimumqstep;
-            ar & mrstep;
-            ar & mmaxextension;
-            ar & mrcalclosteps;
-            ar & mrcalchisteps;
-            if (version >= 1) {
-                ar & mrlimits_are_cached;
-            }
-        }
+  // serialization
+  friend class boost::serialization::access;
+  template <class Archive>
+  void serialize(Archive& ar, const unsigned int version) {
+    using boost::serialization::base_object;
+    ar& base_object<BaseDebyeSum>(*this);
+    ar& base_object<ScatteringFactorTableOwner>(*this);
+    ar& base_object<PDFEnvelopeOwner>(*this);
+    ar & mqminpdf;
+    ar & moptimumqstep;
+    ar & mrstep;
+    ar & mmaxextension;
+    ar & mrcalclosteps;
+    ar & mrcalchisteps;
+    if (version >= 1) {
+      ar & mrlimits_are_cached;
+    }
+  }
 
 };  // class DebyePDFCalculator
 
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 // Serialization -------------------------------------------------------------
 

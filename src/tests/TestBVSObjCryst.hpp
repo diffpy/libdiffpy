@@ -1,21 +1,21 @@
 /*****************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2010 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-******************************************************************************
-*
-* class TestBVSObjCryst -- unit tests for BVS calculation for an ObjCryst
-*   crystal structure
-*
-*****************************************************************************/
+ *
+ * libdiffpy         by DANSE Diffraction group
+ *                   Simon J. L. Billinge
+ *                   (c) 2010 The Trustees of Columbia University
+ *                   in the City of New York.  All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE_DANSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * class TestBVSObjCryst -- unit tests for BVS calculation for an ObjCryst
+ *   crystal structure
+ *
+ *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>
 
@@ -31,44 +31,35 @@ using namespace diffpy::srreal;
 // class Test
 //////////////////////////////////////////////////////////////////////////////
 
-class TestBVSObjCryst : public CxxTest::TestSuite
-{
-    private:
+class TestBVSObjCryst : public CxxTest::TestSuite {
+ private:
+  unique_ptr<ObjCryst::Crystal> mnacl;
+  unique_ptr<BVSCalculator> mbvc;
 
-        unique_ptr<ObjCryst::Crystal> mnacl;
-        unique_ptr<BVSCalculator> mbvc;
+ public:
+  void setUp() {
+    if (!mnacl.get()) {
+      mnacl.reset(loadTestCrystal("NaCl.cif"));
+    }
+    mbvc.reset(new BVSCalculator);
+  }
 
-    public:
+  void test_NaCl() {
+    const double eps = 1e-4;
+    mbvc->eval(*mnacl);
+    TS_ASSERT_EQUALS(2u, mbvc->value().size());
+    TS_ASSERT_DELTA(+1.01352, mbvc->value()[0], eps);
+    TS_ASSERT_DELTA(-1.01352, mbvc->value()[1], eps);
+  }
 
-        void setUp()
-        {
-            if (!mnacl.get())
-            {
-                mnacl.reset(loadTestCrystal("NaCl.cif"));
-            }
-            mbvc.reset(new BVSCalculator);
-        }
-
-
-        void test_NaCl()
-        {
-            const double eps = 1e-4;
-            mbvc->eval(*mnacl);
-            TS_ASSERT_EQUALS(2u, mbvc->value().size());
-            TS_ASSERT_DELTA(+1.01352, mbvc->value()[0], eps);
-            TS_ASSERT_DELTA(-1.01352, mbvc->value()[1], eps);
-        }
-
-
-        void test_NaCl_mixed()
-        {
-            unique_ptr<ObjCryst::Crystal> nacl_mixed;
-            nacl_mixed.reset(loadTestCrystal("NaCl_mixed.cif"));
-            mbvc->eval(*mnacl);
-            BVSCalculator bvc;
-            bvc.eval(*nacl_mixed);
-            TS_ASSERT_DELTA(mbvc->bvrmsdiff(), bvc.bvrmsdiff(), 1e-12);
-        }
+  void test_NaCl_mixed() {
+    unique_ptr<ObjCryst::Crystal> nacl_mixed;
+    nacl_mixed.reset(loadTestCrystal("NaCl_mixed.cif"));
+    mbvc->eval(*mnacl);
+    BVSCalculator bvc;
+    bvc.eval(*nacl_mixed);
+    TS_ASSERT_DELTA(mbvc->bvrmsdiff(), bvc.bvrmsdiff(), 1e-12);
+  }
 
 };  // class TestBVSObjCryst
 

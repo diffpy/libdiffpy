@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         Complex Modeling Initiative
-*                   (c) 2014 Brookhaven Science Associates,
-*                   Brookhaven National Laboratory.
-*                   All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE.txt for license information.
-*
-******************************************************************************
-*
-* Definitions for the libdiffpy_version_info constants.
-*
-*****************************************************************************/
+ *
+ * libdiffpy         Complex Modeling Initiative
+ *                   (c) 2014 Brookhaven Science Associates,
+ *                   Brookhaven National Laboratory.
+ *                   All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.txt for a list of people who contributed.
+ * See LICENSE.txt for license information.
+ *
+ ******************************************************************************
+ *
+ * Definitions for the libdiffpy_version_info constants.
+ *
+ *****************************************************************************/
 
 #include <diffpy/version.hpp>
 
