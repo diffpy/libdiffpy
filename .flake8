@@ -6,7 +6,7 @@ exclude =
     __pycache__,
     build,
     dist,
-    doc/source/conf.py
+    docs/source/conf.py
     site_scons/* # bring it back after updating scons tools
 max-line-length = 115
 # Ignore some style 'errors' produced while formatting by 'black'
