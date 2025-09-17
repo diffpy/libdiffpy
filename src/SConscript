@@ -157,7 +157,7 @@ env_lib = env.Clone()
 # Setup GSL, the GNU Scientific library.
 # The dladdr call in runtimepath.cpp requires the dl library for Windows.
 if env['has_objcryst'] == True:
-    env_lib.AppendUnique(LIBS=['dl', 'gsl', 'gslcblas','boost_serialization', 'libobjcryst'])
+    env_lib.AppendUnique(LIBS=['dl', 'gsl', 'gslcblas','boost_serialization', 'libObjCryst'])
 else:
     env_lib.AppendUnique(LIBS=['dl', 'gsl', 'gslcblas','boost_serialization'])
 

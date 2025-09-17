@@ -2,5 +2,5 @@
 /.gitignore  export-ignore
 /.travis*  export-ignore
 /conda-recipe/  export-ignore
-/doc  export-ignore
+/docs  export-ignore
 gitarchive.cfg  export-subst
