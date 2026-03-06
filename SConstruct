@@ -66,7 +66,7 @@ vars.Add(PathVariable(
 vars.Add(EnumVariable(
     'build',
     'compiler settings',
-    'fast', allowed_values=('fast', 'debug', 'coverage')))
+    'fast', allowed_values=('fast', 'debug', 'develop', 'coverage')))
 vars.Add(EnumVariable(
     'tool',
     'C++ compiler toolkit to be used',
