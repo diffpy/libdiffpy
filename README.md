@@ -149,6 +149,7 @@ construction environment can be further customized in a `sconscript.local`
 script.  The library integrity can be verified by executing unit tests with
 `scons -j4 test` (requires the CxxTest framework).
 
+[Instructions for compiling and modifying source code in development mode](docs/development_instructions.md)
 
 ## CONTACTS
 
