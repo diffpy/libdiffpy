@@ -16,6 +16,7 @@
 *
 *****************************************************************************/
 
+#include <iostream>
 #include <stdexcept>
 #include <sstream>
 #include <cmath>
@@ -158,6 +159,7 @@ QuantityType PDFCalculator::getExtendedPDF() const
         !(1 < pdfutils_qminSteps(this));
     if (skipfft)
     {
+        cout << "WARNING: skip FFT because qmax > pi / rstep.";
         QuantityType rdfpr = this->getExtendedRDFperR();
         QuantityType rdfprb = this->applyBaseline(rgrid_ext, rdfpr);
         QuantityType pdf = this->applyEnvelopes(rgrid_ext, rdfprb);
