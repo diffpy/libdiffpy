@@ -21,7 +21,7 @@ fast_linkflags = ['-s']
 
 # Specify minimum C++ standard.  Allow later standard from sconscript.local.
 # In case of multiple `-std` options the last option holds.
-env.PrependUnique(CXXFLAGS='-std=c++11', delete_existing=1)
+env.PrependUnique(CXXFLAGS='-std=c++23', delete_existing=1)
 
 # Platform specific intricacies.
 if env['PLATFORM'] == 'darwin':
