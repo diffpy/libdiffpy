@@ -65,11 +65,11 @@
 
 from SCons.Script import *
 from SCons.Builder import Builder
-from SCons.Util import PrependPath, unique, uniquer
+from SCons.Util import PrependPath, unique, uniquer_hashables
 import os
 
 # A warning class to notify users of problems
-class ToolCxxTestWarning(SCons.Warnings.Warning):
+class ToolCxxTestWarning(SCons.Warnings.SConsWarning):
     pass
 
 SCons.Warnings.enableWarningClass(ToolCxxTestWarning)
@@ -105,7 +105,7 @@ def prepend_ld_library_path(env, overrides, **kwargs):
     """Prepend LD_LIBRARY_PATH with LIBPATH to run successfully programs that
     were linked against local shared libraries."""
     # make it unique but preserve order ...
-    libpath = uniquer(Split(kwargs.get('CXXTEST_LIBPATH', [])) +
+    libpath = uniquer_hashables(Split(kwargs.get('CXXTEST_LIBPATH', [])) +
                       Split(env.get(   'CXXTEST_LIBPATH', [])))
     if len(libpath) > 0:
         libpath = env.arg2nodes(libpath, env.fs.Dir)
