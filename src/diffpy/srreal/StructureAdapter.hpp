@@ -22,7 +22,6 @@
 
 #include <vector>
 #include <memory>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/export.hpp>
