@@ -20,7 +20,7 @@
 
 #include <algorithm>
 #include <functional>
-#include <boost/make_shared.hpp>
+#include <memory>
 
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>

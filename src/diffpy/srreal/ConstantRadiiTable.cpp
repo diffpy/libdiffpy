@@ -22,7 +22,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <vector>
-#include <boost/make_shared.hpp>
+#include <memory>
 
 #include <diffpy/serialization.ipp>
 #include <diffpy/srreal/ConstantRadiiTable.hpp>
