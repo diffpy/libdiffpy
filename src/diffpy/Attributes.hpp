@@ -24,7 +24,7 @@
 #include <set>
 #include <map>
 #include <stdexcept>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace diffpy {
 namespace attributes {
@@ -109,7 +109,7 @@ class Attributes
 
         // types
         typedef std::map<std::string,
-                boost::shared_ptr<attributes::BaseDoubleAttribute> >
+                std::shared_ptr<attributes::BaseDoubleAttribute> >
                     DoubleAttributeStorage;
         // data
         DoubleAttributeStorage mdoubleattrs;

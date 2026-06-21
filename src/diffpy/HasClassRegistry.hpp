@@ -32,7 +32,7 @@
 #include <stdexcept>
 #include <set>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace diffpy {
 
@@ -42,7 +42,7 @@ class HasClassRegistry
     public:
 
         // types
-        typedef boost::shared_ptr<TBase> SharedPtr;
+        typedef std::shared_ptr<TBase> SharedPtr;
 
         // Contains virtual methods
         virtual ~HasClassRegistry()  { }

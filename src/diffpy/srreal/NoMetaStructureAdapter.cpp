@@ -38,8 +38,8 @@ namespace srreal {
 NoMetaStructureAdapter::NoMetaStructureAdapter(
         StructureAdapterPtr srcstructure)
 {
-    boost::shared_ptr<NoMetaStructureAdapter> nmptr =
-        boost::dynamic_pointer_cast<NoMetaStructureAdapter>(srcstructure);
+    std::shared_ptr<NoMetaStructureAdapter> nmptr =
+        std::dynamic_pointer_cast<NoMetaStructureAdapter>(srcstructure);
     if (nmptr)  srcstructure = nmptr->getSourceStructure();
     msrcstructure = srcstructure.get() ?
         srcstructure : emptyStructureAdapter();
@@ -49,7 +49,7 @@ NoMetaStructureAdapter::NoMetaStructureAdapter(
 
 StructureAdapterPtr NoMetaStructureAdapter::clone() const
 {
-    boost::shared_ptr<NoMetaStructureAdapter> rv(new NoMetaStructureAdapter);
+    std::shared_ptr<NoMetaStructureAdapter> rv(new NoMetaStructureAdapter);
     if (msrcstructure)  rv->msrcstructure = msrcstructure->clone();
     return rv;
 }
@@ -122,8 +122,8 @@ NoMetaStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
     StructureDifference sd = this->StructureAdapter::diff(other);
     if (sd.stru0 == sd.stru1)  return sd;
-    typedef boost::shared_ptr<const class NoMetaStructureAdapter> PPtr;
-    PPtr pother = boost::dynamic_pointer_cast<PPtr::element_type>(other);
+    typedef std::shared_ptr<const class NoMetaStructureAdapter> PPtr;
+    PPtr pother = std::dynamic_pointer_cast<PPtr::element_type>(other);
     if (!pother)  return sd;
     sd = this->getSourceStructure()->diff(pother->getSourceStructure());
     assert(sd.stru0 == this->getSourceStructure());
@@ -152,7 +152,7 @@ NoMetaStructureAdapter::getSourceStructure() const
 StructureAdapterPtr nometa(StructureAdapterPtr stru)
 {
     StructureAdapterPtr rv =
-        boost::dynamic_pointer_cast<NoMetaStructureAdapter>(stru) ? stru :
+        std::dynamic_pointer_cast<NoMetaStructureAdapter>(stru) ? stru :
         StructureAdapterPtr(new NoMetaStructureAdapter(stru));
     return rv;
 }

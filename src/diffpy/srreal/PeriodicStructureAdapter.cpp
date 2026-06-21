@@ -65,8 +65,8 @@ PeriodicStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
     StructureDifference sd = this->StructureAdapter::diff(other);
     if (sd.stru0 == sd.stru1)  return sd;
-    typedef boost::shared_ptr<const class PeriodicStructureAdapter> PPtr;
-    PPtr pother = boost::dynamic_pointer_cast<PPtr::element_type>(other);
+    typedef std::shared_ptr<const class PeriodicStructureAdapter> PPtr;
+    PPtr pother = std::dynamic_pointer_cast<PPtr::element_type>(other);
     if (!pother)  return sd;
     assert(pother == sd.stru1);
     if (this->getLattice() != pother->getLattice())  return sd;

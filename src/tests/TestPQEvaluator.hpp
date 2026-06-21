@@ -89,7 +89,7 @@ class TestPQEvaluator : public CxxTest::TestSuite
             mzeros.assign(mpdfcb.getRgrid().size(), 0.0);
             // setup structure instances
             const int SZ = 10;
-            mstru10 = boost::make_shared<AtomicStructureAdapter>();
+            mstru10 = std::make_shared<AtomicStructureAdapter>();
             Atom ai;
             ai.atomtype = "C";
             ai.uij_cartn = R3::identity();
@@ -100,11 +100,11 @@ class TestPQEvaluator : public CxxTest::TestSuite
                 ai.xyz_cartn[0] = i;
                 mstru10->append(ai);
             }
-            mstru10d1 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
+            mstru10d1 = std::make_shared<AtomicStructureAdapter>(*mstru10);
             (*mstru10d1)[0].atomtype = "Au";
-            mstru10r = boost::make_shared<AtomicStructureAdapter>();
+            mstru10r = std::make_shared<AtomicStructureAdapter>();
             mstru10r->assign(mstru10->rbegin(), mstru10->rend());
-            mstru9 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
+            mstru9 = std::make_shared<AtomicStructureAdapter>(*mstru10);
             mstru9->erase(9);
         }
 
@@ -176,7 +176,7 @@ class TestPQEvaluator : public CxxTest::TestSuite
             mpdfcb.setTypeMask("O2-", "all", false);
             mpdfco.setTypeMask("O2-", "all", false);
             PeriodicStructureAdapterPtr litao =
-                boost::dynamic_pointer_cast<PeriodicStructureAdapter>(
+                std::dynamic_pointer_cast<PeriodicStructureAdapter>(
                         loadTestPeriodicStructure("LiTaO3.stru"));
             TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(litao));
             TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());

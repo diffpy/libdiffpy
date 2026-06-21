@@ -43,13 +43,13 @@ ConstantRadiiTable::ConstantRadiiTable() : mdefaultradius(0.0)
 
 AtomRadiiTablePtr ConstantRadiiTable::create() const
 {
-    return boost::make_shared<ConstantRadiiTable>();
+    return std::make_shared<ConstantRadiiTable>();
 }
 
 
 AtomRadiiTablePtr ConstantRadiiTable::clone() const
 {
-    return boost::make_shared<ConstantRadiiTable>(*this);
+    return std::make_shared<ConstantRadiiTable>(*this);
 }
 
 

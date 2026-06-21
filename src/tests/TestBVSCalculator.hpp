@@ -39,7 +39,7 @@ class TestBVSCalculator : public CxxTest::TestSuite
     private:
 
         StructureAdapterPtr mnacl;
-        boost::shared_ptr<BVSCalculator> mbvc;
+        std::shared_ptr<BVSCalculator> mbvc;
 
     public:
 
@@ -92,7 +92,7 @@ class TestBVSCalculator : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(0.0, mbvc->value()[4]);
             // create structure with bare atom symbols "Na", "Cl".
             PeriodicStructureAdapterPtr naclbare =
-                boost::dynamic_pointer_cast<
+                std::dynamic_pointer_cast<
                 PeriodicStructureAdapter>(mnacl->clone());
             for (int i = 0; i < naclbare->countSites(); ++i)
             {
@@ -147,7 +147,7 @@ class TestBVSCalculator : public CxxTest::TestSuite
             diffpy::serialization::oarchive oa(storage, ios::binary);
             oa << mbvc;
             diffpy::serialization::iarchive ia(storage, ios::binary);
-            boost::shared_ptr<BVSCalculator> bvc1;
+            std::shared_ptr<BVSCalculator> bvc1;
             TS_ASSERT(!bvc1.get());
             ia >> bvc1;
             TS_ASSERT_DIFFERS(mbvc.get(), bvc1.get());

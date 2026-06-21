@@ -129,7 +129,7 @@ class CrystalStructureAdapter : public PeriodicStructureAdapter
 };
 
 
-typedef boost::shared_ptr<CrystalStructureAdapter> CrystalStructureAdapterPtr;
+typedef std::shared_ptr<CrystalStructureAdapter> CrystalStructureAdapterPtr;
 
 // Comparison functions
 

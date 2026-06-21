@@ -35,7 +35,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 {
     private:
 
-        boost::shared_ptr<OverlapCalculator> molc;
+        std::shared_ptr<OverlapCalculator> molc;
         StructureAdapterPtr mnacl;
         double meps;
 
@@ -347,7 +347,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
             stru->append(a0);
             stru->append(a1);
             molc->eval(stru);
-            boost::shared_ptr<OverlapCalculator> olc1;
+            std::shared_ptr<OverlapCalculator> olc1;
             olc1 = dumpandload(molc);
             TS_ASSERT_DIFFERS(molc.get(), olc1.get());
             TS_ASSERT_EQUALS(2, olc1->getStructure()->countSites());
