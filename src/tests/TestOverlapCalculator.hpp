@@ -156,7 +156,6 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 
         void test_bccTouch()
         {
-            using namespace boost;
             PeriodicStructureAdapterPtr bcc(new PeriodicStructureAdapter);
             bcc->setLatPar(2.0, 2.0, 2.0, 90, 90, 90);
             Atom a;
@@ -226,7 +225,6 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 
         void test_NaCl_gradient()
         {
-            using namespace boost;
             molc->eval(mnacl);
             // default gradients are all zero
             std::vector<R3::Vector> g = molc->gradients();
