@@ -19,6 +19,10 @@ if env['tool'] == 'intelc':
 
 fast_linkflags = ['-s']
 
+# libobjcryst is built with double precision for ObjCryst's REAL type.
+# Match that ABI in all consumers of ObjCryst headers.
+env.PrependUnique(CPPDEFINES={'REAL': 'double'})
+
 # Specify minimum C++ standard.  Allow later standard from sconscript.local.
 # In case of multiple `-std` options the last option holds.
 env.PrependUnique(CXXFLAGS='-std=c++23', delete_existing=1)
