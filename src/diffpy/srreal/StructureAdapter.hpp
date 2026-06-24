@@ -21,8 +21,7 @@
 #define STRUCTUREADAPTER_HPP_INCLUDED
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
+#include <memory>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/export.hpp>
@@ -44,7 +43,7 @@ class StructureDifference;
 /// PairQuantity calculator
 
 class StructureAdapter :
-    public boost::enable_shared_from_this<StructureAdapter>
+    public std::enable_shared_from_this<StructureAdapter>
 {
     public:
 
@@ -160,10 +159,10 @@ StructureAdapterPtr convertToStructureAdapter(const T& stru)
 
 
 template <class T>
-StructureAdapterPtr convertToStructureAdapter(const boost::shared_ptr<T>& stru)
+StructureAdapterPtr convertToStructureAdapter(const std::shared_ptr<T>& stru)
 {
     StructureAdapterPtr rv =
-        boost::dynamic_pointer_cast<StructureAdapterPtr::element_type>(stru);
+        std::dynamic_pointer_cast<StructureAdapterPtr::element_type>(stru);
     assert(rv);
     return rv;
 }
@@ -173,7 +172,7 @@ inline
 StructureAdapterPtr convertToStructureAdapter(StructureAdapterConstPtr stru)
 {
     StructureAdapterPtr rv =
-        boost::const_pointer_cast<StructureAdapterPtr::element_type>(stru);
+        std::const_pointer_cast<StructureAdapterPtr::element_type>(stru);
     return rv;
 }
 

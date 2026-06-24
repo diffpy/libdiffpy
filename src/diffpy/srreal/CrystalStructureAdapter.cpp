@@ -80,8 +80,8 @@ CrystalStructureAdapter::diff(StructureAdapterConstPtr other) const
 {
     StructureDifference sd = this->StructureAdapter::diff(other);
     if (sd.stru0 == sd.stru1)  return sd;
-    typedef boost::shared_ptr<const class CrystalStructureAdapter> CPtr;
-    CPtr cother = boost::dynamic_pointer_cast<CPtr::element_type>(other);
+    typedef std::shared_ptr<const class CrystalStructureAdapter> CPtr;
+    CPtr cother = std::dynamic_pointer_cast<CPtr::element_type>(other);
     if (!cother)  return sd;
     // compare symmetry operations in both adapters
     assert(cother == sd.stru1);

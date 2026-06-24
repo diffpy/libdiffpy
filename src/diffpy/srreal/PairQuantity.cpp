@@ -150,7 +150,7 @@ void PairQuantity::setEvaluatorType(PQEvaluatorType evtp)
     {
         pqev->validate(*this);
     }
-    catch (logic_error e)
+    catch (const logic_error& e)
     {
         string emsg("EvaluatorType not supported.  ");
         emsg += e.what();

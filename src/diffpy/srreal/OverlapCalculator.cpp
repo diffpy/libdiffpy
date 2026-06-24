@@ -314,7 +314,7 @@ vector< unordered_set<int> > OverlapCalculator::neighborhoods() const
 {
     int cntsites = this->countSites();
     typedef unordered_set<int> SiteSet;
-    typedef std::vector< boost::shared_ptr<SiteSet> > SiteSetPointers;
+    typedef std::vector< std::shared_ptr<SiteSet> > SiteSetPointers;
     SiteSetPointers rvptr(cntsites);
     int n = this->count();
     for (int index = 0; index < n; ++index)
