@@ -16,6 +16,8 @@
 *
 *****************************************************************************/
 
+#include <algorithm>
+#include <cmath>
 #include <boost/functional/hash.hpp>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_matrix.h>
@@ -79,6 +81,88 @@ const Matrix& inverse(const Matrix& A)
     gsl_permutation_free(gP);
     gsl_matrix_free(gA);
     return B;
+}
+
+
+void eigen_solve_3x3(const Matrix& A, Vector& w, Matrix& V)
+{
+    V = identity();
+    Matrix m = A;
+
+    const int max_iter = 50;
+    const double eps = 1e-10;
+
+    for (int iter = 0; iter < max_iter; ++iter)
+    {
+        double max_off_diag = 0.0;
+        int p = 0;
+        int q = 1;
+
+        for (int i = 0; i < Ndim; ++i)
+        {
+            for (int j = i + 1; j < Ndim; ++j)
+            {
+                if (std::abs(m(i, j)) > max_off_diag)
+                {
+                    max_off_diag = std::abs(m(i, j));
+                    p = i;
+                    q = j;
+                }
+            }
+        }
+
+        if (max_off_diag < eps)  break;
+
+        double phi = 0.5 * std::atan2(
+                2.0 * m(p, q), m(q, q) - m(p, p));
+        double c = std::cos(phi);
+        double s = std::sin(phi);
+
+        double m_pp = m(p, p);
+        double m_qq = m(q, q);
+        double m_pq = m(p, q);
+
+        m(p, p) = c * c * m_pp - 2.0 * s * c * m_pq + s * s * m_qq;
+        m(q, q) = s * s * m_pp + 2.0 * s * c * m_pq + c * c * m_qq;
+        m(p, q) = 0.0;
+        m(q, p) = 0.0;
+
+        for (int i = 0; i < Ndim; ++i)
+        {
+            if (i == p || i == q)  continue;
+            double m_ip = m(i, p);
+            double m_iq = m(i, q);
+            m(i, p) = c * m_ip - s * m_iq;
+            m(p, i) = m(i, p);
+            m(i, q) = s * m_ip + c * m_iq;
+            m(q, i) = m(i, q);
+        }
+
+        for (int i = 0; i < Ndim; ++i)
+        {
+            double v_ip = V(i, p);
+            double v_iq = V(i, q);
+            V(i, p) = c * v_ip - s * v_iq;
+            V(i, q) = s * v_ip + c * v_iq;
+        }
+    }
+
+    w[0] = m(0, 0);
+    w[1] = m(1, 1);
+    w[2] = m(2, 2);
+
+    for (int i = 0; i < Ndim - 1; ++i)
+    {
+        for (int j = 0; j < Ndim - 1 - i; ++j)
+        {
+            if (w[j] <= w[j + 1])  continue;
+            std::swap(w[j], w[j + 1]);
+            for (int k = 0; k < Ndim; ++k)
+            {
+                std::swap(V(k, j), V(k, j + 1));
+            }
+        }
+    }
 }
 
 

@@ -150,6 +150,8 @@ const Matrix& identity();
 const Matrix& zeromatrix();
 double determinant(const Matrix& A);
 const Matrix& inverse(const Matrix& A);
+void eigen_solve_3x3(const Matrix& A, Vector& eigenvalues,
+        Matrix& eigenvectors);
 
 const Vector& floor(const Vector&);
 template <class V> double norm(const V&);

@@ -677,6 +677,14 @@ double PDFCalculator::sfAverage() const
 }
 
 
+double PDFCalculator::getPartialPDFScale() const
+{
+    const double totocc = mstructure_cache.totaloccupancy;
+    return (totocc == 0.0) ? 0.0 :
+        (mstructure_cache.activeoccupancy / totocc);
+}
+
+
 void PDFCalculator::cacheStructureData()
 {
     int cntsites = this->countSites();
