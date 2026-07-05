@@ -114,6 +114,8 @@ class PDFCalculator :
         // support for PQEvaluatorOptimized
         virtual void stashPartialValue();
         virtual void restorePartialValue();
+        /// activeoccupancy / totaloccupancy used by baseline background term
+        double getPartialPDFScale() const;
 
     private:
 
