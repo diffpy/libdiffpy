@@ -1,21 +1,3 @@
-/*************************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2009 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Hai Qiao
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-/*************************************************************************************
-*
-* class PDF3DCalculator -- 3D real-space pair distribution function calculator
-*
-*************************************************************************************/
-
 #ifndef PDF3DCALCULATOR_HPP_INCLUDED
 #define PDF3DCALCULATOR_HPP_INCLUDED
 
@@ -153,6 +135,7 @@ private:
     size_t coordToIndex(double x, double y, double z) const;
     void indexToCoord(size_t idx, double& x, double& y, double& z) const;
 
+    void applyPostProcessing3D(std::vector<double>& grid) const;
     void applyQWindow3D(std::vector<double>& grid) const;
     double computeRho0Background() const;
     void buildDeltaEligibleShellTable();
@@ -207,10 +190,6 @@ private:
     std::unordered_set<DeltaBondKey, DeltaBondKeyHash> mdeltaEligibleBondKeys;
     std::vector<DeltaShellRecord> mdeltaShellRecords;
 
-    std::vector<double> msfCache;
-    double mtotaloccupancy;
-    double msfaverage;
-
     // Internal constants
     static constexpr double DEFAULT_RMAX_3D = 10.0;  // Angstrom
     static constexpr double DEFAULT_GRID_STEP = 0.1; // Angstrom
@@ -245,9 +224,6 @@ private:
         ar & museadpscaleSensitivity3d;
         ar & madpScale3d;
         ar & mrho0backgroundscale3d;
-        ar & msfCache;
-        ar & mtotaloccupancy;
-        ar & msfaverage;
     }
 };
 

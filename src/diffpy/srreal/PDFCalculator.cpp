@@ -187,10 +187,7 @@ QuantityType PDFCalculator::getExtendedPDF() const
 QuantityType PDFCalculator::getExtendedRDF() const
 {
     QuantityType rdf(this->countExtendedPoints());
-    const double& totocc = mstructure_cache.totaloccupancy;
-    double sfavg = this->sfAverage();
-    double rdf_scale = (totocc * sfavg == 0.0) ? 0.0 :
-        1.0 / (totocc * sfavg * sfavg);
+    double rdf_scale = this->getRDFScale();
     QuantityType::iterator iirdf = rdf.begin();
     QuantityType::const_iterator iival, iival_last;
     iival = this->value().begin() +
@@ -491,9 +488,7 @@ void PDFCalculator::resetValue()
     // when applicable, configure linear baseline
     if (this->getBaseline()->type() == "linear")
     {
-        double partialpdfscale =
-            (0.0 == mstructure_cache.totaloccupancy) ? 0.0 :
-            mstructure_cache.activeoccupancy / mstructure_cache.totaloccupancy;
+        double partialpdfscale = this->getPartialPDFScale();
         double pnumdensity = partialpdfscale * mstructure->numberDensity();
         PDFBaseline& bl = *(this->getBaseline());
         bl.setDoubleAttr("slope", -4 * M_PI * pnumdensity);
@@ -682,6 +677,16 @@ double PDFCalculator::getPartialPDFScale() const
     const double totocc = mstructure_cache.totaloccupancy;
     return (totocc == 0.0) ? 0.0 :
         (mstructure_cache.activeoccupancy / totocc);
+}
+
+
+double PDFCalculator::getRDFScale() const
+{
+    const double& totocc = mstructure_cache.totaloccupancy;
+    double sfavg = this->sfAverage();
+    double rv = (totocc * sfavg == 0.0) ? 0.0 :
+        1.0 / (totocc * sfavg * sfavg);
+    return rv;
 }
 
 

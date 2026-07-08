@@ -134,6 +134,53 @@ public:
     }
 
 
+    void test_eigen_solve_3x3()
+    {
+        R3::Matrix A(
+                3.0, 0.2, 0.0,
+                0.2, 2.0, 0.1,
+                0.0, 0.1, 1.0);
+        R3::Vector eigenvalues;
+        R3::Matrix eigenvectors;
+        R3::eigen_solve_3x3(A, eigenvalues, eigenvectors);
+
+        TS_ASSERT(eigenvalues[0] <= eigenvalues[1]);
+        TS_ASSERT(eigenvalues[1] <= eigenvalues[2]);
+
+        EpsilonEqual eigclose(1.0e-8);
+        for (int i = 0; i < R3::Ndim; ++i)
+        {
+            R3::Vector v(
+                    eigenvectors(0, i),
+                    eigenvectors(1, i),
+                    eigenvectors(2, i));
+            R3::Vector Av = R3::mxvecproduct(A, v);
+            R3::Vector lv(
+                    eigenvalues[i] * v[0],
+                    eigenvalues[i] * v[1],
+                    eigenvalues[i] * v[2]);
+            TS_ASSERT(eigclose(Av, lv));
+            TS_ASSERT_DELTA(1.0, R3::norm(v), 1.0e-8);
+        }
+
+        for (int i = 0; i < R3::Ndim; ++i)
+        {
+            for (int j = i + 1; j < R3::Ndim; ++j)
+            {
+                R3::Vector vi(
+                        eigenvectors(0, i),
+                        eigenvectors(1, i),
+                        eigenvectors(2, i));
+                R3::Vector vj(
+                        eigenvectors(0, j),
+                        eigenvectors(1, j),
+                        eigenvectors(2, j));
+                TS_ASSERT_DELTA(0.0, R3::dot(vi, vj), 1.0e-8);
+            }
+        }
+    }
+
+
 };  // class TestR3linalg
 
 // End of file

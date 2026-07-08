@@ -1,21 +1,3 @@
-/*************************************************************************************
-*
-* libdiffpy         by DANSE Diffraction group
-*                   Simon J. L. Billinge
-*                   (c) 2009 The Trustees of Columbia University
-*                   in the City of New York.  All rights reserved.
-*
-* File coded by:    Hai Qiao
-*
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE_DANSE.txt for license information.
-*
-/*************************************************************************************
-*
-* class PDF3DCalculator -- Implementation of PDF3DCalculator
-*
-*************************************************************************************/
-
 #include <diffpy/srreal/PDF3DCalculator.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -65,9 +47,7 @@ PDF3DCalculator::PDF3DCalculator() :
     mdeltaKeyTolerance3d(1.0e-6),
     museadpscaleSensitivity3d(false),
     madpScale3d(1.0),
-    mrho0backgroundscale3d(1.0),
-    mtotaloccupancy(0.0),
-    msfaverage(0.0)
+    mrho0backgroundscale3d(1.0)
 {
     this->registerDoubleAttribute("enable_nn_delta3d",
             this,
@@ -444,44 +424,7 @@ QuantityType PDF3DCalculator::get3DPDF() const
     std::vector<double> grid = mgrid3d;
     if (!this->isVectorHistogramMode3D())
     {
-        if (musecqwindow3d) applyQWindow3D(grid);
-
-        const double rdf_scale = (mtotaloccupancy * msfaverage == 0.0) ? 0.0 :
-            1.0 / (mtotaloccupancy * msfaverage * msfaverage);
-        if (rdf_scale != 1.0)
-        {
-            for (double& val : grid) val *= rdf_scale;
-        }
-
-        if (mapplyrho0background3d)
-        {
-            const double rho0_bg = computeRho0Background();
-            if (rho0_bg != 0.0)
-            {
-                for (double& val : grid) val -= rho0_bg;
-            }
-        }
-
-        double qdamp = 0.0;
-        try
-        {
-            qdamp = this->getEnvelopeByType("qresolution")->getDoubleAttr("qdamp");
-        }
-        catch (...)
-        {
-            qdamp = 0.0;
-        }
-        if (qdamp > 0.0)
-        {
-            for (size_t i = 0; i < grid.size(); ++i)
-            {
-                if (grid[i] == 0.0) continue;
-                double x, y, z;
-                indexToCoord(i, x, y, z);
-                const double r = sqrt(x * x + y * y + z * z);
-                grid[i] *= exp(-0.5 * (r * qdamp) * (r * qdamp));
-            }
-        }
+        this->applyPostProcessing3D(grid);
     }
 
     size_t nonzero_count = 0;
@@ -523,34 +466,7 @@ void PDF3DCalculator::exportGrid3DBinary(const std::string& path, bool usefloat3
     std::vector<double> grid = mgrid3d;
     if (applypost)
     {
-        if (musecqwindow3d) applyQWindow3D(grid);
-
-        const double rdf_scale = (mtotaloccupancy * msfaverage == 0.0) ? 0.0 :
-            1.0 / (mtotaloccupancy * msfaverage * msfaverage);
-        if (rdf_scale != 1.0)
-            for (double& val : grid) val *= rdf_scale;
-
-        if (mapplyrho0background3d)
-        {
-            const double rho0_bg = computeRho0Background();
-            if (rho0_bg != 0.0)
-                for (double& val : grid) val -= rho0_bg;
-        }
-
-        double qdamp = 0.0;
-        try { qdamp = this->getEnvelopeByType("qresolution")->getDoubleAttr("qdamp"); }
-        catch (...) { qdamp = 0.0; }
-        if (qdamp > 0.0)
-        {
-            for (size_t i = 0; i < grid.size(); ++i)
-            {
-                if (grid[i] == 0.0) continue;
-                double x, y, z;
-                indexToCoord(i, x, y, z);
-                const double r = sqrt(x * x + y * y + z * z);
-                grid[i] *= exp(-0.5 * (r * qdamp) * (r * qdamp));
-            }
-        }
+        this->applyPostProcessing3D(grid);
     }
 
     std::ofstream ofs(path.c_str(), std::ios::binary | std::ios::trunc);
@@ -576,6 +492,47 @@ void PDF3DCalculator::exportGrid3DBinary(const std::string& path, bool usefloat3
         }
     }
     if (!ofs) throw std::runtime_error("Failed while writing output file: " + path);
+}
+
+void PDF3DCalculator::applyPostProcessing3D(std::vector<double>& grid) const
+{
+    if (musecqwindow3d) applyQWindow3D(grid);
+
+    const double rdf_scale = this->getRDFScale();
+    if (rdf_scale != 1.0)
+    {
+        for (double& val : grid) val *= rdf_scale;
+    }
+
+    if (mapplyrho0background3d)
+    {
+        const double rho0_bg = computeRho0Background();
+        if (rho0_bg != 0.0)
+        {
+            for (double& val : grid) val -= rho0_bg;
+        }
+    }
+
+    double qdamp = 0.0;
+    try
+    {
+        qdamp = this->getEnvelopeByType("qresolution")->getDoubleAttr("qdamp");
+    }
+    catch (...)
+    {
+        qdamp = 0.0;
+    }
+    if (qdamp > 0.0)
+    {
+        for (size_t i = 0; i < grid.size(); ++i)
+        {
+            if (grid[i] == 0.0) continue;
+            double x, y, z;
+            indexToCoord(i, x, y, z);
+            const double r = sqrt(x * x + y * y + z * z);
+            grid[i] *= exp(-0.5 * (r * qdamp) * (r * qdamp));
+        }
+    }
 }
 
 double PDF3DCalculator::computeRho0Background() const
@@ -721,33 +678,6 @@ void PDF3DCalculator::applyQWindow3D(std::vector<double>& grid) const
 
 void PDF3DCalculator::resetValue()
 {
-    const StructureAdapterPtr& structure = this->getStructure();
-    if (!structure)
-    {
-        msfCache.clear();
-        mtotaloccupancy = 0.0;
-        msfaverage = 0.0;
-    }
-    else
-    {
-        int nsite = this->countSites();
-        msfCache.resize(nsite);
-        const auto& sftable = this->getScatteringFactorTable();
-
-        mtotaloccupancy = structure->totalOccupancy();
-        double totsf = 0.0;
-        for (int i = 0; i < nsite; ++i)
-        {
-            std::string atom_type = structure->siteAtomType(i);
-            const double sf = sftable->lookup(atom_type);
-            const double occ = structure->siteOccupancy(i);
-            const double mult = structure->siteMultiplicity(i);
-            msfCache[i] = sf * occ;
-            totsf += msfCache[i] * mult;
-        }
-        msfaverage = (mtotaloccupancy == 0.0) ? 0.0 : (totsf / mtotaloccupancy);
-    }
-
     // Ensure odd number of bins so origin is centered.
     mnbins = static_cast<int>(2 * ceil(this->getRmax() / mdr)) + 1;
     size_t total = static_cast<size_t>(mnbins) * mnbins * mnbins;
@@ -771,13 +701,14 @@ void PDF3DCalculator::addPairContribution(const BaseBondGenerator& bnds, int sum
 
     int i0 = bnds.site0();
     int i1 = bnds.site1();
+    int cntsites = this->countSites();
 
-    if (i0 >= static_cast<int>(msfCache.size()) || i1 >= static_cast<int>(msfCache.size()))
+    if (i0 >= cntsites || i1 >= cntsites)
         return;
 
     const R3::Vector& rvec = bnds.r01();
     const double pairscale = bnds.multiplicity() * static_cast<double>(summationscale);
-    double sfprod = msfCache[i0] * msfCache[i1] * pairscale;
+    double sfprod = this->sfSite(i0) * this->sfSite(i1) * pairscale;
 
     if (this->isVectorHistogramMode3D())
     {
@@ -860,7 +791,7 @@ void PDF3DCalculator::addAnisotropicGaussianToGrid(const R3::Vector& r_ij, const
         double min_val = center_val - cutoff_radius;
         double max_val = center_val + cutoff_radius;
 
-        // Node-centered grid: points at k * mdr
+        // Node-centered grid: points at k * md
         int start = static_cast<int>(ceil((min_val + halfspan) / mdr));
         int end   = static_cast<int>(floor((max_val + halfspan) / mdr));
 
