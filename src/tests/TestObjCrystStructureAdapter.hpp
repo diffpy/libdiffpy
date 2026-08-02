@@ -144,6 +144,21 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
         }
 
 
+        void test_real_translation_vectors()
+        {
+            // Ni.cif is F-centered.  Its four equivalent atoms require
+            // fetchSymmetryOperations to read ObjCryst translation vectors,
+            // including builds where ObjCryst::REAL is double.
+            CrystalStructureAdapterPtr ni =
+                boost::dynamic_pointer_cast<CrystalStructureAdapter>(m_ni);
+            TS_ASSERT(ni);
+            TS_ASSERT_EQUALS(4, ni->siteMultiplicity(0));
+            CrystalStructureAdapter::AtomVector equivalent =
+                ni->getEquivalentAtoms(0);
+            TS_ASSERT_EQUALS(4u, equivalent.size());
+        }
+
+
         void test_numberDensity()
         {
             const double eps = 1.0e-7;

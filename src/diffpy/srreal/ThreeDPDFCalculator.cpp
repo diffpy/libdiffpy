@@ -1,4 +1,4 @@
-#include <diffpy/srreal/PDF3DCalculator.hpp>
+#include <diffpy/srreal/ThreeDPDFCalculator.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <cmath>
@@ -21,12 +21,12 @@ namespace diffpy {
 namespace srreal {
 
 // Static constants
-constexpr double PDF3DCalculator::DEFAULT_RMAX_3D;
-constexpr double PDF3DCalculator::DEFAULT_GRID_STEP;
+constexpr double ThreeDPDFCalculator::DEFAULT_RMAX_3D;
+constexpr double ThreeDPDFCalculator::DEFAULT_GRID_STEP;
 
 // Constructor ---------------------------------------------------------------
 
-PDF3DCalculator::PDF3DCalculator() :
+ThreeDPDFCalculator::ThreeDPDFCalculator() :
     mdr(DEFAULT_GRID_STEP),
     mnbins(0),
     maccumblocksize(32),
@@ -51,59 +51,59 @@ PDF3DCalculator::PDF3DCalculator() :
 {
     this->registerDoubleAttribute("enable_nn_delta3d",
             this,
-            &PDF3DCalculator::getEnableNNDelta3DAttr,
-            &PDF3DCalculator::setEnableNNDelta3DAttr);
+            &ThreeDPDFCalculator::getEnableNNDelta3DAttr,
+            &ThreeDPDFCalculator::setEnableNNDelta3DAttr);
     this->registerDoubleAttribute("nn_delta3d",
             this,
-            &PDF3DCalculator::getNNDelta3D,
-            &PDF3DCalculator::setNNDelta3D);
+            &ThreeDPDFCalculator::getNNDelta3D,
+            &ThreeDPDFCalculator::setNNDelta3D);
     this->registerDoubleAttribute("nn_delta3d_upper_bound",
             this,
-            &PDF3DCalculator::getNNDelta3DUpperBound);
+            &ThreeDPDFCalculator::getNNDelta3DUpperBound);
     this->registerDoubleAttribute("nn_delta_positive_eta3d",
             this,
-            &PDF3DCalculator::getNNDeltaPositiveEta3D,
-            &PDF3DCalculator::setNNDeltaPositiveEta3D);
+            &ThreeDPDFCalculator::getNNDeltaPositiveEta3D,
+            &ThreeDPDFCalculator::setNNDeltaPositiveEta3D);
     this->registerDoubleAttribute("delta1_3d",
             this,
-            &PDF3DCalculator::getDistanceDelta1_3D,
-            &PDF3DCalculator::setDistanceDelta1_3D);
+            &ThreeDPDFCalculator::getDistanceDelta1_3D,
+            &ThreeDPDFCalculator::setDistanceDelta1_3D);
     this->registerDoubleAttribute("delta2_3d",
             this,
-            &PDF3DCalculator::getDistanceDelta2_3D,
-            &PDF3DCalculator::setDistanceDelta2_3D);
+            &ThreeDPDFCalculator::getDistanceDelta2_3D,
+            &ThreeDPDFCalculator::setDistanceDelta2_3D);
     this->registerDoubleAttribute("delta_shell_index3d",
             this,
-            &PDF3DCalculator::getDeltaShellIndex3DAttr,
-            &PDF3DCalculator::setDeltaShellIndex3DAttr);
+            &ThreeDPDFCalculator::getDeltaShellIndex3DAttr,
+            &ThreeDPDFCalculator::setDeltaShellIndex3DAttr);
     this->registerDoubleAttribute("delta_shell_tolerance3d",
             this,
-            &PDF3DCalculator::getDeltaShellTolerance3D,
-            &PDF3DCalculator::setDeltaShellTolerance3D);
+            &ThreeDPDFCalculator::getDeltaShellTolerance3D,
+            &ThreeDPDFCalculator::setDeltaShellTolerance3D);
     this->registerDoubleAttribute("delta_key_tolerance3d",
             this,
-            &PDF3DCalculator::getDeltaKeyTolerance3D,
-            &PDF3DCalculator::setDeltaKeyTolerance3D);
+            &ThreeDPDFCalculator::getDeltaKeyTolerance3D,
+            &ThreeDPDFCalculator::setDeltaKeyTolerance3D);
     this->registerDoubleAttribute("use_adp_scale_sensitivity3d",
             this,
-            &PDF3DCalculator::getUseADPScaleSensitivity3DAttr,
-            &PDF3DCalculator::setUseADPScaleSensitivity3DAttr);
+            &ThreeDPDFCalculator::getUseADPScaleSensitivity3DAttr,
+            &ThreeDPDFCalculator::setUseADPScaleSensitivity3DAttr);
     this->registerDoubleAttribute("adp_scale3d",
             this,
-            &PDF3DCalculator::getADPScale3D,
-            &PDF3DCalculator::setADPScale3D);
+            &ThreeDPDFCalculator::getADPScale3D,
+            &ThreeDPDFCalculator::setADPScale3D);
     this->registerDoubleAttribute("rho0_background_scale3d",
             this,
-            &PDF3DCalculator::getRho0BackgroundScale3D,
-            &PDF3DCalculator::setRho0BackgroundScale3D);
+            &ThreeDPDFCalculator::getRho0BackgroundScale3D,
+            &ThreeDPDFCalculator::setRho0BackgroundScale3D);
     this->registerDoubleAttribute("calculation_mode3d",
             this,
-            &PDF3DCalculator::getCalculationMode3DAttr,
-            &PDF3DCalculator::setCalculationMode3DAttr);
+            &ThreeDPDFCalculator::getCalculationMode3DAttr,
+            &ThreeDPDFCalculator::setCalculationMode3DAttr);
     this->registerDoubleAttribute("histogram_weight_mode3d",
             this,
-            &PDF3DCalculator::getHistogramWeightMode3DAttr,
-            &PDF3DCalculator::setHistogramWeightMode3DAttr);
+            &ThreeDPDFCalculator::getHistogramWeightMode3DAttr,
+            &ThreeDPDFCalculator::setHistogramWeightMode3DAttr);
 
     this->setRmax(DEFAULT_RMAX_3D);
     this->setRstep(mdr);
@@ -112,7 +112,7 @@ PDF3DCalculator::PDF3DCalculator() :
 
 // Public Methods ------------------------------------------------------------
 
-void PDF3DCalculator::setGridStep(double dr)
+void ThreeDPDFCalculator::setGridStep(double dr)
 {
     if (dr <= 0) throw std::invalid_argument("Grid step must be positive.");
     if (dr != mdr)
@@ -123,43 +123,43 @@ void PDF3DCalculator::setGridStep(double dr)
     }
 }
 
-double PDF3DCalculator::getGridStep() const
+double ThreeDPDFCalculator::getGridStep() const
 {
     return mdr;
 }
 
-void PDF3DCalculator::setAccumBlockSize(int bs)
+void ThreeDPDFCalculator::setAccumBlockSize(int bs)
 {
     if (bs <= 0) throw std::invalid_argument("Accumulation block size must be positive.");
     maccumblocksize = bs;
 }
 
-int PDF3DCalculator::getAccumBlockSize() const
+int ThreeDPDFCalculator::getAccumBlockSize() const
 {
     return maccumblocksize;
 }
 
-void PDF3DCalculator::setApplyRho0Background3D(bool v)
+void ThreeDPDFCalculator::setApplyRho0Background3D(bool v)
 {
     mapplyrho0background3d = v;
 }
 
-bool PDF3DCalculator::getApplyRho0Background3D() const
+bool ThreeDPDFCalculator::getApplyRho0Background3D() const
 {
     return mapplyrho0background3d;
 }
 
-void PDF3DCalculator::setUseCQWindow3D(bool v)
+void ThreeDPDFCalculator::setUseCQWindow3D(bool v)
 {
     musecqwindow3d = v;
 }
 
-bool PDF3DCalculator::getUseCQWindow3D() const
+bool ThreeDPDFCalculator::getUseCQWindow3D() const
 {
     return musecqwindow3d;
 }
 
-void PDF3DCalculator::setCalculationMode3D(int mode)
+void ThreeDPDFCalculator::setCalculationMode3D(int mode)
 {
     if (mode != 0 && mode != 1)
         throw std::invalid_argument("3D calculation mode must be 0 (ADP PDF) or 1 (vector histogram).");
@@ -167,17 +167,17 @@ void PDF3DCalculator::setCalculationMode3D(int mode)
     mcalculationmode3d = mode;
 }
 
-int PDF3DCalculator::getCalculationMode3D() const
+int ThreeDPDFCalculator::getCalculationMode3D() const
 {
     return mcalculationmode3d;
 }
 
-double PDF3DCalculator::getCalculationMode3DAttr() const
+double ThreeDPDFCalculator::getCalculationMode3DAttr() const
 {
     return static_cast<double>(mcalculationmode3d);
 }
 
-void PDF3DCalculator::setCalculationMode3DAttr(double v)
+void ThreeDPDFCalculator::setCalculationMode3DAttr(double v)
 {
     const int mode = static_cast<int>(std::lround(v));
     if (std::fabs(v - static_cast<double>(mode)) > 1.0e-8)
@@ -185,7 +185,7 @@ void PDF3DCalculator::setCalculationMode3DAttr(double v)
     this->setCalculationMode3D(mode);
 }
 
-void PDF3DCalculator::setHistogramWeightMode3D(int mode)
+void ThreeDPDFCalculator::setHistogramWeightMode3D(int mode)
 {
     if (mode != 0 && mode != 1)
         throw std::invalid_argument("3D histogram weight mode must be 0 (scattering) or 1 (count).");
@@ -193,17 +193,17 @@ void PDF3DCalculator::setHistogramWeightMode3D(int mode)
     mhistogramweightmode3d = mode;
 }
 
-int PDF3DCalculator::getHistogramWeightMode3D() const
+int ThreeDPDFCalculator::getHistogramWeightMode3D() const
 {
     return mhistogramweightmode3d;
 }
 
-double PDF3DCalculator::getHistogramWeightMode3DAttr() const
+double ThreeDPDFCalculator::getHistogramWeightMode3DAttr() const
 {
     return static_cast<double>(mhistogramweightmode3d);
 }
 
-void PDF3DCalculator::setHistogramWeightMode3DAttr(double v)
+void ThreeDPDFCalculator::setHistogramWeightMode3DAttr(double v)
 {
     const int mode = static_cast<int>(std::lround(v));
     if (std::fabs(v - static_cast<double>(mode)) > 1.0e-8)
@@ -211,28 +211,28 @@ void PDF3DCalculator::setHistogramWeightMode3DAttr(double v)
     this->setHistogramWeightMode3D(mode);
 }
 
-void PDF3DCalculator::setEnableNNDelta3D(bool v)
+void ThreeDPDFCalculator::setEnableNNDelta3D(bool v)
 {
     if (menablennDelta3d != v)  mticker.click();
     menablennDelta3d = v;
 }
 
-bool PDF3DCalculator::getEnableNNDelta3D() const
+bool ThreeDPDFCalculator::getEnableNNDelta3D() const
 {
     return menablennDelta3d;
 }
 
-double PDF3DCalculator::getEnableNNDelta3DAttr() const
+double ThreeDPDFCalculator::getEnableNNDelta3DAttr() const
 {
     return menablennDelta3d ? 1.0 : 0.0;
 }
 
-void PDF3DCalculator::setEnableNNDelta3DAttr(double v)
+void ThreeDPDFCalculator::setEnableNNDelta3DAttr(double v)
 {
     this->setEnableNNDelta3D(v != 0.0);
 }
 
-void PDF3DCalculator::setNNDelta3D(double v)
+void ThreeDPDFCalculator::setNNDelta3D(double v)
 {
     if (v < 0.0) throw std::invalid_argument("3D NN delta must be non-negative.");
     const double bound = this->currentNNDeltaUpperBound();
@@ -247,22 +247,22 @@ void PDF3DCalculator::setNNDelta3D(double v)
     mnnDelta3d = v;
 }
 
-const double& PDF3DCalculator::getNNDelta3D() const
+const double& ThreeDPDFCalculator::getNNDelta3D() const
 {
     return mnnDelta3d;
 }
 
-double PDF3DCalculator::getNNDelta3DUpperBound() const
+double ThreeDPDFCalculator::getNNDelta3DUpperBound() const
 {
     return this->currentNNDeltaUpperBound();
 }
 
-const double& PDF3DCalculator::getNNDeltaPositiveEta3D() const
+const double& ThreeDPDFCalculator::getNNDeltaPositiveEta3D() const
 {
     return mnnDeltaPositiveEta3d;
 }
 
-void PDF3DCalculator::setNNDeltaPositiveEta3D(double v)
+void ThreeDPDFCalculator::setNNDeltaPositiveEta3D(double v)
 {
     if (v <= 0.0 || v >= 1.0)
         throw std::invalid_argument("Positive-definite eta must be between 0 and 1.");
@@ -275,7 +275,7 @@ void PDF3DCalculator::setNNDeltaPositiveEta3D(double v)
     this->validateDistanceDecayDelta3D();
 }
 
-void PDF3DCalculator::setDistanceDelta1_3D(double v)
+void ThreeDPDFCalculator::setDistanceDelta1_3D(double v)
 {
     if (v < 0.0) throw std::invalid_argument("3D distance-delta delta1 must be non-negative.");
     if (mdistanceDelta1_3d != v)  mticker.click();
@@ -283,12 +283,12 @@ void PDF3DCalculator::setDistanceDelta1_3D(double v)
     this->validateDistanceDecayDelta3D();
 }
 
-const double& PDF3DCalculator::getDistanceDelta1_3D() const
+const double& ThreeDPDFCalculator::getDistanceDelta1_3D() const
 {
     return mdistanceDelta1_3d;
 }
 
-void PDF3DCalculator::setDistanceDelta2_3D(double v)
+void ThreeDPDFCalculator::setDistanceDelta2_3D(double v)
 {
     if (v < 0.0) throw std::invalid_argument("3D distance-delta delta2 must be non-negative.");
     if (mdistanceDelta2_3d != v)  mticker.click();
@@ -296,12 +296,12 @@ void PDF3DCalculator::setDistanceDelta2_3D(double v)
     this->validateDistanceDecayDelta3D();
 }
 
-const double& PDF3DCalculator::getDistanceDelta2_3D() const
+const double& ThreeDPDFCalculator::getDistanceDelta2_3D() const
 {
     return mdistanceDelta2_3d;
 }
 
-void PDF3DCalculator::setDeltaPairTypes3D(const std::string& a, const std::string& b)
+void ThreeDPDFCalculator::setDeltaPairTypes3D(const std::string& a, const std::string& b)
 {
     if (a.empty() || b.empty())
         throw std::invalid_argument("Delta pair atom types must be non-empty.");
@@ -310,90 +310,90 @@ void PDF3DCalculator::setDeltaPairTypes3D(const std::string& a, const std::strin
     mdeltaPairB3d = b;
 }
 
-const std::string& PDF3DCalculator::getDeltaPairA3D() const
+const std::string& ThreeDPDFCalculator::getDeltaPairA3D() const
 {
     return mdeltaPairA3d;
 }
 
-const std::string& PDF3DCalculator::getDeltaPairB3D() const
+const std::string& ThreeDPDFCalculator::getDeltaPairB3D() const
 {
     return mdeltaPairB3d;
 }
 
-void PDF3DCalculator::setDeltaShellIndex3D(int v)
+void ThreeDPDFCalculator::setDeltaShellIndex3D(int v)
 {
     if (v <= 0) throw std::invalid_argument("Delta shell index must be positive.");
     if (mdeltaShellIndex3d != v)  mticker.click();
     mdeltaShellIndex3d = v;
 }
 
-int PDF3DCalculator::getDeltaShellIndex3D() const
+int ThreeDPDFCalculator::getDeltaShellIndex3D() const
 {
     return mdeltaShellIndex3d;
 }
 
-double PDF3DCalculator::getDeltaShellIndex3DAttr() const
+double ThreeDPDFCalculator::getDeltaShellIndex3DAttr() const
 {
     return static_cast<double>(mdeltaShellIndex3d);
 }
 
-void PDF3DCalculator::setDeltaShellIndex3DAttr(double v)
+void ThreeDPDFCalculator::setDeltaShellIndex3DAttr(double v)
 {
     this->setDeltaShellIndex3D(static_cast<int>(std::floor(v + 0.5)));
 }
 
-const double& PDF3DCalculator::getDeltaShellTolerance3D() const
+const double& ThreeDPDFCalculator::getDeltaShellTolerance3D() const
 {
     return mdeltaShellTolerance3d;
 }
 
-void PDF3DCalculator::setDeltaShellTolerance3D(double v)
+void ThreeDPDFCalculator::setDeltaShellTolerance3D(double v)
 {
     if (v <= 0.0) throw std::invalid_argument("Delta shell tolerance must be positive.");
     if (mdeltaShellTolerance3d != v)  mticker.click();
     mdeltaShellTolerance3d = v;
 }
 
-const double& PDF3DCalculator::getDeltaKeyTolerance3D() const
+const double& ThreeDPDFCalculator::getDeltaKeyTolerance3D() const
 {
     return mdeltaKeyTolerance3d;
 }
 
-void PDF3DCalculator::setDeltaKeyTolerance3D(double v)
+void ThreeDPDFCalculator::setDeltaKeyTolerance3D(double v)
 {
     if (v <= 0.0) throw std::invalid_argument("Delta key tolerance must be positive.");
     if (mdeltaKeyTolerance3d != v)  mticker.click();
     mdeltaKeyTolerance3d = v;
 }
 
-int PDF3DCalculator::getDeltaEligiblePairCount3D() const
+int ThreeDPDFCalculator::getDeltaEligiblePairCount3D() const
 {
     return static_cast<int>(mdeltaEligibleBondKeys.size());
 }
 
-void PDF3DCalculator::setUseADPScaleSensitivity3D(bool v)
+void ThreeDPDFCalculator::setUseADPScaleSensitivity3D(bool v)
 {
     if (museadpscaleSensitivity3d != v)  mticker.click();
     museadpscaleSensitivity3d = v;
     this->validateNNDelta3D();
 }
 
-bool PDF3DCalculator::getUseADPScaleSensitivity3D() const
+bool ThreeDPDFCalculator::getUseADPScaleSensitivity3D() const
 {
     return museadpscaleSensitivity3d;
 }
 
-double PDF3DCalculator::getUseADPScaleSensitivity3DAttr() const
+double ThreeDPDFCalculator::getUseADPScaleSensitivity3DAttr() const
 {
     return museadpscaleSensitivity3d ? 1.0 : 0.0;
 }
 
-void PDF3DCalculator::setUseADPScaleSensitivity3DAttr(double v)
+void ThreeDPDFCalculator::setUseADPScaleSensitivity3DAttr(double v)
 {
     this->setUseADPScaleSensitivity3D(v != 0.0);
 }
 
-void PDF3DCalculator::setADPScale3D(double v)
+void ThreeDPDFCalculator::setADPScale3D(double v)
 {
     if (v <= 0.0) throw std::invalid_argument("3D ADP scale must be positive.");
     if (madpScale3d != v)  mticker.click();
@@ -401,24 +401,24 @@ void PDF3DCalculator::setADPScale3D(double v)
     this->validateNNDelta3D();
 }
 
-const double& PDF3DCalculator::getADPScale3D() const
+const double& ThreeDPDFCalculator::getADPScale3D() const
 {
     return madpScale3d;
 }
 
-void PDF3DCalculator::setRho0BackgroundScale3D(double v)
+void ThreeDPDFCalculator::setRho0BackgroundScale3D(double v)
 {
     if (v < 0.0) throw std::invalid_argument("3D rho0 background scale must be non-negative.");
     if (mrho0backgroundscale3d != v)  mticker.click();
     mrho0backgroundscale3d = v;
 }
 
-const double& PDF3DCalculator::getRho0BackgroundScale3D() const
+const double& ThreeDPDFCalculator::getRho0BackgroundScale3D() const
 {
     return mrho0backgroundscale3d;
 }
 
-QuantityType PDF3DCalculator::get3DPDF() const
+QuantityType ThreeDPDFCalculator::getThreeDPDF() const
 {
     QuantityType result;
     std::vector<double> grid = mgrid3d;
@@ -449,7 +449,7 @@ QuantityType PDF3DCalculator::get3DPDF() const
     return result;
 }
 
-QuantityType PDF3DCalculator::getRadialHistogram3D() const
+QuantityType ThreeDPDFCalculator::getRadialHistogram3D() const
 {
     QuantityType result;
     result.reserve(mradialhistogram3d.size() * 2);
@@ -461,7 +461,7 @@ QuantityType PDF3DCalculator::getRadialHistogram3D() const
     return result;
 }
 
-void PDF3DCalculator::exportGrid3DBinary(const std::string& path, bool usefloat32, bool applypost) const
+void ThreeDPDFCalculator::exportGrid3DBinary(const std::string& path, bool usefloat32, bool applypost) const
 {
     std::vector<double> grid = mgrid3d;
     if (applypost)
@@ -494,7 +494,7 @@ void PDF3DCalculator::exportGrid3DBinary(const std::string& path, bool usefloat3
     if (!ofs) throw std::runtime_error("Failed while writing output file: " + path);
 }
 
-void PDF3DCalculator::applyPostProcessing3D(std::vector<double>& grid) const
+void ThreeDPDFCalculator::applyPostProcessing3D(std::vector<double>& grid) const
 {
     if (musecqwindow3d) applyQWindow3D(grid);
 
@@ -535,7 +535,7 @@ void PDF3DCalculator::applyPostProcessing3D(std::vector<double>& grid) const
     }
 }
 
-double PDF3DCalculator::computeRho0Background() const
+double ThreeDPDFCalculator::computeRho0Background() const
 {
     const StructureAdapterPtr& structure = this->getStructure();
     if (!structure)  return 0.0;
@@ -543,7 +543,7 @@ double PDF3DCalculator::computeRho0Background() const
     return mrho0backgroundscale3d * partialpdfscale * structure->numberDensity();
 }
 
-void PDF3DCalculator::applyQWindow3D(std::vector<double>& grid) const
+void ThreeDPDFCalculator::applyQWindow3D(std::vector<double>& grid) const
 {
     if (grid.empty())  return;
 
@@ -676,7 +676,7 @@ void PDF3DCalculator::applyQWindow3D(std::vector<double>& grid) const
 
 // Protected Methods ---------------------------------------------------------
 
-void PDF3DCalculator::resetValue()
+void ThreeDPDFCalculator::resetValue()
 {
     // Ensure odd number of bins so origin is centered.
     mnbins = static_cast<int>(2 * ceil(this->getRmax() / mdr)) + 1;
@@ -695,7 +695,7 @@ void PDF3DCalculator::resetValue()
     if (mevaluator) mevaluator->setFlag(USEFULLSUM, true);
 }
 
-void PDF3DCalculator::addPairContribution(const BaseBondGenerator& bnds, int summationscale)
+void ThreeDPDFCalculator::addPairContribution(const BaseBondGenerator& bnds, int summationscale)
 {
     if (bnds.distance() == 0.0) return;
 
@@ -724,7 +724,7 @@ void PDF3DCalculator::addPairContribution(const BaseBondGenerator& bnds, int sum
     addAnisotropicGaussianToGrid(rvec, Sigma, sfprod);
 }
 
-void PDF3DCalculator::addVectorHistogramToGrid(const R3::Vector& r_ij, double distance, double weight)
+void ThreeDPDFCalculator::addVectorHistogramToGrid(const R3::Vector& r_ij, double distance, double weight)
 {
     if (weight == 0.0)  return;
 
@@ -750,7 +750,7 @@ void PDF3DCalculator::addVectorHistogramToGrid(const R3::Vector& r_ij, double di
     }
 }
 
-void PDF3DCalculator::addAnisotropicGaussianToGrid(const R3::Vector& r_ij, const R3::Matrix& Sigma, double sfprod)
+void ThreeDPDFCalculator::addAnisotropicGaussianToGrid(const R3::Vector& r_ij, const R3::Matrix& Sigma, double sfprod)
 {
     // Eigenvalue decomposition
     R3::Vector eigenvalues;
@@ -873,7 +873,7 @@ void PDF3DCalculator::addAnisotropicGaussianToGrid(const R3::Vector& r_ij, const
                     if (!any) continue;
 
 #ifdef _OPENMP
-#pragma omp critical(pdf3d_tile_reduce)
+#pragma omp critical(threedpdf_tile_reduce)
 #endif
                     {
                         for (int lz = 0; lz < tz; ++lz)
@@ -902,13 +902,13 @@ void PDF3DCalculator::addAnisotropicGaussianToGrid(const R3::Vector& r_ij, const
 
 // Private Helpers -----------------------------------------------------------
 
-bool PDF3DCalculator::DeltaBondKey::operator==(const DeltaBondKey& other) const
+bool ThreeDPDFCalculator::DeltaBondKey::operator==(const DeltaBondKey& other) const
 {
     return site0 == other.site0 && site1 == other.site1 &&
         rx == other.rx && ry == other.ry && rz == other.rz;
 }
 
-size_t PDF3DCalculator::DeltaBondKeyHash::operator()(const DeltaBondKey& key) const
+size_t ThreeDPDFCalculator::DeltaBondKeyHash::operator()(const DeltaBondKey& key) const
 {
     size_t seed = 0;
     seed ^= std::hash<int>()(key.site0) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
@@ -919,7 +919,7 @@ size_t PDF3DCalculator::DeltaBondKeyHash::operator()(const DeltaBondKey& key) co
     return seed;
 }
 
-bool PDF3DCalculator::matchesDeltaPairTypes(
+bool ThreeDPDFCalculator::matchesDeltaPairTypes(
         const std::string& atom0, const std::string& atom1) const
 {
     const bool allpairs = (mdeltaPairA3d == "*" && mdeltaPairB3d == "*");
@@ -935,8 +935,8 @@ bool PDF3DCalculator::matchesDeltaPairTypes(
         (atom0 == mdeltaPairB3d && atom1 == mdeltaPairA3d);
 }
 
-PDF3DCalculator::DeltaBondKey
-PDF3DCalculator::makeDeltaBondKey(const BaseBondGenerator& bnds) const
+ThreeDPDFCalculator::DeltaBondKey
+ThreeDPDFCalculator::makeDeltaBondKey(const BaseBondGenerator& bnds) const
 {
     const R3::Vector& r = bnds.r01();
     DeltaBondKey key;
@@ -948,14 +948,14 @@ PDF3DCalculator::makeDeltaBondKey(const BaseBondGenerator& bnds) const
     return key;
 }
 
-bool PDF3DCalculator::isDeltaEligiblePair(const BaseBondGenerator& bnds) const
+bool ThreeDPDFCalculator::isDeltaEligiblePair(const BaseBondGenerator& bnds) const
 {
     if (!menablennDelta3d || mnnDelta3d == 0.0)  return false;
     return mdeltaEligibleBondKeys.find(this->makeDeltaBondKey(bnds)) !=
         mdeltaEligibleBondKeys.end();
 }
 
-double PDF3DCalculator::projectedSigmaAlongBond(
+double ThreeDPDFCalculator::projectedSigmaAlongBond(
         const R3::Matrix& Sigma,
         const R3::Vector& r,
         double distance) const
@@ -966,7 +966,7 @@ double PDF3DCalculator::projectedSigmaAlongBond(
     return R3::dot(e, tmp);
 }
 
-double PDF3DCalculator::positiveDeltaBoundAlongBond(
+double ThreeDPDFCalculator::positiveDeltaBoundAlongBond(
         const R3::Matrix& Sigma,
         const R3::Vector& r,
         double distance) const
@@ -993,32 +993,32 @@ double PDF3DCalculator::positiveDeltaBoundAlongBond(
     }
 }
 
-bool PDF3DCalculator::isDistanceDecayDeltaActive() const
+bool ThreeDPDFCalculator::isDistanceDecayDeltaActive() const
 {
     return menablennDelta3d &&
         (mdistanceDelta1_3d > 0.0 || mdistanceDelta2_3d > 0.0);
 }
 
-double PDF3DCalculator::distanceDecayDeltaFraction(double distance) const
+double ThreeDPDFCalculator::distanceDecayDeltaFraction(double distance) const
 {
     if (distance <= 0.0)  return 0.0;
     return mdistanceDelta1_3d / distance +
         mdistanceDelta2_3d / (distance * distance);
 }
 
-double PDF3DCalculator::currentNNDeltaUpperBound() const
+double ThreeDPDFCalculator::currentNNDeltaUpperBound() const
 {
     if (mnnDelta3dUpperBound <= 0.0)  return 0.0;
     return museadpscaleSensitivity3d ?
         (mnnDelta3dUpperBound * madpScale3d) : mnnDelta3dUpperBound;
 }
 
-bool PDF3DCalculator::isVectorHistogramMode3D() const
+bool ThreeDPDFCalculator::isVectorHistogramMode3D() const
 {
     return mcalculationmode3d == 1;
 }
 
-void PDF3DCalculator::validateNNDelta3D() const
+void ThreeDPDFCalculator::validateNNDelta3D() const
 {
     if (this->isVectorHistogramMode3D())  return;
     if (mnnDelta3d < 0.0)
@@ -1031,7 +1031,7 @@ void PDF3DCalculator::validateNNDelta3D() const
         throw std::invalid_argument("3D NN delta exceeds the positive-definite shell bound.");
 }
 
-void PDF3DCalculator::validateDistanceDecayDelta3D() const
+void ThreeDPDFCalculator::validateDistanceDecayDelta3D() const
 {
     if (this->isVectorHistogramMode3D())  return;
     if (mdistanceDelta1_3d < 0.0 || mdistanceDelta2_3d < 0.0)
@@ -1052,7 +1052,7 @@ void PDF3DCalculator::validateDistanceDecayDelta3D() const
     }
 }
 
-void PDF3DCalculator::buildDeltaEligibleShellTable()
+void ThreeDPDFCalculator::buildDeltaEligibleShellTable()
 {
     mdeltaEligibleBondKeys.clear();
     mdeltaShellRecords.clear();
@@ -1146,7 +1146,7 @@ void PDF3DCalculator::buildDeltaEligibleShellTable()
     }
 }
 
-R3::Matrix PDF3DCalculator::effectivePairCovariance(
+R3::Matrix ThreeDPDFCalculator::effectivePairCovariance(
         const BaseBondGenerator& bnds,
         const R3::Matrix& U_i,
         const R3::Matrix& U_j) const
@@ -1202,7 +1202,7 @@ R3::Matrix PDF3DCalculator::effectivePairCovariance(
     return Sigma;
 }
 
-size_t PDF3DCalculator::coordToIndex(double x, double y, double z) const
+size_t ThreeDPDFCalculator::coordToIndex(double x, double y, double z) const
 {
     double halfspan = (mnbins / 2) * mdr;
     if (fabs(x) > halfspan || fabs(y) > halfspan || fabs(z) > halfspan)
@@ -1219,7 +1219,7 @@ size_t PDF3DCalculator::coordToIndex(double x, double y, double z) const
     return static_cast<size_t>((iz * mnbins + iy) * mnbins + ix);
 }
 
-void PDF3DCalculator::indexToCoord(size_t idx, double& x, double& y, double& z) const
+void ThreeDPDFCalculator::indexToCoord(size_t idx, double& x, double& y, double& z) const
 {
     size_t iz = idx / (static_cast<size_t>(mnbins) * mnbins);
     size_t rem = idx % (static_cast<size_t>(mnbins) * mnbins);
@@ -1236,4 +1236,4 @@ void PDF3DCalculator::indexToCoord(size_t idx, double& x, double& y, double& z) 
 }   // namespace diffpy
 
 #include <diffpy/serialization.ipp>
-DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::PDF3DCalculator)
+DIFFPY_INSTANTIATE_SERIALIZATION(diffpy::srreal::ThreeDPDFCalculator)
