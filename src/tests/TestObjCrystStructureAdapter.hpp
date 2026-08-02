@@ -19,6 +19,7 @@
 *
 *****************************************************************************/
 
+#include <memory>
 #include <typeinfo>
 #include <cxxtest/TestSuite.h>
 
@@ -150,7 +151,7 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
             // fetchSymmetryOperations to read ObjCryst translation vectors,
             // including builds where ObjCryst::REAL is double.
             CrystalStructureAdapterPtr ni =
-                boost::dynamic_pointer_cast<CrystalStructureAdapter>(m_ni);
+                std::dynamic_pointer_cast<CrystalStructureAdapter>(m_ni);
             TS_ASSERT(ni);
             TS_ASSERT_EQUALS(4, ni->siteMultiplicity(0));
             CrystalStructureAdapter::AtomVector equivalent =

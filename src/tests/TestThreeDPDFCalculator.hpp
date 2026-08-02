@@ -10,10 +10,10 @@
 #include <cstdio>
 #include <fstream>
 #include <limits>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <boost/make_shared.hpp>
 
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/PeriodicStructureAdapter.hpp>
@@ -31,7 +31,7 @@ AtomicStructureAdapterPtr
 makeDimer(const string& atomtype, double uiso)
 {
     AtomicStructureAdapterPtr stru =
-        boost::make_shared<AtomicStructureAdapter>();
+        std::make_shared<AtomicStructureAdapter>();
     Atom atom;
     atom.atomtype = atomtype;
     atom.xyz_cartn = R3::Vector(0.0, 0.0, 0.0);
@@ -49,7 +49,7 @@ PeriodicStructureAdapterPtr
 makePeriodicDimer()
 {
     PeriodicStructureAdapterPtr stru =
-        boost::make_shared<PeriodicStructureAdapter>();
+        std::make_shared<PeriodicStructureAdapter>();
     stru->setLatPar(10.0, 10.0, 10.0, 90.0, 90.0, 90.0);
     AtomicStructureAdapterPtr atoms = makeDimer("Ni", 0.004);
     stru->append(atoms->at(0));
@@ -136,7 +136,7 @@ class TestThreeDPDFCalculator : public CxxTest::TestSuite
 {
     private:
 
-        boost::shared_ptr<ThreeDPDFCalculator> mpdfc;
+        std::shared_ptr<ThreeDPDFCalculator> mpdfc;
         AtomicStructureAdapterPtr mstru2;
         double meps;
         const string mfloat32path = "threedpdf_test_float32.bin";
@@ -484,7 +484,7 @@ class TestThreeDPDFCalculator : public CxxTest::TestSuite
             oa << mpdfc;
             diffpy::serialization::iarchive ia(
                     storage, ios::binary);
-            boost::shared_ptr<ThreeDPDFCalculator> restored;
+            std::shared_ptr<ThreeDPDFCalculator> restored;
             ia >> restored;
 
             TS_ASSERT_DIFFERS(restored.get(), mpdfc.get());
