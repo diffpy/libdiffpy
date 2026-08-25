@@ -19,6 +19,7 @@
 *
 *****************************************************************************/
 
+#include <memory>
 #include <typeinfo>
 #include <cxxtest/TestSuite.h>
 
@@ -141,6 +142,21 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(4.0, m_ni->totalOccupancy());
             TS_ASSERT_EQUALS(23.0, m_kbise->totalOccupancy());
             TS_ASSERT_EQUALS(20.0, m_catio3->totalOccupancy());
+        }
+
+
+        void test_real_translation_vectors()
+        {
+            // Ni.cif is F-centered.  Its four equivalent atoms require
+            // fetchSymmetryOperations to read ObjCryst translation vectors,
+            // including builds where ObjCryst::REAL is double.
+            CrystalStructureAdapterPtr ni =
+                std::dynamic_pointer_cast<CrystalStructureAdapter>(m_ni);
+            TS_ASSERT(ni);
+            TS_ASSERT_EQUALS(4, ni->siteMultiplicity(0));
+            CrystalStructureAdapter::AtomVector equivalent =
+                ni->getEquivalentAtoms(0);
+            TS_ASSERT_EQUALS(4u, equivalent.size());
         }
 
 

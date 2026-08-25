@@ -114,6 +114,14 @@ class PDFCalculator :
         // support for PQEvaluatorOptimized
         virtual void stashPartialValue();
         virtual void restorePartialValue();
+        /// activeoccupancy / totaloccupancy used by baseline background term
+        double getPartialPDFScale() const;
+        /// RDF scale from the cached total occupancy and average scattering factor
+        double getRDFScale() const;
+        /// effective scattering factor at a given site scaled by occupancy
+        const double& sfSite(int) const;
+        /// average scattering factor
+        double sfAverage() const;
 
     private:
 
@@ -145,10 +153,6 @@ class PDFCalculator :
         void cutRipplePoints(QuantityType& y) const;
 
         // structure factors - fast lookup by site index
-        /// effective scattering factor at a given site scaled by occupancy
-        const double& sfSite(int) const;
-        /// average scattering factor
-        double sfAverage() const;
         void cacheStructureData();
         void cacheRlimitsData();
 

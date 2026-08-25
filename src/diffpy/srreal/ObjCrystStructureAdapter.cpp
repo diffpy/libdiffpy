@@ -86,7 +86,9 @@ fetchSymmetryOperations(const ObjCryst::SpaceGroup& spacegroup)
     assert(nbtran * last <= nbsym);
     for (int nt = 0; nt < nbtran; ++nt)
     {
-        const REAL* pt = sgtrans[nt].tr;
+        // Keep this compatible with ObjCryst builds where REAL is either
+        // float or double.
+        const auto* pt = sgtrans[nt].tr;
         R3::Vector sgt(pt[0], pt[1], pt[2]);
         for (int i = 0; i < last; ++i)
         {
