@@ -10,12 +10,12 @@
 *
 ******************************************************************************
 *
-* PDF3DCalculator -- three-dimensional atomic pair distribution calculator
+* ThreeDPDFCalculator -- three-dimensional atomic pair distribution calculator
 *
 *****************************************************************************/
 
-#ifndef PDF3DCALCULATOR_HPP_INCLUDED
-#define PDF3DCALCULATOR_HPP_INCLUDED
+#ifndef THREEDPDFCALCULATOR_HPP_INCLUDED
+#define THREEDPDFCALCULATOR_HPP_INCLUDED
 
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <vector>
@@ -29,11 +29,11 @@
 namespace diffpy {
 namespace srreal {
 
-class PDF3DCalculator : public PDFCalculator
+class ThreeDPDFCalculator : public PDFCalculator
 {
 public:
     // constructor
-    PDF3DCalculator();
+    ThreeDPDFCalculator();
 
     // Public interface to retrieve 3D PDF data
     // Returns a flat vector of [x0, y0, z0, G0, x1, y1, z1, G1, ...]
@@ -257,4 +257,4 @@ private:
 }   // namespace srreal
 }   // namespace diffpy
 
-#endif  // PDF3DCALCULATOR_HPP_INCLUDED
+#endif  // THREEDPDFCALCULATOR_HPP_INCLUDED

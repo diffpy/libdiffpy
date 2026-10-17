@@ -10,25 +10,25 @@
 *
 ******************************************************************************
 *
-* class TestPDF3DCalculator -- unit tests for PDF3DCalculator
+* class TestThreeDPDFCalculator -- unit tests for ThreeDPDFCalculator
 *
 *****************************************************************************/
 
 #include <cxxtest/TestSuite.h>
 
-#include <diffpy/srreal/PDF3DCalculator.hpp>
+#include <diffpy/srreal/ThreeDPDFCalculator.hpp>
 
 using namespace diffpy::srreal;
 
 
-class TestPDF3DCalculator : public CxxTest::TestSuite
+class TestThreeDPDFCalculator : public CxxTest::TestSuite
 {
 
 public:
 
     void test_grid_step_stays_synchronized()
     {
-        PDF3DCalculator calc;
+        ThreeDPDFCalculator calc;
         TS_ASSERT_EQUALS(calc.getGridStep(), calc.getRstep());
 
         calc.setGridStep(0.25);
@@ -45,7 +45,7 @@ public:
 
     void test_modes_validation()
     {
-        PDF3DCalculator calc;
+        ThreeDPDFCalculator calc;
         calc.setCalculationMode3D(1);
         calc.setHistogramWeightMode3D(1);
         TS_ASSERT_EQUALS(1, calc.getCalculationMode3D());
@@ -55,6 +55,6 @@ public:
                 std::invalid_argument);
     }
 
-};  // class TestPDF3DCalculator
+};  // class TestThreeDPDFCalculator
 
 // End of file
