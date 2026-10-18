@@ -19,7 +19,7 @@
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/make_shared.hpp>
+#include <memory>
 
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
@@ -47,7 +47,7 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
         {
             mstru = StructureAdapterPtr(new AtomicStructureAdapter);
             mpstru =
-                boost::dynamic_pointer_cast<AtomicStructureAdapter>(mstru);
+                std::dynamic_pointer_cast<AtomicStructureAdapter>(mstru);
         }
 
 
@@ -73,7 +73,7 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
                 mpstru->append(ai);
             }
             AtomicStructureAdapterPtr cpstru =
-                boost::make_shared<AtomicStructureAdapter>(*mpstru);
+                std::make_shared<AtomicStructureAdapter>(*mpstru);
             sd = mstru->diff(mstru);
             TS_ASSERT(sd.allowsfastupdate())
             sd = mstru->diff(cpstru);
@@ -122,7 +122,7 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
             StructureAdapterPtr stru1;
             stru1 = dumpandload(mstru);
             AtomicStructureAdapterPtr astru1 =
-                boost::dynamic_pointer_cast<AtomicStructureAdapter>(stru1);
+                std::dynamic_pointer_cast<AtomicStructureAdapter>(stru1);
             TS_ASSERT_EQUALS(2, astru1->countSites());
             TS_ASSERT_EQUALS((*mpstru)[0], (*astru1)[0]);
             TS_ASSERT_EQUALS((*mpstru)[1], (*astru1)[1]);
@@ -140,7 +140,7 @@ class TestAtomicStructureAdapter : public CxxTest::TestSuite
                 mpstru->append(ai);
             }
             AtomicStructureAdapterPtr cpstru =
-                boost::make_shared<AtomicStructureAdapter>(*mpstru);
+                std::make_shared<AtomicStructureAdapter>(*mpstru);
             TS_ASSERT_EQUALS(*mpstru, *cpstru);
             TS_ASSERT(!(*mpstru != *cpstru));
             cpstru->at(0).atomtype = "H";

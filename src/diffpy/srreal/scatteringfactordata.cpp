@@ -100,8 +100,7 @@ class WaasKirfFormula
 };
 
 
-class wksmbl_equal :
-    public binary_function<WaasKirfFormula,WaasKirfFormula,bool>
+class wksmbl_equal
 {
     public:
         bool operator() (

@@ -18,7 +18,7 @@
 *   diffpy::serialization_fromstring
 *
 * Definition of macros for explicit instantiation of serialization_tostring
-* and serialization_fromstring for type C or type boost::shared_ptr<C>.
+* and serialization_fromstring for type C or type std::shared_ptr<C>.
 *
 *   DIFFPY_INSTANTIATE_SERIALIZATION(C)
 *   DIFFPY_INSTANTIATE_PTR_SERIALIZATION(C)
@@ -29,7 +29,7 @@
 #define SERIALIZATION_IPP_INCLUDED
 
 #include <sstream>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <diffpy/serialization.hpp>
 
 namespace diffpy {
@@ -70,9 +70,9 @@ void serialization_fromstring(T& tobj, const std::string& s)
         diffpy::serialization_fromstring<C>(C&, const std::string&); \
 
 /// Insert explicit instantiations for serialization_tostring and
-/// serialization_fromstring for type boost::shared_ptr<C>.
+/// serialization_fromstring for type std::shared_ptr<C>.
 
 #define DIFFPY_INSTANTIATE_PTR_SERIALIZATION(C) \
-    DIFFPY_INSTANTIATE_SERIALIZATION(boost::shared_ptr<C>)
+    DIFFPY_INSTANTIATE_SERIALIZATION(std::shared_ptr<C>)
 
 #endif  // SERIALIZATION_IPP_INCLUDED

@@ -70,7 +70,7 @@ BOOST_CLASS_EXPORT(PeriodicAdapterWithPQConfig)
 
 // Typedefs and Functions ----------------------------------------------------
 
-typedef boost::shared_ptr<PeriodicAdapterWithPQConfig>
+typedef std::shared_ptr<PeriodicAdapterWithPQConfig>
     PeriodicAdapterWithPQConfigPtr;
 
 inline
@@ -78,7 +78,7 @@ PeriodicAdapterWithPQConfigPtr
 addCustomPQConfig(StructureAdapterPtr stru)
 {
     PeriodicStructureAdapterPtr pstru =
-        boost::dynamic_pointer_cast<PeriodicStructureAdapter>(stru);
+        std::dynamic_pointer_cast<PeriodicStructureAdapter>(stru);
     return PeriodicAdapterWithPQConfigPtr(
             new PeriodicAdapterWithPQConfig(*pstru));
 }

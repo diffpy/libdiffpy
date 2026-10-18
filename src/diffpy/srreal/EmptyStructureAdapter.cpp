@@ -16,7 +16,7 @@
 *
 *****************************************************************************/
 
-#include <boost/make_shared.hpp>
+#include <memory>
 
 #include <diffpy/serialization.ipp>
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -45,14 +45,14 @@ class EmptyStructureAdapter : public StructureAdapter
         virtual StructureAdapterPtr clone() const
         {
             StructureAdapterPtr rv =
-                boost::const_pointer_cast<StructureAdapter>(shared_from_this());
+                std::const_pointer_cast<StructureAdapter>(shared_from_this());
             return rv;
         }
 
 
         virtual BaseBondGeneratorPtr createBondGenerator() const
         {
-            return boost::make_shared<BaseBondGenerator>(shared_from_this());
+            return std::make_shared<BaseBondGenerator>(shared_from_this());
         }
 
 

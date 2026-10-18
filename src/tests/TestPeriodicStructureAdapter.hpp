@@ -196,7 +196,7 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
         void test_getLattice()
         {
             PeriodicStructureAdapterPtr pkbise =
-                boost::dynamic_pointer_cast<PeriodicStructureAdapter>(m_kbise);
+                std::dynamic_pointer_cast<PeriodicStructureAdapter>(m_kbise);
             TS_ASSERT(pkbise);
             const Lattice& L = pkbise->getLattice();
             const double eps = 1.0e-12;
@@ -222,9 +222,9 @@ class TestPeriodicStructureAdapter : public CxxTest::TestSuite
             TS_ASSERT_EQUALS(string("Se"), kbise1->siteAtomType(10));
             TS_ASSERT_EQUALS(string("Se"), kbise1->siteAtomType(22));
             PeriodicStructureAdapterPtr pkbise =
-                boost::dynamic_pointer_cast<PeriodicStructureAdapter>(m_kbise);
+                std::dynamic_pointer_cast<PeriodicStructureAdapter>(m_kbise);
             PeriodicStructureAdapterPtr pkbise1 =
-                boost::dynamic_pointer_cast<PeriodicStructureAdapter>(kbise1);
+                std::dynamic_pointer_cast<PeriodicStructureAdapter>(kbise1);
             const Lattice& L = pkbise->getLattice();
             const Lattice& L1 = pkbise1->getLattice();
             TS_ASSERT_EQUALS(L.a(), L1.a());

@@ -49,7 +49,7 @@ bool eps_lt(const double& x, const double& y, double eps=SQRT_DOUBLE_EPS);
 
 // binary functor for round-off aware less-than comparison
 
-class EpsilonLess : public std::binary_function<double, double, bool>
+class EpsilonLess
 {
     public:
 
@@ -77,7 +77,7 @@ class EpsilonLess : public std::binary_function<double, double, bool>
 
 // binary functor for round-off aware equality comparison
 
-class EpsilonEqual : public std::binary_function<double, double, bool>
+class EpsilonEqual
 {
     public:
 

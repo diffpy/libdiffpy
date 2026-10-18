@@ -33,7 +33,7 @@ class TestPDFCalculator : public CxxTest::TestSuite
 {
     private:
 
-        boost::shared_ptr<PDFCalculator> mpdfc;
+        std::shared_ptr<PDFCalculator> mpdfc;
         StructureAdapterPtr memptystru;
         double meps;
         double mepsdb;
@@ -265,7 +265,7 @@ class TestPDFCalculator : public CxxTest::TestSuite
             diffpy::serialization::oarchive oa(storage, ios::binary);
             oa << mpdfc;
             diffpy::serialization::iarchive ia(storage, ios::binary);
-            boost::shared_ptr<PDFCalculator> pdfc1;
+            std::shared_ptr<PDFCalculator> pdfc1;
             ia >> pdfc1;
             TS_ASSERT_DIFFERS(pdfc1.get(), mpdfc.get());
             TS_ASSERT_EQUALS(string("constant"),

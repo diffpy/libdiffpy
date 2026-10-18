@@ -24,7 +24,7 @@
 #ifndef PQEVALUATOR_HPP_INCLUDED
 #define PQEVALUATOR_HPP_INCLUDED
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/export.hpp>
@@ -40,7 +40,7 @@ class PairQuantity;
 
 /// shared pointer to PQEvaluatorBasic
 
-typedef boost::shared_ptr<class PQEvaluatorBasic> PQEvaluatorPtr;
+typedef std::shared_ptr<class PQEvaluatorBasic> PQEvaluatorPtr;
 
 enum PQEvaluatorType {NONE, BASIC, OPTIMIZED, CHECK};
 

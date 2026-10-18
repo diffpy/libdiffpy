@@ -156,7 +156,7 @@ class AtomicStructureAdapter : public StructureAdapter
 
 };
 
-typedef boost::shared_ptr<AtomicStructureAdapter> AtomicStructureAdapterPtr;
+typedef std::shared_ptr<AtomicStructureAdapter> AtomicStructureAdapterPtr;
 
 // Complementary comparison function
 

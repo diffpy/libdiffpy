@@ -64,7 +64,7 @@ class PeriodicStructureAdapter : public AtomicStructureAdapter
 
 };
 
-typedef boost::shared_ptr<PeriodicStructureAdapter> PeriodicStructureAdapterPtr;
+typedef std::shared_ptr<PeriodicStructureAdapter> PeriodicStructureAdapterPtr;
 
 // Comparison functions
 

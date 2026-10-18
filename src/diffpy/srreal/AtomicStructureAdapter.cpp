@@ -170,8 +170,8 @@ AtomicStructureAdapter::diff(StructureAdapterConstPtr other) const
     using std::min;
     StructureDifference sd = this->StructureAdapter::diff(other);
     if (sd.stru0 == sd.stru1)  return sd;
-    typedef boost::shared_ptr<const class AtomicStructureAdapter> APtr;
-    APtr pother = boost::dynamic_pointer_cast<APtr::element_type>(other);
+    typedef std::shared_ptr<const class AtomicStructureAdapter> APtr;
+    APtr pother = std::dynamic_pointer_cast<APtr::element_type>(other);
     if (!pother)  return sd;
     // try fast side-by-side comparison
     sd.diffmethod = StructureDifference::Method::SIDEBYSIDE;

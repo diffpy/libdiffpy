@@ -29,14 +29,16 @@ namespace runtimepath {
 
 /// Return full path to a data file included with DiffPy library.
 ///
-/// The paths are looked up from the DIFFPYRUNTIME environment variable.
-/// If DIFFPYRUNTIME does not exist, the paths are resolved as
-/// (1) relative path of the datadir directory with respect to the libdir
-///     directory at the installation time and if it does not exist as
+/// A nonempty DIFFPYRUNTIME environment variable overrides the data directory.
+/// If DIFFPYRUNTIME is unset or empty, the paths are resolved as
+/// (1) DIFFPYRUNTIMERELPATH relative to the module containing this code
+///     (the library or an embedding extension), and if it does not exist as
 /// (2) relative path of the runtime directory in a source tree
 ///     at the build time.
+/// DIFFPYRUNTIMERELPATH defaults to ../share/diffpy/libdiffpy-MAJOR.MINOR.
 ///
-/// Throw runtime_error if the base directory cannot be found.
+/// Throw runtime_error if the base directory cannot be found, including an
+/// invalid explicit override. File existence is checked by the data readers.
 std::string datapath(const std::string& f);
 
 /// Helper class for loading text data

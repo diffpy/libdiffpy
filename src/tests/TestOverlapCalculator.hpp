@@ -35,7 +35,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 {
     private:
 
-        boost::shared_ptr<OverlapCalculator> molc;
+        std::shared_ptr<OverlapCalculator> molc;
         StructureAdapterPtr mnacl;
         double meps;
 
@@ -156,7 +156,6 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 
         void test_bccTouch()
         {
-            using namespace boost;
             PeriodicStructureAdapterPtr bcc(new PeriodicStructureAdapter);
             bcc->setLatPar(2.0, 2.0, 2.0, 90, 90, 90);
             Atom a;
@@ -226,7 +225,6 @@ class TestOverlapCalculator : public CxxTest::TestSuite
 
         void test_NaCl_gradient()
         {
-            using namespace boost;
             molc->eval(mnacl);
             // default gradients are all zero
             std::vector<R3::Vector> g = molc->gradients();
@@ -347,7 +345,7 @@ class TestOverlapCalculator : public CxxTest::TestSuite
             stru->append(a0);
             stru->append(a1);
             molc->eval(stru);
-            boost::shared_ptr<OverlapCalculator> olc1;
+            std::shared_ptr<OverlapCalculator> olc1;
             olc1 = dumpandload(molc);
             TS_ASSERT_DIFFERS(molc.get(), olc1.get());
             TS_ASSERT_EQUALS(2, olc1->getStructure()->countSites());

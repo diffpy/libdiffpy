@@ -213,10 +213,10 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
         {
             StructureAdapterPtr acto = m_catio3;
             CrystalStructureAdapterPtr ccto(
-                boost::dynamic_pointer_cast<CrystalStructureAdapter>(acto));
+                std::dynamic_pointer_cast<CrystalStructureAdapter>(acto));
             StructureAdapterPtr acto2 = acto->clone();
             CrystalStructureAdapterPtr ccto2(
-                boost::dynamic_pointer_cast<CrystalStructureAdapter>(acto2));
+                std::dynamic_pointer_cast<CrystalStructureAdapter>(acto2));
             TS_ASSERT_EQUALS(0.0, diffdegree(acto, acto));
             TS_ASSERT_EQUALS(1.0, diffdegree(acto, StructureAdapterPtr()));
             TS_ASSERT_EQUALS(0.0, diffdegree(acto, acto2));
@@ -253,7 +253,7 @@ class TestObjCrystStructureAdapter : public CxxTest::TestSuite
             unique_ptr<Crystal> crst(loadTestCrystal("NH4Br.cif"));
             StructureAdapterPtr adpt = createStructureAdapter(*crst);
             CrystalStructureAdapterPtr cadpt =
-                boost::dynamic_pointer_cast<CrystalStructureAdapter>(adpt);
+                std::dynamic_pointer_cast<CrystalStructureAdapter>(adpt);
             TS_ASSERT_EQUALS(2, cadpt->countSites());
             TS_ASSERT_EQUALS(4, cadpt->totalOccupancy());
             CrystalStructureAdapter::AtomVector eq0, eq1;

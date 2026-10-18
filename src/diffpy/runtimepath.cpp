@@ -17,14 +17,21 @@
 *****************************************************************************/
 
 #include <cstdlib>
-#include <climits>
-#include <cstring>
 #include <cassert>
+#include <filesystem>
 #include <sstream>
 #include <stdexcept>
-#include <sys/stat.h>
+
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include <system_error>
+#include <vector>
+#else
 #include <dlfcn.h>
-#include <libgen.h>
+#endif
 
 #include <diffpy/version.hpp>
 #include <diffpy/runtimepath.hpp>
@@ -37,6 +44,8 @@ using namespace std;
 
 namespace {
 
+namespace fs = std::filesystem;
+
 const char* runtimerelpath =
 #ifdef DIFFPYRUNTIMERELPATH
     STRINGIFY(DIFFPYRUNTIMERELPATH)
@@ -48,75 +57,84 @@ const char* runtimerelpath =
 #endif
 ;
 
-bool isdir(const string& d)
+// Locate the module containing this code, including an embedding extension.
+fs::path modulepath()
 {
-    struct stat sd;
-    return (stat(d.c_str(), &sd) == 0 && S_ISDIR(sd.st_mode));
+    static const char anchor = 0;
+#ifdef _WIN32
+    HMODULE module = nullptr;
+    if (!GetModuleHandleExW(
+            GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+            GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+            reinterpret_cast<LPCWSTR>(&anchor), &module))
+    {
+        throw system_error(GetLastError(), system_category(),
+                "Cannot locate the libdiffpy module");
+    }
+    vector<wchar_t> buffer(256);
+    for (;;)
+    {
+        DWORD size = GetModuleFileNameW(module, buffer.data(),
+                static_cast<DWORD>(buffer.size()));
+        if (size == 0)
+        {
+            throw system_error(GetLastError(), system_category(),
+                    "Cannot resolve the libdiffpy module path");
+        }
+        if (size < buffer.size())
+        {
+            return fs::path(wstring(buffer.data(), size));
+        }
+        buffer.resize(2 * buffer.size());
+    }
+#else
+    Dl_info info = {};
+    if (!dladdr(&anchor, &info) || !info.dli_fname)
+    {
+        throw runtime_error("Cannot resolve the libdiffpy module path");
+    }
+    return fs::path(info.dli_fname);
+#endif
 }
 
 
-/// throw runtime error if directory does not exist.
-void ensureIsDir(const std::string& d)
+// Validate an explicit directory without falling back to packaged data.
+string canonicalDirectory(const fs::path& directory)
 {
-    if (isdir(d))  return;
-    string emsg("Directory '@D' does not exist.");
-    emsg = emsg.replace(emsg.find_first_of('@'), 2, d);
-    throw runtime_error(emsg);
+    if (!fs::is_directory(directory))
+    {
+        throw runtime_error("Directory '" + directory.string() +
+                "' does not exist.");
+    }
+    return fs::canonical(directory).generic_string();
 }
 
 
-const string& diffpyruntime()
+string diffpyruntime()
 {
-    char fpb[PATH_MAX];
-    static string librt;
-    static bool did_librt = false;
-    static string envrt;
-    static bool did_envrt = false;
     // check the DIFFPYRUNTIME environment variable.
-    char* pe = getenv("DIFFPYRUNTIME");
+    const char* pe = getenv("DIFFPYRUNTIME");
     if (pe && *pe != '\0')
     {
-        static string dprt;
-        did_envrt = did_envrt && (dprt == pe);
-        if (!did_envrt)
-        {
-            dprt = pe;
-            envrt = pe;
-            size_t pt = envrt.find_last_not_of('/');
-            if (pt == string::npos)  envrt = envrt.substr(0, 1);
-            else  envrt.erase(pt + 1);
-            ensureIsDir(envrt);
-            envrt = realpath(envrt.c_str(), fpb);
-            did_envrt = true;
-        }
-        return envrt;
+        return canonicalDirectory(pe);
     }
-    if (did_librt)  return librt;
-    // here we need to resolve path of the libdiffpy shared library
-    Dl_info i;
-    dladdr(reinterpret_cast<void*>(diffpyruntime), &i);
+    static const fs::path module = fs::absolute(modulepath());
     // first candidate is resolved in relative data path
-    strncpy(fpb, i.dli_fname, PATH_MAX);
-    string d1 = string(dirname(fpb)) + "/" + runtimerelpath;
-    if (isdir(d1))
+    const fs::path d1 = module.parent_path() / runtimerelpath;
+    if (fs::is_directory(d1))
     {
-        librt = realpath(d1.c_str(), fpb);
-        did_librt = true;
-        return librt;
+        return fs::canonical(d1).generic_string();
     }
     // second candidate is resolved with respect to physical library location
     // according to the source tree layout
-    string d2 = dirname(realpath(i.dli_fname, fpb));
-    d2 += "/../../src/runtime";
-    if (isdir(d2))
+    const fs::path d2 = fs::canonical(module).parent_path() /
+        "../../src/runtime";
+    if (fs::is_directory(d2))
     {
-        librt = realpath(d2.c_str(), fpb);
-        did_librt = true;
-        return librt;
+        return fs::canonical(d2).generic_string();
     }
     // nothing worked - throw exception about the first candidate path.
-    ensureIsDir(d1);
-    return librt;
+    return canonicalDirectory(d1);
 }
 
 }   // namespace

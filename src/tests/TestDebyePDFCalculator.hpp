@@ -18,7 +18,7 @@
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/make_shared.hpp>
+#include <memory>
 
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
@@ -34,7 +34,7 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
 {
     private:
 
-        boost::shared_ptr<DebyePDFCalculator> mpdfc;
+        std::shared_ptr<DebyePDFCalculator> mpdfc;
         AtomicStructureAdapterPtr memptystru;
         AtomicStructureAdapterPtr mstru10;
         AtomicStructureAdapterPtr mstru10d1;
@@ -50,8 +50,8 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
             const int SZ = 10;
             meps = diffpy::mathutils::SQRT_DOUBLE_EPS;
             mpdfc.reset(new DebyePDFCalculator);
-            memptystru = boost::make_shared<AtomicStructureAdapter>();
-            mstru10 = boost::make_shared<AtomicStructureAdapter>();
+            memptystru = std::make_shared<AtomicStructureAdapter>();
+            mstru10 = std::make_shared<AtomicStructureAdapter>();
             Atom ai;
             ai.atomtype = "C";
             ai.uij_cartn = R3::identity();
@@ -62,11 +62,11 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
                 ai.xyz_cartn[0] = i;
                 mstru10->append(ai);
             }
-            mstru10d1 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
+            mstru10d1 = std::make_shared<AtomicStructureAdapter>(*mstru10);
             (*mstru10d1)[0].atomtype = "Au";
-            mstru10r = boost::make_shared<AtomicStructureAdapter>();
+            mstru10r = std::make_shared<AtomicStructureAdapter>();
             mstru10r->assign(mstru10->rbegin(), mstru10->rend());
-            mstru9 = boost::make_shared<AtomicStructureAdapter>(*mstru10);
+            mstru9 = std::make_shared<AtomicStructureAdapter>(*mstru10);
             mstru9->erase(9);
         }
 
@@ -200,7 +200,7 @@ class TestDebyePDFCalculator : public CxxTest::TestSuite
             diffpy::serialization::oarchive oa(storage, ios::binary);
             oa << mpdfc;
             diffpy::serialization::iarchive ia(storage, ios::binary);
-            boost::shared_ptr<DebyePDFCalculator> pdfc1;
+            std::shared_ptr<DebyePDFCalculator> pdfc1;
             ia >> pdfc1;
             TS_ASSERT_DIFFERS(pdfc1.get(), mpdfc.get());
             TS_ASSERT_EQUALS(string("constant"),

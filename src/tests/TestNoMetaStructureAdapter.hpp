@@ -28,7 +28,6 @@
 #include "test_custompqconfig.hpp"
 
 using namespace std;
-using namespace boost;
 using namespace diffpy::srreal;
 
 //////////////////////////////////////////////////////////////////////////////

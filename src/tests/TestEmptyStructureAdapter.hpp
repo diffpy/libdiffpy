@@ -65,7 +65,7 @@ class TestEmptyStructureAdapter : public CxxTest::TestSuite
             StructureAdapterPtr stru1;
             stru1 = dumpandload(mstru);
             AtomicStructureAdapterPtr astru1 =
-                boost::dynamic_pointer_cast<AtomicStructureAdapter>(stru1);
+                std::dynamic_pointer_cast<AtomicStructureAdapter>(stru1);
             TS_ASSERT(!astru1);
             TS_ASSERT_EQUALS(0, stru1->countSites());
             TS_ASSERT_EQUALS(stru1, stru1->clone());
