@@ -149,15 +149,17 @@ class Matrix : public ublas::matrix<double,
 const Matrix& identity();
 const Matrix& zeromatrix();
 double determinant(const Matrix& A);
-const Matrix& inverse(const Matrix& A);
+Matrix inverse(const Matrix& A);
+// 3D-PDF support: symmetric 3x3 eigen decomposition
+void eigen_solve_3x3(const Matrix& A, Vector& eigenvalues, Matrix& eigenvectors);
 
-const Vector& floor(const Vector&);
+Vector floor(const Vector&);
 template <class V> double norm(const V&);
 template <class V> double distance(const V& u, const V& v);
 template <class V> double dot(const V& u, const V& v);
 template <class V> Vector cross(const V& u, const V& v);
-template <class V> const Vector& mxvecproduct(const Matrix&, const V&);
-template <class V> const Vector& mxvecproduct(const V&, const Matrix&);
+template <class V> Vector mxvecproduct(const Matrix&, const V&);
+template <class V> Vector mxvecproduct(const V&, const Matrix&);
 
 // Equality ------------------------------------------------------------------
 
@@ -199,9 +201,9 @@ size_t hash_value(const Matrix& A);
 // Inlined functions ---------------------------------------------------------
 
 inline
-const Vector& floor(const Vector& v)
+Vector floor(const Vector& v)
 {
-    static Vector res;
+    Vector res;
     Vector::const_iterator xi = v.begin();
     Vector::iterator xo = res.begin();
     for (; xi != v.end(); ++xi, ++xo)  *xo = std::floor(*xi);
@@ -220,7 +222,7 @@ double norm(const V& u)
 template <class V>
 double distance(const V& u, const V& v)
 {
-    static R3::Vector duv;
+    R3::Vector duv;
     duv[0] = u[0] - v[0];
     duv[1] = u[1] - v[1];
     duv[2] = u[2] - v[2];
@@ -247,9 +249,9 @@ Vector cross(const V& u, const V& v)
 
 
 template <class V>
-const Vector& mxvecproduct(const Matrix& M, const V& u)
+Vector mxvecproduct(const Matrix& M, const V& u)
 {
-    static Vector res;
+    Vector res;
     res[0] = M(0,0)*u[0] + M(0,1)*u[1] + M(0,2)*u[2];
     res[1] = M(1,0)*u[0] + M(1,1)*u[1] + M(1,2)*u[2];
     res[2] = M(2,0)*u[0] + M(2,1)*u[1] + M(2,2)*u[2];
@@ -258,9 +260,9 @@ const Vector& mxvecproduct(const Matrix& M, const V& u)
 
 
 template <class V>
-const Vector& mxvecproduct(const V& u, const Matrix& M)
+Vector mxvecproduct(const V& u, const Matrix& M)
 {
-    static Vector res;
+    Vector res;
     res[0] = u[0]*M(0,0) + u[1]*M(1,0) + u[2]*M(2,0);
     res[1] = u[0]*M(0,1) + u[1]*M(1,1) + u[2]*M(2,1);
     res[2] = u[0]*M(0,2) + u[1]*M(1,2) + u[2]*M(2,2);
