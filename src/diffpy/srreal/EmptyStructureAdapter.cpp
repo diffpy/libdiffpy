@@ -99,7 +99,6 @@ class EmptyStructureAdapter : public StructureAdapter
             throw outofrange;
         }
 
-        // reusing StructureAdapter::customPQConfig()
         // reusing StructureAdapter::diff()
 
     private:

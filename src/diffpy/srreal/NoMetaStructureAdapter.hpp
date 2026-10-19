@@ -12,13 +12,11 @@
 *
 ******************************************************************************
 *
-* class NoMetaStructureAdapter -- StructureAdapter proxy class that disables
-*     customPQConfig of another StructureAdapter instance.  This may be used
-*     for preventing the adapter for diffpy.Structure class from applying
-*     scale, spdiameter and such metadata to the PDFCalculator.
+* class NoMetaStructureAdapter -- deprecated StructureAdapter proxy retained
+*     for source and serialization compatibility.  Structures no longer
+*     configure calculators through metadata.
 *
-* nometa -- factory function that returns a NoMetaStructureAdapter
-*     instance wrapped in StructureAdapterPtr
+* nometa -- compatibility function returning the source StructureAdapter
 *
 *****************************************************************************/
 
@@ -49,7 +47,6 @@ class NoMetaStructureAdapter : public StructureAdapter
         virtual double siteOccupancy(int idx) const;
         virtual bool siteAnisotropy(int idx) const;
         virtual const R3::Matrix& siteCartesianUij(int idx) const;
-        virtual void customPQConfig(PairQuantity* pq) const;
         virtual StructureDifference diff(StructureAdapterConstPtr) const;
 
         // methods - own
@@ -74,11 +71,11 @@ class NoMetaStructureAdapter : public StructureAdapter
 
 // Routines ------------------------------------------------------------------
 
-/// create NoMetaStructureAdapter from an existing StructureAdapter
+/// Return the input adapter unchanged, or the empty adapter for a null input.
 StructureAdapterPtr nometa(StructureAdapterPtr stru);
 
 
-/// create NoMetaStructureAdapter from an adaptable structure object
+/// Convert an adaptable structure without creating a proxy.
 template <class T>
 StructureAdapterPtr nometa(const T& stru)
 {
