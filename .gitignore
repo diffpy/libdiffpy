@@ -6,6 +6,30 @@ __pycache__/
 # C extensions
 *.so
 
+# Compiled object files
+*.slo
+*.lo
+*.o
+
+# Compiled dynamic libraries
+*.dylib
+
+# Compiled static libraries
+*.lai
+*.la
+*.a
+
+# SCons build files
+.sconf_temp/
+.sconsign.dblite
+/sconscript.local
+/sconsvars.py
+.gdb_history
+tags
+
+# Source distribution tarball
+libdiffpy-*.tar.gz
+
 # Distribution / packaging
 .Python
 env/
