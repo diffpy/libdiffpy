@@ -9,14 +9,6 @@
 | Software version |release|
 | Last updated |today|.
 
-===============
-Getting started
-===============
-
-Welcome to the ``libdiffpy`` documentation!
-
-To get started, please visit the :ref:`Getting started <getting-started>` page.
-
 =======
 Authors
 =======
@@ -43,7 +35,6 @@ Table of contents
 .. toctree::
    :maxdepth: 2
 
-   getting-started
    Package API <api/libdiffpy>
    release
    license
