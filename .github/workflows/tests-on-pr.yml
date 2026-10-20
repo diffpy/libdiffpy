@@ -6,10 +6,63 @@ on:
 
 jobs:
   tests-on-pr:
-    uses: scikit-package/release-scripts/.github/workflows/_tests-on-pr.yml@v0
-    with:
-      project: libdiffpy
-      c_extension: true
-      headless: false
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Check out libdiffpy
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Initialize miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: test
+          channels: conda-forge
+          auto-update-conda: true
+          auto-activate-base: false
+          python-version: "3.14"  # cxxtest has no Python 3.15 build yet
+
+      - name: Conda config
+        run: >-
+          conda config --set always_yes yes
+          --set changeps1 no
+
+      - name: Install requirements
+        run: >-
+          conda install
+          --file requirements/build.txt
+          --file requirements/conda.txt
+          --file requirements/tests.txt
+
+      - name: Configure SCons for the conda environment
+        run: |
+          cat > sconscript.local <<'EOF'
+          Import('env')
+          import os
+          prefix = os.environ['CONDA_PREFIX']
+          env.Replace(CXX=os.environ['CXX'])
+          env.Prepend(CCFLAGS=['-isystem' + os.path.join(prefix, 'include')])
+          env.Append(LIBPATH=os.path.join(prefix, 'lib'))
+          env.Append(LINKFLAGS='-Wl,-rpath,' + os.path.join(prefix, 'lib'))
+          EOF
+
+      - name: Build and run C++ tests with coverage
+        run: scons build=coverage test
+
+      - name: Generate coverage report
+        run: >-
+          gcovr --gcov-executable "${CXX%c++}gcov"
+          --root . --filter 'build/coverage-.*/diffpy/'
+          --xml coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          verbose: true
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
