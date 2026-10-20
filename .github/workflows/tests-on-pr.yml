@@ -44,18 +44,20 @@ jobs:
           Import('env')
           import os
           prefix = os.environ['CONDA_PREFIX']
-          env.Replace(CXX=os.environ['CXX'])
+          env.Replace(CXX=os.path.join(prefix, 'bin', 'c++'))
           env.Prepend(CCFLAGS=['-isystem' + os.path.join(prefix, 'include')])
           env.Append(LIBPATH=os.path.join(prefix, 'lib'))
           env.Append(LINKFLAGS='-Wl,-rpath,' + os.path.join(prefix, 'lib'))
           EOF
 
       - name: Build and run C++ tests with coverage
-        run: scons build=coverage test
+        run: |
+          "$CONDA_PREFIX/bin/c++" --version
+          scons build=coverage test
 
       - name: Generate coverage report
         run: >-
-          gcovr --gcov-executable "${CXX%c++}gcov"
+          gcovr --gcov-executable "$CONDA_PREFIX/bin/gcov"
           --root . --filter 'build/coverage-.*/diffpy/'
           --xml coverage.xml
 
