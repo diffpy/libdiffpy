@@ -7,7 +7,7 @@
 *
 * File coded by:    Pavol Juhas
 *
-* See AUTHORS.txt for a list of people who contributed.
+* See AUTHORS.rst for a list of people who contributed.
 * See LICENSE_DANSE.txt for license information.
 *
 ************************************************************************
