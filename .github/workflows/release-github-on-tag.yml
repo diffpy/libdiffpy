@@ -1,0 +1,26 @@
+name: Build Wheel and Release
+
+# Trigger on tag push or manual dispatch.
+# Tag and release privilege are verified inside the reusable workflow.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  check-tag-privilege:
+    uses: scikit-package/release-scripts/.github/workflows/_check-tag-privilege.yml@v0
+    with:
+      maintainer_github_username: sbillinge
+
+  check-pat-token-validity:
+    uses: scikit-package/release-scripts/.github/workflows/_check-pat-token-validity.yml@v0
+    secrets:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+  release-github:
+    needs: [check-tag-privilege, check-pat-token-validity]
+    uses: scikit-package/release-scripts/.github/workflows/_release-github.yml@v0
+    secrets:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
