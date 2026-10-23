@@ -1,0 +1,3 @@
+libboost-devel
+gsl
+libobjcryst

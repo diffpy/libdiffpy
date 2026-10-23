@@ -1,0 +1,20 @@
+{
+  "author_names": "Simon Billinge",
+  "author_emails": "sbillinge@ucsb.edu",
+  "maintainer_names": "Simon Billinge",
+  "maintainer_emails": "sbillinge@ucsb.edu",
+  "maintainer_github_usernames": "sbillinge",
+  "contributors": "Pavol Juhas, Chris Farrow, Simon Billinge, Billinge Group members",
+  "project_name": "libdiffpy",
+  "license_holders": "libdiffpy contributors",
+  "github_username_or_orgname": "diffpy",
+  "github_repo_name": "libdiffpy",
+  "conda_pypi_package_dist_name": "libdiffpy",
+  "package_dir_name": "libdiffpy",
+  "project_short_description": "DiffPy C++ library for calculation of PDF and other real-space quantities",
+  "project_keywords": "diffraction, PDF, X-ray, neutron",
+  "minimum_supported_python_version": "3.12",
+  "maximum_supported_python_version": "3.14",
+  "project_needs_c_code_compiled": "Yes",
+  "project_has_gui_tests": "No"
+}

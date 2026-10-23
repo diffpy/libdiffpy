@@ -1,0 +1,70 @@
+name: Tests on PR
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests-on-pr:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Check out libdiffpy
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Initialize miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: test
+          channels: conda-forge
+          conda-remove-defaults: "true"
+          auto-update-conda: true
+          auto-activate-base: false
+
+      - name: Conda config
+        run: >-
+          conda config --set always_yes yes
+          --set changeps1 no
+
+      - name: Install requirements
+        run: >-
+          conda install
+          --file requirements/build.txt
+          --file requirements/conda.txt
+          --file requirements/tests.txt
+
+      - name: Configure SCons for the conda environment
+        run: |
+          cat > sconscript.local <<'EOF'
+          Import('env')
+          import os
+          prefix = os.environ['CONDA_PREFIX']
+          env.Replace(CXX=os.path.join(prefix, 'bin', 'c++'))
+          env.Prepend(CCFLAGS=['-isystem' + os.path.join(prefix, 'include')])
+          env.Append(LIBPATH=os.path.join(prefix, 'lib'))
+          env.Append(LINKFLAGS='-Wl,-rpath,' + os.path.join(prefix, 'lib'))
+          EOF
+
+      - name: Build and run C++ tests with coverage
+        run: |
+          "$CONDA_PREFIX/bin/c++" --version
+          scons build=coverage test
+
+      - name: Generate coverage report
+        run: >-
+          gcovr --gcov-executable "$CONDA_PREFIX/bin/gcov"
+          --root . --filter 'build/coverage-.*/diffpy/'
+          --xml coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          verbose: true
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
