@@ -9,6 +9,12 @@ ci:
   autoupdate_schedule: monthly
   skip: [no-commit-to-branch]
   submodules: false
+# Leave the vendored CxxTest SCons tool and the data tables untouched.
+exclude: |
+  (?x)^(
+    site_scons/site_tools/cxxtest\.py|
+    .*\.(cif|dat)
+  )$
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
