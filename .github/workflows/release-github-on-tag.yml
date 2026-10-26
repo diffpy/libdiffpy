@@ -1,4 +1,4 @@
-name: Build Wheel and Release
+name: Release on GitHub
 
 # Trigger on tag push or manual dispatch.
 # Tag and release privilege are verified inside the reusable workflow.
@@ -24,3 +24,14 @@ jobs:
     uses: scikit-package/release-scripts/.github/workflows/_release-github.yml@v0
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+  docs-release:
+    needs: [release-github]
+    permissions:
+      contents: write
+    uses: scikit-package/release-scripts/.github/workflows/_release-docs.yml@v0
+    with:
+      project: libdiffpy
+      c_extension: true
+      headless: false
+      python_version: 0
