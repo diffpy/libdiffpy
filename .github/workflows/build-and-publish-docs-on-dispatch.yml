@@ -1,49 +1,18 @@
 name: Build and Publish Docs on Dispatch
 
-# Called by release-github-on-tag.yml after a successful release.
 on:
-  workflow_call:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
+  get-python-version:
+    uses: scikit-package/release-scripts/.github/workflows/_get-python-version-latest.yml@v0
+    with:
+      python_version: 0
+
   docs:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}
-
-    steps:
-      - name: Check out libdiffpy
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.ref }} # The release tag is recreated after the changelog update
-          fetch-depth: 0 # Version is read from git tags
-
-      - name: Initialize miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          activate-environment: docs
-          channels: conda-forge
-          conda-remove-defaults: "true"
-          auto-update-conda: true
-          auto-activate-base: false
-
-      - name: Conda config
-        run: >-
-          conda config --set always_yes yes
-          --set changeps1 no
-
-      - name: Install docs requirements
-        run: conda install --file requirements/docs.txt
-
-      - name: Build documents
-        run: make -C docs html
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build/html
+    uses: scikit-package/release-scripts/.github/workflows/_release-docs.yml@v0
+    with:
+      project: libdiffpy
+      c_extension: true
+      headless: false
+      python_version: ${{ fromJSON(needs.get-python-version.outputs.latest_python_version) }}

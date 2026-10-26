@@ -29,4 +29,9 @@ jobs:
     needs: [release-github]
     permissions:
       contents: write
-    uses: ./.github/workflows/build-and-publish-docs-on-dispatch.yml
+    uses: scikit-package/release-scripts/.github/workflows/_release-docs.yml@v0
+    with:
+      project: libdiffpy
+      c_extension: true
+      headless: false
+      python_version: 0
