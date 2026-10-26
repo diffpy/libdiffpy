@@ -448,7 +448,7 @@ void PairQuantity::updateMaskData()
         // rebuild minvertpairmask according to mtypemask
         minvertpairmask.clear();
         TypeMaskStorage::const_iterator tpmsk;
-        // build a list of type masks with all-masks at the begining
+        // build a list of type masks with all-masks at the beginning
         list< pair<string,string> > orderedpairs;
         for (tpmsk = mtypemask.begin(); tpmsk != mtypemask.end(); ++tpmsk)
         {

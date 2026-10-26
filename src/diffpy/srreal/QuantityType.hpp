@@ -16,7 +16,7 @@
 *
 * QuantityType -- type that stores PairQuantity results, an array of doubles
 *   It is a unique derived class from vector<double> to avoid conflicts with
-*   boost_python convertors in cctbx.
+*   boost_python converters in cctbx.
 *
 *****************************************************************************/
 

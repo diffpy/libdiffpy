@@ -16,7 +16,7 @@
 *   functions that produce derived classes.  To be used as a base for a
 *   specific class branch.  For a proper function, the HasClassRegistry
 *   template must be instantiated in just one cpp file that includes the
-*   implementatios in HasClassRegistry.ipp.
+*   implementations in HasClassRegistry.ipp.
 *
 *   A Base class with registry should be declared as
 *     class Base : public HasClassRegistry<Base>
@@ -62,7 +62,7 @@ class HasClassRegistry
 
         /// Clear registration of the specified type under its standard name
         /// or any alias.  Return the number of unset names and aliases or
-        /// 0 if the specifed string type was not registered.
+        /// 0 if the specified string type was not registered.
         static int deregisterType(const std::string& tp);
 
         /// Create new instance of a specified string type.

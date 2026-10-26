@@ -318,7 +318,7 @@ class TestPeriodicStructureBondGenerator : public CxxTest::TestSuite
             // there are 6 second nearest neighbors at 3.52
             m_nibnds->setRmax(3.6);
             TS_ASSERT_EQUALS(6, countBonds(*m_nibnds));
-            // which sums to 18 neigbhors within radius 3.6
+            // which sums to 18 neighbors within radius 3.6
             m_nibnds->setRmin(0);
             TS_ASSERT_EQUALS(18, countBonds(*m_nibnds));
         }
@@ -408,7 +408,7 @@ class TestPeriodicStructureBondGenerator : public CxxTest::TestSuite
                 {
                     TS_ASSERT_DELTA(0.00356, testmsd1(stru, bnds), epsu);
                 }
-                // other 3 tantalums are related by tripple axis and
+                // other 3 tantalums are related by triple axis and
                 // have the same msd towards the central Li
                 else
                 {

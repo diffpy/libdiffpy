@@ -6,3 +6,9 @@ mater
 
 ;; Frobenius norm used in np.linalg.norm
 fro
+
+;; variable name for a pair type multiplicity in BaseDebyeSum.cpp
+multipl
+
+;; custom scattering factor label used in TestScatteringFactorTable.hpp
+ccustom
