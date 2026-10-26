@@ -1,4 +1,4 @@
-name: Build Wheel and Release
+name: Release on GitHub
 
 # Trigger on tag push or manual dispatch.
 # Tag and release privilege are verified inside the reusable workflow.
@@ -19,8 +19,14 @@ jobs:
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
 
+  matrix-tests:
+    needs: [check-tag-privilege]
+    uses: ./.github/workflows/matrix-and-codecov.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   release-github:
-    needs: [check-tag-privilege, check-pat-token-validity]
+    needs: [check-tag-privilege, check-pat-token-validity, matrix-tests]
     uses: scikit-package/release-scripts/.github/workflows/_release-github.yml@v0
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}

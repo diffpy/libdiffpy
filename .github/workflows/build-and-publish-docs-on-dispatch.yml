@@ -3,16 +3,44 @@ name: Build and Publish Docs on Dispatch
 on:
   workflow_dispatch:
 
-jobs:
-  get-python-version:
-    uses: scikit-package/release-scripts/.github/workflows/_get-python-version-latest.yml@v0
-    with:
-      python_version: 0
+permissions:
+  contents: write
 
+jobs:
   docs:
-    uses: scikit-package/release-scripts/.github/workflows/_release-docs.yml@v0
-    with:
-      project: libdiffpy
-      c_extension: true
-      headless: false
-      python_version: ${{ fromJSON(needs.get-python-version.outputs.latest_python_version) }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Check out libdiffpy
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Version is read from git tags
+
+      - name: Initialize miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: docs
+          channels: conda-forge
+          conda-remove-defaults: "true"
+          auto-update-conda: true
+          auto-activate-base: false
+
+      - name: Conda config
+        run: >-
+          conda config --set always_yes yes
+          --set changeps1 no
+
+      - name: Install docs requirements
+        run: conda install --file requirements/docs.txt
+
+      - name: Build documents
+        run: make -C docs html
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build/html

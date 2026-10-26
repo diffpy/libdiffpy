@@ -1,21 +1,77 @@
 name: Matrix and Codecov
 
+# Called by release-github-on-tag.yml so a failing test blocks the release.
 on:
-  # push:
-  #   branches:
-  #     - main
-  release:
-    types:
-      - prereleased
-      - published
+  workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: false
   workflow_dispatch:
 
 jobs:
   matrix-coverage:
-    uses: scikit-package/release-scripts/.github/workflows/_matrix-and-codecov-on-merge-to-main.yml@v0
-    with:
-      project: libdiffpy
-      c_extension: true
-      headless: false
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-15-intel]
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Check out libdiffpy
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Initialize miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: test
+          channels: conda-forge
+          conda-remove-defaults: "true"
+          auto-update-conda: true
+          auto-activate-base: false
+
+      - name: Conda config
+        run: >-
+          conda config --set always_yes yes
+          --set changeps1 no
+
+      - name: Install requirements
+        run: >-
+          conda install
+          --file requirements/build.txt
+          --file requirements/conda.txt
+          --file requirements/tests.txt
+
+      - name: Configure SCons for the conda environment
+        run: |
+          cat > sconscript.local <<'EOF'
+          Import('env')
+          import os
+          prefix = os.environ['CONDA_PREFIX']
+          env.Replace(CXX=os.environ.get('CXX', os.path.join(prefix, 'bin', 'c++')))
+          env.Prepend(CCFLAGS=['-isystem' + os.path.join(prefix, 'include')])
+          env.Append(LIBPATH=os.path.join(prefix, 'lib'))
+          env.Append(LINKFLAGS='-Wl,-rpath,' + os.path.join(prefix, 'lib'))
+          EOF
+
+      - name: Build and run C++ tests with coverage
+        run: scons build=coverage test
+
+      - name: Generate coverage report
+        if: matrix.os == 'ubuntu-latest'
+        run: >-
+          gcovr --gcov-executable "$CONDA_PREFIX/bin/gcov"
+          --root . --filter 'build/coverage-.*/diffpy/'
+          --xml coverage.xml
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
