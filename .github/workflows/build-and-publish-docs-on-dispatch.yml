@@ -1,6 +1,8 @@
 name: Build and Publish Docs on Dispatch
 
+# Called by release-github-on-tag.yml after a successful release.
 on:
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -17,6 +19,7 @@ jobs:
       - name: Check out libdiffpy
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.ref }} # The release tag is recreated after the changelog update
           fetch-depth: 0 # Version is read from git tags
 
       - name: Initialize miniconda
