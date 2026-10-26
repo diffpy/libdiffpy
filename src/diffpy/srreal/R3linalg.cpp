@@ -12,7 +12,7 @@
 *
 ******************************************************************************
 *
-* R3linalg -- vector and matrix types and linar algebra operations in R3 space
+* R3linalg -- vector and matrix types and linear algebra operations in R3 space
 *
 *****************************************************************************/
 

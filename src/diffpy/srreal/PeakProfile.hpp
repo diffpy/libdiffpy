@@ -13,7 +13,7 @@
 ******************************************************************************
 *
 * class PeakProfile -- base class for calculation of peak profiles.
-*     When possible total integrated area of the profile should eqaul 1.
+*     When possible total integrated area of the profile should equal 1.
 *     The operator()(x, fwhm) returns amplitude of a zero-centered profile.
 *     Methods xboundlo(fwhm), xboundhi(fwhm) return low and high x-boundaries,
 *     where amplitude relative to the maximum becomes smaller than precision

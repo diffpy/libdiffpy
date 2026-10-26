@@ -15,14 +15,7 @@
 
 import sys
 import time
-from importlib.metadata import version
 from pathlib import Path
-
-# Attempt to import the version dynamically from GitHub tag.
-try:
-    fullversion = version("libdiffpy")
-except Exception:
-    fullversion = "No version found. The correct version will appear in the released version."  # noqa: E501
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -30,9 +23,21 @@ except Exception:
 # sys.path.insert(0, str(Path(".").resolve()))
 sys.path.insert(0, str(Path("../..").resolve()))
 sys.path.insert(0, str(Path("../../src").resolve()))
+sys.path.insert(0, str(Path("../../site_scons").resolve()))
+
+# libdiffpy is a C++ library, so take the version from git tags through
+# the SCons build utilities rather than from installed Python metadata.
+try:
+    from libdiffpybuildutils import getversion
+
+    fullversion = getversion()["version"]
+except Exception:
+    fullversion = "No version found. The correct version will appear in the released version."  # noqa: E501
 
 # abbreviations
-ab_authors = "Pavol Juhas, Chris Farrow, Simon Billinge, Billinge Group members"
+ab_authors = (
+    "Pavol Juhas, Chris Farrow, Simon Billinge, Billinge Group members"
+)
 
 # -- General configuration ------------------------------------------------
 
