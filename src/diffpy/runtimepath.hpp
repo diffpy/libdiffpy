@@ -23,6 +23,7 @@
 #include <vector>
 #include <istream>
 #include <stdexcept>
+#include <diffpy/Export.hpp>
 
 namespace diffpy {
 namespace runtimepath {
@@ -39,10 +40,10 @@ namespace runtimepath {
 ///
 /// Throw runtime_error if the base directory cannot be found, including an
 /// invalid explicit override. File existence is checked by the data readers.
-std::string datapath(const std::string& f);
+DLL_EXPORT std::string datapath(const std::string& f);
 
 /// Helper class for loading text data
-class LineReader {
+class DLL_EXPORT LineReader {
  public:
   // constructor
   LineReader();
@@ -64,7 +65,7 @@ class LineReader {
 };
 
 // non-member functions for the LineReader class
-std::istream& operator>>(std::istream&, LineReader&);
+DLL_EXPORT std::istream& operator>>(std::istream&, LineReader&);
 
 }  // namespace runtimepath
 }  // namespace diffpy

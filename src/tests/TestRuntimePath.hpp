@@ -36,19 +36,28 @@ class TestRuntimePath : public CxxTest::TestSuite {
     return bool(fp);
   }
 
+  void setRuntime(const char* value) {
+#ifdef _WIN32
+    TS_ASSERT_EQUALS(_putenv_s("DIFFPYRUNTIME", value ? value : ""), 0);
+#else
+    if (value) {
+      TS_ASSERT_EQUALS(setenv("DIFFPYRUNTIME", value, 1), 0);
+    } else {
+      TS_ASSERT_EQUALS(unsetenv("DIFFPYRUNTIME"), 0);
+    }
+#endif
+  }
+
  public:
   void setUp() {
     char* pe = getenv("DIFFPYRUNTIME");
     mhas_diffpyruntime = pe;
     if (mhas_diffpyruntime) mdiffpyruntime = pe;
-    unsetenv("DIFFPYRUNTIME");
+    setRuntime(nullptr);
   }
 
   void tearDown() {
-    unsetenv("DIFFPYRUNTIME");
-    if (mhas_diffpyruntime) {
-      setenv("DIFFPYRUNTIME", mdiffpyruntime.c_str(), 1);
-    }
+    setRuntime(mhas_diffpyruntime ? mdiffpyruntime.c_str() : nullptr);
   }
 
   void test_datapath() {
@@ -60,11 +69,11 @@ class TestRuntimePath : public CxxTest::TestSuite {
 
   void test_envvar_lookup() {
     using namespace std;
-    setenv("DIFFPYRUNTIME", "does/not/exist", 0);
+    setRuntime("does/not/exist");
     TS_ASSERT_THROWS(datapath("f0_WaasKirf.dat"), runtime_error);
     TS_ASSERT_THROWS(datapath("NaCl.cif"), runtime_error);
     string td = prepend_testdata_dir("");
-    setenv("DIFFPYRUNTIME", td.c_str(), 1);
+    setRuntime(td.c_str());
     string fnacl = prepend_testdata_dir("NaCl.cif");
     TS_ASSERT_EQUALS(fnacl, datapath("NaCl.cif"));
   }

@@ -26,12 +26,12 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include <diffpy/Export.hpp>
-
 namespace diffpy {
 namespace srreal {
 
-class DLL_EXPORT QuantityType : public std::vector<double> {
+// This header-only type needs no DLL export. Exporting the class also exports
+// std::vector<double> on MSVC, conflicting with other libraries using it.
+class QuantityType : public std::vector<double> {
  private:
   typedef std::vector<double> Base;
 

@@ -19,12 +19,13 @@
 #ifndef PAIRCOUNTER_HPP_INCLUDED
 #define PAIRCOUNTER_HPP_INCLUDED
 
+#include <diffpy/Export.hpp>
 #include <diffpy/srreal/PairQuantity.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class PairCounter : public PairQuantity {
+class DLL_EXPORT PairCounter : public PairQuantity {
  public:
   // constructor
   PairCounter();

@@ -22,12 +22,13 @@
 
 #include <boost/serialization/base_object.hpp>
 #include <diffpy/mathutils.hpp>
+#include <diffpy/Export.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
 
 namespace diffpy {
 namespace srreal {
 
-class Lattice {
+class DLL_EXPORT Lattice {
  public:
   // constructors
 

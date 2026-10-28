@@ -52,13 +52,14 @@
 #define POINTSINSPHERE_HPP_INCLUDED
 
 #include <cmath>
+#include <diffpy/Export.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 namespace pointsinsphere {
 
-class LatticeParameters {
+class DLL_EXPORT LatticeParameters {
  public:
   // data
   // input arguments
@@ -82,7 +83,7 @@ class LatticeParameters {
 
 }  // namespace pointsinsphere
 
-class PointsInSphere {
+class DLL_EXPORT PointsInSphere {
  public:
   // constructors
   PointsInSphere(double rmin, double rmax,
@@ -141,7 +142,7 @@ class PointsInSphere {
   void init();
 };
 
-class ReflectionsInQminQmax {
+class DLL_EXPORT ReflectionsInQminQmax {
  public:
   // constructors
   ReflectionsInQminQmax(double _Qmin, double _Qmax,
@@ -176,7 +177,7 @@ class ReflectionsInQminQmax {
   PointsInSphere sph;
 };
 
-class ReflectionsInDmaxDmin : public ReflectionsInQminQmax {
+class DLL_EXPORT ReflectionsInDmaxDmin : public ReflectionsInQminQmax {
  public:
   // constructors
   ReflectionsInDmaxDmin(double dmax, double dmin,

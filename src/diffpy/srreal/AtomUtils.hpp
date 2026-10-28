@@ -20,16 +20,17 @@
 #define ATOMUTILS_HPP_INCLUDED
 
 #include <string>
+#include <diffpy/Export.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 /// Return bare element symbol from atom symbol that may be isotope or ion,
 /// for example "Ca2+" or "12-C".
-std::string atomBareSymbol(const std::string& atomtype);
+DLL_EXPORT std::string atomBareSymbol(const std::string& atomtype);
 
 /// Return valence of possibly ionic symbol such as "S2-" or "Cl-".
-int atomValence(const std::string& atomtype);
+DLL_EXPORT int atomValence(const std::string& atomtype);
 
 }  // namespace srreal
 }  // namespace diffpy

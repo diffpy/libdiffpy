@@ -138,10 +138,10 @@ class DLL_EXPORT Matrix
 
 // Functions
 
-const Matrix& identity();
-const Matrix& zeromatrix();
-double determinant(const Matrix& A);
-const Matrix& inverse(const Matrix& A);
+DLL_EXPORT const Matrix& identity();
+DLL_EXPORT const Matrix& zeromatrix();
+DLL_EXPORT double determinant(const Matrix& A);
+DLL_EXPORT const Matrix& inverse(const Matrix& A);
 
 const Vector& floor(const Vector&);
 template <class V>
@@ -176,8 +176,8 @@ inline bool operator!=(const Matrix& A, const Matrix& B) { return !(A == B); }
 
 // Hashing -------------------------------------------------------------------
 
-size_t hash_value(const Vector& v);
-size_t hash_value(const Matrix& A);
+DLL_EXPORT size_t hash_value(const Vector& v);
+DLL_EXPORT size_t hash_value(const Matrix& A);
 
 // Inlined functions ---------------------------------------------------------
 
@@ -245,15 +245,17 @@ namespace mathutils {
 // Template specializations --------------------------------------------------
 
 template <>
-bool EpsilonLess::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
+DLL_EXPORT bool EpsilonLess::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
   const srreal::R3::Matrix& A, const srreal::R3::Matrix& B) const;
 
 template <>
-bool EpsilonEqual::operator()<srreal::R3::Vector, srreal::R3::Vector>(
+DLL_EXPORT bool
+EpsilonEqual::operator()<srreal::R3::Vector, srreal::R3::Vector>(
   const srreal::R3::Vector& u, const srreal::R3::Vector& v) const;
 
 template <>
-bool EpsilonEqual::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
+DLL_EXPORT bool
+EpsilonEqual::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
   const srreal::R3::Matrix& A, const srreal::R3::Matrix& B) const;
 
 }  // namespace mathutils

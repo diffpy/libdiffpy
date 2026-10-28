@@ -70,7 +70,7 @@ DLL_EXPORT bool operator==(const PeriodicStructureAdapter&,
 DLL_EXPORT bool operator!=(const PeriodicStructureAdapter&,
                            const PeriodicStructureAdapter&);
 
-class PeriodicStructureBondGenerator : public BaseBondGenerator {
+class DLL_EXPORT PeriodicStructureBondGenerator : public BaseBondGenerator {
  public:
   // constructors
   PeriodicStructureBondGenerator(StructureAdapterConstPtr);

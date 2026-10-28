@@ -105,11 +105,12 @@ class DLL_EXPORT StructureAdapter
 DLL_EXPORT StructureAdapterPtr emptyStructureAdapter();
 
 /// Calculate MSD along specified direction in Cartesian space.
-double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
-                              bool anisotropy = true);
+DLL_EXPORT double meanSquareDisplacement(const R3::Matrix& Uijcartn,
+                                         const R3::Vector& s,
+                                         bool anisotropy = true);
 
 /// Maximum diagonal Uii element from all atoms in the structure.
-double maxUii(StructureAdapterPtr stru);
+DLL_EXPORT double maxUii(StructureAdapterPtr stru);
 
 /// Translate an index container to a vector of string symbols
 template <class T>
