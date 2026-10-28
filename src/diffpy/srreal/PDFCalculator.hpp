@@ -26,10 +26,12 @@
 #include <diffpy/srreal/PDFEnvelope.hpp>
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class PDFCalculator :
+class DLL_EXPORT PDFCalculator :
     public PairQuantity,
     public PeakWidthModelOwner,
     public ScatteringFactorTableOwner,

@@ -21,13 +21,15 @@
 
 #include <diffpy/srreal/PDFEnvelope.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
 /// @class ScaleEnvelope
 /// @brief constant PDF scaling factor
 
-class ScaleEnvelope : public PDFEnvelope
+class DLL_EXPORT ScaleEnvelope : public PDFEnvelope
 {
     public:
 

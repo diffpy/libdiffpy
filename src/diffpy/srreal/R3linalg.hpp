@@ -26,6 +26,8 @@
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <diffpy/mathutils.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 namespace R3 {
@@ -40,13 +42,13 @@ using ublas::trans;
 
 // Constants
 
-const int Ndim = 3;
+extern DLL_EXPORT const int Ndim;
 using ::diffpy::mathutils::SQRT_DOUBLE_EPS;
 const ublas::zero_vector<double> zerovector(Ndim);
 
 // Classes
 
-class Vector : public ublas::vector<double, ublas::bounded_array<double,3> >
+class DLL_EXPORT Vector : public ublas::vector<double, ublas::bounded_array<double,3> >
 {
         typedef ublas::vector<double, ublas::bounded_array<double,3> >
             BaseVector;
@@ -94,7 +96,7 @@ class Vector : public ublas::vector<double, ublas::bounded_array<double,3> >
 };
 
 
-class Matrix : public ublas::matrix<double,
+class DLL_EXPORT Matrix : public ublas::matrix<double,
     ublas::row_major, ublas::bounded_array<double,9> >
 {
     typedef ublas::matrix<double, ublas::row_major,

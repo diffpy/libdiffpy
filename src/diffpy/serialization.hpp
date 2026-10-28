@@ -32,9 +32,10 @@
 namespace diffpy {
 
 template <typename T>
-    std::string serialization_tostring(const T& tobj);
+std::string serialization_tostring(const T& tobj);
+
 template <typename T>
-    void serialization_fromstring(T& tobj, const std::string& s);
+void serialization_fromstring(T& tobj, const std::string& s);
 
 namespace serialization {
 
@@ -43,5 +44,8 @@ typedef ::boost::archive::binary_oarchive oarchive;
 
 }   // namespace serialization
 }   // namespace diffpy
+
+// Pull in the inline definitions and macro logic
+#include "serialization.ipp"
 
 #endif  // SERIALIZATION_HPP_INCLUDED

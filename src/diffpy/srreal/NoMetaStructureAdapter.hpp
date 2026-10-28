@@ -27,10 +27,12 @@
 
 #include <diffpy/srreal/StructureAdapter.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class NoMetaStructureAdapter : public StructureAdapter
+class DLL_EXPORT NoMetaStructureAdapter : public StructureAdapter
 {
     public:
 
@@ -75,7 +77,7 @@ class NoMetaStructureAdapter : public StructureAdapter
 // Routines ------------------------------------------------------------------
 
 /// create NoMetaStructureAdapter from an existing StructureAdapter
-StructureAdapterPtr nometa(StructureAdapterPtr stru);
+DLL_EXPORT StructureAdapterPtr nometa(StructureAdapterPtr stru);
 
 
 /// create NoMetaStructureAdapter from an adaptable structure object

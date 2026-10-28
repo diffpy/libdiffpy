@@ -29,7 +29,7 @@
 namespace diffpy {
 
 // Unique instantiation of the template registry base class.
-template class HasClassRegistry<srreal::AtomRadiiTable>;
+template class DLL_EXPORT HasClassRegistry<srreal::AtomRadiiTable>;
 
 namespace srreal {
 

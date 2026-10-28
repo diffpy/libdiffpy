@@ -25,6 +25,10 @@ namespace diffpy {
 namespace srreal {
 namespace R3 {
 
+// Constants
+DLL_EXPORT const int Ndim = 3;
+
+// Functions
 const Matrix& identity()
 {
     static Matrix mx = ublas::identity_matrix<double>(Ndim);

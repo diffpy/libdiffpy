@@ -21,10 +21,12 @@
 
 #include <diffpy/srreal/AtomRadiiTable.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class ConstantRadiiTable : public AtomRadiiTable
+class DLL_EXPORT ConstantRadiiTable : public AtomRadiiTable
 {
     public:
 

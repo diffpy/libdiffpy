@@ -21,6 +21,8 @@
 
 #include <diffpy/srreal/PDFEnvelope.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
@@ -29,7 +31,7 @@ namespace srreal {
 /// Spherical shape envelope is not applied for spherical particle
 /// diameter, spdiameter, smaller or equal to zero.
 
-class SphericalShapeEnvelope : public PDFEnvelope
+class DLL_EXPORT SphericalShapeEnvelope : public PDFEnvelope
 {
     public:
 

@@ -32,10 +32,12 @@
 
 #include <diffpy/HasClassRegistry.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class AtomRadiiTable :
+class DLL_EXPORT AtomRadiiTable :
     public diffpy::HasClassRegistry<AtomRadiiTable>
 {
     public:

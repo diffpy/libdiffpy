@@ -24,6 +24,9 @@
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/CrystalStructureAdapter.hpp>
 #include <ObjCryst/ObjCryst/Crystal.h>
+
+#include <diffpy/Export.hpp>
+
 #include <ObjCryst/ObjCryst/Molecule.h>
 
 namespace diffpy {
@@ -31,7 +34,7 @@ namespace srreal {
 
 // ObjCryst::Crystal is now adapted with CrystalStructureAdapter
 
-StructureAdapterPtr
+DLL_EXPORT StructureAdapterPtr
 createStructureAdapter(const ObjCryst::Crystal& cryst);
 
 // ObjCryst::Molecule can be adapted with AtomicStructureAdapter
@@ -41,7 +44,7 @@ createStructureAdapter(const ObjCryst::Crystal& cryst);
 // molecule as a scattering component within an ObjCryst::Crystal.
 
 
-StructureAdapterPtr
+DLL_EXPORT StructureAdapterPtr
 createStructureAdapter(const ObjCryst::Molecule& molecule);
 
 }   // namespace srreal

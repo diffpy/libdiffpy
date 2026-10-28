@@ -24,10 +24,12 @@
 
 #include <diffpy/srreal/forwardtypes.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class StructureDifference {
+class DLL_EXPORT StructureDifference {
 
     public:
 

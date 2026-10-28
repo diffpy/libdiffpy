@@ -33,10 +33,12 @@
 #include <diffpy/HasClassRegistry.hpp>
 #include <diffpy/EventTicker.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class ScatteringFactorTable :
+class DLL_EXPORT ScatteringFactorTable :
     public diffpy::HasClassRegistry<ScatteringFactorTable>
 {
     public:
@@ -79,7 +81,7 @@ class ScatteringFactorTable :
 
 typedef ScatteringFactorTable::SharedPtr ScatteringFactorTablePtr;
 
-class ScatteringFactorTableOwner
+class DLL_EXPORT ScatteringFactorTableOwner
 {
     public:
 

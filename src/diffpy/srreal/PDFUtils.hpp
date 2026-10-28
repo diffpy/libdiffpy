@@ -28,6 +28,8 @@
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/QuantityType.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
@@ -43,10 +45,10 @@ const double DEFAULT_QGRID_QMAX = 10.0;
 const double DEFAULT_QGRID_QSTEP = 0.05;
 
 /// fast Fourier transformation converting G(r) to F(Q)
-QuantityType fftgtof(const QuantityType& g, double rstep, double rmin=0.0);
+DLL_EXPORT QuantityType fftgtof(const QuantityType& g, double rstep, double rmin=0.0);
 
 /// fast Fourier transformation converting F(Q) to G(r)
-QuantityType fftftog(const QuantityType& f, double qstep, double qmin=0.0);
+DLL_EXPORT QuantityType fftftog(const QuantityType& f, double qstep, double qmin=0.0);
 
 /// shared methods for PDFCalculator and DebyePDFCalculator
 template <class T> QuantityType pdfutils_getQgrid(const T* pdfc);

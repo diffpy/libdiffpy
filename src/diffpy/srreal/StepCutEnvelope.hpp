@@ -21,6 +21,8 @@
 
 #include <diffpy/srreal/PDFEnvelope.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
@@ -28,7 +30,7 @@ namespace srreal {
 /// @brief empirical step-function PDF envelope.  The envelope is not
 /// applied when the cutoff radius stepcut is smaller or equal zero.
 
-class StepCutEnvelope : public PDFEnvelope
+class DLL_EXPORT StepCutEnvelope : public PDFEnvelope
 {
     public:
 

@@ -33,10 +33,12 @@
 #include <diffpy/HasClassRegistry.hpp>
 #include <diffpy/EventTicker.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class PeakProfile :
+class DLL_EXPORT PeakProfile :
     public diffpy::Attributes,
     public diffpy::HasClassRegistry<PeakProfile>
 {

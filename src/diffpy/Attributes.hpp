@@ -26,6 +26,8 @@
 #include <stdexcept>
 #include <memory>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace attributes {
 
@@ -46,7 +48,7 @@ class DoubleAttributeError : public std::runtime_error
 /// @class BaseDoubleAttribute
 /// @brief abstract base class for accessing a particular double attribute
 
-class BaseDoubleAttribute
+class DLL_EXPORT BaseDoubleAttribute
 {
     public:
 
@@ -75,7 +77,7 @@ class BaseAttributesVisitor
 /// should derive from Attributes and register their setter and
 /// getter methods in their constructors.
 
-class Attributes
+class DLL_EXPORT Attributes
 {
     public:
 
@@ -98,7 +100,7 @@ class Attributes
 
     protected:
 
-        friend void registerBaseDoubleAttribute(Attributes*,
+        friend DLL_EXPORT void registerBaseDoubleAttribute(Attributes*,
                 const std::string&, attributes::BaseDoubleAttribute* pa);
         template <class T, class Getter>
             void registerDoubleAttribute(const std::string& name, T* obj, Getter);
@@ -186,10 +188,10 @@ class Attributes
 
 // non-member helpers
 
-void registerBaseDoubleAttribute(Attributes* obj,
+DLL_EXPORT void registerBaseDoubleAttribute(Attributes* obj,
         const std::string& name, BaseDoubleAttribute* pa);
 
-void throwDoubleAttributeReadOnly();
+DLL_EXPORT void throwDoubleAttributeReadOnly();
 
 }   // namespace attributes
 }   // namespace diffpy

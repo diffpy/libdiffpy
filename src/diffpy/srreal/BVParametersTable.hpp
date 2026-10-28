@@ -27,12 +27,14 @@
 #include <boost/serialization/unordered_map.hpp>
 #include <diffpy/srreal/BVParam.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
 typedef std::shared_ptr<class BVParametersTable> BVParametersTablePtr;
 
-class BVParametersTable
+class DLL_EXPORT BVParametersTable
 {
 
     public:

@@ -26,10 +26,12 @@
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 #include <diffpy/serialization.ipp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class SFTElectron : public ScatteringFactorTable
+class DLL_EXPORT SFTElectron : public ScatteringFactorTable
 {
     public:
 

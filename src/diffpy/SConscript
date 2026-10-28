@@ -4,9 +4,12 @@ Import('env', 'GlobSources')
 
 env['lib_includes'] += GlobSources('*.[hi]pp')
 env['lib_sources'] += [f for f in GlobSources('*.cpp')
-        if str(f) != 'runtimepath.cpp']
+    if str(f) != 'runtimepath.cpp']
 
 rtrp = os.path.relpath(env['runtimepath'], env['libdir'])
+if env['PLATFORM'] == "win32":
+    rtrp = rtrp.replace('\\', '/')
+
 env_rt = env.Clone()
 env_rt.AppendUnique(CPPDEFINES=dict(DIFFPYRUNTIMERELPATH=rtrp))
 rtso = env_rt.SharedObject('runtimepath', 'runtimepath.cpp')

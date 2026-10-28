@@ -23,10 +23,12 @@
 
 #include <diffpy/srreal/GaussianProfile.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class CroppedGaussianProfile : public GaussianProfile
+class DLL_EXPORT CroppedGaussianProfile : public GaussianProfile
 {
     public:
 

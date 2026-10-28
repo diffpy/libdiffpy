@@ -26,10 +26,12 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class QuantityType : public std::vector<double>
+class DLL_EXPORT QuantityType : public std::vector<double>
 {
     private:
 

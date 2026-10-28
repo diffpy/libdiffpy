@@ -22,10 +22,12 @@
 
 #include <diffpy/srreal/PeakProfile.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class GaussianProfile : public PeakProfile
+class DLL_EXPORT GaussianProfile : public PeakProfile
 {
     public:
 

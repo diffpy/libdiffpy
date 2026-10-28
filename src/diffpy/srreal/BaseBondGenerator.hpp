@@ -23,13 +23,15 @@
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/forwardtypes.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
 /// Use zero default for rmax so any misconfiguration of r-limits is obvious.
 const double DEFAULT_BONDGENERATOR_RMAX = 0.0;
 
-class BaseBondGenerator
+class DLL_EXPORT BaseBondGenerator
 {
     public:
 

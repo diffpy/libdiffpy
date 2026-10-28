@@ -24,10 +24,12 @@
 
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class SFTNeutron : public ScatteringFactorTable
+class DLL_EXPORT SFTNeutron : public ScatteringFactorTable
 {
     public:
 

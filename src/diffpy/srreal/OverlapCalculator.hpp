@@ -24,10 +24,12 @@
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/AtomRadiiTable.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class OverlapCalculator : public PairQuantity
+class DLL_EXPORT OverlapCalculator : public PairQuantity
 {
     public:
 

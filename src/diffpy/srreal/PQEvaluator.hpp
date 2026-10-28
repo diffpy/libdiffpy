@@ -33,6 +33,8 @@
 #include <diffpy/srreal/QuantityType.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
@@ -51,11 +53,11 @@ enum PQEvaluatorFlag {
     FIXEDSITEINDEX = 2,
 };
 
-class PQEvaluatorBasic
+class DLL_EXPORT PQEvaluatorBasic
 {
     public:
 
-        friend
+        friend DLL_EXPORT
             PQEvaluatorPtr createPQEvaluator(PQEvaluatorType, PQEvaluatorPtr);
         // constructor
         PQEvaluatorBasic();
@@ -98,7 +100,7 @@ class PQEvaluatorBasic
 };
 
 
-class PQEvaluatorOptimized : public PQEvaluatorBasic
+class DLL_EXPORT PQEvaluatorOptimized : public PQEvaluatorBasic
 {
     public:
 
@@ -127,7 +129,7 @@ class PQEvaluatorOptimized : public PQEvaluatorBasic
 };
 
 
-class PQEvaluatorCheck : public PQEvaluatorOptimized
+class DLL_EXPORT PQEvaluatorCheck : public PQEvaluatorOptimized
 {
     public:
 
@@ -149,7 +151,7 @@ class PQEvaluatorCheck : public PQEvaluatorOptimized
 
 // Factory function for PairQuantity evaluators ------------------------------
 
-PQEvaluatorPtr createPQEvaluator(
+DLL_EXPORT PQEvaluatorPtr createPQEvaluator(
         PQEvaluatorType pqtp, PQEvaluatorPtr pqevsrc=PQEvaluatorPtr());
 
 }   // namespace srreal

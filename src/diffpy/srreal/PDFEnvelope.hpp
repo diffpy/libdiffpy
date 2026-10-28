@@ -35,6 +35,8 @@
 #include <diffpy/HasClassRegistry.hpp>
 #include <diffpy/srreal/QuantityType.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
@@ -42,7 +44,7 @@ namespace srreal {
 /// @class PDFEnvelope
 /// @brief abstract base class for PDF envelope scaling function
 
-class PDFEnvelope :
+class DLL_EXPORT PDFEnvelope :
     public diffpy::Attributes,
     public diffpy::HasClassRegistry<PDFEnvelope>
 {
@@ -69,7 +71,7 @@ typedef PDFEnvelope::SharedPtr PDFEnvelopePtr;
 /// @brief storage of one or more PDFEnvelope functions and their
 /// application to unscaled x, y arrays
 
-class PDFEnvelopeOwner
+class DLL_EXPORT PDFEnvelopeOwner
 {
     public:
 

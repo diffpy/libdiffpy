@@ -21,13 +21,15 @@
 
 #include <diffpy/srreal/PDFBaseline.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
 /// @class ZeroBaseline
 /// @brief trivial zero baseline
 
-class ZeroBaseline : public PDFBaseline
+class DLL_EXPORT ZeroBaseline : public PDFBaseline
 {
     public:
 

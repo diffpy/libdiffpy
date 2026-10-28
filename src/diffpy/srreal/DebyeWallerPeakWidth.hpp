@@ -22,11 +22,13 @@
 
 #include <diffpy/srreal/PeakWidthModel.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
 
-class DebyeWallerPeakWidth : public PeakWidthModel
+class DLL_EXPORT DebyeWallerPeakWidth : public PeakWidthModel
 {
     public:
 

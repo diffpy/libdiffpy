@@ -23,7 +23,7 @@
 namespace diffpy {
 
 // Unique instantiation of the template registry base class.
-template class HasClassRegistry<srreal::PDFBaseline>;
+template class DLL_EXPORT HasClassRegistry<srreal::PDFBaseline>;
 
 }   // namespace diffpy
 

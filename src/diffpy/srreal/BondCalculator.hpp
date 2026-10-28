@@ -21,10 +21,12 @@
 
 #include <diffpy/srreal/PairQuantity.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class BondCalculator : public PairQuantity
+class DLL_EXPORT BondCalculator : public PairQuantity
 {
     public:
 

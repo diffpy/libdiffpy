@@ -32,12 +32,14 @@
 #include <diffpy/Attributes.hpp>
 #include <diffpy/EventTicker.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
 class BaseBondGenerator;
 
-class PairQuantity : public diffpy::Attributes
+class DLL_EXPORT PairQuantity : public diffpy::Attributes
 {
     public:
 
@@ -84,7 +86,7 @@ class PairQuantity : public diffpy::Attributes
 
         friend class PQEvaluatorBasic;
         friend class PQEvaluatorOptimized;
-        friend StructureAdapterPtr
+        friend DLL_EXPORT StructureAdapterPtr
             replacePairQuantityStructure(PairQuantity&, StructureAdapterPtr);
 
         // methods
@@ -171,7 +173,7 @@ void PairQuantity::setStructure(const T& stru)
 /// The purpose of this function is to support Python pickling of
 /// PairQuantity objects that hold Python-derived StructureAdapter classes.
 /// Use it only if you absolutely have to and you know what you do.
-StructureAdapterPtr
+DLL_EXPORT StructureAdapterPtr
 replacePairQuantityStructure(PairQuantity& pq, StructureAdapterPtr stru);
 
 }   // namespace srreal

@@ -27,7 +27,7 @@ using diffpy::validators::ensureNonNull;
 namespace diffpy {
 
 // Unique instantiation of the template registry base class.
-template class HasClassRegistry<srreal::PeakWidthModel>;
+template class DLL_EXPORT HasClassRegistry<srreal::PeakWidthModel>;
 
 namespace srreal {
 

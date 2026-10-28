@@ -21,13 +21,15 @@
 
 #include <diffpy/srreal/PDFEnvelope.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
 /// @class QResolutionEnvelope
 /// @brief wide Gaussian PDF scaling envelope caused by finite Q resolution
 
-class QResolutionEnvelope : public PDFEnvelope
+class DLL_EXPORT QResolutionEnvelope : public PDFEnvelope
 {
     public:
 

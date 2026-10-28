@@ -23,11 +23,13 @@
 
 #include <diffpy/srreal/DebyeWallerPeakWidth.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
 
-class JeongPeakWidth : public DebyeWallerPeakWidth
+class DLL_EXPORT JeongPeakWidth : public DebyeWallerPeakWidth
 {
     public:
 

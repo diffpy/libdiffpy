@@ -23,14 +23,17 @@
 #define PERIODICSTRUCTUREADAPTER_HPP_INCLUDED
 
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
+#include <diffpy/srreal/PointsInSphere.hpp>
 #include <diffpy/srreal/Lattice.hpp>
+
+#include <diffpy/Export.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 class PointsInSphere;
 
-class PeriodicStructureAdapter : public AtomicStructureAdapter
+class DLL_EXPORT PeriodicStructureAdapter : public AtomicStructureAdapter
 {
     public:
 
@@ -68,8 +71,8 @@ typedef std::shared_ptr<PeriodicStructureAdapter> PeriodicStructureAdapterPtr;
 
 // Comparison functions
 
-bool operator==(const PeriodicStructureAdapter&, const PeriodicStructureAdapter&);
-bool operator!=(const PeriodicStructureAdapter&, const PeriodicStructureAdapter&);
+DLL_EXPORT bool operator==(const PeriodicStructureAdapter&, const PeriodicStructureAdapter&);
+DLL_EXPORT bool operator!=(const PeriodicStructureAdapter&, const PeriodicStructureAdapter&);
 
 
 class PeriodicStructureBondGenerator : public BaseBondGenerator

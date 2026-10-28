@@ -29,10 +29,12 @@
 
 #include <diffpy/srreal/StructureAdapter.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class NoSymmetryStructureAdapter : public StructureAdapter
+class DLL_EXPORT NoSymmetryStructureAdapter : public StructureAdapter
 {
     public:
 
@@ -77,7 +79,7 @@ class NoSymmetryStructureAdapter : public StructureAdapter
 // Routines ------------------------------------------------------------------
 
 /// create NoSymmetryStructureAdapter from an existing StructureAdapter
-StructureAdapterPtr nosymmetry(StructureAdapterPtr stru);
+DLL_EXPORT StructureAdapterPtr nosymmetry(StructureAdapterPtr stru);
 
 
 /// create NoSymmetryStructureAdapter from an adaptable structure object

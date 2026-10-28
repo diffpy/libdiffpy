@@ -24,10 +24,12 @@
 
 #include <diffpy/srreal/StructureAdapter.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class Atom
+class DLL_EXPORT Atom
 {
     public:
 
@@ -64,17 +66,17 @@ class Atom
 
 // Functions related to class Atom
 
-bool operator<(const Atom&, const Atom&);
+DLL_EXPORT bool operator<(const Atom&, const Atom&);
 inline bool operator>(const Atom& a0, const Atom& a1)  { return a1 < a0; }
 inline bool operator<=(const Atom& a0, const Atom& a1)  { return !(a1 < a0); }
 inline bool operator>=(const Atom& a0, const Atom& a1)  { return !(a0 < a1); }
 
-bool operator==(const Atom&, const Atom&);
-bool operator!=(const Atom&, const Atom&);
-size_t hash_value(const Atom&);
+DLL_EXPORT bool operator==(const Atom&, const Atom&);
+DLL_EXPORT bool operator!=(const Atom&, const Atom&);
+DLL_EXPORT size_t hash_value(const Atom&);
 
 
-class AtomicStructureAdapter : public StructureAdapter
+class DLL_EXPORT AtomicStructureAdapter : public StructureAdapter
 {
     public:
 

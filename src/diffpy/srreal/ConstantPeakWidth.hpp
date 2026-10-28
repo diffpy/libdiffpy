@@ -21,11 +21,13 @@
 
 #include <diffpy/srreal/PeakWidthModel.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
 
-class ConstantPeakWidth : public PeakWidthModel
+class DLL_EXPORT ConstantPeakWidth : public PeakWidthModel
 {
     public:
 

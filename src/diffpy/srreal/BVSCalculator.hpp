@@ -22,10 +22,12 @@
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/BVParametersTable.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class BVSCalculator : public PairQuantity
+class DLL_EXPORT BVSCalculator : public PairQuantity
 {
     public:
 

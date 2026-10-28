@@ -52,10 +52,12 @@
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 #include <diffpy/srreal/PDFEnvelope.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class DebyePDFCalculator :
+class DLL_EXPORT DebyePDFCalculator :
     public BaseDebyeSum,
     public ScatteringFactorTableOwner,
     public PDFEnvelopeOwner

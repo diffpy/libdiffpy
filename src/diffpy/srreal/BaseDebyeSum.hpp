@@ -23,10 +23,12 @@
 #include <diffpy/srreal/PeakWidthModel.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class BaseDebyeSum :
+class DLL_EXPORT BaseDebyeSum :
     public PairQuantity,
     public PeakWidthModelOwner
 {

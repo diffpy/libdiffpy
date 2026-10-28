@@ -26,10 +26,12 @@
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/split_member.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace eventticker {
 
-class EventTicker
+class DLL_EXPORT EventTicker
 {
     public:
 

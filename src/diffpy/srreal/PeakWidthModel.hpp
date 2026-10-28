@@ -35,10 +35,12 @@
 #include <diffpy/EventTicker.hpp>
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
-class PeakWidthModel :
+class DLL_EXPORT PeakWidthModel :
     public diffpy::Attributes,
     public diffpy::HasClassRegistry<PeakWidthModel>
 {
@@ -71,7 +73,7 @@ class PeakWidthModel :
 typedef PeakWidthModel::SharedPtr PeakWidthModelPtr;
 
 
-class PeakWidthModelOwner
+class DLL_EXPORT PeakWidthModelOwner
 {
     public:
 

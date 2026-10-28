@@ -30,13 +30,15 @@
 #include <diffpy/Attributes.hpp>
 #include <diffpy/HasClassRegistry.hpp>
 
+#include <diffpy/Export.hpp>
+
 namespace diffpy {
 namespace srreal {
 
 /// @class PDFBaseline
 /// @brief abstract base class for PDF baseline function
 
-class PDFBaseline :
+class DLL_EXPORT PDFBaseline :
     public Attributes,
     public HasClassRegistry<PDFBaseline>
 {
