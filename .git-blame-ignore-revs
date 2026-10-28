@@ -1,0 +1,8 @@
+# Commits that only reformat code.  Use with
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+# GitHub's blame view reads this file automatically.
+
+# style: apply clang-format (Google style) to C++ sources
+69c43f493b013e13a8e004e830bda197501beaea
+# add precommit hooks and configuration files (upstream clang-format reformat)
+ba376c74884c9e57eb6fb86f17f2e482389ac547
