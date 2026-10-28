@@ -4,6 +4,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+concurrency:
+  group: tests-on-pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests-on-pr:
     runs-on: ubuntu-latest
@@ -23,7 +27,7 @@ jobs:
           activate-environment: test
           channels: conda-forge
           conda-remove-defaults: "true"
-          auto-update-conda: true
+          auto-update-conda: false
           auto-activate-base: false
 
       - name: Conda config
@@ -53,7 +57,7 @@ jobs:
       - name: Build and run C++ tests with coverage
         run: |
           "$CONDA_PREFIX/bin/c++" --version
-          scons build=coverage test
+          scons -j4 build=coverage test
 
       - name: Generate coverage report
         run: >-

@@ -10,6 +10,10 @@ on:
       - published
   workflow_dispatch:
 
+concurrency:
+  group: matrix-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'release' }}
+
 jobs:
   matrix-coverage:
     name: C++ tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
@@ -24,15 +28,19 @@ jobs:
           - os: ubuntu-latest
             shell: bash -l {0}
             build: coverage
+            jobs: 4
           - os: windows-latest
             shell: cmd /C CALL {0}
             build: fast
+            jobs: 4
           - os: macos-latest
             shell: bash -l {0}
             build: fast
+            jobs: 2
           - os: macos-15-intel
             shell: bash -l {0}
             build: fast
+            jobs: 4
     defaults:
       run:
         shell: ${{ matrix.shell }}
@@ -55,28 +63,26 @@ jobs:
           ref: 191adddb3876ab389c0c856e1c03874bf70f8ee4
           path: build/cxxtest
 
-      - name: Initialize miniconda
+      - name: Prepare C++ test configuration
+        shell: python {0}
+        run: |
+          import runpy
+          runpy.run_path('.github/scripts/configure-matrix.py')
+
+      - name: Create build environment
         uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: test
           channels: conda-forge
           conda-remove-defaults: "true"
-          auto-update-conda: true
+          auto-update-conda: false
           auto-activate-base: false
           python-version: ${{ matrix.python-version }}
-
-      - name: Prepare C++ test configuration
-        run: python .github/scripts/configure-matrix.py
-
-      - name: Install requirements
-        run: >-
-          conda install --yes --override-channels -c conda-forge
-          --file requirements/build.txt
-          --file requirements/conda.txt
-          --file build/matrix-tests.txt
+          environment-file: build/matrix-environment.yml
+          channel-priority: strict
 
       - name: Build and run C++ tests
-        run: scons -j2 build=${{ matrix.build }} test
+        run: scons -j${{ matrix.jobs }} build=${{ matrix.build }} test
 
       - name: Generate coverage report
         if: runner.os == 'Linux' && matrix.python-version == '3.14'
