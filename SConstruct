@@ -70,7 +70,11 @@ if env['PLATFORM'] == "win32":
     lib_path = pjoin(env['prefix'], 'Library', 'lib')
     shared_path = pjoin(env['prefix'], 'Library', 'share')
 
-    env['ENV']['TMP'] = os.environ['TMP']
+    # Windows programs started by SCons, such as python for cxxtestgen,
+    # fail without these system variables.
+    for k in ('SYSTEMROOT', 'SYSTEMDRIVE', 'COMSPEC', 'PATHEXT', 'TEMP', 'TMP'):
+        if k in os.environ:
+            env['ENV'][k] = os.environ[k]
 else:
     include_path = pjoin(env['prefix'], 'include')
     lib_path = pjoin(env['prefix'], 'lib')

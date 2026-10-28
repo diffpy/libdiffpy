@@ -15,7 +15,11 @@ else:
 use_our_library = not env['test_installed']
 
 env_test.PrependUnique(LIBS='diffpy', LIBPATH=lib_dir, delete_existing=1)
-env_test.PrependUnique(LINKFLAGS="-Wl,-rpath,%r" % lib_dir)
+if env['PLATFORM'] == 'win32':
+    # Windows has no rpath.  Let the test program find diffpy.dll on PATH.
+    env_test.PrependENVPath('PATH', lib_dir)
+else:
+    env_test.PrependUnique(LINKFLAGS="-Wl,-rpath,%r" % lib_dir)
 
 # Targets --------------------------------------------------------------------
 

@@ -48,8 +48,7 @@ if env['PLATFORM'] == 'darwin':
 
 # Compiler specific options
 if env['PLATFORM'] == 'win32':
-    # BUILD_DLL makes DLL_EXPORT export symbols, see diffpy/Export.hpp.
-    env.AppendUnique(CPPDEFINES=['BUILD_DLL', '_USE_MATH_DEFINES'])
+    env.AppendUnique(CPPDEFINES=['_USE_MATH_DEFINES'])
     if env['tool'] == 'clang':
         # clang++ on Windows
         env['CC'] = 'clang'
@@ -63,7 +62,10 @@ if env['PLATFORM'] == 'win32':
         env.AppendUnique(LINKFLAGS='-m64')
     else:
         # Visual C++
-        env.PrependUnique(CCFLAGS=['/Ox', '/EHsc', '/MD', '/Wall'])
+        # /W3 rather than /Wall, which floods the log with warnings from the
+        # standard library and boost headers.  /bigobj is needed for the
+        # boost serialization code.
+        env.PrependUnique(CCFLAGS=['/Ox', '/EHsc', '/MD', '/W3', '/bigobj'])
         env.AppendUnique(CXXFLAGS='/std:c++latest')
         env.AppendUnique(CPPDEFINES={'NDEBUG': None})
         env.AppendUnique(LINKFLAGS=['/OPT:NOREF', '/OPT:NOICF'])
@@ -167,6 +169,10 @@ if 'sdist' in COMMAND_LINE_TARGETS:
 
 # use new environment with extra libraries needed for libdiffpy.
 env_lib = env.Clone()
+if env['PLATFORM'] == 'win32':
+    # Export the API from the DLL, see diffpy/Export.hpp.  Code that uses
+    # the library, including the unit tests, imports it instead.
+    env_lib.AppendUnique(CPPDEFINES=['BUILD_DLL'])
 # The dladdr call in runtimepath.cpp requires the dl library.
 # Windows uses GetModuleHandleEx instead.
 if env['PLATFORM'] != 'win32':

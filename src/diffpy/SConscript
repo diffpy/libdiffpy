@@ -12,6 +12,9 @@ if env['PLATFORM'] == "win32":
 
 env_rt = env.Clone()
 env_rt.AppendUnique(CPPDEFINES=dict(DIFFPYRUNTIMERELPATH=rtrp))
+if env['PLATFORM'] == "win32":
+    # runtimepath is part of the DLL, see BUILD_DLL in src/SConscript.
+    env_rt.AppendUnique(CPPDEFINES=['BUILD_DLL'])
 rtso = env_rt.SharedObject('runtimepath', 'runtimepath.cpp')
 env['lib_sources'] += rtso
 
