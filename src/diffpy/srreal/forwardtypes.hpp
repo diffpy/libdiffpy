@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         Complex Modeling Initiative
-*                   (c) 2013 Brookhaven Science Associates,
-*                   Brookhaven National Laboratory.
-*                   All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.rst for a list of people who contributed.
-* See LICENSE.rst for license information.
-*
-******************************************************************************
-*
-* Forward declaration of commonly used pointer types.
-*
-*****************************************************************************/
+ *
+ * libdiffpy         Complex Modeling Initiative
+ *                   (c) 2013 Brookhaven Science Associates,
+ *                   Brookhaven National Laboratory.
+ *                   All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.rst for a list of people who contributed.
+ * See LICENSE.rst for license information.
+ *
+ ******************************************************************************
+ *
+ * Forward declaration of commonly used pointer types.
+ *
+ *****************************************************************************/
 
 #ifndef FORWARDTYPES_HPP_INCLUDED
 #define FORWARDTYPES_HPP_INCLUDED
@@ -33,7 +33,7 @@ typedef std::shared_ptr<const class StructureAdapter> StructureAdapterConstPtr;
 /// type for holding indices for atom sites
 typedef std::vector<int> SiteIndices;
 
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 #endif  // FORWARDTYPES_HPP_INCLUDED
