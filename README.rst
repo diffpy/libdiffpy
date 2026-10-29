@@ -10,10 +10,13 @@
 
 |Forge| |PR|
 
-|CI| |Tracking|
+|CI| |Codecov| |Tracking|
 
 .. |CI| image:: https://github.com/diffpy/libdiffpy/actions/workflows/matrix-and-codecov.yml/badge.svg
         :target: https://github.com/diffpy/libdiffpy/actions/workflows/matrix-and-codecov.yml
+
+.. |Codecov| image:: https://codecov.io/gh/diffpy/libdiffpy/branch/main/graph/badge.svg
+        :target: https://codecov.io/gh/diffpy/libdiffpy
 
 .. |Forge| image:: https://img.shields.io/conda/vn/conda-forge/libdiffpy
         :target: https://anaconda.org/conda-forge/libdiffpy
@@ -76,74 +79,30 @@ The following creates and activates a new environment named ``libdiffpy_env`` ::
         conda create -n libdiffpy_env libdiffpy
         conda activate libdiffpy_env
 
-When compiling with the conda version of libdiffpy it is essential to
-specify the header path, library path and runtime path of the active conda
-environment. To verify the installation, compile and run the included
-test code `examples/testlib.cpp <examples/testlib.cpp>`_ ::
+To verify the installation, compile and run the included test code
+`examples/testlib.cpp <examples/testlib.cpp>`_ ::
 
         cd examples
         c++ testlib.cpp -I$CONDA_PREFIX/include -L$CONDA_PREFIX/lib -Wl,-rpath,$CONDA_PREFIX/lib -ldiffpy
         ./a.out
 
-Note the conda package for libdiffpy is built with C++ compilers
-provided by conda-forge. This may cause incompatibility with system C++.
+The conda package for libdiffpy is built with C++ compilers provided by
+conda-forge, which may be incompatible with the system C++ compiler.
 In such case please use the conda-forge C++ compiler to link with libdiffpy.
 
-Requirements
-^^^^^^^^^^^^
-
-To build libdiffpy from sources, a C++ compiler and the following software are required:
-
-* ``scons`` - software constructions tool (1.0 or later)
-* ``libboost-dev`` - Boost C++ libraries development files (1.56 or later)
-* ``GSL`` - GNU Scientific Library for C
-
-Recommended software:
-
-* ``libobjcryst`` - C++ library for free objects for crystallography,
-  https://github.com/diffpy/libobjcryst
-* ``cxxtest`` - CxxTest Unit Testing Framework, http://cxxtest.com
-
-The required software is commonly available in the system package manager.
-For example, on Ubuntu Linux the required software can be installed using ::
-
-        sudo apt-get install build-essential scons libboost-dev libgsl0-dev
-
-Alternatively, all of the above can be installed into a conda environment from
-the ``requirements`` folder ::
+If you prefer to install from sources, obtain the source archive from
+`GitHub <https://github.com/diffpy/libdiffpy/>`_ and ``cd`` into your
+``libdiffpy`` directory. Create a conda environment with the build
+dependencies listed in the ``requirements`` folder ::
 
         conda create -n libdiffpy_env --file requirements/build.txt --file requirements/conda.txt --file requirements/tests.txt
         conda activate libdiffpy_env
 
-Installation from sources
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Then build and install libdiffpy into the active conda environment ::
 
-Use sources from the git repository or extract the latest source
-bundle from https://github.com/diffpy/libdiffpy/releases/latest. ::
+        scons -j4 install
 
-        tar xzf libdiffpy-VERSION.tar.gz
-        cd libdiffpy-VERSION
-
-To build and install the libdiffpy library use ::
-
-        sudo scons -j4 install
-
-This installs libdiffpy for all users under the ``/usr/local`` directory.
-If administrator (root) access is not available, see the output from
-``scons --help`` for options to install to a user-writable location.
-
-To verify the libdiffpy installation, compile and run the included
-test code `examples/testlib.cpp <examples/testlib.cpp>`_ ::
-
-        cd examples
-        c++ testlib.cpp -ldiffpy
-        ./a.out
-
-If compilation fails because of missing header files or missing libdiffpy
-library, adjust the ``CPATH`` and ``LIBRARY_PATH`` environment variables or
-use the ``-I`` or ``-L`` compiler options. If the shared library libdiffpy
-is unavailable at runtime, add a ``-Wl,-rpath,SomePath`` option to the
-c++ command or adjust the ``LD_LIBRARY_PATH`` environment variable.
+See the output from ``scons --help`` for the available build targets and options.
 
 Getting Started
 ---------------
@@ -161,11 +120,14 @@ library with debug information and C-assertions checks ::
 
         scons -j4 build=develop
 
+The library integrity can be verified by executing the unit tests ::
+
+        scons -j4 test
+
 The build script checks for a presence of ``sconsvars.py`` file, which
 can be used to permanently set the ``build`` variable. The SCons
 construction environment can be further customized in a ``sconscript.local``
-script. The library integrity can be verified by executing unit tests with
-``scons test`` (requires the CxxTest framework).
+script.
 
 See also the `instructions for compiling and modifying source code in development mode <docs/development_instructions.md>`_.
 
@@ -176,10 +138,11 @@ hooks.
 
 2. Initialize pre-commit (one time only) ``pre-commit install``.
 
-Thereafter your code will be linted by black and isort and checked against flake8 before you can commit.
-If it fails by black or isort, just rerun and it should pass (black and isort will modify the files so should
-pass after they are modified). If the flake8 test fails please see the error messages and fix them manually before
-trying to commit again.
+Thereafter C++ sources will be formatted by clang-format, Python build scripts will be linted by black and
+isort and checked against flake8, and spelling will be checked by codespell before you can commit.
+If it fails by clang-format, black or isort, just rerun and it should pass (these hooks modify the files so
+should pass after they are modified). If the flake8 or codespell checks fail please see the error messages and
+fix them manually before trying to commit again.
 
 Improvements and fixes are always appreciated.
 
