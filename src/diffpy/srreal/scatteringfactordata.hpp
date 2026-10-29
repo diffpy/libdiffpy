@@ -26,26 +26,27 @@
 #define SCATTERINGFACTORS_HPP_INCLUDED
 
 #include <string>
+#include <diffpy/Export.hpp>
 
 namespace diffpy {
 namespace srreal {
 
 /// X-ray scattering factor of an element or ion a given Q
-double fxrayatq(const std::string& smbl, double q);
+DLL_EXPORT double fxrayatq(const std::string& smbl, double q);
 
 /// X-ray scattering factor of an element or ion a given sin(theta)/lambda
-double fxrayatstol(const std::string& smbl, double stol);
+DLL_EXPORT double fxrayatstol(const std::string& smbl, double stol);
 
 /// Electron scattering factor of an element or ion a given Q
-double felectronatq(const std::string& smbl, double q);
+DLL_EXPORT double felectronatq(const std::string& smbl, double q);
 
 /// Number of electrons for an element or ion
-int electronnumber(const std::string& smbl);
+DLL_EXPORT int electronnumber(const std::string& smbl);
 
 /// Coherent scattering length of an element or isotope in fm
-double bcneutron(const std::string& smbl);
+DLL_EXPORT double bcneutron(const std::string& smbl);
 
-}   // namespace srreal
-}   // namespace diffpy
+}  // namespace srreal
+}  // namespace diffpy
 
 #endif  // SCATTERINGFACTORS_HPP_INCLUDED

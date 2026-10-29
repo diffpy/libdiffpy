@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-* libdiffpy         Complex Modeling Initiative
-*                   (c) 2013 Brookhaven Science Associates,
-*                   Brookhaven National Laboratory.
-*                   All rights reserved.
-*
-* File coded by:    Pavol Juhas
-*
-* See AUTHORS.rst for a list of people who contributed.
-* See LICENSE.rst for license information.
-*
-******************************************************************************
-*
-* Functions for resolving paths to static data files at runtime.
-*
-*****************************************************************************/
+ *
+ * libdiffpy         Complex Modeling Initiative
+ *                   (c) 2013 Brookhaven Science Associates,
+ *                   Brookhaven National Laboratory.
+ *                   All rights reserved.
+ *
+ * File coded by:    Pavol Juhas
+ *
+ * See AUTHORS.rst for a list of people who contributed.
+ * See LICENSE.rst for license information.
+ *
+ ******************************************************************************
+ *
+ * Functions for resolving paths to static data files at runtime.
+ *
+ *****************************************************************************/
 
 #ifndef RUNTIMEPATH_HPP_INCLUDED
 #define RUNTIMEPATH_HPP_INCLUDED
@@ -23,6 +23,7 @@
 #include <vector>
 #include <istream>
 #include <stdexcept>
+#include <diffpy/Export.hpp>
 
 namespace diffpy {
 namespace runtimepath {
@@ -39,35 +40,34 @@ namespace runtimepath {
 ///
 /// Throw runtime_error if the base directory cannot be found, including an
 /// invalid explicit override. File existence is checked by the data readers.
-std::string datapath(const std::string& f);
+DLL_EXPORT std::string datapath(const std::string& f);
 
 /// Helper class for loading text data
-class LineReader
-{
-    public:
-        // constructor
-        LineReader();
+class DLL_EXPORT LineReader {
+ public:
+  // constructor
+  LineReader();
 
-        // methods
-        bool isignored() const;
-        bool iscomment() const;
-        bool isblank() const;
-        size_t wcount() const;
-        std::runtime_error format_error(
-                const std::string& filename, const std::string& edetail);
+  // methods
+  bool isignored() const;
+  bool iscomment() const;
+  bool isblank() const;
+  size_t wcount() const;
+  std::runtime_error format_error(const std::string& filename,
+                                  const std::string& edetail);
 
-        // data
-        int lineno;
-        std::string commentmark;
-        std::string separator;
-        std::string line;
-        std::vector<std::string> words;
+  // data
+  int lineno;
+  std::string commentmark;
+  std::string separator;
+  std::string line;
+  std::vector<std::string> words;
 };
 
 // non-member functions for the LineReader class
-std::istream& operator>> (std::istream&, LineReader&);
+DLL_EXPORT std::istream& operator>>(std::istream&, LineReader&);
 
-}   // namespace runtimepath
-}   // namespace diffpy
+}  // namespace runtimepath
+}  // namespace diffpy
 
 #endif  // RUNTIMEPATH_HPP_INCLUDED

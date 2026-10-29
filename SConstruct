@@ -22,6 +22,8 @@ SCons construction environment can be customized in sconscript.local script.
 
 import os
 import platform
+from os.path import join as pjoin
+from SCons.Script import *
 
 def subdictionary(d, keyset):
     return dict(kv for kv in d.items() if kv[0] in keyset)
@@ -31,38 +33,74 @@ DefaultEnvironment(ENV=subdictionary(os.environ, '''
     PATH CPATH CPLUS_INCLUDE_PATH LIBRARY_PATH LD_RUN_PATH
     LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH
     MACOSX_DEPLOYMENT_TARGET
+    HOME USERPROFILE HOMEDRIVE HOMEPATH APPDATA LOCALAPPDATA
     '''.split())
 )
 
 # Create construction environment
 env = DefaultEnvironment().Clone()
 
-# Variables definitions below work only with 0.98.1 or later.
+# Variables definitions below work only with 0.98.1 or later
 env.EnsureSConsVersion(0, 98, 1)
 
 # Customizable compile variables
 vars = Variables('sconsvars.py')
 
-vars.Add(PathVariable(
-    'prefix',
-    'installation prefix directory',
-    '/usr/local'))
-vars.Update(env)
+# Set PATHs
+if 'PREFIX' in os.environ:
+    vars.Add(PathVariable(
+        'prefix',
+        'installation prefix directory',
+        os.environ['PREFIX']))
+    vars.Update(env)
+elif 'CONDA_PREFIX' in os.environ:
+    vars.Add(PathVariable(
+        'prefix',
+        'installation prefix directory',
+        os.environ['CONDA_PREFIX']))
+    vars.Update(env)
+else:
+    vars.Add(PathVariable(
+        'prefix',
+        'installation prefix directory',
+        '/usr/local'))
+    vars.Update(env)
+
+if env['PLATFORM'] == "win32":
+    include_path = pjoin(env['prefix'], 'Library', 'include')
+    lib_path = pjoin(env['prefix'], 'Library', 'lib')
+    shared_path = pjoin(env['prefix'], 'Library', 'share')
+
+    # Windows programs started by SCons, such as python for cxxtestgen,
+    # fail without these system variables.
+    for k in ('SYSTEMROOT', 'SYSTEMDRIVE', 'COMSPEC', 'PATHEXT', 'TEMP', 'TMP'):
+        if k in os.environ:
+            env['ENV'][k] = os.environ[k]
+else:
+    include_path = pjoin(env['prefix'], 'include')
+    lib_path = pjoin(env['prefix'], 'lib')
+    shared_path = pjoin(env['prefix'], 'share')
+
 vars.Add(PathVariable(
     'libdir',
-    'installation directory for compiled library [prefix/lib]',
-    env['prefix'] + '/lib',
+    'installation directory for compiled programs',
+    lib_path,
     PathVariable.PathAccept))
 vars.Add(PathVariable(
     'includedir',
-    'installation directory for C++ header files [prefix/include]',
-    env['prefix'] + '/include',
+    'installation directory for C++ header files',
+    include_path,
     PathVariable.PathAccept))
 vars.Add(PathVariable(
     'datadir',
-    'installation directory for architecture independent data [prefix/share]',
-    env['prefix'] + '/share',
+    'installation directory for architecture independent data',
+    shared_path,
     PathVariable.PathAccept))
+
+env.AppendUnique(CPPPATH=[include_path])
+env.AppendUnique(LIBPATH=[lib_path])
+
+# Customizable build variables
 vars.Add(EnumVariable(
     'build',
     'compiler settings',
@@ -70,7 +108,7 @@ vars.Add(EnumVariable(
 vars.Add(EnumVariable(
     'tool',
     'C++ compiler toolkit to be used',
-    'default', allowed_values=('default', 'intelc')))
+    'default', allowed_values=('default', 'clang', 'gcc', 'intelc')))
 vars.Add(BoolVariable(
     'enable_objcryst',
     'enable objcryst support, when installed', None))
@@ -83,10 +121,13 @@ vars.Add(
 vars.Add(BoolVariable(
     'test_installed',
     'build tests using the installed library.', False))
+
 vars.Update(env)
+
 env.Help(MY_SCONS_HELP % vars.GenerateHelpText(env))
 
 env['has_objcryst'] = None
+
 btags = [env['build'], platform.machine()]
 if env['profile']:  btags.append('profile')
 builddir = env.Dir('build/' + '-'.join(btags))

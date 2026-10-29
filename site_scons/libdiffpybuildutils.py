@@ -28,7 +28,8 @@ def gitinfo():
         return _cached_gitinfo
     nullfile = open(os.devnull, "w")
     kw = dict(stdout=PIPE, stderr=nullfile, cwd=MYDIR, universal_newlines=True)
-    proc = Popen(["git", "describe", "--match=v[[:digit:]]*"], **kw)
+    # Release tags may be lightweight, as with v1.4.1.
+    proc = Popen(["git", "describe", "--tags", "--match=v[[:digit:]]*"], **kw)
     desc = proc.stdout.read()
     if proc.wait():
         _cached_gitinfo = {}

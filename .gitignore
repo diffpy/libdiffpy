@@ -115,3 +115,12 @@ target/
 
 # Ipython Notebook
 .ipynb_checkpoints
+
+# source distribution tarball
+libdiffpy-*.tar.gz
+
+# Windows build artifacts (MSVC)
+.vs/
+*.exp
+*.lib
+*.dll
