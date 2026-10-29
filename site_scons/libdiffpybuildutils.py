@@ -4,6 +4,7 @@
 
 import os
 import re
+import subprocess
 
 MYDIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -18,35 +19,50 @@ EMSG_BAD_FALLBACK_VERSION = """
 Inconsistent FALLBACK_VERSION {} vs {} from git tag.
 """
 
+RELEASE_TAG = re.compile(r"([0-9]+\.[0-9]+\.[0-9]+)(?:-rc\.([0-9]+))?")
+
+
+def release_version(tag):
+    """Normalize a release tag to the internal version format."""
+    match = RELEASE_TAG.fullmatch(tag)
+    if not match:
+        raise RuntimeError(
+            f"Invalid release tag {tag!r}; expected X.Y.Z or X.Y.Z-rc.N."
+        )
+    base, candidate = match.groups()
+    return base if candidate is None else f"{base}rc{candidate}"
+
 
 def gitinfo():
     "Extract dictionary of version data from git records."
-    from subprocess import PIPE, Popen
-
     global _cached_gitinfo
     if _cached_gitinfo is not None:
         return _cached_gitinfo
-    nullfile = open(os.devnull, "w")
-    kw = dict(stdout=PIPE, stderr=nullfile, cwd=MYDIR, universal_newlines=True)
-    # Release tags may be lightweight, as with v1.4.1.
-    proc = Popen(["git", "describe", "--tags", "--match=v[[:digit:]]*"], **kw)
-    desc = proc.stdout.read()
-    if proc.wait():
+    kw = dict(
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        cwd=MYDIR,
+        text=True,
+    )
+    proc = subprocess.run(["git", "log", "-1", "--format=%H %ci"], **kw)
+    if proc.returncode:
         _cached_gitinfo = {}
-        return gitinfo()
-    proc = Popen(["git", "log", "-1", "--format=%H %ci"], **kw)
-    glog = proc.stdout.read()
-    words = desc.strip().split("-")
-    vtag = words[0].lstrip("v")
-    vnum = int((words[1:2] or ["0"])[0])
+        return _cached_gitinfo
     rv = {}
-    rv["commit"], rv["date"] = glog.strip().split(None, 1)
-    rv["patchnumber"] = vnum
-    rv["version"] = vtag
-    if vnum:
-        rv["version"] += ".post" + str(vnum)
+    rv["commit"], rv["date"] = proc.stdout.strip().split(None, 1)
+    # --long makes the commit count explicit even at a tag.  Split from
+    # the right so the -rc.N suffix remains part of the release tag.
+    proc = subprocess.run(
+        ["git", "describe", "--tags", "--long", "--match=[0-9]*"], **kw
+    )
+    if not proc.returncode:
+        tag, count, _ = proc.stdout.strip().rsplit("-", 2)
+        rv["patchnumber"] = int(count)
+        rv["version"] = release_version(tag)
+        if rv["patchnumber"]:
+            rv["version"] += ".post" + count
     _cached_gitinfo = rv
-    return gitinfo()
+    return _cached_gitinfo
 
 
 _cached_gitinfo = None
@@ -56,11 +72,17 @@ def getversion():
     """Extract version from gitinfo and/or gitarchive.cfg file.
 
     Process gitinfo first and make sure it matches FALLBACK_VERSION in
-    gitarchive.cfg.  Use expanded data from gitarchive.cfg when these
-    sources are from git archive bundle.
+    fallback_version.py.  Use expanded data from gitarchive.cfg when
+    these sources are from git archive bundle.
     """
     from fallback_version import FALLBACK_VERSION
 
+    if not re.fullmatch(
+        r"[0-9]+\.[0-9]+\.[0-9]+(?:rc[0-9]+)?\.post0", FALLBACK_VERSION
+    ):
+        raise RuntimeError(
+            "FALLBACK_VERSION must be X.Y.Z.post0 or X.Y.ZrcN.post0."
+        )
     gitarchivecfgfile = os.path.join(MYDIR, "gitarchive.cfg")
     assert os.path.isfile(gitarchivecfgfile)
     with open(gitarchivecfgfile) as fp:
@@ -69,33 +91,32 @@ def getversion():
     ga = dict(gaitems)
     gi = gitinfo()
     rv = {}
-    if gi:
+    if not gi:
+        # Not a git repository.  Require an expanded source archive.
+        if "$Format:" in ga["commit"]:
+            raise RuntimeError(EMSG_GIT_MISSING)
+        gi = dict(commit=ga["commit"], date=ga["date"])
+        for ref in ga["refnames"].split(", "):
+            if ref.startswith("tag: ") and re.match(r"[0-9]", ref[5:]):
+                gi["version"] = release_version(ref[5:])
+                gi["patchnumber"] = 0
+                break
+    rv.update(gi)
+    if "version" in gi:
         afb = FALLBACK_VERSION
         gfb = gi["version"].split(".post")[0] + ".post0"
         if gfb != afb:
             raise RuntimeError(EMSG_BAD_FALLBACK_VERSION.format(afb, gfb))
-        rv.update(gi)
     else:
-        # Not a git repository.  Require that gitarchive.cfg is expanded.
-        if "$Format:" in ga["commit"]:
-            raise RuntimeError(EMSG_GIT_MISSING)
-        rv["commit"] = ga["commit"]
-        rv["date"] = ga["date"]
-        # First assume we have an undetermined post-release.  Keep version
-        # suffix as ".post0", but set patchnumber to ensure we are post
-        # FALLBACK_VERSION.
+        # A development checkout without a new-format tag, or an untagged
+        # archive, has no known commit count.  Keep the fallback version.
         rv["version"] = FALLBACK_VERSION
         rv["patchnumber"] = 1
-        # If we are at version tag turn this to regular release.
-        mx = re.search(r"\btag: v(\d[^,]*)", ga["refnames"])
-        if mx:
-            rv["version"] = mx.group(1)
-            rv["patchnumber"] = 0
     # rv['version'] is resolved, let's parse its subfields.
     vbase = rv["version"].split(".post")[0]
-    mx = re.match(r"^(\d+)\.(\d+)(?:\.(\d+))?((?:[ab]|rc)\d*)?", vbase)
+    mx = re.fullmatch(r"([0-9]+)\.([0-9]+)\.([0-9]+)(rc[0-9]+)?", vbase)
     rv["major"] = int(mx.group(1))
     rv["minor"] = int(mx.group(2))
-    rv["micro"] = int(mx.group(3) or 0)
+    rv["micro"] = int(mx.group(3))
     rv["prerelease"] = mx.group(4)
     return rv
