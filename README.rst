@@ -116,7 +116,7 @@ If you see a bug or want to request a feature, please `report it as an issue <ht
 
 Feel free to fork the project and contribute. When developing it is
 preferable to compile with the ``build=develop`` option, which compiles the
-library with debug information and C-assertions checks ::
+library without optimizations and with C-assertions checks ::
 
         scons -j4 build=develop
 
@@ -129,7 +129,8 @@ can be used to permanently set the ``build`` variable. The SCons
 construction environment can be further customized in a ``sconscript.local``
 script.
 
-See also the `instructions for compiling and modifying source code in development mode <docs/development_instructions.md>`_.
+See also the `development guide <docs/source/development.rst>`_ for build variants, running a subset of
+the unit tests, coverage analysis and testing changes with diffpy.srreal.
 
 To ensure code quality and to prevent accidental commits into the default branch, please set up the use of our pre-commit
 hooks.

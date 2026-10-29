@@ -16,7 +16,7 @@ assignees: ""
 - [ ] Grammar and writing quality are checked (no typos).
 - [ ] `FALLBACK_VERSION` in `site_scons/fallback_version.py` is updated to `<version-number>.post0`. Without this, the SCons build fails after tagging.
 - [ ] `scons test` passes locally with the latest conda-forge compilers and dependencies.
-- [ ] Dispatch matrix testing to test the release on all systems. If you do not have permission to run this workflow, tag the maintainer and say `@maintainer, please dispatch matrix testing workflow`. Matrix testing also runs automatically on the tag and blocks the release if it fails.
+- [ ] Dispatch matrix testing to test the release on all systems. If you do not have permission to run this workflow, tag the maintainer and say `@maintainer, please dispatch matrix testing workflow`. Matrix testing also runs automatically after a GitHub release is published, but it does not block the release, so check that it passes.
 
 Please tag the maintainer (e.g., @username) in the comment here when you are ready for the GitHub release. Include any additional comments necessary, such as version information and details about the pre-release here:
 
