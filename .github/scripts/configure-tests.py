@@ -1,4 +1,4 @@
-"""Configure SCons and CxxTest for the CI matrix."""
+"""Configure SCons, CxxTest and the conda environment for CI tests."""
 
 import json
 from pathlib import Path
@@ -11,7 +11,7 @@ for filename in ("build.txt", "conda.txt", "tests.txt"):
             requirements.append(spec)
 
 Path("build").mkdir(exist_ok=True)
-Path("build/matrix-environment.yml").write_text(
+Path("build/test-environment.yml").write_text(
     json.dumps(
         {
             "name": "test",
