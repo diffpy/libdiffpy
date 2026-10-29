@@ -305,7 +305,7 @@ texinfo_documents = [
         "libdiffpy Documentation",
         ab_authors,
         "libdiffpy",
-        "One line description of project.",
+        "DiffPy C++ library for calculation of PDF and other real-space quantities",  # noqa: E501
         "Miscellaneous",
     ),
 ]
