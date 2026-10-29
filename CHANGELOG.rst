@@ -4,6 +4,38 @@ Release notes
 
 .. current developments
 
+1.4.1
+=====
+
+Released 2025-06-25. Notable differences from version 1.4.0.
+
+**Added:**
+
+* ``qbroad_seperable`` attribute to ``JeongPeakWidth`` for a Q-dependent
+  peak broadening term, see https://doi.org/10.1107/S0108767391011327.
+* Build scripts for Windows.
+* GitHub release with the source tarball SHA256 created automatically
+  after a tag push.
+
+**Changed:**
+
+* Require libobjcryst 2017.2.1 or later.
+* Add the conda environment include and library paths to the build when
+  ``CONDA_PREFIX`` is set.
+* Do not create ``OverlapCalculator`` self-neighborhoods at sites excluded
+  by the pair mask.
+
+**Removed:**
+
+* Runtime check for the ObjCryst inversion center bug, which is fixed in
+  libobjcryst 2017.2.1.
+
+**Fixed:**
+
+* ``OverlapCalculator`` now respects its ``rmin`` value.
+* Build with ``REAL=double`` to match the floating-point type of libobjcryst.
+* Read the installation prefix from the ``PREFIX`` environment variable.
+
 1.4.0
 =====
 
