@@ -8,4 +8,4 @@ from git zip archive.
 Update FALLBACK_VERSION when tagging a new release.
 """
 
-FALLBACK_VERSION = "1.4.1.post0"
+FALLBACK_VERSION = "1.5.0.post0"
