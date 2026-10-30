@@ -1,29 +1,29 @@
 name: Matrix and Codecov
 
 on:
-  # push:
-  #   branches:
-  #     - main
-  release:
-    types:
-      - prereleased
-      - published
+  push:
+    branches:
+      - main
+
+  workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: false
   workflow_dispatch:
 
 concurrency:
   group: matrix-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name != 'release' }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
   matrix-coverage:
-    name: C++ tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    name: C++ tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
-        python-version: ["3.12", "3.13", "3.14"]
         include:
           - os: ubuntu-latest
             shell: bash -l {0}
@@ -51,48 +51,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch upstream release tags
-        run: git fetch --tags https://github.com/diffpy/libdiffpy.git
-
-      # CxxTest is header-only and its generator runs directly from source.
-      # The conda-forge package is not available on every matrix platform.
-      - name: Check out CxxTest 4.4
-        uses: actions/checkout@v6
-        with:
-          repository: CxxTest/cxxtest
-          ref: 191adddb3876ab389c0c856e1c03874bf70f8ee4
-          path: build/cxxtest
-
-      - name: Prepare C++ test configuration
-        shell: python {0}
-        run: |
-          import runpy
-          runpy.run_path('.github/scripts/configure-matrix.py')
-
-      - name: Create build environment
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          activate-environment: test
-          channels: conda-forge
-          conda-remove-defaults: "true"
-          auto-update-conda: false
-          auto-activate-base: false
-          python-version: ${{ matrix.python-version }}
-          environment-file: build/matrix-environment.yml
-          channel-priority: strict
+      - name: Set up C++ tests
+        uses: ./.github/actions/setup-tests
 
       - name: Build and run C++ tests
         run: scons -j${{ matrix.jobs }} build=${{ matrix.build }} test
 
       - name: Generate coverage report
-        if: runner.os == 'Linux' && matrix.python-version == '3.14'
+        if: runner.os == 'Linux'
         run: >-
           gcovr --gcov-executable "$CONDA_PREFIX/bin/gcov"
           --root . --filter 'build/coverage-.*/diffpy/'
           --xml coverage.xml
 
       - name: Save coverage report
-        if: runner.os == 'Linux' && matrix.python-version == '3.14'
+        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -101,9 +74,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         # Fork push builds have no upstream Codecov token; keep their artifact.
-        if: >-
-          runner.os == 'Linux' && matrix.python-version == '3.14' &&
-          github.repository == 'diffpy/libdiffpy'
+        if: runner.os == 'Linux' && github.repository == 'diffpy/libdiffpy'
         uses: codecov/codecov-action@v5
         with:
           files: coverage.xml

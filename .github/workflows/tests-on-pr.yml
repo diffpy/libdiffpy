@@ -21,38 +21,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Initialize miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          activate-environment: test
-          channels: conda-forge
-          conda-remove-defaults: "true"
-          auto-update-conda: false
-          auto-activate-base: false
-
-      - name: Conda config
-        run: >-
-          conda config --set always_yes yes
-          --set changeps1 no
-
-      - name: Install requirements
-        run: >-
-          conda install
-          --file requirements/build.txt
-          --file requirements/conda.txt
-          --file requirements/tests.txt
-
-      - name: Configure SCons for the conda environment
-        run: |
-          cat > sconscript.local <<'EOF'
-          Import('env')
-          import os
-          prefix = os.environ['CONDA_PREFIX']
-          env.Replace(CXX=os.path.join(prefix, 'bin', 'c++'))
-          env.Prepend(CCFLAGS=['-isystem' + os.path.join(prefix, 'include')])
-          env.Append(LIBPATH=os.path.join(prefix, 'lib'))
-          env.Append(LINKFLAGS='-Wl,-rpath,' + os.path.join(prefix, 'lib'))
-          EOF
+      - name: Set up C++ tests
+        uses: ./.github/actions/setup-tests
 
       - name: Build and run C++ tests with coverage
         run: |
