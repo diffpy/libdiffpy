@@ -39,4 +39,5 @@ jobs:
       project: libdiffpy
       c_extension: true
       headless: false
+      install_project: false
       python_version: 0

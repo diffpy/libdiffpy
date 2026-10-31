@@ -15,4 +15,5 @@ jobs:
       project: libdiffpy
       c_extension: true
       headless: false
+      install_project: false
       python_version: ${{ fromJSON(needs.get-python-version.outputs.latest_python_version) }}
