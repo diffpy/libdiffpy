@@ -15,5 +15,6 @@ jobs:
       project: libdiffpy
       c_extension: true
       headless: false
+      # libdiffpy is a C++ library and does not need a Python package installed for docs.
       install_project: false
       python_version: ${{ fromJSON(needs.get-python-version.outputs.latest_python_version) }}
