@@ -69,7 +69,6 @@ const QuantityType& PairQuantity::eval(StructureAdapterPtr stru)
 void PairQuantity::setStructure(StructureAdapterPtr stru)
 {
     mstructure = stru.get() ? stru : emptyStructureAdapter();
-    mstructure->customPQConfig(this);
     this->updateMaskData();
     this->resetValue();
 }

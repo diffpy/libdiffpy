@@ -247,8 +247,8 @@ void PQEvaluatorOptimized::updateValue(
     // save current value to override the resetValue call from setStructure
     assert(sd.stru1);
     pq.stashPartialValue();
-    // setStructure(stru1) calls stru1->customPQConfig(pq), which may totally
-    // change pq configuration.  If so, revert to full calculation.
+    // Fall back to a full calculation if assigning the new structure
+    // changes the calculator's configuration ticker.
     assert(pq.ticker() < mvalue_ticker);
     pq.setStructure(sd.stru1);
     if (pq.ticker() >= mvalue_ticker)

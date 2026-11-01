@@ -25,7 +25,6 @@
 #include <diffpy/srreal/PDFCalculator.hpp>
 #include <diffpy/serialization.hpp>
 #include "test_helpers.hpp"
-#include "test_custompqconfig.hpp"
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -47,23 +46,20 @@ class TestNoMetaStructureAdapter : public CxxTest::TestSuite
             CxxTest::setAbortTestOnFail(true);
             if (!m_pswt)
             {
-                StructureAdapterPtr pswt;
-                pswt = loadTestPeriodicStructure("PbScW25TiO3.stru");
-                PeriodicAdapterWithPQConfigPtr pswt_pqcfg;
-                pswt_pqcfg = addCustomPQConfig(pswt);
-                pswt_pqcfg->cfg["scale"] = 2.5;
-                m_pswt = pswt_pqcfg;
+                m_pswt = loadTestPeriodicStructure("PbScW25TiO3.stru");
             }
             CxxTest::setAbortTestOnFail(false);
         }
 
 
-        void test_PDFCalcMeta()
+        void test_PDFCalcPreservesConfiguration()
         {
             PDFCalculator pdfc;
             pdfc.setRstep(0.1);
             pdfc.setRmax(5.0);
-            TS_ASSERT_EQUALS(1.0, pdfc.getDoubleAttr("scale"));
+            pdfc.setDoubleAttr("scale", 2.5);
+            pdfc.setStructure(m_pswt);
+            TS_ASSERT_EQUALS(2.5, pdfc.getDoubleAttr("scale"));
             pdfc.eval(m_pswt);
             TS_ASSERT_EQUALS(2.5, pdfc.getDoubleAttr("scale"));
         }
@@ -84,7 +80,11 @@ class TestNoMetaStructureAdapter : public CxxTest::TestSuite
         {
             StructureAdapterPtr adpt0 = nometa(m_pswt);
             StructureAdapterPtr adpt1 = nometa(adpt0);
+            TS_ASSERT_EQUALS(m_pswt, adpt0);
             TS_ASSERT_EQUALS(adpt0, adpt1);
+            TS_ASSERT_EQUALS(emptyStructureAdapter(), nometa(StructureAdapterPtr()));
+            StructureAdapterPtr proxy(new NoMetaStructureAdapter(m_pswt));
+            TS_ASSERT_EQUALS(proxy, nometa(proxy));
         }
 
 
@@ -93,7 +93,7 @@ class TestNoMetaStructureAdapter : public CxxTest::TestSuite
             using namespace diffpy::serialization;
             stringstream storage(ios::in | ios::out | ios::binary);
             oarchive oa(storage, ios::binary);
-            StructureAdapterPtr pswtbare0(nometa(m_pswt));
+            StructureAdapterPtr pswtbare0(new NoMetaStructureAdapter(m_pswt));
             oa << pswtbare0;
             iarchive ia(storage, ios::binary);
             StructureAdapterPtr pswtbare1;
