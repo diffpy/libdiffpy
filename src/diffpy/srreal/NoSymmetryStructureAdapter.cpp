@@ -86,10 +86,6 @@ const R3::Matrix& NoSymmetryStructureAdapter::siteCartesianUij(int idx) const {
   return msrcstructure->siteCartesianUij(idx);
 }
 
-void NoSymmetryStructureAdapter::customPQConfig(PairQuantity* pq) const {
-  msrcstructure->customPQConfig(pq);
-}
-
 StructureDifference NoSymmetryStructureAdapter::diff(
   StructureAdapterConstPtr other) const {
   StructureDifference sd = this->StructureAdapter::diff(other);

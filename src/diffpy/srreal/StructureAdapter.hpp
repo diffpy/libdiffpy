@@ -36,7 +36,6 @@
 namespace diffpy {
 namespace srreal {
 
-class PairQuantity;
 class StructureDifference;
 
 /// @class StructureAdapter
@@ -84,10 +83,6 @@ class DLL_EXPORT StructureAdapter
   /// tensor of atom displacement parameters converted in
   /// Cartesian coordinate system at independent site @param idx
   virtual const R3::Matrix& siteCartesianUij(int idx) const = 0;
-
-  /// this method allows custom special configuration for a concrete
-  /// pair of StructureAdapter and PairQuantity objects.
-  [[deprecated]] virtual void customPQConfig(PairQuantity* pq) const {}
 
   /// Return difference from the other StructureAdapter
   virtual StructureDifference diff(StructureAdapterConstPtr) const;

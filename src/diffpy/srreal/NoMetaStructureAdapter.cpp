@@ -12,13 +12,11 @@
  *
  ******************************************************************************
  *
- * class NoMetaStructureAdapter -- StructureAdapter proxy class that disables
- *     customPQConfig of another StructureAdapter instance.  This may be used
- *     for preventing the adapter for diffpy.Structure class from applying
- *     scale, spdiameter and such metadata to the PDFCalculator.
+ * class NoMetaStructureAdapter -- deprecated StructureAdapter proxy retained
+ *     for source and serialization compatibility.  Structures no longer
+ *     configure calculators through metadata.
  *
- * nometa -- factory function that returns a NoMetaStructureAdapter
- *     instance wrapped in StructureAdapterPtr
+ * nometa -- compatibility function returning the source StructureAdapter
  *
  *****************************************************************************/
 
@@ -88,10 +86,6 @@ const R3::Matrix& NoMetaStructureAdapter::siteCartesianUij(int idx) const {
   return msrcstructure->siteCartesianUij(idx);
 }
 
-void NoMetaStructureAdapter::customPQConfig(PairQuantity* pq) const {
-  // disable customPQConfig of the wrapped PairQuantity
-}
-
 StructureDifference NoMetaStructureAdapter::diff(
   StructureAdapterConstPtr other) const {
   StructureDifference sd = this->StructureAdapter::diff(other);
@@ -118,11 +112,7 @@ StructureAdapterConstPtr NoMetaStructureAdapter::getSourceStructure() const {
 // Routines ------------------------------------------------------------------
 
 StructureAdapterPtr nometa(StructureAdapterPtr stru) {
-  StructureAdapterPtr rv =
-    std::dynamic_pointer_cast<NoMetaStructureAdapter>(stru)
-      ? stru
-      : StructureAdapterPtr(new NoMetaStructureAdapter(stru));
-  return rv;
+  return stru ? stru : emptyStructureAdapter();
 }
 
 }  // namespace srreal
