@@ -1,0 +1,22 @@
+name: Build and Publish Docs on Dispatch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  get-python-version:
+    uses: scikit-package/release-scripts/.github/workflows/_get-python-version-latest.yml@v0
+    with:
+      python_version: 0
+
+  docs:
+    uses: scikit-package/release-scripts/.github/workflows/_release-docs.yml@v0
+    with:
+      project: libdiffpy
+      c_extension: true
+      headless: false
+      # true: install the project with `python -m pip install -e . --no-deps`.
+      # false: skip project installation; still install dependencies and build docs.
+      # libdiffpy is a C++ library and does not need a Python package installed for docs.
+      install_project: false
+      python_version: ${{ fromJSON(needs.get-python-version.outputs.latest_python_version) }}

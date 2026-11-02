@@ -1,0 +1,33 @@
+name: Set up C++ tests
+
+runs:
+  using: composite
+  steps:
+    - name: Fetch upstream release tags
+      shell: bash
+      run: git fetch --tags https://github.com/diffpy/libdiffpy.git
+
+    - name: Check out CxxTest 4.4
+      uses: actions/checkout@v6
+      with:
+        repository: CxxTest/cxxtest
+        ref: 191adddb3876ab389c0c856e1c03874bf70f8ee4
+        path: build/cxxtest
+
+    - name: Prepare C++ test configuration
+      shell: python {0}
+      run: |
+        import runpy
+        runpy.run_path('.github/scripts/configure-tests.py')
+
+    - name: Create build environment
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        activate-environment: test
+        channels: conda-forge
+        conda-remove-defaults: "true"
+        auto-update-conda: false
+        auto-activate-base: false
+        python-version: "3.14"
+        environment-file: build/test-environment.yml
+        channel-priority: strict

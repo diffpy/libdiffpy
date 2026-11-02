@@ -7,8 +7,8 @@
 *
 * File coded by:    Pavol Juhas
 *
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE.txt for license information.
+* See AUTHORS.rst for a list of people who contributed.
+* See LICENSE.rst for license information.
 *
 ******************************************************************************
 *
@@ -64,7 +64,9 @@
 // libdiffpy_version_info will hold runtime version data, which may be
 // different from client compile-time values.
 
-struct libdiffpy_version_info {
+#include <diffpy/Export.hpp>
+
+struct DLL_EXPORT libdiffpy_version_info {
 
     static const long long version;
     static const char* version_str;

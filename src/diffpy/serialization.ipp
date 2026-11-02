@@ -7,8 +7,8 @@
 *
 * File coded by:    Pavol Juhas
 *
-* See AUTHORS.txt for a list of people who contributed.
-* See LICENSE.txt for license information.
+* See AUTHORS.rst for a list of people who contributed.
+* See LICENSE.rst for license information.
 *
 ******************************************************************************
 *
@@ -58,6 +58,16 @@ void serialization_fromstring(T& tobj, const std::string& s)
 
 // Macros --------------------------------------------------------------------
 
+#ifdef _WIN32
+
+// On Windows serialization.hpp includes this file, so the templates are
+// instantiated implicitly where used.  Skip the explicit instantiations to
+// avoid dllimport/dllexport clashes.
+#define DIFFPY_INSTANTIATE_SERIALIZATION(C)
+#define DIFFPY_INSTANTIATE_PTR_SERIALIZATION(C)
+
+#else
+
 /// Insert explicit instantiations for serialization_tostring and
 /// serialization_fromstring for class C.
 
@@ -74,5 +84,7 @@ void serialization_fromstring(T& tobj, const std::string& s)
 
 #define DIFFPY_INSTANTIATE_PTR_SERIALIZATION(C) \
     DIFFPY_INSTANTIATE_SERIALIZATION(std::shared_ptr<C>)
+
+#endif  // _WIN32
 
 #endif  // SERIALIZATION_IPP_INCLUDED

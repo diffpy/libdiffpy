@@ -1,0 +1,46 @@
+name: Release on GitHub
+
+# Trigger on tag push or manual dispatch.
+# Tag and release privilege are verified inside the reusable workflow.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  check-tag-privilege:
+    uses: scikit-package/release-scripts/.github/workflows/_check-tag-privilege.yml@v0
+    with:
+      maintainer_github_username: sbillinge
+
+  check-pat-token-validity:
+    uses: scikit-package/release-scripts/.github/workflows/_check-pat-token-validity.yml@v0
+    secrets:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+  matrix:
+    uses: ./.github/workflows/matrix-and-codecov.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  release-github:
+    needs: [check-tag-privilege, check-pat-token-validity, matrix]
+    uses: scikit-package/release-scripts/.github/workflows/_release-github.yml@v0
+    secrets:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+  docs-release:
+    needs: [release-github]
+    permissions:
+      contents: write
+    uses: scikit-package/release-scripts/.github/workflows/_release-docs.yml@v0
+    with:
+      project: libdiffpy
+      c_extension: true
+      headless: false
+      # true: install the project with `python -m pip install -e . --no-deps`.
+      # false: skip project installation; still install dependencies and build docs.
+      # libdiffpy is a C++ library and does not need a Python package installed for docs.
+      install_project: false
+      python_version: 0

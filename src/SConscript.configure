@@ -19,39 +19,29 @@ def CheckBoostVersion(context, version):
     context.Result(rv)
     return rv
 
-# Helper functions -----------------------------------------------------------
-
-boostlibtags = ['', '-mt']
-def configure_boost_library(libname):
-    '''Add a boost library to the configured environment allowing for any
-    of the boostlibtags name extensions.
-
-    libname  -- boost library name without any extension
-
-    Note: CheckLib function automatically adds library to the environment.
+def CheckObjCrystVersion(context, version):
+    '''Check if ObjCryst Library is at least of specified version
     '''
-    # using global conf defined below
-    for t in boostlibtags:
-        libnamefull = libname + t
-        if conf.CheckLib(libnamefull, language='C++'):
-            boostlibtags[:] = [t]
-            return
-    # library not found here
-    print('This program requires %r library' % libname)
-    Exit(1)
+    # Boost versions are in format major.minor.subminor
+    v_arr = [int(n) for n in version.split(".")]
+    version_n = str(int(sum([(v * n) for v, n in zip(v_arr, (1e9, 1e6, 1e3))])))+"LL"
+    context.Message('Checking for ObjCryst version >= %s... ' % (version))
+    rv = context.TryCompile('\n'.join([
+        '#include <ObjCryst/version.h>',
+        '#if LIBOBJCRYST_VERSION < %s',
+        '#error Installed ObjCryst is too old!',
+        '#endif',
+        'int main() { return 0; }',
+        '', ]) % version_n, '.cpp')
+    context.Result(rv)
+    return rv
 
 # Start configuration --------------------------------------------------------
 
 conf = Configure(env, custom_tests={
     'CheckBoostVersion' : CheckBoostVersion,
+    'CheckObjCrystVersion' : CheckObjCrystVersion,
     })
-
-# Add Conda include and library paths
-import os
-conda_prefix = Environment(ENV=os.environ)['ENV'].get('CONDA_PREFIX')
-if conda_prefix:
-    env.Append(CPPPATH=[os.path.join(conda_prefix, 'include')])
-    env.Append(LIBPATH=[os.path.join(conda_prefix, 'lib')])
 
 # serialization of unordered_map requires boost 1.56.0
 boost_required = '1.56.0'
@@ -59,21 +49,15 @@ if not conf.CheckBoostVersion(boost_required):
     print('This software requires Boost %s or later.' % boost_required)
     Exit(1)
 
-# boost_serialization
-configure_boost_library('boost_serialization')
-
-# ObjCryst - assume a no-objcryst fallback configuration.
-conf.env['has_objcryst'] = False
-# Detect ObjCryst and exit with error if requested and not found.
-# By default conf.env does not contain the 'enable_objcryst' key.
+# Check for ObjCryst library
 if conf.env.get('enable_objcryst', True):
-    conf.env['has_objcryst'] = conf.CheckLibWithHeader(
-        'ObjCryst', 'ObjCryst/ObjCryst/Crystal.h',
-        language='C++', autoadd=True)
-    objcryst_requested = conf.env.get('enable_objcryst', False)
-    if objcryst_requested and not conf.env['has_objcryst']:
-        print("Adjust compiler paths or build with 'enable_objcryst=False'.")
+    if not conf.CheckObjCrystVersion('2017.2.1'):
+        print('ObjCryst library not found. Please install it or disable it.')
         Exit(1)
+    else:
+        conf.env['has_objcryst'] = True
+else:
+    conf.env['has_objcryst'] = False
 
 env = conf.Finish()
 
