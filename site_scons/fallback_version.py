@@ -8,4 +8,4 @@ to determine the version.
 Review FALLBACK_VERSION before a release.
 """
 
-FALLBACK_VERSION = "1.4.1.post0"
+FALLBACK_VERSION = "1.5.0rc0.post0"
