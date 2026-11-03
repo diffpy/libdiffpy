@@ -14,7 +14,7 @@ assignees: ""
 - [ ] Locally rendered documentation contains all appropriate pages and other human-written text is up-to-date with any changes in the code.
 - [ ] Installation instructions in the README, documentation, and the website are updated.
 - [ ] Grammar and writing quality are checked (no typos).
-- [ ] `FALLBACK_VERSION` in `site_scons/fallback_version.py` is updated to `<version-number>.post0`. Without this, the SCons build fails after tagging.
+- [ ] Review `FALLBACK_VERSION` in `site_scons/fallback_version.py` for builds without a resolvable release tag.
 - [ ] `scons test` passes locally with the latest conda-forge compilers and dependencies.
 - [ ] Dispatch matrix testing to test the release on all systems. If you do not have permission to run this workflow, tag the maintainer and say `@maintainer, please dispatch matrix testing workflow`. Matrix testing also runs automatically after a GitHub release is published, but it does not block the release, so check that it passes.
 
@@ -23,6 +23,7 @@ Please tag the maintainer (e.g., @username) in the comment here when you are rea
 ### GitHub full-release preparation checklist:
 
 - [ ] The rc GitHub release and its source tarball appear correctly on the releases page.
+- [ ] Build the release source tarball without a Git checkout and verify that its version matches the release tag (with `X.Y.Z-rc.N` normalized to `X.Y.ZrcN`).
 - [ ] Docs are deployed successfully to `https://www.diffpy.org/libdiffpy`.
 - [ ] Successfully run all tests and do functional testing, e.g., with `diffpy.srreal` built against the rc.
 
