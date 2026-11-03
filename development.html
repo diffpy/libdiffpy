@@ -1,0 +1,206 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Development guide &mdash; libdiffpy 1.5.0rc0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=c1620c82"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=cca77546"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Release notes" href="release.html" />
+    <link rel="prev" title="libdiffpy documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            libdiffpy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Development guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#set-up-the-build-environment">Set up the build environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build-the-library">Build the library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-unit-tests">Run the unit tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#measure-test-coverage">Measure test coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-changes-with-diffpy-srreal">Test changes with diffpy.srreal</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">libdiffpy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Development guide</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/diffpy/libdiffpy/blob/main/docs/source/development.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="development-guide">
+<span id="index-0"></span><h1>Development guide<a class="headerlink" href="#development-guide" title="Link to this heading"></a></h1>
+<p>This page describes how to build and test libdiffpy from sources when
+modifying the library. See the
+<a class="reference external" href="https://github.com/diffpy/libdiffpy#support-and-contribute">README</a>
+for how to fork the repository and set up the pre-commit hooks.</p>
+<section id="set-up-the-build-environment">
+<h2>Set up the build environment<a class="headerlink" href="#set-up-the-build-environment" title="Link to this heading"></a></h2>
+<p>From the root of your libdiffpy clone, create a conda environment with the
+build and test dependencies listed in the <code class="docutils literal notranslate"><span class="pre">requirements</span></code> folder</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">libdiffpy_env</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">/</span><span class="n">build</span><span class="o">.</span><span class="n">txt</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">/</span><span class="n">conda</span><span class="o">.</span><span class="n">txt</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">/</span><span class="n">tests</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">libdiffpy_env</span>
+</pre></div>
+</div>
+</section>
+<section id="build-the-library">
+<h2>Build the library<a class="headerlink" href="#build-the-library" title="Link to this heading"></a></h2>
+<p>Build the shared library with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scons</span> <span class="o">-</span><span class="n">j4</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">build</span></code> option selects the compiler settings, for example
+<code class="docutils literal notranslate"><span class="pre">scons</span> <span class="pre">-j4</span> <span class="pre">build=develop</span></code>. On Linux and macOS the build variants are</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fast</span></code> - optimized build with C assertion checks disabled (default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">debug</span></code> - build with debug information and C assertion checks</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">develop</span></code> - unoptimized build with C assertion checks</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">coverage</span></code> - unoptimized build instrumented for coverage analysis</p></li>
+</ul>
+<p>The library is built in the <code class="docutils literal notranslate"><span class="pre">build/&lt;variant&gt;-&lt;machine&gt;</span></code> directory,
+for example <code class="docutils literal notranslate"><span class="pre">build/fast-x86_64/</span></code>. Run <code class="docutils literal notranslate"><span class="pre">scons</span> <span class="pre">--help</span></code> for the full list
+of build targets and options.</p>
+<p>To use the same options for every build, set them in a <code class="docutils literal notranslate"><span class="pre">sconsvars.py</span></code>
+file in the repository root, for example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">build</span> <span class="o">=</span> <span class="s1">'develop'</span>
+</pre></div>
+</div>
+<p>The SCons construction environment can be further customized in a
+<code class="docutils literal notranslate"><span class="pre">sconscript.local</span></code> file in the repository root. Both files are ignored
+by git. For example, the following <code class="docutils literal notranslate"><span class="pre">sconscript.local</span></code> builds with the
+conda-forge compiler and records the conda library directory as the runtime
+path, so that the unit tests find the conda libraries</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Import</span><span class="p">(</span><span class="s1">'env'</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">'CONDA_PREFIX'</span><span class="p">]</span>
+<span class="n">env</span><span class="o">.</span><span class="n">Replace</span><span class="p">(</span><span class="n">CXX</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">'bin'</span><span class="p">,</span> <span class="s1">'c++'</span><span class="p">))</span>
+<span class="n">env</span><span class="o">.</span><span class="n">Prepend</span><span class="p">(</span><span class="n">CCFLAGS</span><span class="o">=</span><span class="p">[</span><span class="s1">'-isystem'</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">'include'</span><span class="p">)])</span>
+<span class="n">env</span><span class="o">.</span><span class="n">Append</span><span class="p">(</span><span class="n">LIBPATH</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">'lib'</span><span class="p">))</span>
+<span class="n">env</span><span class="o">.</span><span class="n">Append</span><span class="p">(</span><span class="n">LINKFLAGS</span><span class="o">=</span><span class="s1">'-Wl,-rpath,'</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">'lib'</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="run-the-unit-tests">
+<h2>Run the unit tests<a class="headerlink" href="#run-the-unit-tests" title="Link to this heading"></a></h2>
+<p>The unit tests use the CxxTest framework. Build and run all of them with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scons</span> <span class="o">-</span><span class="n">j4</span> <span class="n">test</span>
+</pre></div>
+</div>
+<p>To run only some of the tests, pass fixed-string patterns of the test file
+names with the <code class="docutils literal notranslate"><span class="pre">tests</span></code> option. Patterns are case-insensitive and can be
+separated by commas</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scons</span> <span class="o">-</span><span class="n">j4</span> <span class="n">test</span> <span class="n">tests</span><span class="o">=</span><span class="n">PDFCalculator</span><span class="p">,</span><span class="n">Lattice</span>
+</pre></div>
+</div>
+<p>To run the tests against the installed library instead of the one in the
+<code class="docutils literal notranslate"><span class="pre">build</span></code> directory, use <code class="docutils literal notranslate"><span class="pre">scons</span> <span class="pre">test</span> <span class="pre">test_installed=True</span></code>.</p>
+</section>
+<section id="measure-test-coverage">
+<h2>Measure test coverage<a class="headerlink" href="#measure-test-coverage" title="Link to this heading"></a></h2>
+<p>Build with the <code class="docutils literal notranslate"><span class="pre">coverage</span></code> variant, run the tests and summarize the results
+with <code class="docutils literal notranslate"><span class="pre">gcovr</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scons</span> <span class="o">-</span><span class="n">j4</span> <span class="n">build</span><span class="o">=</span><span class="n">coverage</span> <span class="n">test</span>
+<span class="n">gcovr</span> <span class="o">--</span><span class="n">root</span> <span class="o">.</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">'build/coverage-.*/diffpy/'</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">scons</span> <span class="pre">zerocounters</span></code> to reset the coverage counts between runs.</p>
+</section>
+<section id="test-changes-with-diffpy-srreal">
+<h2>Test changes with diffpy.srreal<a class="headerlink" href="#test-changes-with-diffpy-srreal" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://github.com/diffpy/diffpy.srreal">diffpy.srreal</a> compiles the
+libdiffpy sources from the commit pinned in its
+<code class="docutils literal notranslate"><span class="pre">cmake/LibdiffpyVersion.cmake</span></code> file. To build diffpy.srreal against a local
+libdiffpy clone, point the CMake <code class="docutils literal notranslate"><span class="pre">FETCHCONTENT_SOURCE_DIR_LIBDIFFPY</span></code>
+variable to it. diffpy.srreal checks that the clone is at the pinned commit,
+so update the pin in <code class="docutils literal notranslate"><span class="pre">cmake/LibdiffpyVersion.cmake</span></code> when testing new
+libdiffpy commits. See the diffpy.srreal documentation for its build
+instructions.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="libdiffpy documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="release.html" class="btn btn-neutral float-right" title="Release notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, libdiffpy contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
