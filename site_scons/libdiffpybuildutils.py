@@ -15,10 +15,6 @@ or use a source archive from
     https://github.com/diffpy/libdiffpy/releases
 """
 
-EMSG_BAD_FALLBACK_VERSION = """
-Inconsistent FALLBACK_VERSION {} vs {} from git tag.
-"""
-
 RELEASE_TAG = re.compile(r"([0-9]+\.[0-9]+\.[0-9]+)(?:-rc\.([0-9]+))?")
 
 
@@ -71,18 +67,9 @@ _cached_gitinfo = None
 def getversion():
     """Extract version from gitinfo and/or gitarchive.cfg file.
 
-    Process gitinfo first and make sure it matches FALLBACK_VERSION in
-    fallback_version.py.  Use expanded data from gitarchive.cfg when
-    these sources are from git archive bundle.
+    Prefer the version from gitinfo or an expanded git archive tag. Use
+    FALLBACK_VERSION only when neither provides a version.
     """
-    from fallback_version import FALLBACK_VERSION
-
-    if not re.fullmatch(
-        r"[0-9]+\.[0-9]+\.[0-9]+(?:rc[0-9]+)?\.post0", FALLBACK_VERSION
-    ):
-        raise RuntimeError(
-            "FALLBACK_VERSION must be X.Y.Z.post0 or X.Y.ZrcN.post0."
-        )
     gitarchivecfgfile = os.path.join(MYDIR, "gitarchive.cfg")
     assert os.path.isfile(gitarchivecfgfile)
     with open(gitarchivecfgfile) as fp:
@@ -102,12 +89,15 @@ def getversion():
                 gi["patchnumber"] = 0
                 break
     rv.update(gi)
-    if "version" in gi:
-        afb = FALLBACK_VERSION
-        gfb = gi["version"].split(".post")[0] + ".post0"
-        if gfb != afb:
-            raise RuntimeError(EMSG_BAD_FALLBACK_VERSION.format(afb, gfb))
-    else:
+    if "version" not in gi:
+        from fallback_version import FALLBACK_VERSION
+
+        if not re.fullmatch(
+            r"[0-9]+\.[0-9]+\.[0-9]+(?:rc[0-9]+)?\.post0", FALLBACK_VERSION
+        ):
+            raise RuntimeError(
+                "FALLBACK_VERSION must be X.Y.Z.post0 or X.Y.ZrcN.post0."
+            )
         # A development checkout without a new-format tag, or an untagged
         # archive, has no known commit count.  Keep the fallback version.
         rv["version"] = FALLBACK_VERSION
