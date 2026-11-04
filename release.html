@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release notes &mdash; libdiffpy 1.5.0rc0 documentation</title>
+  <title>Release notes &mdash; libdiffpy 1.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=c1620c82"></script>
+      <script src="_static/documentation_options.js?v=623e1633"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,8 +48,9 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="development.html">Development guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id1">1.4.1</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">1.4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">1.5.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">1.4.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">1.4.0</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
@@ -82,7 +83,46 @@
   <section id="release-notes">
 <span id="index-0"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading"></a></h1>
 <section id="id1">
-<h2>1.4.1<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<h2>1.5.0<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p><strong>Added:</strong></p>
+<ul class="simple">
+<li><p>Support building libdiffpy on Windows with MSVC, clang or MinGW, merged from the upstream <code class="docutils literal notranslate"><span class="pre">windows</span></code> branch.</p></li>
+<li><p>Export the public API from the Windows DLL with the <code class="docutils literal notranslate"><span class="pre">DLL_EXPORT</span></code> macro in <code class="docutils literal notranslate"><span class="pre">diffpy/Export.hpp</span></code>.</p></li>
+<li><p>Install headers, libraries and data under <code class="docutils literal notranslate"><span class="pre">$PREFIX</span></code> or <code class="docutils literal notranslate"><span class="pre">$CONDA_PREFIX</span></code> by default, using the <code class="docutils literal notranslate"><span class="pre">Library/</span></code> layout on Windows.</p></li>
+<li><p>Add a clang-format pre-commit hook and <code class="docutils literal notranslate"><span class="pre">.git-blame-ignore-revs</span></code> for the reformat commits.</p></li>
+<li><p>Codecov badge in the README.</p></li>
+<li><p>Development guide in the documentation for build variants, running a subset of the unit tests, coverage analysis and testing changes with <code class="docutils literal notranslate"><span class="pre">diffpy.srreal</span></code>.</p></li>
+<li><p>Release notes for version 1.4.1 in <code class="docutils literal notranslate"><span class="pre">CHANGELOG.rst</span></code>.</p></li>
+<li><p>Library overview from the old manual on the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> index page.</p></li>
+</ul>
+<p><strong>Changed:</strong></p>
+<ul class="simple">
+<li><p>Format all C++ sources with clang-format (Google style).</p></li>
+<li><p>Require ObjCryst by default. Build with <code class="docutils literal notranslate"><span class="pre">enable_objcryst=False</span></code> to skip it.</p></li>
+<li><p>Restructure the README to follow the scikit-package template and point to the <code class="docutils literal notranslate"><span class="pre">requirements</span></code> folder instead of listing dependencies.</p></li>
+<li><p>Describe the clang-format and codespell pre-commit hooks in the README.</p></li>
+<li><p>Moved the Sphinx documentation from <code class="docutils literal notranslate"><span class="pre">doc/manual/</span></code> to the scikit-package <code class="docutils literal notranslate"><span class="pre">docs/</span></code> layout.</p></li>
+<li><p>Read the documentation version from git tags through <code class="docutils literal notranslate"><span class="pre">site_scons/libdiffpybuildutils.py</span></code>.</p></li>
+<li><p>Rename <code class="docutils literal notranslate"><span class="pre">LICENSE_DANSE.txt</span></code> to <code class="docutils literal notranslate"><span class="pre">LICENSE_DANSE.rst</span></code> to match <code class="docutils literal notranslate"><span class="pre">diffpy.srreal</span></code> and update all in-file references.</p></li>
+<li><p>Include <code class="docutils literal notranslate"><span class="pre">LICENSE.rst</span></code> in the license page of the documentation instead of keeping a separate hand-formatted copy.</p></li>
+<li><p>Publish docs automatically after a successful GitHub release.</p></li>
+<li><p>Update the release checklist for GitHub and conda-forge releases without PyPI.</p></li>
+</ul>
+<p><strong>Fixed:</strong></p>
+<ul class="simple">
+<li><p>Pre-commit hooks now pass: fixed spelling in C++ comments, reformatted <code class="docutils literal notranslate"><span class="pre">site_scons</span></code> helpers, and excluded the vendored CxxTest tool and data tables.</p></li>
+<li><p>Allow updating the fallback version before tagging a release by using it</p></li>
+</ul>
+<p>only when no version can be determined from Git or source archive tags.</p>
+<p><strong>Removed:</strong></p>
+<ul class="simple">
+<li><p>Outdated <code class="docutils literal notranslate"><span class="pre">docs/development_instructions.md</span></code>, replaced by the development guide.</p></li>
+<li><p>Old <code class="docutils literal notranslate"><span class="pre">doc/manual/</span></code> Sphinx project.</p></li>
+<li><p>Python <code class="docutils literal notranslate"><span class="pre">automodule</span></code> API page, which cannot document a C++ library.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>1.4.1<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
 <p>Released 2025-06-25. Notable differences from version 1.4.0.</p>
 <p><strong>Added:</strong></p>
 <ul class="simple">
@@ -112,8 +152,8 @@ libobjcryst 2017.2.1.</p></li>
 <li><p>Read the installation prefix from the <code class="docutils literal notranslate"><span class="pre">PREFIX</span></code> environment variable.</p></li>
 </ul>
 </section>
-<section id="id2">
-<h2>1.4.0<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<section id="id3">
+<h2>1.4.0<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
 <p>Released 2019-03-09. Notable differences from version 1.3.4.</p>
 <p><strong>Added:</strong></p>
 <ul class="simple">
