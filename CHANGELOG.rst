@@ -4,6 +4,46 @@ Release notes
 
 .. current developments
 
+1.5.0
+=====
+
+**Added:**
+
+* Support building libdiffpy on Windows with MSVC, clang or MinGW, merged from the upstream ``windows`` branch.
+* Export the public API from the Windows DLL with the ``DLL_EXPORT`` macro in ``diffpy/Export.hpp``.
+* Install headers, libraries and data under ``$PREFIX`` or ``$CONDA_PREFIX`` by default, using the ``Library/`` layout on Windows.
+* Add a clang-format pre-commit hook and ``.git-blame-ignore-revs`` for the reformat commits.
+* Codecov badge in the README.
+* Development guide in the documentation for build variants, running a subset of the unit tests, coverage analysis and testing changes with ``diffpy.srreal``.
+* Release notes for version 1.4.1 in ``CHANGELOG.rst``.
+* Library overview from the old manual on the ``docs/`` index page.
+
+**Changed:**
+
+* Format all C++ sources with clang-format (Google style).
+* Require ObjCryst by default. Build with ``enable_objcryst=False`` to skip it.
+* Restructure the README to follow the scikit-package template and point to the ``requirements`` folder instead of listing dependencies.
+* Describe the clang-format and codespell pre-commit hooks in the README.
+* Moved the Sphinx documentation from ``doc/manual/`` to the scikit-package ``docs/`` layout.
+* Read the documentation version from git tags through ``site_scons/libdiffpybuildutils.py``.
+* Rename ``LICENSE_DANSE.txt`` to ``LICENSE_DANSE.rst`` to match ``diffpy.srreal`` and update all in-file references.
+* Include ``LICENSE.rst`` in the license page of the documentation instead of keeping a separate hand-formatted copy.
+* Publish docs automatically after a successful GitHub release.
+* Update the release checklist for GitHub and conda-forge releases without PyPI.
+
+**Fixed:**
+
+* Pre-commit hooks now pass: fixed spelling in C++ comments, reformatted ``site_scons`` helpers, and excluded the vendored CxxTest tool and data tables.
+* Allow updating the fallback version before tagging a release by using it
+only when no version can be determined from Git or source archive tags.
+
+**Removed:**
+
+* Outdated ``docs/development_instructions.md``, replaced by the development guide.
+* Old ``doc/manual/`` Sphinx project.
+* Python ``automodule`` API page, which cannot document a C++ library.
+
+
 1.4.1
 =====
 
