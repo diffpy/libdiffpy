@@ -27,12 +27,15 @@ jobs:
       - name: Build and run C++ tests with coverage
         run: |
           "$CONDA_PREFIX/bin/c++" --version
-          scons -j4 build=coverage test
+          cmake --preset coverage $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_INSTALL_LIBDIR=lib/x86_64-linux-gnu -DCXXTEST_ROOT="$PWD/build/cxxtest"
+          cmake --build --preset coverage --parallel 4
+          ctest --preset coverage
 
       - name: Generate coverage report
         run: >-
           gcovr --gcov-executable "$CONDA_PREFIX/bin/gcov"
-          --root . --filter 'build/coverage-.*/diffpy/'
+          --root . --filter 'src/diffpy/'
           --xml coverage.xml
 
       - name: Upload coverage to Codecov

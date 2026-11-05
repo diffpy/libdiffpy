@@ -4,6 +4,9 @@ build:
   os: "ubuntu-22.04"
   tools:
     python: "latest"
+  # cmake resolves the documentation version from git tags.
+  apt_packages:
+    - cmake
 
 python:
   install:

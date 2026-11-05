@@ -1,2 +1,3 @@
 cxx-compiler
-scons
+cmake>=3.22
+ninja

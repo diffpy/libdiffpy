@@ -25,74 +25,76 @@ Build the library
 
 Build the shared library with ::
 
-        scons -j4
+        cmake --preset release
+        cmake --build --preset release --parallel 4
 
-The ``build`` option selects the compiler settings, for example
-``scons -j4 build=develop``. On Linux and macOS the build variants are
+The CMake presets require CMake 3.22 or later and use Ninja. On Windows,
+run them in a command prompt with the conda build environment activated.
+The build presets are
 
-* ``fast`` - optimized build with C assertion checks disabled (default)
-* ``debug`` - build with debug information and C assertion checks
-* ``develop`` - unoptimized build with C assertion checks
+* ``release`` - optimized build with C assertion checks disabled
+* ``debug`` - unoptimized build with debug information and C assertion checks
 * ``coverage`` - unoptimized build instrumented for coverage analysis
 
-The library is built in the ``build/<variant>-<machine>`` directory,
-for example ``build/fast-x86_64/``. Run ``scons --help`` for the full list
-of build targets and options.
+The library is built in the ``build/<preset>`` directory, for example
+``build/release/``. Use ``cmake --install build/release`` to install it.
+Pass ``-DCMAKE_INSTALL_PREFIX=<prefix>`` when configuring to choose the
+installation directory.
 
-To use the same options for every build, set them in a ``sconsvars.py``
-file in the repository root, for example ::
-
-        build = 'develop'
-
-The SCons construction environment can be further customized in a
-``sconscript.local`` file in the repository root. Both files are ignored
-by git. For example, the following ``sconscript.local`` builds with the
-conda-forge compiler and records the conda library directory as the runtime
-path, so that the unit tests find the conda libraries ::
-
-        Import('env')
-        import os
-        prefix = os.environ['CONDA_PREFIX']
-        env.Replace(CXX=os.path.join(prefix, 'bin', 'c++'))
-        env.Prepend(CCFLAGS=['-isystem' + os.path.join(prefix, 'include')])
-        env.Append(LIBPATH=os.path.join(prefix, 'lib'))
-        env.Append(LINKFLAGS='-Wl,-rpath,' + os.path.join(prefix, 'lib'))
+To use the same options for every build, set them in a ``CMakeUserPresets.json``
+file in the repository root. To use another generator, configure a separate
+directory with ``cmake -S . -B <build-dir> -G "<generator>"``. To disable the
+ObjCryst adapter, pass ``-DLIBDIFFPY_ENABLE_OBJCRYST=OFF``. For gprof
+instrumentation, use ``-DLIBDIFFPY_PROFILE=ON``.
 
 Run the unit tests
 ------------------
 
 The unit tests use the CxxTest framework. Build and run all of them with ::
 
-        scons -j4 test
+        cmake --preset debug
+        cmake --build --preset debug --parallel 4
+        ctest --preset debug
 
 To run only some of the tests, pass fixed-string patterns of the test file
-names with the ``tests`` option. Patterns are case-insensitive and can be
+names with the ``LIBDIFFPY_TESTS`` option. Patterns are case-insensitive and can be
 separated by commas ::
 
-        scons -j4 test tests=PDFCalculator,Lattice
+        cmake --preset debug -DLIBDIFFPY_TESTS=PDFCalculator,Lattice
+        cmake --build --preset debug --target check
+
+Set ``LIBDIFFPY_TESTS`` to an empty string to build all suites again.
 
 To run the tests against the installed library instead of the one in the
-``build`` directory, use ``scons test test_installed=True``.
+``build`` directory, configure a separate directory with
+``-DLIBDIFFPY_TEST_INSTALLED=ON``. If CMake cannot locate the installation,
+add its prefix to ``CMAKE_PREFIX_PATH``.
 
 Measure test coverage
 ---------------------
 
-Build with the ``coverage`` variant, run the tests and summarize the results
+Build with the ``coverage`` preset, run the tests and summarize the results
 with ``gcovr`` ::
 
-        scons -j4 build=coverage test
-        gcovr --root . --filter 'build/coverage-.*/diffpy/'
+        cmake --preset coverage
+        cmake --build --preset coverage --parallel 4
+        ctest --preset coverage
+        gcovr --root . --filter src/diffpy/
 
-Use ``scons zerocounters`` to reset the coverage counts between runs.
+Use ``cmake --build --preset coverage --target zerocounters`` to reset the
+coverage counts between runs.
 
 Test changes with diffpy.srreal
 -------------------------------
 
 `diffpy.srreal <https://github.com/diffpy/diffpy.srreal>`_ compiles the
-libdiffpy sources from the commit pinned in its
-``cmake/LibdiffpyVersion.cmake`` file. To build diffpy.srreal against a local
-libdiffpy clone, point the CMake ``FETCHCONTENT_SOURCE_DIR_LIBDIFFPY``
-variable to it. diffpy.srreal checks that the clone is at the pinned commit,
-so update the pin in ``cmake/LibdiffpyVersion.cmake`` when testing new
-libdiffpy commits. See the diffpy.srreal documentation for its build
-instructions.
+libdiffpy sources from the commit pinned in its ``extern/libdiffpy`` submodule.
+See the diffpy.srreal documentation for its build instructions.
+
+Create a source distribution
+----------------------------
+
+From a Git checkout, run ``cmake -P cmake/MakeSdist.cmake`` to package
+``HEAD`` as ``libdiffpy-<version>.tar.gz`` in the repository root. To write
+the archive into a configured build directory, build the ``sdist`` target.
+The archive includes the version header and can be built without Git.

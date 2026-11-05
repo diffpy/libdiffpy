@@ -14,8 +14,8 @@ assignees: ""
 - [ ] Locally rendered documentation contains all appropriate pages and other human-written text is up-to-date with any changes in the code.
 - [ ] Installation instructions in the README, documentation, and the website are updated.
 - [ ] Grammar and writing quality are checked (no typos).
-- [ ] Review `FALLBACK_VERSION` in `site_scons/fallback_version.py` for builds without a resolvable release tag.
-- [ ] `scons test` passes locally with the latest conda-forge compilers and dependencies.
+- [ ] Review `LIBDIFFPY_FALLBACK_VERSION` in `cmake/FallbackVersion.cmake` for builds without a resolvable release tag.
+- [ ] The unit tests pass locally (`cmake --preset debug`, `cmake --build --preset debug`, `ctest --preset debug`) with the latest conda-forge compilers and dependencies.
 - [ ] Dispatch matrix testing to test the release on all systems. If you do not have permission to run this workflow, tag the maintainer and say `@maintainer, please dispatch matrix testing workflow`. Matrix testing also runs automatically after a GitHub release is published, but it does not block the release, so check that it passes.
 
 Please tag the maintainer (e.g., @username) in the comment here when you are ready for the GitHub release. Include any additional comments necessary, such as version information and details about the pre-release here:

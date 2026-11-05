@@ -1,0 +1,31 @@
+# CMake package configuration for libdiffpy.
+#
+# Usage:
+#
+#   find_package(libdiffpy REQUIRED)
+#   target_link_libraries(myprogram PRIVATE libdiffpy::diffpy)
+#
+# Variables:
+#
+#   libdiffpy_HAS_OBJCRYST  true when libdiffpy was built with ObjCryst
+#   libdiffpy_RUNTIME_DIR   directory of the installed data files
+
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+set(libdiffpy_HAS_OBJCRYST @LIBDIFFPY_HAS_OBJCRYST@)
+set_and_check(libdiffpy_RUNTIME_DIR "@PACKAGE_LIBDIFFPY_RUNTIME_INSTALL_DIR@")
+
+find_dependency(Boost CONFIG COMPONENTS serialization)
+if(libdiffpy_HAS_OBJCRYST)
+  list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+  find_dependency(ObjCryst)
+  list(POP_FRONT CMAKE_MODULE_PATH)
+endif()
+
+if(NOT TARGET libdiffpy::diffpy)
+  include("${CMAKE_CURRENT_LIST_DIR}/libdiffpyTargets.cmake")
+endif()
+
+check_required_components(libdiffpy)
