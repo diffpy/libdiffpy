@@ -12,61 +12,77 @@
  *
  ******************************************************************************
  *
- * class TestSphericalShapeEnvelope -- unit tests for SphericalShapeEnvelope
+ * TestSphericalShapeEnvelope -- unit tests for SphericalShapeEnvelope
  *
  *****************************************************************************/
 
-#include <cxxtest/TestSuite.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <diffpy/srreal/PDFEnvelope.hpp>
 #include "serialization_helpers.hpp"
 
+using Catch::Matchers::WithinAbs;
+
 using namespace std;
 using namespace diffpy::srreal;
 
-class TestSphericalShapeEnvelope : public CxxTest::TestSuite {
- private:
+class TestSphericalShapeEnvelopeFixture {
+ protected:
   PDFEnvelopePtr menvelope;
 
  public:
-  void setUp() { menvelope = PDFEnvelope::createByType("sphericalshape"); }
-
-  void test_create() {
-    TS_ASSERT_EQUALS(0.0, menvelope->getDoubleAttr("spdiameter"));
-    menvelope->setDoubleAttr("spdiameter", 13.0);
-    TS_ASSERT_EQUALS(13.0, menvelope->getDoubleAttr("spdiameter"));
-    PDFEnvelopePtr e1 = menvelope->create();
-    TS_ASSERT_EQUALS(0.0, e1->getDoubleAttr("spdiameter"));
+  TestSphericalShapeEnvelopeFixture() {
+    menvelope = PDFEnvelope::createByType("sphericalshape");
   }
+};  // class TestSphericalShapeEnvelopeFixture
 
-  void test_copy() {
-    menvelope->setDoubleAttr("spdiameter", 13.0);
-    TS_ASSERT_EQUALS(13.0, menvelope->getDoubleAttr("spdiameter"));
-    PDFEnvelopePtr e1 = menvelope->clone();
-    TS_ASSERT_EQUALS(13.0, e1->getDoubleAttr("spdiameter"));
-  }
+TEST_CASE_METHOD(TestSphericalShapeEnvelopeFixture,
+                 "TestSphericalShapeEnvelope::test_create",
+                 "[SphericalShapeEnvelope]") {
+  CHECK(0.0 == menvelope->getDoubleAttr("spdiameter"));
+  menvelope->setDoubleAttr("spdiameter", 13.0);
+  CHECK(13.0 == menvelope->getDoubleAttr("spdiameter"));
+  PDFEnvelopePtr e1 = menvelope->create();
+  CHECK(0.0 == e1->getDoubleAttr("spdiameter"));
+}
 
-  void test_type() { TS_ASSERT_EQUALS("sphericalshape", menvelope->type()); }
+TEST_CASE_METHOD(TestSphericalShapeEnvelopeFixture,
+                 "TestSphericalShapeEnvelope::test_copy",
+                 "[SphericalShapeEnvelope]") {
+  menvelope->setDoubleAttr("spdiameter", 13.0);
+  CHECK(13.0 == menvelope->getDoubleAttr("spdiameter"));
+  PDFEnvelopePtr e1 = menvelope->clone();
+  CHECK(13.0 == e1->getDoubleAttr("spdiameter"));
+}
 
-  void test_parentheses_operator() {
-    const PDFEnvelope& fne = *menvelope;
-    TS_ASSERT_EQUALS(1.0, fne(0.0));
-    TS_ASSERT_EQUALS(1.0, fne(100.0));
-    menvelope->setDoubleAttr("spdiameter", 10.0);
-    TS_ASSERT_EQUALS(1.0, fne(0.0));
-    TS_ASSERT_EQUALS(0.0, fne(10.0));
-    TS_ASSERT_EQUALS(0.0, fne(100));
-    TS_ASSERT(fne(9.99) > 0.0);
-    TS_ASSERT_DELTA(0.3125, fne(5), 1e-8);
-  }
+TEST_CASE_METHOD(TestSphericalShapeEnvelopeFixture,
+                 "TestSphericalShapeEnvelope::test_type",
+                 "[SphericalShapeEnvelope]") {
+  CHECK("sphericalshape" == menvelope->type());
+}
 
-  void test_serialization() {
-    menvelope->setDoubleAttr("spdiameter", 13.1);
-    PDFEnvelopePtr e1 = dumpandload(menvelope);
-    TS_ASSERT_EQUALS(string("sphericalshape"), e1->type());
-    TS_ASSERT_EQUALS(13.1, e1->getDoubleAttr("spdiameter"));
-  }
+TEST_CASE_METHOD(TestSphericalShapeEnvelopeFixture,
+                 "TestSphericalShapeEnvelope::test_parentheses_operator",
+                 "[SphericalShapeEnvelope]") {
+  const PDFEnvelope& fne = *menvelope;
+  CHECK(1.0 == fne(0.0));
+  CHECK(1.0 == fne(100.0));
+  menvelope->setDoubleAttr("spdiameter", 10.0);
+  CHECK(1.0 == fne(0.0));
+  CHECK(0.0 == fne(10.0));
+  CHECK(0.0 == fne(100));
+  CHECK(fne(9.99) > 0.0);
+  CHECK_THAT(0.3125, WithinAbs(fne(5), 1e-8));
+}
 
-};  // class TestSphericalShapeEnvelope
+TEST_CASE_METHOD(TestSphericalShapeEnvelopeFixture,
+                 "TestSphericalShapeEnvelope::test_serialization",
+                 "[SphericalShapeEnvelope]") {
+  menvelope->setDoubleAttr("spdiameter", 13.1);
+  PDFEnvelopePtr e1 = dumpandload(menvelope);
+  CHECK(string("sphericalshape") == e1->type());
+  CHECK(13.1 == e1->getDoubleAttr("spdiameter"));
+}
 
 // End of file

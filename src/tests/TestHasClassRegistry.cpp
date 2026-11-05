@@ -12,11 +12,11 @@
  *
  ******************************************************************************
  *
- * class TestHasClassRegistry -- test registration machinery for named classes.
+ * TestHasClassRegistry -- test registration machinery for named classes.
  *
  *****************************************************************************/
 
-#include <cxxtest/TestSuite.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 
@@ -24,51 +24,56 @@ using diffpy::srreal::ScatteringFactorTable;
 using diffpy::srreal::ScatteringFactorTablePtr;
 
 //////////////////////////////////////////////////////////////////////////////
-// class TestHasClassRegistry
+// TestHasClassRegistry
 //////////////////////////////////////////////////////////////////////////////
 
-class TestHasClassRegistry : public CxxTest::TestSuite {
- private:
+class TestHasClassRegistryFixture {
+ protected:
   typedef diffpy::HasClassRegistry<ScatteringFactorTable> HCRBase;
   ScatteringFactorTablePtr msftb;
   HCRBase* mpreg;
 
  public:
-  void setUp() {
+  TestHasClassRegistryFixture() {
     msftb = ScatteringFactorTable::createByType("xray");
     mpreg = msftb.get();
   }
 
-  void tearDown() {
+  ~TestHasClassRegistryFixture() {
     // restore SFTXray registration if removed in some test.
     msftb->deregisterType(msftb->type());
     msftb->registerThisType();
-    TS_ASSERT(ScatteringFactorTable::isRegisteredType("X"));
-    TS_ASSERT(ScatteringFactorTable::isRegisteredType("xray"));
+    CHECK(ScatteringFactorTable::isRegisteredType("X"));
+    CHECK(ScatteringFactorTable::isRegisteredType("xray"));
   }
+};  // class TestHasClassRegistryFixture
 
-  void test_deregisterType() {
-    TS_ASSERT_EQUALS(0, ScatteringFactorTable::deregisterType("invalid"));
-    TS_ASSERT_EQUALS(2, ScatteringFactorTable::deregisterType("X"));
-    TS_ASSERT(!(mpreg->isRegisteredType("xray")));
-    TS_ASSERT(!(mpreg->isRegisteredType("X")));
-  }
+TEST_CASE_METHOD(TestHasClassRegistryFixture,
+                 "TestHasClassRegistry::test_deregisterType",
+                 "[HasClassRegistry]") {
+  CHECK(0 == ScatteringFactorTable::deregisterType("invalid"));
+  CHECK(2 == ScatteringFactorTable::deregisterType("X"));
+  CHECK(!(mpreg->isRegisteredType("xray")));
+  CHECK(!(mpreg->isRegisteredType("X")));
+}
 
-  void test_isRegisteredType() {
-    TS_ASSERT(msftb->isRegisteredType("xray"));
-    TS_ASSERT(ScatteringFactorTable::isRegisteredType("X"));
-    TS_ASSERT_EQUALS(false, mpreg->isRegisteredType("invalid"));
-  }
+TEST_CASE_METHOD(TestHasClassRegistryFixture,
+                 "TestHasClassRegistry::test_isRegisteredType",
+                 "[HasClassRegistry]") {
+  CHECK(msftb->isRegisteredType("xray"));
+  CHECK(ScatteringFactorTable::isRegisteredType("X"));
+  CHECK(false == mpreg->isRegisteredType("invalid"));
+}
 
-  void test_getAliasedTypes() {
-    std::map<std::string, std::string> atps;
-    atps = ScatteringFactorTable::getAliasedTypes();
-    TS_ASSERT_EQUALS(4, atps.size());
-    TS_ASSERT(atps.count("X"));
-    TS_ASSERT_EQUALS("xray", atps["X"]);
-    TS_ASSERT_EQUALS("electronnumber", atps["EN"]);
-  }
-
-};  // class TestHasClassRegistry
+TEST_CASE_METHOD(TestHasClassRegistryFixture,
+                 "TestHasClassRegistry::test_getAliasedTypes",
+                 "[HasClassRegistry]") {
+  std::map<std::string, std::string> atps;
+  atps = ScatteringFactorTable::getAliasedTypes();
+  CHECK(4 == atps.size());
+  CHECK(atps.count("X"));
+  CHECK("xray" == atps["X"]);
+  CHECK("electronnumber" == atps["EN"]);
+}
 
 // End of file

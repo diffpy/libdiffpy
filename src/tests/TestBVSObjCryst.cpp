@@ -12,17 +12,20 @@
  *
  ******************************************************************************
  *
- * class TestBVSObjCryst -- unit tests for BVS calculation for an ObjCryst
+ * TestBVSObjCryst -- unit tests for BVS calculation for an ObjCryst
  *   crystal structure
  *
  *****************************************************************************/
 
-#include <cxxtest/TestSuite.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <diffpy/srreal/ObjCrystStructureAdapter.hpp>
 #include <diffpy/srreal/BVSCalculator.hpp>
 
 #include "objcryst_helpers.hpp"
+
+using Catch::Matchers::WithinAbs;
 
 using namespace std;
 using namespace diffpy::srreal;
@@ -31,36 +34,35 @@ using namespace diffpy::srreal;
 // class Test
 //////////////////////////////////////////////////////////////////////////////
 
-class TestBVSObjCryst : public CxxTest::TestSuite {
- private:
+class TestBVSObjCrystFixture {
+ protected:
   unique_ptr<ObjCryst::Crystal> mnacl;
   unique_ptr<BVSCalculator> mbvc;
 
  public:
-  void setUp() {
-    if (!mnacl.get()) {
-      mnacl.reset(loadTestCrystal("NaCl.cif"));
-    }
+  TestBVSObjCrystFixture() {
+    mnacl.reset(loadTestCrystal("NaCl.cif"));
     mbvc.reset(new BVSCalculator);
   }
+};  // class TestBVSObjCrystFixture
 
-  void test_NaCl() {
-    const double eps = 1e-4;
-    mbvc->eval(*mnacl);
-    TS_ASSERT_EQUALS(2u, mbvc->value().size());
-    TS_ASSERT_DELTA(+1.01352, mbvc->value()[0], eps);
-    TS_ASSERT_DELTA(-1.01352, mbvc->value()[1], eps);
-  }
+TEST_CASE_METHOD(TestBVSObjCrystFixture, "TestBVSObjCryst::test_NaCl",
+                 "[BVSObjCryst]") {
+  const double eps = 1e-4;
+  mbvc->eval(*mnacl);
+  CHECK(2u == mbvc->value().size());
+  CHECK_THAT(+1.01352, WithinAbs(mbvc->value()[0], eps));
+  CHECK_THAT(-1.01352, WithinAbs(mbvc->value()[1], eps));
+}
 
-  void test_NaCl_mixed() {
-    unique_ptr<ObjCryst::Crystal> nacl_mixed;
-    nacl_mixed.reset(loadTestCrystal("NaCl_mixed.cif"));
-    mbvc->eval(*mnacl);
-    BVSCalculator bvc;
-    bvc.eval(*nacl_mixed);
-    TS_ASSERT_DELTA(mbvc->bvrmsdiff(), bvc.bvrmsdiff(), 1e-12);
-  }
-
-};  // class TestBVSObjCryst
+TEST_CASE_METHOD(TestBVSObjCrystFixture, "TestBVSObjCryst::test_NaCl_mixed",
+                 "[BVSObjCryst]") {
+  unique_ptr<ObjCryst::Crystal> nacl_mixed;
+  nacl_mixed.reset(loadTestCrystal("NaCl_mixed.cif"));
+  mbvc->eval(*mnacl);
+  BVSCalculator bvc;
+  bvc.eval(*nacl_mixed);
+  CHECK_THAT(mbvc->bvrmsdiff(), WithinAbs(bvc.bvrmsdiff(), 1e-12));
+}
 
 // End of file

@@ -12,11 +12,11 @@
  *
  ******************************************************************************
  *
- * class TestAttributes -- test the helper Attributes class
+ * TestAttributes -- test the helper Attributes class
  *
  *****************************************************************************/
 
-#include <cxxtest/TestSuite.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include <diffpy/Attributes.hpp>
 
@@ -42,31 +42,32 @@ class Example : public diffpy::Attributes {
 
 // ---------------------------------------------------------------------------
 
-class TestAttributes : public CxxTest::TestSuite {
- private:
+class TestAttributesFixture {
+ protected:
   // data
   std::unique_ptr<Example> mobj;
 
  public:
-  void setUp() { mobj.reset(new Example); }
+  TestAttributesFixture() { mobj.reset(new Example); }
+};  // class TestAttributesFixture
 
-  void test_names() {
-    TS_ASSERT_EQUALS(2, mobj->namesOfDoubleAttributes().size());
-    TS_ASSERT_EQUALS(1, mobj->namesOfWritableDoubleAttributes().size());
-  }
+TEST_CASE_METHOD(TestAttributesFixture, "TestAttributes::test_names",
+                 "[Attributes]") {
+  CHECK(2 == mobj->namesOfDoubleAttributes().size());
+  CHECK(1 == mobj->namesOfWritableDoubleAttributes().size());
+}
 
-  void test_getsetdoubleattr() {
-    using diffpy::attributes::DoubleAttributeError;
-    TS_ASSERT_EQUALS(0.0, mobj->getDoubleAttr("a"));
-    mobj->setDoubleAttr("a", 1.3);
-    TS_ASSERT_EQUALS(1.3, mobj->getDoubleAttr("a"));
-    TS_ASSERT_THROWS(mobj->setDoubleAttr("b", 3), DoubleAttributeError);
-    TS_ASSERT_EQUALS(1.3, mobj->getDoubleAttr("b"));
-    const Example ex1;
-    TS_ASSERT_EQUALS(0.0, ex1.getDoubleAttr("a"));
-    TS_ASSERT_THROWS(ex1.getDoubleAttr("bad"), DoubleAttributeError);
-  }
-
-};  // class TestAttributes
+TEST_CASE_METHOD(TestAttributesFixture, "TestAttributes::test_getsetdoubleattr",
+                 "[Attributes]") {
+  using diffpy::attributes::DoubleAttributeError;
+  CHECK(0.0 == mobj->getDoubleAttr("a"));
+  mobj->setDoubleAttr("a", 1.3);
+  CHECK(1.3 == mobj->getDoubleAttr("a"));
+  CHECK_THROWS_AS(mobj->setDoubleAttr("b", 3), DoubleAttributeError);
+  CHECK(1.3 == mobj->getDoubleAttr("b"));
+  const Example ex1;
+  CHECK(0.0 == ex1.getDoubleAttr("a"));
+  CHECK_THROWS_AS(ex1.getDoubleAttr("bad"), DoubleAttributeError);
+}
 
 // End of file

@@ -7,7 +7,7 @@ requirements = ["python"]
 for filename in ("build.txt", "conda.txt", "tests.txt"):
     for line in (Path("requirements") / filename).read_text().splitlines():
         spec = line.split("#", 1)[0].strip()
-        if spec and spec != "cxxtest":
+        if spec:
             requirements.append(spec)
 
 Path("build").mkdir(exist_ok=True)

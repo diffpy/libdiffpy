@@ -50,7 +50,7 @@ instrumentation, use ``-DLIBDIFFPY_PROFILE=ON``.
 Run the unit tests
 ------------------
 
-The unit tests use the CxxTest framework. Build and run all of them with ::
+The unit tests use Catch2 3.5 or later. Build and run all of them with ::
 
         cmake --preset debug
         cmake --build --preset debug --parallel 4
@@ -64,6 +64,7 @@ separated by commas ::
         cmake --build --preset debug --target check
 
 Set ``LIBDIFFPY_TESTS`` to an empty string to build all suites again.
+To run a subset of already built tests, use ``ctest --preset debug -R Lattice``.
 
 To run the tests against the installed library instead of the one in the
 ``build`` directory, configure a separate directory with

@@ -12,11 +12,11 @@
  *
  ******************************************************************************
  *
- * class TestPairCounter -- unit tests for PairCounter class
+ * TestPairCounter -- unit tests for PairCounter class
  *
  *****************************************************************************/
 
-#include <cxxtest/TestSuite.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/PairCounter.hpp>
@@ -24,114 +24,116 @@
 using namespace std;
 using namespace diffpy::srreal;
 
-class TestPairCounter : public CxxTest::TestSuite {
- private:
+class TestPairCounterFixture {
+ protected:
   AtomicStructureAdapterPtr mstru;
   AtomicStructureAdapterPtr mline100;
 
  public:
-  void setUp() {
+  TestPairCounterFixture() {
     mstru.reset(new AtomicStructureAdapter);
-    if (!mline100) {
-      mline100.reset(new AtomicStructureAdapter);
-      Atom a;
-      for (int i = 0; i < 100; ++i) {
-        a.xyz_cartn = R3::Vector(1.0 * i, 0.0, 0.0);
-        mline100->append(a);
-      }
-    }
-  }
-
-  void test_call() {
-    PairCounter pcount;
+    mline100.reset(new AtomicStructureAdapter);
     Atom a;
     for (int i = 0; i < 100; ++i) {
-      int npairs = i * (i - 1) / 2;
-      TS_ASSERT_EQUALS(npairs, pcount(mstru));
       a.xyz_cartn = R3::Vector(1.0 * i, 0.0, 0.0);
-      mstru->append(a);
+      mline100->append(a);
     }
-    mstru->clear();
-    TS_ASSERT_EQUALS(0, pcount(mstru));
   }
+};  // class TestPairCounterFixture
 
-  void test_setRmin() {
-    PairCounter pcount;
-    TS_ASSERT_EQUALS(100 * 99 / 2, pcount(mline100));
-    pcount.setRmin(100);
-    TS_ASSERT_EQUALS(0, pcount(mline100));
-    pcount.setRmin(99.0);
-    TS_ASSERT_EQUALS(1, pcount(mline100));
-    pcount.setRmin(1.1);
-    TS_ASSERT_EQUALS(100 * 99 / 2 - 99, pcount(mline100));
+TEST_CASE_METHOD(TestPairCounterFixture, "TestPairCounter::test_call",
+                 "[PairCounter]") {
+  PairCounter pcount;
+  Atom a;
+  for (int i = 0; i < 100; ++i) {
+    int npairs = i * (i - 1) / 2;
+    CHECK(npairs == pcount(mstru));
+    a.xyz_cartn = R3::Vector(1.0 * i, 0.0, 0.0);
+    mstru->append(a);
   }
+  mstru->clear();
+  CHECK(0 == pcount(mstru));
+}
 
-  void test_setRmax() {
-    PairCounter pcount;
-    pcount.setRmax(0.9);
-    TS_ASSERT_EQUALS(0, pcount(mline100));
-    pcount.setRmax(1.1);
-    TS_ASSERT_EQUALS(99, pcount(mline100));
-    pcount.setRmax(98.5);
-    TS_ASSERT_EQUALS(100 * 99 / 2 - 1, pcount(mline100));
+TEST_CASE_METHOD(TestPairCounterFixture, "TestPairCounter::test_setRmin",
+                 "[PairCounter]") {
+  PairCounter pcount;
+  CHECK(100 * 99 / 2 == pcount(mline100));
+  pcount.setRmin(100);
+  CHECK(0 == pcount(mline100));
+  pcount.setRmin(99.0);
+  CHECK(1 == pcount(mline100));
+  pcount.setRmin(1.1);
+  CHECK(100 * 99 / 2 - 99 == pcount(mline100));
+}
+
+TEST_CASE_METHOD(TestPairCounterFixture, "TestPairCounter::test_setRmax",
+                 "[PairCounter]") {
+  PairCounter pcount;
+  pcount.setRmax(0.9);
+  CHECK(0 == pcount(mline100));
+  pcount.setRmax(1.1);
+  CHECK(99 == pcount(mline100));
+  pcount.setRmax(98.5);
+  CHECK(100 * 99 / 2 - 1 == pcount(mline100));
+}
+
+TEST_CASE_METHOD(TestPairCounterFixture, "TestPairCounter::test_maskTicker",
+                 "[PairCounter]") {
+  using diffpy::eventticker::EventTicker;
+  PairCounter pcount;
+  EventTicker et0 = pcount.ticker();
+  pcount.maskAllPairs(true);
+  pcount.setPairMask(pcount.ALLATOMSINT, pcount.ALLATOMSINT, true);
+  pcount.setTypeMask("all", "all", true);
+  CHECK(et0 == pcount.ticker());
+  pcount.setTypeMask("A", "B", true);
+  EventTicker et1 = pcount.ticker();
+  CHECK(et0 < et1);
+  pcount.setTypeMask("A", "B", true);
+  CHECK(et1 == pcount.ticker());
+  pcount.setTypeMask("A", "B", false);
+  EventTicker et2 = pcount.ticker();
+  CHECK(et1 < et2);
+  pcount.setTypeMask("A", "all", false);
+  EventTicker et3 = pcount.ticker();
+  CHECK(et2 < et3);
+  pcount.setTypeMask("A", "all", false);
+  CHECK(et3 == pcount.ticker());
+  pcount.setTypeMask("A", "all", true);
+  EventTicker et4 = pcount.ticker();
+  CHECK(et3 < et4);
+  pcount.setPairMask(0, 0, false);
+  EventTicker et5 = pcount.ticker();
+  CHECK(et4 < et5);
+  pcount.setPairMask(0, 0, false);
+  CHECK(et5 == pcount.ticker());
+  pcount.setPairMask(0, 5, true);
+  CHECK(et5 == pcount.ticker());
+  pcount.setPairMask(0, 5, false);
+  CHECK(et5 < pcount.ticker());
+}
+
+TEST_CASE_METHOD(TestPairCounterFixture, "TestPairCounter::test_parallel",
+                 "[PairCounter]") {
+  const int ncpu = 7;
+  PairCounter pmaster;
+  PairCounter pslave[ncpu];
+  bool allequal = true;
+  for (int cpuindex = 0; cpuindex < ncpu; ++cpuindex) {
+    pslave[cpuindex].setupParallelRun(cpuindex, ncpu);
+    pslave[cpuindex].eval(mline100);
+    allequal =
+      allequal && (pslave[cpuindex].value()[0] == pslave[0].value()[0]);
   }
-
-  void test_maskTicker() {
-    using diffpy::eventticker::EventTicker;
-    PairCounter pcount;
-    EventTicker et0 = pcount.ticker();
-    pcount.maskAllPairs(true);
-    pcount.setPairMask(pcount.ALLATOMSINT, pcount.ALLATOMSINT, true);
-    pcount.setTypeMask("all", "all", true);
-    TS_ASSERT_EQUALS(et0, pcount.ticker());
-    pcount.setTypeMask("A", "B", true);
-    EventTicker et1 = pcount.ticker();
-    TS_ASSERT_LESS_THAN(et0, et1);
-    pcount.setTypeMask("A", "B", true);
-    TS_ASSERT_EQUALS(et1, pcount.ticker());
-    pcount.setTypeMask("A", "B", false);
-    EventTicker et2 = pcount.ticker();
-    TS_ASSERT_LESS_THAN(et1, et2);
-    pcount.setTypeMask("A", "all", false);
-    EventTicker et3 = pcount.ticker();
-    TS_ASSERT_LESS_THAN(et2, et3);
-    pcount.setTypeMask("A", "all", false);
-    TS_ASSERT_EQUALS(et3, pcount.ticker());
-    pcount.setTypeMask("A", "all", true);
-    EventTicker et4 = pcount.ticker();
-    TS_ASSERT_LESS_THAN(et3, et4);
-    pcount.setPairMask(0, 0, false);
-    EventTicker et5 = pcount.ticker();
-    TS_ASSERT_LESS_THAN(et4, et5);
-    pcount.setPairMask(0, 0, false);
-    TS_ASSERT_EQUALS(et5, pcount.ticker());
-    pcount.setPairMask(0, 5, true);
-    TS_ASSERT_EQUALS(et5, pcount.ticker());
-    pcount.setPairMask(0, 5, false);
-    TS_ASSERT_LESS_THAN(et5, pcount.ticker());
+  CHECK(!allequal);
+  pmaster.setStructure(mline100);
+  CHECK(1u == pmaster.value().size());
+  CHECK(0.0 == pmaster.value()[0]);
+  for (PairCounter* p = pslave; p != pslave + ncpu; ++p) {
+    pmaster.mergeParallelData(p->getParallelData(), ncpu);
   }
-
-  void test_parallel() {
-    const int ncpu = 7;
-    PairCounter pmaster;
-    PairCounter pslave[ncpu];
-    bool allequal = true;
-    for (int cpuindex = 0; cpuindex < ncpu; ++cpuindex) {
-      pslave[cpuindex].setupParallelRun(cpuindex, ncpu);
-      pslave[cpuindex].eval(mline100);
-      allequal =
-        allequal && (pslave[cpuindex].value()[0] == pslave[0].value()[0]);
-    }
-    TS_ASSERT(!allequal);
-    pmaster.setStructure(mline100);
-    TS_ASSERT_EQUALS(1u, pmaster.value().size());
-    TS_ASSERT_EQUALS(0.0, pmaster.value()[0]);
-    for (PairCounter* p = pslave; p != pslave + ncpu; ++p) {
-      pmaster.mergeParallelData(p->getParallelData(), ncpu);
-    }
-    TS_ASSERT_EQUALS(100 * 99 / 2, pmaster.value()[0]);
-  }
-
-};  // class TestPairCounter
+  CHECK(100 * 99 / 2 == pmaster.value()[0]);
+}
 
 // End of file

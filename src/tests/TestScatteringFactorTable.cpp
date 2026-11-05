@@ -12,174 +12,195 @@
  *
  ******************************************************************************
  *
- * class TestScatteringFactorTable -- unit tests for implementations
+ * TestScatteringFactorTable -- unit tests for implementations
  *     of the ScatteringFactorTable class
  *
  *****************************************************************************/
 
 #include <typeinfo>
 #include <stdexcept>
-#include <cxxtest/TestSuite.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <diffpy/srreal/ScatteringFactorTable.hpp>
 #include <diffpy/mathutils.hpp>
 #include "serialization_helpers.hpp"
 
+using Catch::Matchers::WithinAbs;
+
 using namespace std;
 using namespace diffpy::srreal;
 
-class TestScatteringFactorTable : public CxxTest::TestSuite {
- private:
+class TestScatteringFactorTableFixture {
+ protected:
   double mtol;
   double meps;
   ScatteringFactorTablePtr msftb;
 
  public:
-  void setUp() {
+  TestScatteringFactorTableFixture() {
     mtol = 1.0e-4;
     meps = 10 * diffpy::mathutils::DOUBLE_EPS;
   }
+};  // class TestScatteringFactorTableFixture
 
-  void test_factory() {
-    ScatteringFactorTablePtr sfx0, sfx1, sfn0, sfn1;
-    TS_ASSERT_THROWS(ScatteringFactorTable::createByType("invalid"),
-                     invalid_argument);
-    sfx0 = ScatteringFactorTable::createByType("xray");
-    sfx1 = ScatteringFactorTable::createByType("X");
-    TS_ASSERT(sfx0.get());
-    TS_ASSERT(sfx1.get());
-    TS_ASSERT_EQUALS(sfx0->type(), sfx1->type());
-    ScatteringFactorTable& r_sfx0 = *sfx0;
-    ScatteringFactorTable& r_sfx1 = *sfx1;
-    TS_ASSERT(typeid(r_sfx0) == typeid(r_sfx1));
-    sfn0 = ScatteringFactorTable::createByType("neutron");
-    sfn1 = ScatteringFactorTable::createByType("N");
-    TS_ASSERT(sfn0.get());
-    TS_ASSERT(sfn1.get());
-    TS_ASSERT_EQUALS(sfn0->type(), sfn1->type());
-    ScatteringFactorTable& r_sfn0 = *sfn0;
-    ScatteringFactorTable& r_sfn1 = *sfn1;
-    TS_ASSERT(typeid(r_sfn0) == typeid(r_sfn1));
-  }
+TEST_CASE_METHOD(TestScatteringFactorTableFixture,
+                 "TestScatteringFactorTable::test_factory",
+                 "[ScatteringFactorTable]") {
+  ScatteringFactorTablePtr sfx0, sfx1, sfn0, sfn1;
+  CHECK_THROWS_AS(ScatteringFactorTable::createByType("invalid"),
+                  invalid_argument);
+  sfx0 = ScatteringFactorTable::createByType("xray");
+  sfx1 = ScatteringFactorTable::createByType("X");
+  CHECK(sfx0.get());
+  CHECK(sfx1.get());
+  CHECK(sfx0->type() == sfx1->type());
+  ScatteringFactorTable& r_sfx0 = *sfx0;
+  ScatteringFactorTable& r_sfx1 = *sfx1;
+  CHECK(typeid(r_sfx0) == typeid(r_sfx1));
+  sfn0 = ScatteringFactorTable::createByType("neutron");
+  sfn1 = ScatteringFactorTable::createByType("N");
+  CHECK(sfn0.get());
+  CHECK(sfn1.get());
+  CHECK(sfn0->type() == sfn1->type());
+  ScatteringFactorTable& r_sfn0 = *sfn0;
+  ScatteringFactorTable& r_sfn1 = *sfn1;
+  CHECK(typeid(r_sfn0) == typeid(r_sfn1));
+}
 
-  void test_setCustomAs() {
-    msftb = ScatteringFactorTable::createByType("X");
-    TS_ASSERT_THROWS(msftb->lookup(""), invalid_argument);
-    TS_ASSERT_DELTA(6.0, msftb->lookup("C"), 0.01);
-    msftb->setCustomAs("C", "C", 6.3);
-    TS_ASSERT_DELTA(6.3, msftb->lookup("C"), meps);
-    msftb->setCustomAs("C", "C", 6.4);
-    TS_ASSERT_DELTA(6.4, msftb->lookup("C"), meps);
-    TS_ASSERT_THROWS(msftb->lookup("Ccustom"), invalid_argument);
-    msftb->setCustomAs("Ccustom", "C", 6.5);
-    TS_ASSERT_DELTA(6.5, msftb->lookup("Ccustom"), meps);
-    msftb->resetCustom("C");
-    TS_ASSERT_DELTA(6.5, msftb->lookup("Ccustom"), meps);
-    TS_ASSERT_DELTA(6.0, msftb->lookup("C"), 0.01);
-    msftb->resetAll();
-    TS_ASSERT_THROWS(msftb->lookup("Ccustom"), invalid_argument);
-    TS_ASSERT_DELTA(6.0, msftb->lookup("C"), 0.01);
-    msftb->setCustomAs("Calias", "C");
-    TS_ASSERT_EQUALS(msftb->lookup("C", 0), msftb->lookup("Calias", 0));
-    TS_ASSERT_DELTA(msftb->lookup("C", 2.5), msftb->lookup("Calias", 2.5),
-                    meps);
-  }
+TEST_CASE_METHOD(TestScatteringFactorTableFixture,
+                 "TestScatteringFactorTable::test_setCustomAs",
+                 "[ScatteringFactorTable]") {
+  msftb = ScatteringFactorTable::createByType("X");
+  CHECK_THROWS_AS(msftb->lookup(""), invalid_argument);
+  CHECK_THAT(6.0, WithinAbs(msftb->lookup("C"), 0.01));
+  msftb->setCustomAs("C", "C", 6.3);
+  CHECK_THAT(6.3, WithinAbs(msftb->lookup("C"), meps));
+  msftb->setCustomAs("C", "C", 6.4);
+  CHECK_THAT(6.4, WithinAbs(msftb->lookup("C"), meps));
+  CHECK_THROWS_AS(msftb->lookup("Ccustom"), invalid_argument);
+  msftb->setCustomAs("Ccustom", "C", 6.5);
+  CHECK_THAT(6.5, WithinAbs(msftb->lookup("Ccustom"), meps));
+  msftb->resetCustom("C");
+  CHECK_THAT(6.5, WithinAbs(msftb->lookup("Ccustom"), meps));
+  CHECK_THAT(6.0, WithinAbs(msftb->lookup("C"), 0.01));
+  msftb->resetAll();
+  CHECK_THROWS_AS(msftb->lookup("Ccustom"), invalid_argument);
+  CHECK_THAT(6.0, WithinAbs(msftb->lookup("C"), 0.01));
+  msftb->setCustomAs("Calias", "C");
+  CHECK(msftb->lookup("C", 0) == msftb->lookup("Calias", 0));
+  CHECK_THAT(msftb->lookup("C", 2.5),
+             WithinAbs(msftb->lookup("Calias", 2.5), meps));
+}
 
-  void test_getCustomSymbols() {
-    msftb = ScatteringFactorTable::createByType("X");
-    TS_ASSERT(msftb->getCustomSymbols().empty());
-    msftb->setCustomAs("C", "C", 6.1);
-    TS_ASSERT_EQUALS(1u, msftb->getCustomSymbols().size());
-    TS_ASSERT_EQUALS(1u, msftb->getCustomSymbols().count("C"));
-    msftb->setCustomAs("C", "C", 6.3);
-    TS_ASSERT_EQUALS(1u, msftb->getCustomSymbols().size());
-    TS_ASSERT_EQUALS(1u, msftb->getCustomSymbols().count("C"));
-    TS_ASSERT_DELTA(6.3, msftb->lookup("C"), meps);
-    ScatteringFactorTablePtr sftb1 = msftb->clone();
-    msftb->resetCustom("C");
-    TS_ASSERT(msftb->getCustomSymbols().empty());
-    TS_ASSERT_EQUALS(1u, sftb1->getCustomSymbols().size());
-    TS_ASSERT_EQUALS(1u, sftb1->getCustomSymbols().count("C"));
-    TS_ASSERT_DELTA(6.3, sftb1->lookup("C"), meps);
-    sftb1->resetAll();
-    TS_ASSERT(msftb->getCustomSymbols().empty());
-  }
+TEST_CASE_METHOD(TestScatteringFactorTableFixture,
+                 "TestScatteringFactorTable::test_getCustomSymbols",
+                 "[ScatteringFactorTable]") {
+  msftb = ScatteringFactorTable::createByType("X");
+  CHECK(msftb->getCustomSymbols().empty());
+  msftb->setCustomAs("C", "C", 6.1);
+  CHECK(1u == msftb->getCustomSymbols().size());
+  CHECK(1u == msftb->getCustomSymbols().count("C"));
+  msftb->setCustomAs("C", "C", 6.3);
+  CHECK(1u == msftb->getCustomSymbols().size());
+  CHECK(1u == msftb->getCustomSymbols().count("C"));
+  CHECK_THAT(6.3, WithinAbs(msftb->lookup("C"), meps));
+  ScatteringFactorTablePtr sftb1 = msftb->clone();
+  msftb->resetCustom("C");
+  CHECK(msftb->getCustomSymbols().empty());
+  CHECK(1u == sftb1->getCustomSymbols().size());
+  CHECK(1u == sftb1->getCustomSymbols().count("C"));
+  CHECK_THAT(6.3, WithinAbs(sftb1->lookup("C"), meps));
+  sftb1->resetAll();
+  CHECK(msftb->getCustomSymbols().empty());
+}
 
-  void test_ticker() {
-    using diffpy::eventticker::EventTicker;
-    msftb = ScatteringFactorTable::createByType("X");
-    EventTicker e0 = msftb->ticker();
-    TS_ASSERT_EQUALS(e0, msftb->clone()->ticker());
-    TS_ASSERT_EQUALS(e0, dumpandload(msftb)->ticker());
-    msftb->setCustomAs("C", "C", 6.1);
-    TS_ASSERT_LESS_THAN(e0, msftb->ticker());
-  }
+TEST_CASE_METHOD(TestScatteringFactorTableFixture,
+                 "TestScatteringFactorTable::test_ticker",
+                 "[ScatteringFactorTable]") {
+  using diffpy::eventticker::EventTicker;
+  msftb = ScatteringFactorTable::createByType("X");
+  EventTicker e0 = msftb->ticker();
+  CHECK(e0 == msftb->clone()->ticker());
+  CHECK(e0 == dumpandload(msftb)->ticker());
+  msftb->setCustomAs("C", "C", 6.1);
+  CHECK(e0 < msftb->ticker());
+}
 
-  void test_SFTXray() {
-    msftb = ScatteringFactorTable::createByType("X");
-    TS_ASSERT_DELTA(1.0, msftb->lookup("H"), 0.01);
-    TS_ASSERT_DELTA(8.0, msftb->lookup("O"), 0.01);
-    TS_ASSERT_DELTA(10.0, msftb->lookup("O2-"), 0.01);
-    TS_ASSERT_DELTA(11.0, msftb->lookup("Na"), 0.01);
-    TS_ASSERT_DELTA(10.0, msftb->lookup("Na+"), 0.01);
-    TS_ASSERT_EQUALS(msftb->lookup("Na+"), msftb->lookup("Na1+"));
-    TS_ASSERT_DELTA(74.0, msftb->lookup("W"), 0.04);
-    TS_ASSERT_DELTA(88.0, msftb->lookup("Ra"), 0.04);
-    TS_ASSERT_EQUALS(msftb->lookup("Si"), msftb->lookup("Si0+"));
-    TS_ASSERT_EQUALS("xray", msftb->clone()->type());
-  }
+TEST_CASE_METHOD(TestScatteringFactorTableFixture,
+                 "TestScatteringFactorTable::test_SFTXray",
+                 "[ScatteringFactorTable]") {
+  msftb = ScatteringFactorTable::createByType("X");
+  CHECK_THAT(1.0, WithinAbs(msftb->lookup("H"), 0.01));
+  CHECK_THAT(8.0, WithinAbs(msftb->lookup("O"), 0.01));
+  CHECK_THAT(10.0, WithinAbs(msftb->lookup("O2-"), 0.01));
+  CHECK_THAT(11.0, WithinAbs(msftb->lookup("Na"), 0.01));
+  CHECK_THAT(10.0, WithinAbs(msftb->lookup("Na+"), 0.01));
+  CHECK(msftb->lookup("Na+") == msftb->lookup("Na1+"));
+  CHECK_THAT(74.0, WithinAbs(msftb->lookup("W"), 0.04));
+  CHECK_THAT(88.0, WithinAbs(msftb->lookup("Ra"), 0.04));
+  CHECK(msftb->lookup("Si") == msftb->lookup("Si0+"));
+  CHECK("xray" == msftb->clone()->type());
+}
 
-  void test_SFTElectron() {
-    using diffpy::mathutils::DOUBLE_MAX;
-    msftb = ScatteringFactorTable::createByType("E");
-    TS_ASSERT_EQUALS(DOUBLE_MAX, msftb->lookup("H"));
-    TS_ASSERT_EQUALS(DOUBLE_MAX, msftb->lookup("Ra"));
-    TS_ASSERT_DELTA(3.42104, msftb->lookup("Na", 1), 1e-5);
-    TS_ASSERT_DELTA(1.34868, msftb->lookup("Na", 3), 1e-5);
-    TS_ASSERT_DELTA(0.832158, msftb->lookup("Na", 5), 1e-5);
-    TS_ASSERT_THROWS(msftb->lookup("H4+"), invalid_argument);
-    TS_ASSERT_THROWS(msftb->lookup("H4+", 3), invalid_argument);
-    TS_ASSERT_EQUALS("electron", msftb->clone()->type());
-  }
+TEST_CASE_METHOD(TestScatteringFactorTableFixture,
+                 "TestScatteringFactorTable::test_SFTElectron",
+                 "[ScatteringFactorTable]") {
+  using diffpy::mathutils::DOUBLE_MAX;
+  msftb = ScatteringFactorTable::createByType("E");
+  CHECK(DOUBLE_MAX == msftb->lookup("H"));
+  CHECK(DOUBLE_MAX == msftb->lookup("Ra"));
+  CHECK_THAT(3.42104, WithinAbs(msftb->lookup("Na", 1), 1e-5));
+  CHECK_THAT(1.34868, WithinAbs(msftb->lookup("Na", 3), 1e-5));
+  CHECK_THAT(0.832158, WithinAbs(msftb->lookup("Na", 5), 1e-5));
+  CHECK_THROWS_AS(msftb->lookup("H4+"), invalid_argument);
+  CHECK_THROWS_AS(msftb->lookup("H4+", 3), invalid_argument);
+  CHECK("electron" == msftb->clone()->type());
+}
 
-  void test_SFTNeutron() {
-    msftb = ScatteringFactorTable::createByType("N");
-    TS_ASSERT_DELTA(3.63, msftb->lookup("Na"), mtol);
-    TS_ASSERT_DELTA(-3.37, msftb->lookup("Ti"), mtol);
-    TS_ASSERT_DELTA(5.805, msftb->lookup("O"), mtol);
-    TS_ASSERT_DELTA(6.6484, msftb->lookup("C"), mtol);
-    TS_ASSERT_EQUALS(msftb->lookup("Na"), msftb->lookup("Na1+"));
-    TS_ASSERT_EQUALS(msftb->lookup("Ge"), msftb->lookup("Ge0+"));
-    TS_ASSERT_EQUALS("neutron", msftb->clone()->type());
-  }
+TEST_CASE_METHOD(TestScatteringFactorTableFixture,
+                 "TestScatteringFactorTable::test_SFTNeutron",
+                 "[ScatteringFactorTable]") {
+  msftb = ScatteringFactorTable::createByType("N");
+  CHECK_THAT(3.63, WithinAbs(msftb->lookup("Na"), mtol));
+  CHECK_THAT(-3.37, WithinAbs(msftb->lookup("Ti"), mtol));
+  CHECK_THAT(5.805, WithinAbs(msftb->lookup("O"), mtol));
+  CHECK_THAT(6.6484, WithinAbs(msftb->lookup("C"), mtol));
+  CHECK(msftb->lookup("Na") == msftb->lookup("Na1+"));
+  CHECK(msftb->lookup("Ge") == msftb->lookup("Ge0+"));
+  CHECK("neutron" == msftb->clone()->type());
+}
 
-  void test_ElectronNumber() {
-    msftb = ScatteringFactorTable::createByType("electronnumber");
-    TS_ASSERT_EQUALS(8.0, msftb->lookup("O"));
-    TS_ASSERT_EQUALS(10.0, msftb->lookup("O2-"));
-    TS_ASSERT_EQUALS(18.0, msftb->lookup("K+"));
-    TS_ASSERT_EQUALS(18.0, msftb->lookup("K1+"));
-    TS_ASSERT_EQUALS(68.0, msftb->lookup("W6+"));
-    TS_ASSERT_THROWS(msftb->lookup("H4+"), invalid_argument);
-    TS_ASSERT_THROWS(msftb->lookup("O3+"), invalid_argument);
-    TS_ASSERT_EQUALS("electronnumber", msftb->clone()->type());
-  }
+TEST_CASE_METHOD(TestScatteringFactorTableFixture,
+                 "TestScatteringFactorTable::test_ElectronNumber",
+                 "[ScatteringFactorTable]") {
+  msftb = ScatteringFactorTable::createByType("electronnumber");
+  CHECK(8.0 == msftb->lookup("O"));
+  CHECK(10.0 == msftb->lookup("O2-"));
+  CHECK(18.0 == msftb->lookup("K+"));
+  CHECK(18.0 == msftb->lookup("K1+"));
+  CHECK(68.0 == msftb->lookup("W6+"));
+  CHECK_THROWS_AS(msftb->lookup("H4+"), invalid_argument);
+  CHECK_THROWS_AS(msftb->lookup("O3+"), invalid_argument);
+  CHECK("electronnumber" == msftb->clone()->type());
+}
 
-  void test_serialization() {
-    ScatteringFactorTablePtr sftb1;
-    msftb = ScatteringFactorTable::createByType("electronnumber");
-    msftb->setCustomAs("H", "H", 1.23);
-    sftb1 = dumpandload(msftb);
-    TS_ASSERT_EQUALS(string("electronnumber"), sftb1->type());
-    TS_ASSERT_EQUALS(1.23, sftb1->lookup("H"));
-    TS_ASSERT_EQUALS(1u, sftb1->getCustomSymbols().size());
-    sftb1 = dumpandload(ScatteringFactorTable::createByType("N"));
-    TS_ASSERT_EQUALS(string("neutron"), sftb1->type());
-    sftb1 = dumpandload(ScatteringFactorTable::createByType("X"));
-    TS_ASSERT_EQUALS(string("xray"), sftb1->type());
-    sftb1 = dumpandload(ScatteringFactorTable::createByType("E"));
-    TS_ASSERT_EQUALS(string("electron"), sftb1->type());
-  }
-};
+TEST_CASE_METHOD(TestScatteringFactorTableFixture,
+                 "TestScatteringFactorTable::test_serialization",
+                 "[ScatteringFactorTable]") {
+  ScatteringFactorTablePtr sftb1;
+  msftb = ScatteringFactorTable::createByType("electronnumber");
+  msftb->setCustomAs("H", "H", 1.23);
+  sftb1 = dumpandload(msftb);
+  CHECK(string("electronnumber") == sftb1->type());
+  CHECK(1.23 == sftb1->lookup("H"));
+  CHECK(1u == sftb1->getCustomSymbols().size());
+  sftb1 = dumpandload(ScatteringFactorTable::createByType("N"));
+  CHECK(string("neutron") == sftb1->type());
+  sftb1 = dumpandload(ScatteringFactorTable::createByType("X"));
+  CHECK(string("xray") == sftb1->type());
+  sftb1 = dumpandload(ScatteringFactorTable::createByType("E"));
+  CHECK(string("electron") == sftb1->type());
+}
 
 // End of file

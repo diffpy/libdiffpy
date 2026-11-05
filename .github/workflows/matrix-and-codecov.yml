@@ -62,7 +62,7 @@ jobs:
           cmake -S . -B build/ci -G Ninja $CMAKE_ARGS \
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} \
             -DLIBDIFFPY_COVERAGE=${{ matrix.coverage }} \
-            -DLIBDIFFPY_BUILD_TESTS=ON -DCXXTEST_ROOT="$PWD/build/cxxtest"
+            -DLIBDIFFPY_BUILD_TESTS=ON
           cmake --build build/ci --parallel ${{ matrix.jobs }}
           ctest --test-dir build/ci --output-on-failure
 
@@ -71,7 +71,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           where cl.exe || exit /b 1
-          cmake --preset release -DLIBDIFFPY_BUILD_TESTS=ON -DCXXTEST_ROOT="%CD%/build/cxxtest" || exit /b 1
+          cmake --preset release -DLIBDIFFPY_BUILD_TESTS=ON || exit /b 1
           cmake --build --preset release --parallel ${{ matrix.jobs }} || exit /b 1
           ctest --test-dir build\release --output-on-failure --no-tests=error
 

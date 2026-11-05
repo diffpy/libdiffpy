@@ -1,26 +1,11 @@
-# Unit tests with the CxxTest framework.
+# Unit tests with the Catch2 framework.
 #
-# cxxtestgen writes one source file per suite and a runner with
-# the main function.  They are linked into the "alltests" program.
+# The Test*.cpp files are compiled into the "alltests" program.  CTest runs
+# each of its test cases as a separate test.
 
-set(CXXTEST_ROOT "" CACHE PATH "CxxTest source checkout or install prefix")
-find_path(CXXTEST_INCLUDE_DIR cxxtest/TestSuite.h HINTS "${CXXTEST_ROOT}")
-find_program(CXXTEST_TESTGEN NAMES cxxtestgen cxxtestgen.py
-  HINTS "${CXXTEST_ROOT}/bin")
-if(NOT CXXTEST_INCLUDE_DIR OR NOT CXXTEST_TESTGEN)
-  message(FATAL_ERROR
-    "Cannot find CxxTest.  Install cxxtest or set CXXTEST_ROOT to a CxxTest "
-    "source checkout.")
-endif()
-
-# cxxtestgen is a Python script.  Windows cannot execute it directly,
-# other platforms run it with the interpreter from its #! line.
-if(NOT WIN32 OR CXXTEST_TESTGEN MATCHES "\\.(exe|bat|cmd)$")
-  set(_testgen "${CXXTEST_TESTGEN}")
-else()
-  find_package(Python3 REQUIRED COMPONENTS Interpreter)
-  set(_testgen "${Python3_EXECUTABLE}" "${CXXTEST_TESTGEN}")
-endif()
+find_package(Catch2 3.5 CONFIG REQUIRED)
+message(STATUS "Using Catch2 ${Catch2_VERSION} from ${Catch2_DIR}")
+include(Catch)
 
 # Select the test suites -----------------------------------------------------
 
@@ -55,31 +40,6 @@ if(NOT _suites)
     "Cannot find any test matching LIBDIFFPY_TESTS='${LIBDIFFPY_TESTS}'.")
 endif()
 
-# Generate the test sources --------------------------------------------------
-
-set(_gendir "${CMAKE_CURRENT_BINARY_DIR}/cxxtest")
-file(MAKE_DIRECTORY "${_gendir}")
-set(_testgen_options --error-printer)
-
-set(_generated "${_gendir}/runner.cpp")
-add_custom_command(
-  OUTPUT "${_gendir}/runner.cpp"
-  COMMAND ${_testgen} --root ${_testgen_options} -o "${_gendir}/runner.cpp"
-  DEPENDS "${CXXTEST_TESTGEN}"
-  COMMENT "Generating CxxTest runner"
-  VERBATIM)
-foreach(suite IN LISTS _suites)
-  cmake_path(GET suite STEM name)
-  set(out "${_gendir}/${name}.cpp")
-  add_custom_command(
-    OUTPUT "${out}"
-    COMMAND ${_testgen} --part ${_testgen_options} -o "${out}" "${suite}"
-    DEPENDS "${suite}" "${CXXTEST_TESTGEN}"
-    COMMENT "Generating CxxTest suite ${name}"
-    VERBATIM)
-  list(APPEND _generated "${out}")
-endforeach()
-
 # alltests -- the unit test program ------------------------------------------
 
 set(_helpers test_helpers.cpp)
@@ -87,21 +47,23 @@ if(LIBDIFFPY_HAS_OBJCRYST)
   list(APPEND _helpers objcryst_helpers.cpp)
 endif()
 
-add_executable(alltests ${_generated} ${_helpers})
+add_executable(alltests ${_suites} ${_helpers})
 target_include_directories(alltests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_include_directories(alltests SYSTEM PRIVATE "${CXXTEST_INCLUDE_DIR}")
-target_link_libraries(alltests PRIVATE libdiffpy::diffpy)
+target_link_libraries(alltests PRIVATE libdiffpy::diffpy Catch2::Catch2WithMain)
 # test_helpers.cpp finds the testdata directory from this macro.
 set_property(SOURCE test_helpers.cpp APPEND PROPERTY COMPILE_DEFINITIONS
   "DIFFPYTESTSDIRPATH=${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_test(NAME alltests COMMAND alltests)
+# Register every test case with CTest.  PRE_TEST lists the test cases when
+# CTest runs, so that a build does not need to run the test program.
+set(_discover_options)
 if(WIN32 AND LIBDIFFPY_TEST_INSTALLED)
-  # Windows has no rpath.  Let the test program find diffpy.dll on PATH.
-  set(_path "$<TARGET_FILE_DIR:libdiffpy::diffpy>;$ENV{PATH}")
-  string(REPLACE ";" "\\;" _path "${_path}")
-  set_tests_properties(alltests PROPERTIES ENVIRONMENT "PATH=${_path}")
+  # Add the installed DLL directory to PATH during test discovery and execution.
+  set(_discover_options DL_PATHS "$<TARGET_FILE_DIR:libdiffpy::diffpy>")
 endif()
+catch_discover_tests(alltests
+  DISCOVERY_MODE PRE_TEST
+  ${_discover_options})
 
 # check -- build and run the unit tests.
 add_custom_target(check

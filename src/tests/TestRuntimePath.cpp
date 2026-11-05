@@ -12,7 +12,7 @@
  *
  ******************************************************************************
  *
- * class TestRuntimePath -- unit tests for the resolution of datafile paths
+ * TestRuntimePath -- unit tests for the resolution of datafile paths
  *
  *****************************************************************************/
 
@@ -20,14 +20,14 @@
 #include <cstdlib>
 #include <fstream>
 #include <stdexcept>
-#include <cxxtest/TestSuite.h>
+#include <catch2/catch_test_macros.hpp>
 #include <diffpy/runtimepath.hpp>
 #include "test_helpers.hpp"
 
 using diffpy::runtimepath::datapath;
 
-class TestRuntimePath : public CxxTest::TestSuite {
- private:
+class TestRuntimePathFixture {
+ protected:
   bool mhas_diffpyruntime;
   std::string mdiffpyruntime;
 
@@ -38,45 +38,47 @@ class TestRuntimePath : public CxxTest::TestSuite {
 
   void setRuntime(const char* value) {
 #ifdef _WIN32
-    TS_ASSERT_EQUALS(_putenv_s("DIFFPYRUNTIME", value ? value : ""), 0);
+    CHECK(_putenv_s("DIFFPYRUNTIME", value ? value : "") == 0);
 #else
     if (value) {
-      TS_ASSERT_EQUALS(setenv("DIFFPYRUNTIME", value, 1), 0);
+      CHECK(setenv("DIFFPYRUNTIME", value, 1) == 0);
     } else {
-      TS_ASSERT_EQUALS(unsetenv("DIFFPYRUNTIME"), 0);
+      CHECK(unsetenv("DIFFPYRUNTIME") == 0);
     }
 #endif
   }
 
  public:
-  void setUp() {
+  TestRuntimePathFixture() {
     char* pe = getenv("DIFFPYRUNTIME");
     mhas_diffpyruntime = pe;
     if (mhas_diffpyruntime) mdiffpyruntime = pe;
     setRuntime(nullptr);
   }
 
-  void tearDown() {
+  ~TestRuntimePathFixture() {
     setRuntime(mhas_diffpyruntime ? mdiffpyruntime.c_str() : nullptr);
   }
+};  // class TestRuntimePathFixture
 
-  void test_datapath() {
-    std::string f = datapath("f0_WaasKirf.dat");
-    TS_ASSERT(filereadable(f));
-    std::string d = datapath("");
-    TS_ASSERT_EQUALS(f, d + '/' + "f0_WaasKirf.dat");
-  }
+TEST_CASE_METHOD(TestRuntimePathFixture, "TestRuntimePath::test_datapath",
+                 "[RuntimePath]") {
+  std::string f = datapath("f0_WaasKirf.dat");
+  CHECK(filereadable(f));
+  std::string d = datapath("");
+  CHECK(f == d + '/' + "f0_WaasKirf.dat");
+}
 
-  void test_envvar_lookup() {
-    using namespace std;
-    setRuntime("does/not/exist");
-    TS_ASSERT_THROWS(datapath("f0_WaasKirf.dat"), runtime_error);
-    TS_ASSERT_THROWS(datapath("NaCl.cif"), runtime_error);
-    string td = prepend_testdata_dir("");
-    setRuntime(td.c_str());
-    string fnacl = prepend_testdata_dir("NaCl.cif");
-    TS_ASSERT_EQUALS(fnacl, datapath("NaCl.cif"));
-  }
-};
+TEST_CASE_METHOD(TestRuntimePathFixture, "TestRuntimePath::test_envvar_lookup",
+                 "[RuntimePath]") {
+  using namespace std;
+  setRuntime("does/not/exist");
+  CHECK_THROWS_AS(datapath("f0_WaasKirf.dat"), runtime_error);
+  CHECK_THROWS_AS(datapath("NaCl.cif"), runtime_error);
+  string td = prepend_testdata_dir("");
+  setRuntime(td.c_str());
+  string fnacl = prepend_testdata_dir("NaCl.cif");
+  CHECK(fnacl == datapath("NaCl.cif"));
+}
 
 // End of file

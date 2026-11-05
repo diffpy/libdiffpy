@@ -27,11 +27,11 @@ message(STATUS "libdiffpy version ${LIBDIFFPY_VERSION_STR}")
 # Options ---------------------------------------------------------------------
 
 option(LIBDIFFPY_ENABLE_OBJCRYST "Build with the ObjCryst structure adapter" ON)
-option(LIBDIFFPY_BUILD_TESTS "Build the CxxTest unit tests" OFF)
+option(LIBDIFFPY_BUILD_TESTS "Build the Catch2 unit tests" OFF)
 option(LIBDIFFPY_TEST_INSTALLED
   "Build only the unit tests and link them with the installed libdiffpy" OFF)
 set(LIBDIFFPY_TESTS "" CACHE STRING
-  "Comma or space separated patterns selecting the unit test suites")
+  "Comma or space separated patterns selecting the Test*.cpp unit test files")
 option(LIBDIFFPY_COVERAGE "Instrument the build for coverage analysis" OFF)
 option(LIBDIFFPY_PROFILE "Build with gprof profiling information" OFF)
 

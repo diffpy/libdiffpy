@@ -12,11 +12,11 @@
  *
  ******************************************************************************
  *
- * class TestPQEvaluator -- unit tests for the PairQuantity evaluator class
+ * TestPQEvaluator -- unit tests for the PairQuantity evaluator class
  *
  *****************************************************************************/
 
-#include <cxxtest/TestSuite.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -46,11 +46,11 @@ class BadPairCounter : public PairCounter {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-// class TestPQEvaluator
+// TestPQEvaluator
 //////////////////////////////////////////////////////////////////////////////
 
-class TestPQEvaluator : public CxxTest::TestSuite {
- private:
+class TestPQEvaluatorFixture {
+ protected:
   // data
   EpsilonEqual allclose;
   PDFCalculator mpdfcb;
@@ -74,7 +74,7 @@ class TestPQEvaluator : public CxxTest::TestSuite {
   }
 
  public:
-  void setUp() {
+  TestPQEvaluatorFixture() {
     // setup PDFCalculator instances and the zero vector for comparison
     mpdfcb.setEvaluatorType(BASIC);
     mpdfco.setEvaluatorType(OPTIMIZED);
@@ -97,168 +97,181 @@ class TestPQEvaluator : public CxxTest::TestSuite {
     mstru9 = std::make_shared<AtomicStructureAdapter>(*mstru10);
     mstru9->erase(9);
   }
+};  // class TestPQEvaluatorFixture
 
-  void test_initial_evaluator_type_used() {
-    PDFCalculator pdfc;
-    TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
-    pdfc.setEvaluatorType(OPTIMIZED);
-    TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
-    pdfc.setEvaluatorType(CHECK);
-    TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
-    pdfc.setEvaluatorType(BASIC);
-    TS_ASSERT_EQUALS(NONE, pdfc.getEvaluatorTypeUsed());
-  }
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_initial_evaluator_type_used",
+                 "[PQEvaluator]") {
+  PDFCalculator pdfc;
+  CHECK(NONE == pdfc.getEvaluatorTypeUsed());
+  pdfc.setEvaluatorType(OPTIMIZED);
+  CHECK(NONE == pdfc.getEvaluatorTypeUsed());
+  pdfc.setEvaluatorType(CHECK);
+  CHECK(NONE == pdfc.getEvaluatorTypeUsed());
+  pdfc.setEvaluatorType(BASIC);
+  CHECK(NONE == pdfc.getEvaluatorTypeUsed());
+}
 
-  void test_PDF_change_atom() {
-    using std::placeholders::_1;
-    TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorType());
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorType());
-    TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(mstru10));
-    // first call of mpdfco should use the BASIC evaluation
-    TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorTypeUsed());
-    TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
-    // verify there are some non-zero values in the PDF.
-    QuantityType gb = mpdfcb.getPDF();
-    TS_ASSERT(!gb.empty());
-    int cnonzero =
-      count_if(gb.begin(), gb.end(), bind(not_equal_to<double>(), _1, 0.0));
-    TS_ASSERT(cnonzero);
-    // test second call on the same structure
-    mpdfco.eval(mstru10);
-    TS_ASSERT_EQUALS(gb, mpdfco.getPDF());
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-    // test structure with one different atom
-    TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru10d1)));
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-    QuantityType gb1 = mpdfcb.getPDF();
-    TS_ASSERT(!allclose(gb, gb1));
-    // change position of 1 atom
-    mstru10d1->at(0).xyz_cartn[1] = 0.5;
-    TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru10d1)));
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-    QuantityType gb2 = mpdfcb.getPDF();
-    TS_ASSERT(!allclose(gb1, gb2));
-  }
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_PDF_change_atom", "[PQEvaluator]") {
+  using std::placeholders::_1;
+  CHECK(BASIC == mpdfcb.getEvaluatorType());
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorType());
+  CHECK(mzeros == this->pdfcdiff(mstru10));
+  // first call of mpdfco should use the BASIC evaluation
+  CHECK(BASIC == mpdfcb.getEvaluatorTypeUsed());
+  CHECK(BASIC == mpdfco.getEvaluatorTypeUsed());
+  // verify there are some non-zero values in the PDF.
+  QuantityType gb = mpdfcb.getPDF();
+  CHECK(!gb.empty());
+  int cnonzero =
+    count_if(gb.begin(), gb.end(), bind(not_equal_to<double>(), _1, 0.0));
+  CHECK(cnonzero);
+  // test second call on the same structure
+  mpdfco.eval(mstru10);
+  CHECK(gb == mpdfco.getPDF());
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  // test structure with one different atom
+  CHECK(allclose(mzeros, this->pdfcdiff(mstru10d1)));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  QuantityType gb1 = mpdfcb.getPDF();
+  CHECK(!allclose(gb, gb1));
+  // change position of 1 atom
+  mstru10d1->at(0).xyz_cartn[1] = 0.5;
+  CHECK(allclose(mzeros, this->pdfcdiff(mstru10d1)));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  QuantityType gb2 = mpdfcb.getPDF();
+  CHECK(!allclose(gb1, gb2));
+}
 
-  void test_PDF_reverse_atoms() {
-    mpdfco.eval(mstru10);
-    TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru10r)));
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-  }
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_PDF_reverse_atoms", "[PQEvaluator]") {
+  mpdfco.eval(mstru10);
+  CHECK(allclose(mzeros, this->pdfcdiff(mstru10r)));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+}
 
-  void test_PDF_remove_atom() {
-    mpdfco.eval(mstru10);
-    TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru9)));
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-  }
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_PDF_remove_atom", "[PQEvaluator]") {
+  mpdfco.eval(mstru10);
+  CHECK(allclose(mzeros, this->pdfcdiff(mstru9)));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+}
 
-  void test_PDF_type_mask() {
-    mpdfcb.setTypeMask("O2-", "all", false);
-    mpdfco.setTypeMask("O2-", "all", false);
-    PeriodicStructureAdapterPtr litao =
-      std::dynamic_pointer_cast<PeriodicStructureAdapter>(
-        loadTestPeriodicStructure("LiTaO3.stru"));
-    TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(litao));
-    TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
-    QuantityType gb0 = mpdfcb.getPDF();
-    // change masked-away oxygen
-    Atom& o29 = litao->at(29);
-    TS_ASSERT_EQUALS("O2-", o29.atomtype);
-    o29.xyz_cartn = R3::Vector(0.1, 0.2, 0.3);
-    TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(litao));
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-    QuantityType gb1 = mpdfcb.getPDF();
-    TS_ASSERT_EQUALS(gb0, gb1);
-    // change active lithium
-    Atom& li0 = litao->at(0);
-    li0.occupancy = 0.1;
-    TS_ASSERT(allclose(mzeros, this->pdfcdiff(litao)));
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-    QuantityType gb2 = mpdfcb.getPDF();
-    TS_ASSERT(!allclose(gb0, gb2));
-  }
+TEST_CASE_METHOD(TestPQEvaluatorFixture, "TestPQEvaluator::test_PDF_type_mask",
+                 "[PQEvaluator]") {
+  mpdfcb.setTypeMask("O2-", "all", false);
+  mpdfco.setTypeMask("O2-", "all", false);
+  PeriodicStructureAdapterPtr litao =
+    std::dynamic_pointer_cast<PeriodicStructureAdapter>(
+      loadTestPeriodicStructure("LiTaO3.stru"));
+  CHECK(mzeros == this->pdfcdiff(litao));
+  CHECK(BASIC == mpdfco.getEvaluatorTypeUsed());
+  QuantityType gb0 = mpdfcb.getPDF();
+  // change masked-away oxygen
+  Atom& o29 = litao->at(29);
+  CHECK("O2-" == o29.atomtype);
+  o29.xyz_cartn = R3::Vector(0.1, 0.2, 0.3);
+  CHECK(mzeros == this->pdfcdiff(litao));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  QuantityType gb1 = mpdfcb.getPDF();
+  CHECK(gb0 == gb1);
+  // change active lithium
+  Atom& li0 = litao->at(0);
+  li0.occupancy = 0.1;
+  CHECK(allclose(mzeros, this->pdfcdiff(litao)));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  QuantityType gb2 = mpdfcb.getPDF();
+  CHECK(!allclose(gb0, gb2));
+}
 
-  void test_PDF_pair_mask() {
-    mpdfcb.setPairMask(0, 3, false);
-    mpdfco.setPairMask(0, 3, false);
-    TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(mstru10));
-    TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
-    QuantityType gb0 = mpdfcb.getPDF();
-    // check structure with one changed atom
-    TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru10d1)));
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-    QuantityType gb1 = mpdfcb.getPDF();
-    TS_ASSERT(!allclose(gb0, gb1));
-    // check structure with one removed atom
-    TS_ASSERT(allclose(mzeros, this->pdfcdiff(mstru9)));
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-    QuantityType gb2 = mpdfcb.getPDF();
-    TS_ASSERT(!allclose(gb1, gb2));
-    // check full evaluation for structure with reversed atoms
-    mpdfco.eval(mstru10);
-    TS_ASSERT_EQUALS(mzeros, this->pdfcdiff(mstru10r));
-    TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
-    QuantityType gb3 = mpdfcb.getPDF();
-    TS_ASSERT(allclose(gb0, gb3));
-    // check effect of pair mask updates
-    mpdfco.eval(mstru10r);
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-    mpdfco.setPairMask(0, 3, false);
-    mpdfco.eval(mstru10r);
-    TS_ASSERT_EQUALS(OPTIMIZED, mpdfco.getEvaluatorTypeUsed());
-    mpdfco.setPairMask(0, 3, true);
-    mpdfco.eval(mstru10r);
-    TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
-  }
+TEST_CASE_METHOD(TestPQEvaluatorFixture, "TestPQEvaluator::test_PDF_pair_mask",
+                 "[PQEvaluator]") {
+  mpdfcb.setPairMask(0, 3, false);
+  mpdfco.setPairMask(0, 3, false);
+  CHECK(mzeros == this->pdfcdiff(mstru10));
+  CHECK(BASIC == mpdfco.getEvaluatorTypeUsed());
+  QuantityType gb0 = mpdfcb.getPDF();
+  // check structure with one changed atom
+  CHECK(allclose(mzeros, this->pdfcdiff(mstru10d1)));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  QuantityType gb1 = mpdfcb.getPDF();
+  CHECK(!allclose(gb0, gb1));
+  // check structure with one removed atom
+  CHECK(allclose(mzeros, this->pdfcdiff(mstru9)));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  QuantityType gb2 = mpdfcb.getPDF();
+  CHECK(!allclose(gb1, gb2));
+  // check full evaluation for structure with reversed atoms
+  mpdfco.eval(mstru10);
+  CHECK(mzeros == this->pdfcdiff(mstru10r));
+  CHECK(BASIC == mpdfco.getEvaluatorTypeUsed());
+  QuantityType gb3 = mpdfcb.getPDF();
+  CHECK(allclose(gb0, gb3));
+  // check effect of pair mask updates
+  mpdfco.eval(mstru10r);
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  mpdfco.setPairMask(0, 3, false);
+  mpdfco.eval(mstru10r);
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  mpdfco.setPairMask(0, 3, true);
+  mpdfco.eval(mstru10r);
+  CHECK(BASIC == mpdfco.getEvaluatorTypeUsed());
+}
 
-  void test_optimized_supported() {
-    mpdfcb.eval(mstru10);
-    TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorTypeUsed());
-    mpdfcb.setEvaluatorType(OPTIMIZED);
-    TS_ASSERT_EQUALS(BASIC, mpdfcb.getEvaluatorTypeUsed());
-  }
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_optimized_supported", "[PQEvaluator]") {
+  mpdfcb.eval(mstru10);
+  CHECK(BASIC == mpdfcb.getEvaluatorTypeUsed());
+  mpdfcb.setEvaluatorType(OPTIMIZED);
+  CHECK(BASIC == mpdfcb.getEvaluatorTypeUsed());
+}
 
-  void test_optimized_unsupported() {
-    OverlapCalculator olc;
-    TS_ASSERT_EQUALS(BASIC, olc.getEvaluatorType());
-    TS_ASSERT_THROWS(olc.setEvaluatorType(OPTIMIZED), invalid_argument);
-    TS_ASSERT_EQUALS(BASIC, olc.getEvaluatorType());
-  }
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_optimized_unsupported",
+                 "[PQEvaluator]") {
+  OverlapCalculator olc;
+  CHECK(BASIC == olc.getEvaluatorType());
+  CHECK_THROWS_AS(olc.setEvaluatorType(OPTIMIZED), invalid_argument);
+  CHECK(BASIC == olc.getEvaluatorType());
+}
 
-  void test_checkevaluator_unsupported() {
-    OverlapCalculator olc;
-    TS_ASSERT_EQUALS(BASIC, olc.getEvaluatorType());
-    TS_ASSERT_THROWS(olc.setEvaluatorType(CHECK), invalid_argument);
-    TS_ASSERT_EQUALS(BASIC, olc.getEvaluatorType());
-  }
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_checkevaluator_unsupported",
+                 "[PQEvaluator]") {
+  OverlapCalculator olc;
+  CHECK(BASIC == olc.getEvaluatorType());
+  CHECK_THROWS_AS(olc.setEvaluatorType(CHECK), invalid_argument);
+  CHECK(BASIC == olc.getEvaluatorType());
+}
 
-  void test_checkevaluator_passes() {
-    mpdfco.setEvaluatorType(CHECK);
-    TS_ASSERT_EQUALS(CHECK, mpdfco.getEvaluatorType());
-    mpdfco.eval(mstru10);
-    TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
-    mpdfco.eval(mstru10);
-    TS_ASSERT_EQUALS(CHECK, mpdfco.getEvaluatorTypeUsed());
-    mpdfco.eval(mstru9);
-    TS_ASSERT_EQUALS(CHECK, mpdfco.getEvaluatorTypeUsed());
-    mpdfco.eval(emptyStructureAdapter());
-    TS_ASSERT_EQUALS(BASIC, mpdfco.getEvaluatorTypeUsed());
-  }
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_checkevaluator_passes",
+                 "[PQEvaluator]") {
+  mpdfco.setEvaluatorType(CHECK);
+  CHECK(CHECK == mpdfco.getEvaluatorType());
+  mpdfco.eval(mstru10);
+  CHECK(BASIC == mpdfco.getEvaluatorTypeUsed());
+  mpdfco.eval(mstru10);
+  CHECK(CHECK == mpdfco.getEvaluatorTypeUsed());
+  mpdfco.eval(mstru9);
+  CHECK(CHECK == mpdfco.getEvaluatorTypeUsed());
+  mpdfco.eval(emptyStructureAdapter());
+  CHECK(BASIC == mpdfco.getEvaluatorTypeUsed());
+}
 
-  void test_checkevaluator_fails() {
-    BadPairCounter badcounter;
-    badcounter.setEvaluatorType(CHECK);
-    TS_ASSERT_EQUALS(45, badcounter(mstru10));
-    TS_ASSERT_EQUALS(BASIC, badcounter.getEvaluatorTypeUsed());
-    TS_ASSERT_THROWS(badcounter(mstru10), logic_error);
-    TS_ASSERT_EQUALS(CHECK, badcounter.getEvaluatorTypeUsed());
-  }
-
-};  // class TestPQEvaluator
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_checkevaluator_fails",
+                 "[PQEvaluator]") {
+  BadPairCounter badcounter;
+  badcounter.setEvaluatorType(CHECK);
+  CHECK(45 == badcounter(mstru10));
+  CHECK(BASIC == badcounter.getEvaluatorTypeUsed());
+  CHECK_THROWS_AS(badcounter(mstru10), logic_error);
+  CHECK(CHECK == badcounter.getEvaluatorTypeUsed());
+}
 
 }  // namespace srreal
 }  // namespace diffpy
-
-using diffpy::srreal::TestPQEvaluator;
 
 // End of file

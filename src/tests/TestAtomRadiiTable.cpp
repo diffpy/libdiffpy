@@ -12,12 +12,12 @@
  *
  ******************************************************************************
  *
- * class TestAtomRadiiTable -- unit tests for the AtomRadiiTable class
+ * TestAtomRadiiTable -- unit tests for the AtomRadiiTable class
  *
  *****************************************************************************/
 
 #include <stdexcept>
-#include <cxxtest/TestSuite.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "serialization_helpers.hpp"
 #include <diffpy/srreal/AtomRadiiTable.hpp>
@@ -26,82 +26,94 @@
 using namespace std;
 using namespace diffpy::srreal;
 
-class TestAtomRadiiTable : public CxxTest::TestSuite {
- private:
+class TestAtomRadiiTableFixture {
+ protected:
   AtomRadiiTablePtr mrtb;
 
  public:
-  void setUp() { mrtb = AtomRadiiTable::createByType("constant"); }
-
-  void test_lookup() { TS_ASSERT_EQUALS(0.0, mrtb->lookup("everything")); }
-
-  void test_setCustom() {
-    mrtb->setCustom("C", 1.23);
-    TS_ASSERT_EQUALS(1.23, mrtb->lookup("C"));
-    mrtb->setCustom("C", 1.5);
-    TS_ASSERT_EQUALS(1.5, mrtb->lookup("C"));
-    mrtb->resetAll();
-    TS_ASSERT_EQUALS(0.0, mrtb->lookup("C"));
+  TestAtomRadiiTableFixture() {
+    mrtb = AtomRadiiTable::createByType("constant");
   }
+};  // class TestAtomRadiiTableFixture
 
-  void test_fromString() {
-    TS_ASSERT_EQUALS(0u, mrtb->getAllCustom().size());
-    mrtb->fromString("A:1.1, B:1.2,    C:  1.3  \t");
-    TS_ASSERT_EQUALS(3u, mrtb->getAllCustom().size());
-    TS_ASSERT_EQUALS(1.1, mrtb->lookup("A"));
-    TS_ASSERT_EQUALS(1.2, mrtb->lookup("B"));
-    TS_ASSERT_EQUALS(1.3, mrtb->lookup("C"));
-    TS_ASSERT_THROWS(mrtb->fromString("X12"), invalid_argument);
-    TS_ASSERT_EQUALS(3u, mrtb->getAllCustom().size());
-    mrtb->fromString("D:4.3");
-    TS_ASSERT_EQUALS(4.3, mrtb->lookup("D"));
-    TS_ASSERT_EQUALS(4u, mrtb->getAllCustom().size());
-  }
+TEST_CASE_METHOD(TestAtomRadiiTableFixture, "TestAtomRadiiTable::test_lookup",
+                 "[AtomRadiiTable]") {
+  CHECK(0.0 == mrtb->lookup("everything"));
+}
 
-  void test_resetCustom() {
-    mrtb->fromString("A:1.1, B:1.2,    C:  1.3");
-    TS_ASSERT_EQUALS(3u, mrtb->getAllCustom().size());
-    mrtb->resetCustom("B");
-    TS_ASSERT_EQUALS(1.1, mrtb->lookup("A"));
-    TS_ASSERT_EQUALS(1.3, mrtb->lookup("C"));
-  }
+TEST_CASE_METHOD(TestAtomRadiiTableFixture,
+                 "TestAtomRadiiTable::test_setCustom", "[AtomRadiiTable]") {
+  mrtb->setCustom("C", 1.23);
+  CHECK(1.23 == mrtb->lookup("C"));
+  mrtb->setCustom("C", 1.5);
+  CHECK(1.5 == mrtb->lookup("C"));
+  mrtb->resetAll();
+  CHECK(0.0 == mrtb->lookup("C"));
+}
 
-  void test_resetAll() {
-    mrtb->fromString("A:1.1, B:1.2,    C:  1.3");
-    TS_ASSERT_EQUALS(3u, mrtb->getAllCustom().size());
-    mrtb->resetAll();
-    TS_ASSERT(mrtb->getAllCustom().empty());
-  }
+TEST_CASE_METHOD(TestAtomRadiiTableFixture,
+                 "TestAtomRadiiTable::test_fromString", "[AtomRadiiTable]") {
+  CHECK(0u == mrtb->getAllCustom().size());
+  mrtb->fromString("A:1.1, B:1.2,    C:  1.3  \t");
+  CHECK(3u == mrtb->getAllCustom().size());
+  CHECK(1.1 == mrtb->lookup("A"));
+  CHECK(1.2 == mrtb->lookup("B"));
+  CHECK(1.3 == mrtb->lookup("C"));
+  CHECK_THROWS_AS(mrtb->fromString("X12"), invalid_argument);
+  CHECK(3u == mrtb->getAllCustom().size());
+  mrtb->fromString("D:4.3");
+  CHECK(4.3 == mrtb->lookup("D"));
+  CHECK(4u == mrtb->getAllCustom().size());
+}
 
-  void test_toString() {
-    TS_ASSERT(mrtb->toString().empty());
-    mrtb->fromString("A:1.1,    C:  1.3, B:1.2");
-    TS_ASSERT_EQUALS(string("A:1.1,B:1.2,C:1.3"), mrtb->toString());
-    TS_ASSERT_EQUALS(string("A:1.1, B:1.2, C:1.3"), mrtb->toString(", "));
-    mrtb->resetAll();
-    TS_ASSERT(mrtb->toString().empty());
-  }
+TEST_CASE_METHOD(TestAtomRadiiTableFixture,
+                 "TestAtomRadiiTable::test_resetCustom", "[AtomRadiiTable]") {
+  mrtb->fromString("A:1.1, B:1.2,    C:  1.3");
+  CHECK(3u == mrtb->getAllCustom().size());
+  mrtb->resetCustom("B");
+  CHECK(1.1 == mrtb->lookup("A"));
+  CHECK(1.3 == mrtb->lookup("C"));
+}
 
-  void test_setDefault() {
-    ConstantRadiiTable* crtb = dynamic_cast<ConstantRadiiTable*>(mrtb.get());
-    crtb->setDefault(7.1);
-    TS_ASSERT_EQUALS(7.1, mrtb->lookup("everything"));
-    crtb->setDefault(3.1);
-    TS_ASSERT_EQUALS(3.1, mrtb->lookup("Na"));
-  }
+TEST_CASE_METHOD(TestAtomRadiiTableFixture, "TestAtomRadiiTable::test_resetAll",
+                 "[AtomRadiiTable]") {
+  mrtb->fromString("A:1.1, B:1.2,    C:  1.3");
+  CHECK(3u == mrtb->getAllCustom().size());
+  mrtb->resetAll();
+  CHECK(mrtb->getAllCustom().empty());
+}
 
-  void test_serialization() {
-    AtomRadiiTablePtr rtb1;
-    mrtb->setCustom("H", 1.23);
-    ConstantRadiiTable* crtb = dynamic_cast<ConstantRadiiTable*>(mrtb.get());
-    crtb->setDefault(0.5);
-    rtb1 = dumpandload(mrtb);
-    TS_ASSERT_EQUALS(1.23, rtb1->lookup("H"));
-    TS_ASSERT_EQUALS(1u, rtb1->getAllCustom().size());
-    TS_ASSERT_DIFFERS(mrtb.get(), rtb1.get());
-    ConstantRadiiTable* crtb1 = dynamic_cast<ConstantRadiiTable*>(rtb1.get());
-    TS_ASSERT_EQUALS(0.5, crtb1->getDefault());
-  }
-};
+TEST_CASE_METHOD(TestAtomRadiiTableFixture, "TestAtomRadiiTable::test_toString",
+                 "[AtomRadiiTable]") {
+  CHECK(mrtb->toString().empty());
+  mrtb->fromString("A:1.1,    C:  1.3, B:1.2");
+  CHECK(string("A:1.1,B:1.2,C:1.3") == mrtb->toString());
+  CHECK(string("A:1.1, B:1.2, C:1.3") == mrtb->toString(", "));
+  mrtb->resetAll();
+  CHECK(mrtb->toString().empty());
+}
+
+TEST_CASE_METHOD(TestAtomRadiiTableFixture,
+                 "TestAtomRadiiTable::test_setDefault", "[AtomRadiiTable]") {
+  ConstantRadiiTable* crtb = dynamic_cast<ConstantRadiiTable*>(mrtb.get());
+  crtb->setDefault(7.1);
+  CHECK(7.1 == mrtb->lookup("everything"));
+  crtb->setDefault(3.1);
+  CHECK(3.1 == mrtb->lookup("Na"));
+}
+
+TEST_CASE_METHOD(TestAtomRadiiTableFixture,
+                 "TestAtomRadiiTable::test_serialization", "[AtomRadiiTable]") {
+  AtomRadiiTablePtr rtb1;
+  mrtb->setCustom("H", 1.23);
+  ConstantRadiiTable* crtb = dynamic_cast<ConstantRadiiTable*>(mrtb.get());
+  crtb->setDefault(0.5);
+  rtb1 = dumpandload(mrtb);
+  CHECK(1.23 == rtb1->lookup("H"));
+  CHECK(1u == rtb1->getAllCustom().size());
+  CHECK(mrtb.get() != rtb1.get());
+  ConstantRadiiTable* crtb1 = dynamic_cast<ConstantRadiiTable*>(rtb1.get());
+  CHECK(0.5 == crtb1->getDefault());
+}
 
 // End of file
