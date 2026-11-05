@@ -23,5 +23,6 @@
 #include <ObjCryst/ObjCryst/Crystal.h>
 
 ObjCryst::Crystal* loadTestCrystal(const std::string& tailname);
+const ObjCryst::Crystal& cachedTestCrystal(const std::string& tailname);
 
 #endif  // OBJCRYST_HELPERS_HPP_INCLUDED

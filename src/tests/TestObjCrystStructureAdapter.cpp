@@ -86,22 +86,12 @@ Molecule* makeC60Molecule();
 
 class TestObjCrystStructureAdapterFixture {
  protected:
-  unique_ptr<Crystal> mcryst_ni;
-  StructureAdapterPtr m_ni;
-  unique_ptr<Crystal> mcryst_kbise;
-  StructureAdapterPtr m_kbise;
-  unique_ptr<Crystal> mcryst_catio3;
-  StructureAdapterPtr m_catio3;
-
- public:
-  TestObjCrystStructureAdapterFixture() {
-    mcryst_ni.reset(loadTestCrystal("Ni.cif"));
-    m_ni = createStructureAdapter(*mcryst_ni);
-    mcryst_kbise.reset(loadTestCrystal("alpha_K2Bi8Se13.cif"));
-    m_kbise = createStructureAdapter(*mcryst_kbise);
-    mcryst_catio3.reset(loadTestCrystal("CaTiO3.cif"));
-    m_catio3 = createStructureAdapter(*mcryst_catio3);
-  }
+  StructureAdapterPtr m_ni =
+    createStructureAdapter(cachedTestCrystal("Ni.cif"));
+  StructureAdapterPtr m_kbise =
+    createStructureAdapter(cachedTestCrystal("alpha_K2Bi8Se13.cif"));
+  StructureAdapterPtr m_catio3 =
+    createStructureAdapter(cachedTestCrystal("CaTiO3.cif"));
 };  // class TestObjCrystStructureAdapterFixture
 
 TEST_CASE_METHOD(TestObjCrystStructureAdapterFixture,
@@ -291,16 +281,9 @@ TEST_CASE_METHOD(TestObjCrystStructureAdapterFixture,
 
 class TestObjCrystStructureBondGeneratorFixture {
  protected:
-  unique_ptr<Crystal> mcryst_ni;
-  StructureAdapterPtr m_ni;
-  BaseBondGeneratorPtr m_nibnds;
-
- public:
-  TestObjCrystStructureBondGeneratorFixture() {
-    mcryst_ni.reset(loadTestCrystal("Ni.cif"));
-    m_ni = createStructureAdapter(*mcryst_ni);
-    m_nibnds = m_ni->createBondGenerator();
-  }
+  StructureAdapterPtr m_ni =
+    createStructureAdapter(cachedTestCrystal("Ni.cif"));
+  BaseBondGeneratorPtr m_nibnds = m_ni->createBondGenerator();
 };  // class TestObjCrystStructureBondGeneratorFixture
 
 TEST_CASE_METHOD(TestObjCrystStructureBondGeneratorFixture,

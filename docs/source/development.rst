@@ -64,7 +64,11 @@ separated by commas ::
         cmake --build --preset debug --target check
 
 Set ``LIBDIFFPY_TESTS`` to an empty string to build all suites again.
-To run a subset of already built tests, use ``ctest --preset debug -R Lattice``.
+CTest runs all built cases in one process. To run a single case or a group
+of cases, pass its name or tag to the Catch2 executable ::
+
+        build/debug/bin/alltests "TestLattice::test_angle"
+        build/debug/bin/alltests "[Lattice]"
 
 To run the tests against the installed library instead of the one in the
 ``build`` directory, configure a separate directory with

@@ -36,33 +36,27 @@ using namespace diffpy::srreal;
 
 class TestBVSObjCrystFixture {
  protected:
-  unique_ptr<ObjCryst::Crystal> mnacl;
-  unique_ptr<BVSCalculator> mbvc;
-
- public:
-  TestBVSObjCrystFixture() {
-    mnacl.reset(loadTestCrystal("NaCl.cif"));
-    mbvc.reset(new BVSCalculator);
-  }
+  const ObjCryst::Crystal& mnacl = cachedTestCrystal("NaCl.cif");
+  BVSCalculator mbvc;
 };  // class TestBVSObjCrystFixture
 
 TEST_CASE_METHOD(TestBVSObjCrystFixture, "TestBVSObjCryst::test_NaCl",
                  "[BVSObjCryst]") {
   const double eps = 1e-4;
-  mbvc->eval(*mnacl);
-  CHECK(2u == mbvc->value().size());
-  CHECK_THAT(+1.01352, WithinAbs(mbvc->value()[0], eps));
-  CHECK_THAT(-1.01352, WithinAbs(mbvc->value()[1], eps));
+  mbvc.eval(mnacl);
+  CHECK(2u == mbvc.value().size());
+  CHECK_THAT(+1.01352, WithinAbs(mbvc.value()[0], eps));
+  CHECK_THAT(-1.01352, WithinAbs(mbvc.value()[1], eps));
 }
 
 TEST_CASE_METHOD(TestBVSObjCrystFixture, "TestBVSObjCryst::test_NaCl_mixed",
                  "[BVSObjCryst]") {
   unique_ptr<ObjCryst::Crystal> nacl_mixed;
   nacl_mixed.reset(loadTestCrystal("NaCl_mixed.cif"));
-  mbvc->eval(*mnacl);
+  mbvc.eval(mnacl);
   BVSCalculator bvc;
   bvc.eval(*nacl_mixed);
-  CHECK_THAT(mbvc->bvrmsdiff(), WithinAbs(bvc.bvrmsdiff(), 1e-12));
+  CHECK_THAT(mbvc.bvrmsdiff(), WithinAbs(bvc.bvrmsdiff(), 1e-12));
 }
 
 // End of file

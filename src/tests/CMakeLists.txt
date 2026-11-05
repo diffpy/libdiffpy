@@ -1,11 +1,9 @@
 # Unit tests with the Catch2 framework.
 #
-# The Test*.cpp files are compiled into the "alltests" program.  CTest runs
-# each of its test cases as a separate test.
+# CTest runs the Test*.cpp suites together in the "alltests" program.
 
 find_package(Catch2 3.5 CONFIG REQUIRED)
 message(STATUS "Using Catch2 ${Catch2_VERSION} from ${Catch2_DIR}")
-include(Catch)
 
 # Select the test suites -----------------------------------------------------
 
@@ -54,16 +52,11 @@ target_link_libraries(alltests PRIVATE libdiffpy::diffpy Catch2::Catch2WithMain)
 set_property(SOURCE test_helpers.cpp APPEND PROPERTY COMPILE_DEFINITIONS
   "DIFFPYTESTSDIRPATH=${CMAKE_CURRENT_SOURCE_DIR}")
 
-# Register every test case with CTest.  PRE_TEST lists the test cases when
-# CTest runs, so that a build does not need to run the test program.
-set(_discover_options)
+add_test(NAME alltests COMMAND alltests)
 if(WIN32 AND LIBDIFFPY_TEST_INSTALLED)
-  # Add the installed DLL directory to PATH during test discovery and execution.
-  set(_discover_options DL_PATHS "$<TARGET_FILE_DIR:libdiffpy::diffpy>")
+  set_tests_properties(alltests PROPERTIES ENVIRONMENT_MODIFICATION
+    "PATH=path_list_prepend:$<TARGET_FILE_DIR:libdiffpy::diffpy>")
 endif()
-catch_discover_tests(alltests
-  DISCOVERY_MODE PRE_TEST
-  ${_discover_options})
 
 # check -- build and run the unit tests.
 add_custom_target(check
