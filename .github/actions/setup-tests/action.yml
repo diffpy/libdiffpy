@@ -7,13 +7,6 @@ runs:
       shell: bash
       run: git fetch --tags https://github.com/diffpy/libdiffpy.git
 
-    - name: Check out CxxTest 4.4
-      uses: actions/checkout@v6
-      with:
-        repository: CxxTest/cxxtest
-        ref: 191adddb3876ab389c0c856e1c03874bf70f8ee4
-        path: build/cxxtest
-
     - name: Prepare C++ test configuration
       shell: python {0}
       run: |

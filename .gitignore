@@ -19,11 +19,8 @@ __pycache__/
 *.la
 *.a
 
-# SCons build files
-.sconf_temp/
-.sconsign.dblite
-/sconscript.local
-/sconsvars.py
+# CMake user settings
+/CMakeUserPresets.json
 .gdb_history
 tags
 

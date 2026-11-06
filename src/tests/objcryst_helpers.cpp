@@ -16,9 +16,10 @@
  *
  *****************************************************************************/
 
-#include <iostream>
 #include <fstream>
-#include <sstream>
+#include <map>
+#include <memory>
+#include <stdexcept>
 
 #include <ObjCryst/ObjCryst/CIF.h>
 
@@ -29,20 +30,33 @@ using namespace std;
 
 namespace {
 
-void NoMessages(const string&) {}
+struct QuietObjCryst {
+  decltype(ObjCryst::fpObjCrystInformUser) saved =
+    ObjCryst::fpObjCrystInformUser;
+  QuietObjCryst() {
+    ObjCryst::fpObjCrystInformUser = [](const string&) {};
+  }
+  ~QuietObjCryst() { ObjCryst::fpObjCrystInformUser = saved; }
+};
 
 }  // namespace
 
 ObjCryst::Crystal* loadTestCrystal(const string& tailname) {
   string fp = prepend_testdata_dir(tailname);
   ifstream in(fp.c_str());
-  // suppress the chatty output from CreateCrystalFromCIF
-  void (*OCMessages)(const string&) = ObjCryst::fpObjCrystInformUser;
-  ObjCryst::fpObjCrystInformUser = NoMessages;
+  if (!in) throw runtime_error("Cannot open " + fp);
+  QuietObjCryst quiet;
   ObjCryst::CIF cif(in);
   ObjCryst::Crystal* crst = ObjCryst::CreateCrystalFromCIF(cif, false);
-  ObjCryst::fpObjCrystInformUser = OCMessages;
+  if (!crst) throw runtime_error("No crystal structure in " + fp);
   return crst;
+}
+
+const ObjCryst::Crystal& cachedTestCrystal(const string& tailname) {
+  static map<string, unique_ptr<ObjCryst::Crystal>> crystals;
+  auto& crystal = crystals[tailname];
+  if (!crystal) crystal.reset(loadTestCrystal(tailname));
+  return *crystal;
 }
 
 // End of file

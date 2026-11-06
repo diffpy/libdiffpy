@@ -100,9 +100,16 @@ dependencies listed in the ``requirements`` folder ::
 
 Then build and install libdiffpy into the active conda environment ::
 
-        scons -j4 install
+        cmake --preset release
+        cmake --build --preset release --parallel 4
+        cmake --install build/release
 
-See the output from ``scons --help`` for the available build targets and options.
+The presets use Ninja and require CMake 3.22 or later. To choose the
+installation directory, pass ``-DCMAKE_INSTALL_PREFIX=<prefix>`` when
+configuring. Other CMake projects can use the installed library with ::
+
+        find_package(libdiffpy REQUIRED)
+        target_link_libraries(myprogram PRIVATE libdiffpy::diffpy)
 
 Getting Started
 ---------------
@@ -115,19 +122,18 @@ Support and Contribute
 If you see a bug or want to request a feature, please `report it as an issue <https://github.com/diffpy/libdiffpy/issues>`_ and/or `submit a fix as a PR <https://github.com/diffpy/libdiffpy/pulls>`_.
 
 Feel free to fork the project and contribute. When developing it is
-preferable to compile with the ``build=develop`` option, which compiles the
+preferable to compile with the ``debug`` preset, which compiles the
 library without optimizations and with C-assertions checks ::
 
-        scons -j4 build=develop
+        cmake --preset debug
+        cmake --build --preset debug --parallel 4
 
 The library integrity can be verified by executing the unit tests ::
 
-        scons -j4 test
+        ctest --preset debug
 
-The build script checks for a presence of ``sconsvars.py`` file, which
-can be used to permanently set the ``build`` variable. The SCons
-construction environment can be further customized in a ``sconscript.local``
-script.
+To keep local build settings, add a preset to ``CMakeUserPresets.json``
+in the repository root.
 
 See also the `development guide <docs/source/development.rst>`_ for build variants, running a subset of
 the unit tests, coverage analysis and testing changes with diffpy.srreal.

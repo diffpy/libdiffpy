@@ -13,6 +13,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -23,14 +24,18 @@ from pathlib import Path
 # sys.path.insert(0, str(Path(".").resolve()))
 sys.path.insert(0, str(Path("../..").resolve()))
 sys.path.insert(0, str(Path("../../src").resolve()))
-sys.path.insert(0, str(Path("../../site_scons").resolve()))
 
 # libdiffpy is a C++ library, so take the version from git tags through
-# the SCons build utilities rather than from installed Python metadata.
+# the CMake version script rather than from installed Python metadata.
 try:
-    from libdiffpybuildutils import getversion
-
-    fullversion = getversion()["version"]
+    versionscript = Path(__file__).resolve().parents[2] / "cmake"
+    versionscript /= "LibdiffpyVersion.cmake"
+    fullversion = subprocess.run(
+        ["cmake", "-P", str(versionscript)],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
 except Exception:
     fullversion = "No version found. The correct version will appear in the released version."  # noqa: E501
 

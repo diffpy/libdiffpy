@@ -9,10 +9,9 @@ ci:
   autoupdate_schedule: monthly
   skip: [no-commit-to-branch]
   submodules: false
-# Leave the vendored CxxTest SCons tool and the data tables untouched.
+# Leave the data tables untouched.
 exclude: |
   (?x)^(
-    site_scons/site_tools/cxxtest\.py|
     .*\.(cif|dat)
   )$
 repos:

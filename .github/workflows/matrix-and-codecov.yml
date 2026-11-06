@@ -27,19 +27,21 @@ jobs:
         include:
           - os: ubuntu-latest
             shell: bash -l {0}
-            build: coverage
+            build-type: Debug
+            coverage: "ON"
             jobs: 4
           - os: windows-latest
             shell: cmd /C CALL {0}
-            build: fast
             jobs: 4
           - os: macos-latest
             shell: bash -l {0}
-            build: fast
+            build-type: Release
+            coverage: "OFF"
             jobs: 2
           - os: macos-15-intel
             shell: bash -l {0}
-            build: fast
+            build-type: Release
+            coverage: "OFF"
             jobs: 4
     defaults:
       run:
@@ -55,13 +57,29 @@ jobs:
         uses: ./.github/actions/setup-tests
 
       - name: Build and run C++ tests
-        run: scons -j${{ matrix.jobs }} build=${{ matrix.build }} test
+        if: runner.os != 'Windows'
+        run: |
+          cmake -S . -B build/ci -G Ninja $CMAKE_ARGS \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} \
+            -DLIBDIFFPY_COVERAGE=${{ matrix.coverage }} \
+            -DLIBDIFFPY_BUILD_TESTS=ON
+          cmake --build build/ci --parallel ${{ matrix.jobs }}
+          ctest --test-dir build/ci --output-on-failure
+
+      # The conda cxx-compiler activation configures MSVC for Ninja in cmd.
+      - name: Build and run C++ tests (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          where cl.exe || exit /b 1
+          cmake --preset release -DLIBDIFFPY_BUILD_TESTS=ON || exit /b 1
+          cmake --build --preset release --parallel ${{ matrix.jobs }} || exit /b 1
+          ctest --test-dir build\release --output-on-failure --no-tests=error
 
       - name: Generate coverage report
         if: runner.os == 'Linux'
         run: >-
           gcovr --gcov-executable "$CONDA_PREFIX/bin/gcov"
-          --root . --filter 'build/coverage-.*/diffpy/'
+          --root . --filter 'src/diffpy/'
           --xml coverage.xml
 
       - name: Save coverage report
