@@ -27,7 +27,7 @@ jobs:
       - name: Build and run C++ tests with coverage
         run: |
           "$CONDA_PREFIX/bin/c++" --version
-          cmake --preset coverage $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Debug \
+          cmake --preset coverage $CMAKE_ARGS \
             -DCMAKE_INSTALL_LIBDIR=lib/x86_64-linux-gnu
           cmake --build --preset coverage --parallel 4
           ctest --preset coverage

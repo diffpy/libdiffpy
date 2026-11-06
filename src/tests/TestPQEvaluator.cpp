@@ -106,7 +106,7 @@ TEST_CASE_METHOD(TestPQEvaluatorFixture,
   CHECK(NONE == pdfc.getEvaluatorTypeUsed());
   pdfc.setEvaluatorType(OPTIMIZED);
   CHECK(NONE == pdfc.getEvaluatorTypeUsed());
-  pdfc.setEvaluatorType(CHECK);
+  pdfc.setEvaluatorType(PQEvaluatorType::CHECK);
   CHECK(NONE == pdfc.getEvaluatorTypeUsed());
   pdfc.setEvaluatorType(BASIC);
   CHECK(NONE == pdfc.getEvaluatorTypeUsed());
@@ -241,21 +241,22 @@ TEST_CASE_METHOD(TestPQEvaluatorFixture,
                  "[PQEvaluator]") {
   OverlapCalculator olc;
   CHECK(BASIC == olc.getEvaluatorType());
-  CHECK_THROWS_AS(olc.setEvaluatorType(CHECK), invalid_argument);
+  CHECK_THROWS_AS(olc.setEvaluatorType(PQEvaluatorType::CHECK),
+                  invalid_argument);
   CHECK(BASIC == olc.getEvaluatorType());
 }
 
 TEST_CASE_METHOD(TestPQEvaluatorFixture,
                  "TestPQEvaluator::test_checkevaluator_passes",
                  "[PQEvaluator]") {
-  mpdfco.setEvaluatorType(CHECK);
-  CHECK(CHECK == mpdfco.getEvaluatorType());
+  mpdfco.setEvaluatorType(PQEvaluatorType::CHECK);
+  CHECK(PQEvaluatorType::CHECK == mpdfco.getEvaluatorType());
   mpdfco.eval(mstru10);
   CHECK(BASIC == mpdfco.getEvaluatorTypeUsed());
   mpdfco.eval(mstru10);
-  CHECK(CHECK == mpdfco.getEvaluatorTypeUsed());
+  CHECK(PQEvaluatorType::CHECK == mpdfco.getEvaluatorTypeUsed());
   mpdfco.eval(mstru9);
-  CHECK(CHECK == mpdfco.getEvaluatorTypeUsed());
+  CHECK(PQEvaluatorType::CHECK == mpdfco.getEvaluatorTypeUsed());
   mpdfco.eval(emptyStructureAdapter());
   CHECK(BASIC == mpdfco.getEvaluatorTypeUsed());
 }
@@ -264,11 +265,11 @@ TEST_CASE_METHOD(TestPQEvaluatorFixture,
                  "TestPQEvaluator::test_checkevaluator_fails",
                  "[PQEvaluator]") {
   BadPairCounter badcounter;
-  badcounter.setEvaluatorType(CHECK);
+  badcounter.setEvaluatorType(PQEvaluatorType::CHECK);
   CHECK(45 == badcounter(mstru10));
   CHECK(BASIC == badcounter.getEvaluatorTypeUsed());
   CHECK_THROWS_AS(badcounter(mstru10), logic_error);
-  CHECK(CHECK == badcounter.getEvaluatorTypeUsed());
+  CHECK(PQEvaluatorType::CHECK == badcounter.getEvaluatorTypeUsed());
 }
 
 }  // namespace srreal

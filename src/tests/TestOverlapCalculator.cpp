@@ -86,13 +86,13 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   molc->eval(stru);
   CHECK(0.0 == molc->totalSquareOverlap());
   QuantityType sqolps = molc->siteSquareOverlaps();
-  CHECK(2u == sqolps.size());
+  REQUIRE(2u == sqolps.size());
   CHECK(0.0 == sqolps[0]);
   CHECK(0.0 == sqolps[1]);
   CHECK(0.0 == molc->flipDiffTotal(0, 0));
   CHECK(0.0 == molc->flipDiffTotal(0, 1));
   std::vector<R3::Vector> g = molc->gradients();
-  CHECK(2u == g.size());
+  REQUIRE(2u == g.size());
   CHECK(0.0 == R3::norm(g[0]));
   CHECK(0.0 == R3::norm(g[1]));
 }
@@ -109,12 +109,12 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   molc->eval(stru);
   CHECK(0.25 == molc->totalSquareOverlap());
   QuantityType sqolps = molc->siteSquareOverlaps();
-  CHECK(2u == sqolps.size());
+  REQUIRE(2u == sqolps.size());
   CHECK(0.125 == sqolps[0]);
   CHECK(0.125 == sqolps[1]);
   CHECK(0.0 == molc->flipDiffTotal(0, 1));
   std::vector<R3::Vector> g = molc->gradients();
-  CHECK(2u == g.size());
+  REQUIRE(2u == g.size());
   R3::Vector g0(0.0, 0.0, +1);
   CHECK(0.0 == R3::distance(g0, g[0]));
   R3::Vector g1(0.0, 0.0, -1);
@@ -132,6 +132,7 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   stru->append(a1);
   molc->eval(stru);
   std::vector<R3::Vector> g = molc->gradients();
+  REQUIRE(2u == g.size());
   double dx = 1e-6;
   double tsqo0 = molc->totalSquareOverlap();
   R3::Vector r1 = stru->siteCartesianPosition(1);
@@ -165,6 +166,7 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   CHECK(8 * pow(2.0 - sqrt(3.0), 2) == molc->totalSquareOverlap());
   // gradient is zero due to bcc symmetry
   std::vector<R3::Vector> g = molc->gradients();
+  REQUIRE(2u == g.size());
   CHECK_THAT(0.0, WithinAbs(R3::norm(g[0]), meps));
   CHECK_THAT(0.0, WithinAbs(R3::norm(g[1]), meps));
   // move the second atom so it touches only one ball
@@ -174,7 +176,7 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   double tsqo = 1.5 * 1.5 + 0.5 * 0.5;
   CHECK_THAT(tsqo, WithinAbs(molc->totalSquareOverlap(), meps));
   g = molc->gradients();
-  CHECK(2u == g.size());
+  REQUIRE(2u == g.size());
   double gx = 1.5 + 0.5;
   CHECK_THAT(-gx, WithinAbs(g[0][0], meps));
   CHECK_THAT(0.0, WithinAbs(g[0][1], meps));
@@ -191,7 +193,7 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   molc->eval(mnacl);
   CHECK_THAT(olp, WithinAbs(molc->meanSquareOverlap(), meps));
   QuantityType sqolps = molc->siteSquareOverlaps();
-  CHECK(8u == sqolps.size());
+  REQUIRE(8u == sqolps.size());
   for (int i = 0; i < 8; ++i) {
     CHECK_THAT(olp, WithinAbs(sqolps[i], meps));
   }
@@ -221,7 +223,7 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   molc->eval(mnacl);
   // default gradients are all zero
   std::vector<R3::Vector> g = molc->gradients();
-  CHECK(8u == g.size());
+  REQUIRE(8u == g.size());
   for (int i = 0; i < 8; ++i) {
     CHECK_THAT(0.0, WithinAbs(R3::norm(g[i]), meps));
   }
@@ -232,6 +234,7 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   xyzc0 = R3::Vector(0.02, 0.03, 0.07);
   molc->eval(nacl1);
   double c0 = molc->totalSquareOverlap();
+  REQUIRE(8u == molc->gradients().size());
   R3::Vector g0 = molc->gradients()[0];
   CHECK(R3::norm(g0) > meps);
   R3::Vector g0n;
@@ -250,7 +253,7 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
                  "[OverlapCalculator]") {
   molc->eval(mnacl);
   auto nbsites = molc->getNeighborSites(0);
-  CHECK(3u == nbsites.size());
+  REQUIRE(3u == nbsites.size());
   for (int j = 5; j < 8; ++j) {
     CHECK(nbsites.count(j));
   }
@@ -262,7 +265,7 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   using std::placeholders::_1;
   molc->eval(mnacl);
   auto cnums = molc->coordinations();
-  CHECK(8u == cnums.size());
+  REQUIRE(8u == cnums.size());
   auto eq6 = bind(equal_to<double>(), _1, 6.0);
   CHECK(all_of(cnums.begin(), cnums.end(), eq6));
 }
@@ -274,8 +277,8 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   auto cbtb0 = molc->coordinationByTypes(0);
   auto cbtb3 = molc->coordinationByTypes(3);
   auto cbtb5 = molc->coordinationByTypes(5);
-  CHECK(1u == cbtb0.size());
-  CHECK(1u == cbtb5.size());
+  REQUIRE(1u == cbtb0.size());
+  REQUIRE(1u == cbtb5.size());
   CHECK(cbtb0 == cbtb3);
   CHECK(6 == cbtb0.at("Cl1-"));
   CHECK(6 == cbtb5.at("Na1+"));
@@ -287,12 +290,13 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   auto tb = molc->getAtomRadiiTable();
   molc->eval(mnacl);
   auto nbhood = molc->neighborhoods();
-  CHECK(1u == nbhood.size());
-  CHECK(8u == nbhood[0].size());
+  REQUIRE(1u == nbhood.size());
+  REQUIRE(8u == nbhood[0].size());
   tb->resetAll();
   molc->eval(mnacl);
   auto nbsep = molc->neighborhoods();
-  CHECK(8u == nbsep.size());
+  REQUIRE(8u == nbsep.size());
+  REQUIRE_FALSE(nbsep[5].empty());
   int nb5site = *(nbsep[5].begin());
   CHECK(5 == nb5site);
   molc->maskAllPairs(false);
@@ -302,15 +306,16 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   molc->setTypeMask("Na1+", "Na1+", true);
   molc->eval(mnacl);
   auto nbnanasep = molc->neighborhoods();
-  CHECK(4u == nbnanasep.size());
+  REQUIRE(4u == nbnanasep.size());
+  REQUIRE_FALSE(nbnanasep[3].empty());
   int nb3site = *(nbnanasep[3].begin());
   CHECK(3 == nb3site);
   tb->setCustom("Na1+", 5);
   tb->setCustom("Cl1-", 5);
   molc->eval(mnacl);
   auto nbnana = molc->neighborhoods();
-  CHECK(1u == nbnana.size());
-  CHECK(4u == nbnana[0].size());
+  REQUIRE(1u == nbnana.size());
+  REQUIRE(4u == nbnana[0].size());
   CHECK(nbnana[0].count(0));
   CHECK(!nbnana[0].count(4));
 }
@@ -342,7 +347,7 @@ TEST_CASE_METHOD(TestOverlapCalculatorFixture,
   CHECK(2 == olc1->getStructure()->countSites());
   CHECK(0.25 == olc1->totalSquareOverlap());
   QuantityType sqolps = molc->siteSquareOverlaps();
-  CHECK(2u == olc1->siteSquareOverlaps().size());
+  REQUIRE(2u == olc1->siteSquareOverlaps().size());
   CHECK(0.125 == olc1->siteSquareOverlaps()[0]);
   CHECK(0.125 == olc1->siteSquareOverlaps()[1]);
 }

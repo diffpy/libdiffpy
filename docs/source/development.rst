@@ -47,6 +47,30 @@ directory with ``cmake -S . -B <build-dir> -G "<generator>"``. To disable the
 ObjCryst adapter, pass ``-DLIBDIFFPY_ENABLE_OBJCRYST=OFF``. For gprof
 instrumentation, use ``-DLIBDIFFPY_PROFILE=ON``.
 
+Embed libdiffpy in another CMake project
+----------------------------------------
+
+Add libdiffpy with ``add_subdirectory``. It then keeps the parent's build
+type, install prefix, output directories and compiler options. A Python
+extension would typically build it as an OBJECT library ::
+
+        set(LIBDIFFPY_INSTALL OFF)
+        set(LIBDIFFPY_BUILD_OBJECT_LIB ON)
+        set(LIBDIFFPY_ENABLE_OBJCRYST OFF)
+        set(LIBDIFFPY_RUNTIME_RELPATH data)
+        set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+        add_subdirectory(extern/libdiffpy)
+        target_link_libraries(my_extension PRIVATE libdiffpy::diffpy)
+
+An OBJECT library keeps all factory and serialization registrations; a static
+library (``BUILD_SHARED_LIBS=OFF``) may need whole-archive linking to keep
+them. To use your own ``Boost::serialization`` or ``GSL::gsl``, define those
+targets before ``add_subdirectory``.
+
+With ``LIBDIFFPY_INSTALL=OFF`` nothing is installed. Copy ``src/runtime/*.dat``
+and ``src/runtime/bvparm2011sel.cif`` into the ``LIBDIFFPY_RUNTIME_RELPATH``
+directory next to your extension, ``data/`` in this example.
+
 Run the unit tests
 ------------------
 
@@ -64,8 +88,9 @@ separated by commas ::
         cmake --build --preset debug --target check
 
 Set ``LIBDIFFPY_TESTS`` to an empty string to build all suites again.
-CTest runs all built cases in one process. To run a single case or a group
-of cases, pass its name or tag to the Catch2 executable ::
+CTest runs each suite as a separate test, so ``ctest --preset debug -R Lattice``
+selects suites by name. To run a single case or a group of cases, pass its
+name or tag to the Catch2 executable ::
 
         build/debug/bin/alltests "TestLattice::test_angle"
         build/debug/bin/alltests "[Lattice]"
