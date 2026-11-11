@@ -50,7 +50,13 @@ add_executable(alltests ${_suites} ${_helpers})
 set_target_properties(alltests PROPERTIES CXX_EXTENSIONS OFF)
 if(MSVC)
   target_compile_options(alltests PRIVATE /bigobj)
+  set(_test_math_options /fp:precise)
+else()
+  set(_test_math_options -fno-fast-math)
 endif()
+# Numerical checks must recognize NaN and infinity even in Release builds.
+set_property(SOURCE TestCalculationKernel.cpp test_helpers.cpp
+  APPEND PROPERTY COMPILE_OPTIONS "${_test_math_options}")
 target_include_directories(alltests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(alltests PRIVATE libdiffpy::diffpy Catch2::Catch2WithMain)
 # test_helpers.cpp finds the testdata directory from this macro.

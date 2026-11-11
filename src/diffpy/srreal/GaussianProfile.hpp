@@ -39,11 +39,23 @@ class DLL_EXPORT GaussianProfile : public PeakProfile {
   double operator()(double x, double fwhm) const;
   double xboundlo(double fwhm) const;
   double xboundhi(double fwhm) const;
+  void addRDFPeak(double* out, int ilo, int ihi, int rlosteps, double rstep,
+                  double dist, double fwhm, double scale) const override;
   void setPrecision(double eps);
 
  protected:
   // data
   double mhalfboundrel;
+
+  /// Profiles that addRDFPeak can evaluate with the calculation kernel.
+  /// CroppedGaussian is zero for |x| >= mhalfboundrel * fwhm.
+  enum class KernelShape { None, Gaussian, CroppedGaussian };
+
+  // methods
+  /// Shape of operator() for the kernel in addRDFPeak, None for the generic
+  /// loop.  It is None for derived classes, which may change operator(),
+  /// unless they override this.
+  virtual KernelShape kernelShape() const;
 
  private:
   // serialization

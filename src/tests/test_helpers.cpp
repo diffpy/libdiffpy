@@ -20,7 +20,9 @@
 #include <sstream>
 #include <cassert>
 #include <cctype>
+#include <cmath>
 #include <algorithm>
+#include <limits>
 #include <string_view>
 
 #include <diffpy/runtimepath.hpp>
@@ -133,6 +135,24 @@ diffpy::srreal::StructureAdapterPtr loadTestPeriodicStructure(
     stru.append(ai);
   }
   return pstru;
+}
+
+// Array comparison ----------------------------------------------------------
+
+double maxRelativeError(const diffpy::srreal::QuantityType& actual,
+                        const diffpy::srreal::QuantityType& reference,
+                        double scale) {
+  const double inf = std::numeric_limits<double>::infinity();
+  if (actual.size() != reference.size()) return inf;
+  double maxdiff = 0.0;
+  double maxref = 0.0;
+  for (size_t i = 0; i < actual.size(); ++i) {
+    if (!std::isfinite(actual[i]) || !std::isfinite(reference[i])) return inf;
+    maxdiff = std::max(maxdiff, std::fabs(actual[i] - reference[i]));
+    maxref = std::max(maxref, std::fabs(reference[i]));
+  }
+  if (scale == 0.0) scale = maxref;
+  return (scale > 0.0) ? maxdiff / scale : inf;
 }
 
 // End of test_helpers.cpp

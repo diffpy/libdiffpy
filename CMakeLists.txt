@@ -320,6 +320,8 @@ if(LIBDIFFPY_HAS_OBJCRYST)
   target_link_libraries(diffpy PUBLIC ObjCryst::ObjCryst)
 endif()
 
+include(CalculationKernels)
+
 # Installation ----------------------------------------------------------------
 
 if(LIBDIFFPY_INSTALL)

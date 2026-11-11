@@ -2,6 +2,15 @@
 
 * ``diffpy/hash.hpp`` with ``hash_combine``, ``hash_range``, ``hash_values``
   and ``PairHash``.
+* SIMD calculation kernels for ``PDFCalculator`` and ``DebyePDFCalculator``:
+  AVX-512, AVX2 and SSE2 on x86-64, NEON on arm64. They are built when the
+  header-only xsimd library is found, unless the ``LIBDIFFPY_SIMD`` CMake
+  option is ``OFF``. The best kernel the CPU supports is used at runtime;
+  ``availableCalculationKernels``, ``getCalculationKernel`` and
+  ``setCalculationKernel`` select it by name.
+* ``PeakProfile::addRDFPeak`` to add a peak to an RDF array, and protected
+  ``GaussianProfile::kernelShape``, which derived profiles that keep
+  ``operator()`` can override to use the calculation kernels.
 
 **Changed:**
 
@@ -16,10 +25,11 @@
   reference to a shared static result, so later calls no longer overwrite
   earlier results. They are thread-safe, as are ``Lattice::distance`` and
   ``Lattice::ucMaxDiagonal``.
+* Faster Gaussian peak evaluation.
 
 **Removed:**
 
-* Dependency on Boost.Functional/Hash, Boost.StringAlgo and Boost.uBLAS.
+* Dependencies on Boost.Functional/Hash, Boost.StringAlgo and Boost.uBLAS.
   ``R3::Vector`` and ``R3::Matrix`` no longer accept uBLAS expressions.
 
 **Fixed:**
@@ -28,3 +38,6 @@
   of aborting the program.
 * ``Lattice::setLatPar`` and ``Lattice::setLatBase`` leave the lattice
   unchanged when they throw for degenerate parameters or base vectors.
+* ``CroppedGaussianProfile`` peaks of zero width no longer produce NaN in
+  ``PDFCalculator`` results.
+* Better accuracy for narrow Gaussian peaks at large pair distances.

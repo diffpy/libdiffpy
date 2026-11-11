@@ -433,15 +433,8 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
   int ilast = min(this->countCalcPoints(), this->calcIndex(xhi) + 1);
   assert(ilast <= int(mvalue.size()));
   assert(eps_gt(dist, 0.0));
-  for (; i < ilast; ++i) {
-    double x = (this->rcalcloSteps() + i) * this->getRstep() - dist;
-    double y = pkf(x, fwhm);
-    // Contributions in G(r) need to be normalized by pair distance,
-    // not by r as done in PDFfit or PDFfit2.  Here we rescale RDF
-    // in such way that division by r will give a correct result.
-    double yrdf = y * (x / dist + 1);
-    mvalue[i] += peakscale * yrdf;
-  }
+  pkf.addRDFPeak(mvalue.data(), i, ilast, this->rcalcloSteps(),
+                 this->getRstep(), dist, fwhm, peakscale);
 }
 
 void PDFCalculator::stashPartialValue() {

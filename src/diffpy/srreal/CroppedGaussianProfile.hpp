@@ -40,6 +40,10 @@ class DLL_EXPORT CroppedGaussianProfile : public GaussianProfile {
   double operator()(double x, double fwhm) const;
   void setPrecision(double eps);
 
+ protected:
+  // methods
+  KernelShape kernelShape() const override;
+
  private:
   // data
   double mscale;

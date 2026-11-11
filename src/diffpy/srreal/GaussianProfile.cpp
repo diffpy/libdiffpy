@@ -18,8 +18,10 @@
  *****************************************************************************/
 
 #include <cmath>
+#include <typeinfo>
 
 #include <diffpy/srreal/GaussianProfile.hpp>
+#include <diffpy/srreal/kernels/CalculationKernelImpl.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/serialization.ipp>
 
@@ -70,6 +72,31 @@ double GaussianProfile::xboundhi(double fwhm) const {
   return rv;
 }
 
+void GaussianProfile::addRDFPeak(double* out, int ilo, int ihi, int rlosteps,
+                                 double rstep, double dist, double fwhm,
+                                 double scale) const {
+  const KernelShape shape = this->kernelShape();
+  if (shape == KernelShape::None) {
+    this->PeakProfile::addRDFPeak(out, ilo, ihi, rlosteps, rstep, dist, fwhm,
+                                  scale);
+    return;
+  }
+  if (fwhm <= 0.0) return;
+  kernels::activeCalculationKernel().gaussianWindow({
+    .out = out,
+    .ilo = ilo,
+    .ihi = ihi,
+    .rlosteps = rlosteps,
+    .rstep = rstep,
+    .dist = dist,
+    .fwhm = fwhm,
+    .scale = scale,
+    .peakheight = (*this)(0.0, fwhm),
+    .cropped = (shape == KernelShape::CroppedGaussian),
+    .halfboundrel = mhalfboundrel,
+  });
+}
+
 void GaussianProfile::setPrecision(double eps) {
   // correct any settings below DOUBLE_EPS
   double eps1 = max(eps, DOUBLE_EPS);
@@ -78,6 +105,13 @@ void GaussianProfile::setPrecision(double eps) {
     mhalfboundrel = sqrt(-log(eps1) / (4 * M_LN2));
   else
     mhalfboundrel = 0.0;
+}
+
+// Protected Methods ---------------------------------------------------------
+
+GaussianProfile::KernelShape GaussianProfile::kernelShape() const {
+  const bool exact = (typeid(*this) == typeid(GaussianProfile));
+  return exact ? KernelShape::Gaussian : KernelShape::None;
 }
 
 // Registration --------------------------------------------------------------
