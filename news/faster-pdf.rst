@@ -28,6 +28,7 @@
 * Faster Gaussian peak evaluation and bond generation for periodic and
   crystal structures. ``CrystalStructureAdapter`` expands symmetry faster
   and only after its atoms, lattice or symmetry operations change.
+* Faster ``fftgtof`` and ``fftftog`` using cached mixed-radix complex FFTs.
 * Optimized builds of the shared library use link-time optimization unless
   configured with ``-DLIBDIFFPY_LTO=OFF``. The library is compiled with
   ``-fno-semantic-interposition`` when supported, so ``LD_PRELOAD`` may no

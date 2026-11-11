@@ -4,6 +4,7 @@
 # suite separately, preserving filtering without executing test discovery.
 
 find_package(Catch2 3.5 CONFIG REQUIRED)
+find_package(Threads REQUIRED)
 message(STATUS "Using Catch2 ${Catch2_VERSION} from ${Catch2_DIR}")
 
 # Select the test suites -----------------------------------------------------
@@ -58,7 +59,8 @@ endif()
 set_property(SOURCE TestCalculationKernel.cpp test_helpers.cpp
   APPEND PROPERTY COMPILE_OPTIONS "${_test_math_options}")
 target_include_directories(alltests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(alltests PRIVATE libdiffpy::diffpy Catch2::Catch2WithMain)
+target_link_libraries(alltests PRIVATE
+  libdiffpy::diffpy Catch2::Catch2WithMain Threads::Threads)
 # test_helpers.cpp finds the testdata directory from this macro.
 set_property(SOURCE test_helpers.cpp APPEND PROPERTY COMPILE_DEFINITIONS
   "DIFFPYTESTSDIRPATH=${CMAKE_CURRENT_SOURCE_DIR}")
