@@ -45,7 +45,8 @@ To use the same options for every build, set them in a ``CMakeUserPresets.json``
 file in the repository root. To use another generator, configure a separate
 directory with ``cmake -S . -B <build-dir> -G "<generator>"``. To disable the
 ObjCryst adapter, pass ``-DLIBDIFFPY_ENABLE_OBJCRYST=OFF``. For gprof
-instrumentation, use ``-DLIBDIFFPY_PROFILE=ON``.
+instrumentation, use ``-DLIBDIFFPY_PROFILE=ON``. To build the optimized
+shared library without link-time optimization, pass ``-DLIBDIFFPY_LTO=OFF``.
 
 Calculation kernels
 -------------------

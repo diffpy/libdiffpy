@@ -28,6 +28,10 @@
 * Faster Gaussian peak evaluation and bond generation for periodic and
   crystal structures. ``CrystalStructureAdapter`` expands symmetry faster
   and only after its atoms, lattice or symmetry operations change.
+* Optimized builds of the shared library use link-time optimization unless
+  configured with ``-DLIBDIFFPY_LTO=OFF``. The library is compiled with
+  ``-fno-semantic-interposition`` when supported, so ``LD_PRELOAD`` may no
+  longer replace calls inside the library.
 
 **Removed:**
 

@@ -35,6 +35,8 @@ endif()
 option(LIBDIFFPY_BUILD_OBJECT_LIB "Build an OBJECT library for embedding" OFF)
 option(LIBDIFFPY_INSTALL "Install libdiffpy and its CMake package" ON)
 option(LIBDIFFPY_ENABLE_OBJCRYST "Build with the ObjCryst structure adapter" ON)
+option(LIBDIFFPY_LTO
+  "Link the optimized shared library with link-time optimization" ON)
 option(LIBDIFFPY_BUILD_TESTS "Build the Catch2 unit tests" OFF)
 option(LIBDIFFPY_TEST_INSTALLED
   "Build only the unit tests and link them with the installed libdiffpy" OFF)
@@ -294,6 +296,27 @@ endif()
 if(MSVC)
   # Required for the Boost.Serialization code, including embedded builds.
   target_compile_options(diffpy PRIVATE /bigobj)
+else()
+  # Let GCC inline calls between the exported functions of the library.
+  include(CheckCXXCompilerFlag)
+  check_cxx_compiler_flag(-fno-semantic-interposition
+    LIBDIFFPY_HAS_NO_SEMANTIC_INTERPOSITION)
+  if(LIBDIFFPY_HAS_NO_SEMANTIC_INTERPOSITION)
+    target_compile_options(diffpy PRIVATE -fno-semantic-interposition)
+  endif()
+  # LTO inlines the short per-pair calls between source files.  Static and
+  # OBJECT libraries skip it, their objects would need the same compiler.
+  if(LIBDIFFPY_LTO AND _libdiffpy_library_type STREQUAL "SHARED_LIBRARY")
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT _ipo_supported OUTPUT _ipo_error LANGUAGES CXX)
+    if(_ipo_supported)
+      set_target_properties(diffpy PROPERTIES
+        INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
+        INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON)
+    else()
+      message(STATUS "Link-time optimization is not supported, skipping it.")
+    endif()
+  endif()
 endif()
 target_compile_features(diffpy PUBLIC cxx_std_23)
 target_include_directories(diffpy PUBLIC
@@ -319,7 +342,6 @@ target_link_libraries(diffpy
 if(LIBDIFFPY_HAS_OBJCRYST)
   target_link_libraries(diffpy PUBLIC ObjCryst::ObjCryst)
 endif()
-
 include(CalculationKernels)
 
 # Installation ----------------------------------------------------------------
