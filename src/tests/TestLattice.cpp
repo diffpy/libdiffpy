@@ -16,6 +16,8 @@
  *
  *****************************************************************************/
 
+#include <stdexcept>
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
@@ -115,6 +117,37 @@ TEST_CASE_METHOD(TestLatticeFixture, "TestLattice::test_setLatBase",
                      60.0);
   CHECK(allclose(base_check, lattice->base()));
   CHECK(allclose(recbase_check, lattice->recbase()));
+}
+
+TEST_CASE_METHOD(TestLatticeFixture, "TestLattice::test_invalid_unchanged",
+                 "[Lattice]") {
+  // A degenerate lattice throws and leaves the lattice as it was.
+  lattice->setLatPar(1.0, 2.0, 3.0, 80, 90, 100);
+  const Lattice saved = *lattice;
+  const R3::Vector v(0.3, -1.7, 2.9);
+  auto unchanged = [&]() {
+    return lattice->a() == saved.a() && lattice->b() == saved.b() &&
+           lattice->c() == saved.c() && lattice->alpha() == saved.alpha() &&
+           lattice->beta() == saved.beta() &&
+           lattice->gamma() == saved.gamma() && lattice->ar() == saved.ar() &&
+           lattice->base() == saved.base() &&
+           lattice->recbase() == saved.recbase() &&
+           lattice->baserot() == saved.baserot() &&
+           lattice->metrics() == saved.metrics() &&
+           lattice->fractional(v) == saved.fractional(v) &&
+           lattice->cartesian(v) == saved.cartesian(v);
+  };
+  REQUIRE(unchanged());
+  CHECK_THROWS_AS(lattice->setLatPar(0.0, 4.0, 4.0, 90, 90, 90),
+                  std::invalid_argument);
+  CHECK(unchanged());
+  const R3::Vector va(1.0, 0.0, 0.0);
+  const R3::Vector vc(0.0, 0.0, 1.0);
+  CHECK_THROWS_AS(lattice->setLatBase(va, va, vc), std::invalid_argument);
+  CHECK(unchanged());
+  CHECK_THROWS_AS(lattice->setLatBase(va, vc, R3::Vector(0.0, 1.0, 0.0)),
+                  std::invalid_argument);
+  CHECK(unchanged());
 }
 
 TEST_CASE_METHOD(TestLatticeFixture, "TestLattice::test_dist", "[Lattice]") {

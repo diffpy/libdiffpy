@@ -19,8 +19,8 @@
 
 #include <cassert>
 #include <algorithm>
-#include <boost/functional/hash.hpp>
 
+#include <diffpy/hash.hpp>
 #include <diffpy/serialization.ipp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
@@ -69,13 +69,8 @@ bool operator==(const Atom& a0, const Atom& a1) {
 bool operator!=(const Atom& a0, const Atom& a1) { return !(a0 == a1); }
 
 size_t hash_value(const Atom& a) {
-  size_t seed = 0;
-  boost::hash_combine(seed, a.atomtype);
-  boost::hash_combine(seed, a.xyz_cartn);
-  boost::hash_combine(seed, a.occupancy);
-  boost::hash_combine(seed, a.anisotropy);
-  boost::hash_combine(seed, a.uij_cartn);
-  return seed;
+  return diffpy::hash_values(a.atomtype, a.xyz_cartn, a.occupancy, a.anisotropy,
+                             a.uij_cartn);
 }
 
 //////////////////////////////////////////////////////////////////////////////

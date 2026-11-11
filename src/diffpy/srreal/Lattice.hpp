@@ -108,20 +108,20 @@ class DLL_EXPORT Lattice {
   template <class V>
   double anglerad(const V& u, const V& v) const;
   // conversion of coordinates and tensors
-  const R3::Vector& cartesian(const R3::Vector& lv) const;
+  R3::Vector cartesian(const R3::Vector& lv) const;
   template <class V>
-  const R3::Vector& cartesian(const V& lv) const;
-  const R3::Vector& fractional(const R3::Vector& cv) const;
+  R3::Vector cartesian(const V& lv) const;
+  R3::Vector fractional(const R3::Vector& cv) const;
   template <class V>
-  const R3::Vector& fractional(const V& cv) const;
-  const R3::Vector& ucvCartesian(const R3::Vector& cv) const;
+  R3::Vector fractional(const V& cv) const;
+  R3::Vector ucvCartesian(const R3::Vector& cv) const;
   template <class V>
-  const R3::Vector& ucvCartesian(const V& cv) const;
-  const R3::Vector& ucvFractional(const R3::Vector& lv) const;
+  R3::Vector ucvCartesian(const V& cv) const;
+  R3::Vector ucvFractional(const R3::Vector& lv) const;
   template <class V>
-  const R3::Vector& ucvFractional(const V& lv) const;
-  const R3::Matrix& cartesianMatrix(const R3::Matrix& Ml) const;
-  const R3::Matrix& fractionalMatrix(const R3::Matrix& Mc) const;
+  R3::Vector ucvFractional(const V& lv) const;
+  R3::Matrix cartesianMatrix(const R3::Matrix& Ml) const;
+  R3::Matrix fractionalMatrix(const R3::Matrix& Mc) const;
   // largest cell diagonal in fractional coordinates
   const R3::Vector& ucMaxDiagonal() const;
   double ucMaxDiagonalLength() const;
@@ -132,6 +132,11 @@ class DLL_EXPORT Lattice {
 
  private:
   // methods
+  /// setLatPar and setLatBase in place, not exception safe
+  void assignLatPar(double a, double b, double c, double alpha, double beta,
+                    double gamma);
+  void assignLatBase(const R3::Vector& va, const R3::Vector& vb,
+                     const R3::Vector& vc);
   void updateMetrics();
   void updateStandardBase();
 
@@ -191,7 +196,7 @@ class DLL_EXPORT Lattice {
 // Template Constructor ------------------------------------------------------
 
 template <class V>
-Lattice::Lattice(const V& va0, const V& vb0, const V& vc0) {
+Lattice::Lattice(const V& va0, const V& vb0, const V& vc0) : Lattice() {
   this->setLatBase(va0, vb0, vc0);
 }
 
@@ -298,10 +303,7 @@ double Lattice::norm(const V& u) const {
 
 template <class V>
 double Lattice::distance(const V& u, const V& v) const {
-  static R3::Vector duv;
-  duv[0] = u[0] - v[0];
-  duv[1] = u[1] - v[1];
-  duv[2] = u[2] - v[2];
+  const R3::Vector duv(u[0] - v[0], u[1] - v[1], u[2] - v[2]);
   return this->norm(duv);
 }
 
@@ -319,39 +321,23 @@ double Lattice::anglerad(const V& u, const V& v) const {
 }
 
 template <class V>
-const R3::Vector& Lattice::cartesian(const V& lv) const {
-  static R3::Vector lvcopy;
-  lvcopy[0] = lv[0];
-  lvcopy[1] = lv[1];
-  lvcopy[2] = lv[2];
-  return this->cartesian(lvcopy);
+R3::Vector Lattice::cartesian(const V& lv) const {
+  return this->cartesian(R3::Vector(lv[0], lv[1], lv[2]));
 }
 
 template <class V>
-const R3::Vector& Lattice::fractional(const V& cv) const {
-  static R3::Vector cvcopy;
-  cvcopy[0] = cv[0];
-  cvcopy[1] = cv[1];
-  cvcopy[2] = cv[2];
-  return this->fractional(cvcopy);
+R3::Vector Lattice::fractional(const V& cv) const {
+  return this->fractional(R3::Vector(cv[0], cv[1], cv[2]));
 }
 
 template <class V>
-const R3::Vector& Lattice::ucvCartesian(const V& cv) const {
-  static R3::Vector cvcopy;
-  cvcopy[0] = cv[0];
-  cvcopy[1] = cv[1];
-  cvcopy[2] = cv[2];
-  return this->ucvCartesian(cvcopy);
+R3::Vector Lattice::ucvCartesian(const V& cv) const {
+  return this->ucvCartesian(R3::Vector(cv[0], cv[1], cv[2]));
 }
 
 template <class V>
-const R3::Vector& Lattice::ucvFractional(const V& cv) const {
-  static R3::Vector cvcopy;
-  cvcopy[0] = cv[0];
-  cvcopy[1] = cv[1];
-  cvcopy[2] = cv[2];
-  return ucvFractional(cvcopy);
+R3::Vector Lattice::ucvFractional(const V& lv) const {
+  return this->ucvFractional(R3::Vector(lv[0], lv[1], lv[2]));
 }
 
 }  // namespace srreal
