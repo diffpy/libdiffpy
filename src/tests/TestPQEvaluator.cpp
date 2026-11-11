@@ -24,6 +24,7 @@
 
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
+#include <diffpy/srreal/CrystalStructureAdapter.hpp>
 #include <diffpy/srreal/PeriodicStructureAdapter.hpp>
 #include <diffpy/srreal/PairCounter.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
@@ -44,6 +45,48 @@ class BadPairCounter : public PairCounter {
   virtual void stashPartialValue() {}
   virtual void restorePartialValue() {}
 };
+
+// calculator that fails after a given number of pair contributions
+
+class FailingPDFCalculator : public PDFCalculator {
+ public:
+  /// Pair contributions left before the failure, negative for no failure.
+  int countdown = -1;
+  /// Pair contributions added so far.
+  int calls = 0;
+
+ protected:
+  virtual void addPairContribution(const BaseBondGenerator& bnds,
+                                   int summationscale) {
+    if (countdown == 0) throw runtime_error("failed pair contribution");
+    if (countdown > 0) --countdown;
+    ++calls;
+    this->PDFCalculator::addPairContribution(bnds, summationscale);
+  }
+};
+
+// Crystal with an inversion center at the origin.  The first atom sits
+// on it at x = 0 and has two symmetry positions elsewhere.
+
+CrystalStructureAdapterPtr inversionCrystal(double x) {
+  CrystalStructureAdapterPtr rv(new CrystalStructureAdapter);
+  rv->setLatPar(4.0, 4.5, 5.0, 90.0, 90.0, 90.0);
+  rv->addSymOp(R3::identity(), R3::zerovector);
+  rv->addSymOp(-1.0 * R3::identity(), R3::zerovector);
+  const double positions[][3] = {{x, 0.0, 0.0},
+                                 {0.9, 0.6, 1.3},
+                                 {1.7, 1.2, 0.5},
+                                 {0.4, 1.9, 2.1},
+                                 {1.3, 0.3, 1.9}};
+  Atom a;
+  a.atomtype = "Ni";
+  a.uij_cartn = 0.005 * R3::identity();
+  for (const auto& xyz : positions) {
+    a.xyz_cartn = R3::Vector(xyz[0], xyz[1], xyz[2]);
+    rv->append(a);
+  }
+  return rv;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // TestPQEvaluator
@@ -270,6 +313,84 @@ TEST_CASE_METHOD(TestPQEvaluatorFixture,
   CHECK(BASIC == badcounter.getEvaluatorTypeUsed());
   CHECK_THROWS_AS(badcounter(mstru10), logic_error);
   CHECK(PQEvaluatorType::CHECK == badcounter.getEvaluatorTypeUsed());
+}
+
+TEST_CASE_METHOD(TestPQEvaluatorFixture, "TestPQEvaluator::test_failed_update",
+                 "[PQEvaluator]") {
+  // A value left by a failed update must not pass for a valid one.
+  mpdfcb.eval(mstru10);
+  const QuantityType v10 = mpdfcb.value();
+  mpdfcb.eval(mstru10d1);
+  const QuantityType v10d1 = mpdfcb.value();
+  // count the pair contributions in a fast update
+  FailingPDFCalculator counter;
+  counter.eval(mstru10);
+  counter.calls = 0;
+  counter.eval(mstru10d1);
+  REQUIRE(OPTIMIZED == counter.getEvaluatorTypeUsed());
+  const int nfast = counter.calls;
+  REQUIRE(nfast > 4);
+  FailingPDFCalculator pdfc;
+  SECTION("full calculation") {
+    // all atoms are different, which needs a full calculation
+    AtomicStructureAdapterPtr shifted =
+      std::make_shared<AtomicStructureAdapter>(*mstru10);
+    for (Atom& a : *shifted) a.xyz_cartn[1] += 0.5;
+    pdfc.eval(mstru10);
+    pdfc.countdown = 3;
+    CHECK_THROWS_AS(pdfc.eval(shifted), runtime_error);
+    pdfc.countdown = -1;
+    pdfc.eval(mstru10);
+    CHECK(BASIC == pdfc.getEvaluatorTypeUsed());
+    CHECK(allclose(v10, pdfc.value()));
+  }
+  SECTION("fast update") {
+    pdfc.eval(mstru10);
+    pdfc.countdown = nfast / 2;
+    CHECK_THROWS_AS(pdfc.eval(mstru10d1), runtime_error);
+    pdfc.countdown = -1;
+    pdfc.eval(mstru10);
+    CHECK(BASIC == pdfc.getEvaluatorTypeUsed());
+    CHECK(allclose(v10, pdfc.value()));
+  }
+  SECTION("check of a fast update") {
+    // fail in the full calculation that follows the fast update
+    pdfc.setEvaluatorType(PQEvaluatorType::CHECK);
+    pdfc.eval(mstru10);
+    pdfc.countdown = nfast + 2;
+    CHECK_THROWS_AS(pdfc.eval(mstru10d1), runtime_error);
+    pdfc.countdown = -1;
+    pdfc.eval(mstru10d1);
+    CHECK(allclose(v10d1, pdfc.value()));
+  }
+}
+
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_structure_changed_in_place",
+                 "[PQEvaluator]") {
+  // The first evaluation after an atom moves off a special position must
+  // include its new symmetry positions.
+  mpdfcb.setRmax(7.0);
+  mpdfcb.eval(inversionCrystal(0.3));
+  const QuantityType expected = mpdfcb.getPDF();
+  for (PQEvaluatorType tp : {BASIC, OPTIMIZED, PQEvaluatorType::CHECK}) {
+    INFO("evaluator " << tp);
+    CrystalStructureAdapterPtr stru = inversionCrystal(0.0);
+    PDFCalculator pdfc;
+    pdfc.setEvaluatorType(tp);
+    pdfc.setRmax(7.0);
+    pdfc.eval(stru);
+    REQUIRE(1 == stru->siteMultiplicity(0));
+    REQUIRE(!allclose(expected, pdfc.getPDF()));
+    stru->at(0).xyz_cartn[0] = 0.3;
+    for (int i = 0; i < 2; ++i) {
+      pdfc.eval(stru);
+      // the first evaluation is a fast update unless the type is BASIC
+      if (i == 0) CHECK(tp == pdfc.getEvaluatorTypeUsed());
+      CHECK(2 == stru->siteMultiplicity(0));
+      CHECK(allclose(expected, pdfc.getPDF()));
+    }
+  }
 }
 
 }  // namespace srreal

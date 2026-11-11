@@ -25,12 +25,18 @@
   reference to a shared static result, so later calls no longer overwrite
   earlier results. They are thread-safe, as are ``Lattice::distance`` and
   ``Lattice::ucMaxDiagonal``.
-* Faster Gaussian peak evaluation.
+* Faster Gaussian peak evaluation and bond generation for periodic and
+  crystal structures. ``CrystalStructureAdapter`` expands symmetry faster
+  and only after its atoms, lattice or symmetry operations change.
 
 **Removed:**
 
 * Dependencies on Boost.Functional/Hash, Boost.StringAlgo and Boost.uBLAS.
   ``R3::Vector`` and ``R3::Matrix`` no longer accept uBLAS expressions.
+* Protected ``updater1`` method and ``msphere``, ``mrcsphere``, ``msymidx``,
+  ``mcstructure`` and ``mpuc1`` members of ``PeriodicStructureBondGenerator``
+  and ``CrystalStructureBondGenerator``, which no longer override
+  ``iterateSymmetry``.
 
 **Fixed:**
 
@@ -41,3 +47,8 @@
 * ``CroppedGaussianProfile`` peaks of zero width no longer produce NaN in
   ``PDFCalculator`` results.
 * Better accuracy for narrow Gaussian peaks at large pair distances.
+* Calculators give the correct result on the first evaluation after
+  a ``CrystalStructureAdapter`` atom moves in place to or from a special
+  position.
+* After an evaluation fails with an exception, the ``OPTIMIZED`` evaluator
+  recalculates fully instead of updating the incomplete result.

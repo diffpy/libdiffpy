@@ -90,6 +90,9 @@ class DLL_EXPORT CrystalStructureAdapter : public PeriodicStructureAdapter {
   double msymmetry_precision;
   mutable std::vector<AtomVector> msymatoms;
   mutable bool msymmetry_cached;
+  /// Atoms and lattice that msymatoms were expanded from, not serialized.
+  mutable AtomVector msymsource;
+  mutable Lattice msymlattice;
 
   // symmetry helpers
   /// return index of AtomVector atom at an equal position or -1
@@ -98,6 +101,12 @@ class DLL_EXPORT CrystalStructureAdapter : public PeriodicStructureAdapter {
   /// this only detects addition or removal of atom in the asymmetric
   /// unit, but does not check for changes in atom positions.
   bool isSymmetryCached() const;
+  /// exact check of site idx, also for changes in place
+  bool isSiteSymmetryUpToDate(int idx) const;
+  /// exact check of all sites
+  bool isSymmetryUpToDate() const;
+  /// symmetry positions of all sites brought up to date
+  const std::vector<AtomVector>& symmetryAtoms() const;
 
   // comparison
   friend DLL_EXPORT bool operator==(const CrystalStructureAdapter&,
@@ -130,29 +139,13 @@ class DLL_EXPORT CrystalStructureBondGenerator
   // constructors
   CrystalStructureBondGenerator(StructureAdapterConstPtr);
 
-  // configuration
-  virtual void selectAnchorSite(int);
-
   // data access
   virtual const R3::Matrix& Ucartesian1() const;
 
- protected:
-  // methods
-  virtual bool iterateSymmetry();
-  virtual void rewindSymmetry();
-  virtual void getNextBond();
-  virtual void updater1();
-
-  // data
-  const CrystalStructureAdapter* mcstructure;
-  size_t msymidx;
-  const R3::Matrix* mpuc1;
-
  private:
-  typedef CrystalStructureAdapter::AtomVector AtomVector;
-
-  // methods
-  const AtomVector& symatoms(int idx);
+  // data
+  /// Displacement tensor at each of the site1 positions.
+  std::vector<R3::Matrix> mcelluij;
 };
 
 }  // namespace srreal
