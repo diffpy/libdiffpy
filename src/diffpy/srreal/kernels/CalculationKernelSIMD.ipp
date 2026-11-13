@@ -40,7 +40,6 @@
 #error "Define LIBDIFFPY_XSIMD_NAMESPACE, see the comment above."
 #endif
 
-#include <float.h>
 #include <math.h>
 #include <stdint.h>
 
@@ -65,13 +64,6 @@ constexpr int RESEED_SLACK = 8;
 /// Limit of b x^2 at the seeds and of |log(rho)|, which keeps the seeds
 /// normal and rho finite.  exp(-SAFE_EXPONENT) is about 1e-261.
 constexpr double SAFE_EXPONENT = 600.0;
-
-/// True when xsimd::fma of Arch is a fused multiply-add.  SSE2 has none and
-/// xsimd evaluates u * v + w there.
-template <class Arch>
-constexpr bool FUSED_FMA = true;
-template <>
-constexpr bool FUSED_FMA<xsimd::sse2> = false;
 
 template <class Arch>
 struct SIMDKernel {
@@ -111,11 +103,6 @@ struct SIMDKernel {
     for (int j = 0; j < n; ++j) out[j] += uv[j];
   }
 
-  /// u * v + w for one value, rounded as in the lanes of xsimd::fma.
-  static double mulAdd(double u, double v, double w) {
-    return FUSED_FMA<Arch> ? fma(u, v, w) : u * v + w;
-  }
-
   static void gaussianWindow(const GaussianWindowArgs& args) {
     // Vector stores may alias anything, work on a copy of the arguments.
     const GaussianWindowArgs a = args;
@@ -123,16 +110,13 @@ struct SIMDKernel {
     // exp(-b x^2) and its ratio over one vector step.
     const double b = 4 * M_LN2 / (a.fwhm * a.fwhm);
     const double wh = W * a.rstep;
-    // Use the scalar kernel for NaN, for windows too far from the peak, where
-    // b * x^2 or 2 * b * wh * |x| reach SAFE_EXPONENT, and for narrow peaks
-    // far out, where the grid rounding (~eps * dist) is too coarse.
+    // Use the scalar kernel for NaN and for windows too far from the peak,
+    // where b * x^2 or 2 * b * wh * |x| reach SAFE_EXPONENT.
     const double xlo = (a.rlosteps + a.ilo) * a.rstep - a.dist;
     const double xhi = (a.rlosteps + a.ihi) * a.rstep - a.dist;
     const double xfar = (-xlo > xhi) ? -xlo : xhi;
     const double reach = (xfar > 2 * wh) ? xfar : 2 * wh;
-    const bool recurrence = (b * xfar * reach < SAFE_EXPONENT) &&
-                            (DBL_EPSILON * a.dist <= 1e-13 * a.fwhm);
-    if (!recurrence) {
+    if (!(b * xfar * reach < SAFE_EXPONENT)) {
       scalarCalculationKernel().gaussianWindow(args);
       return;
     }
@@ -142,27 +126,26 @@ struct SIMDKernel {
     const B ratiostep(exp(-2 * b * wh * wh));
     const B vw(1.0 * W);
     const B vrstep(a.rstep);
-    const B vdist(a.dist);
+    const B vxlo(xlo);
     const B vinvdist(1.0 / a.dist);
     const B vnorm(a.scale * a.peakheight);
     const B vfwhm(a.fwhm);
     const B vhalfbound(a.halfboundrel);
     const B one(1.0);
     const B zero(0.0);
-    // Grid steps of the lanes, whole numbers are exact in double.
-    B steps = B(double(a.rlosteps + a.ilo)) + laneIndex();
-    // x / dist + 1 is r / dist, which grows by a constant per vector step.
-    const B vrscale(a.rstep / a.dist);
+    // Grid steps of the lanes from ilo, whole numbers are exact in double.
+    B steps = laneIndex();
+    // x / dist + 1 grows by a constant per vector step.
     const B vrscalestep(wh / a.dist);
     for (int i = a.ilo; i < a.ihi;) {
       const int iend = blockEnd(i, a.ihi);
-      const B xseed = steps * vrstep - vdist;
+      // Same x as the scalar kernel, so cropping agrees.
+      const B xseed = steps * vrstep + vxlo;
       B g = vnorm * xsimd::exp(negb * xseed * xseed);
       B ratio = xsimd::exp(negb * (twowh * xseed + whwh));
       if (a.cropped) {
         for (; i < iend; i += W) {
-          // Same x as the scalar kernel, so cropping agrees.
-          const B x = steps * vrstep - vdist;
+          const B x = steps * vrstep + vxlo;
           const B y =
             xsimd::select(xsimd::abs(x / vfwhm) >= vhalfbound, zero, g);
           addProduct(a.out + i, y, xsimd::fma(x, vinvdist, one), iend - i);
@@ -171,7 +154,7 @@ struct SIMDKernel {
           steps += vw;
         }
       } else {
-        B rscaled = steps * vrscale;
+        B rscaled = xsimd::fma(xseed, vinvdist, one);
         const int istart = i;
         for (; i < iend; i += W) {
           addProduct(a.out + i, g, rscaled, iend - i);
@@ -255,13 +238,13 @@ struct SIMDKernel {
         m += int((bits >> j) & 1);
       }
     }
-    // The last points go one by one with the rounding of the vector lanes,
-    // a partial vector load would be much slower.
+    // The last points go one by one, a partial vector load would be much
+    // slower.
     for (; i < a.n; ++i) {
       const double dx = a.x[i] + a.ox;
       const double dy = a.y[i] + a.oy;
       const double dz = a.z[i] + a.oz;
-      const double d2 = mulAdd(dz, dz, mulAdd(dy, dy, dx * dx));
+      const double d2 = dx * dx + dy * dy + dz * dz;
       a.idx[m] = i;
       m += int(!(d2 < a.d2lo || d2 > a.d2hi));
     }

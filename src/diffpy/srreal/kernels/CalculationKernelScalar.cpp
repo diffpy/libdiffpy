@@ -26,8 +26,9 @@ namespace {
 
 void gaussianWindowScalar(const GaussianWindowArgs& a) {
   if (a.fwhm <= 0.0) return;
+  const double xlo = (a.rlosteps + a.ilo) * a.rstep - a.dist;
   for (int i = a.ilo; i < a.ihi; ++i) {
-    const double x = (a.rlosteps + i) * a.rstep - a.dist;
+    const double x = xlo + (i - a.ilo) * a.rstep;
     const double xrel = x / a.fwhm;
     if (a.cropped && fabs(xrel) >= a.halfboundrel) continue;
     const double y = a.peakheight * exp(-4 * std::numbers::ln2 * xrel * xrel);

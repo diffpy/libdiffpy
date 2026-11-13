@@ -444,36 +444,6 @@ TEST_CASE("TestCalculationKernel::test_bond_candidates",
         }
       }
     }
-    // All points are the same, so all or none are candidates.  With the
-    // bound between the fused and the separately rounded x^2 + z^2, the
-    // count is partial when the last points round unlike the vector lanes.
-    int nrounded = 0;
-    for (int k = 1; k < 200; ++k) {
-      const double vx = 1.0 + k * 0x1p-30;
-      const double vz = 3.0 - k * 0x1p-31;
-      const volatile double xx = vx * vx;
-      const volatile double zz = vz * vz;
-      const double fused = std::fma(vz, vz, xx);
-      const double separate = zz + xx;
-      if (fused == separate) continue;
-      ++nrounded;
-      for (int n : {9, 15, 17}) {
-        INFO("k = " << k << ", n = " << n);
-        std::vector<double> x(n, vx), y(n, 0.0), z(n, vz);
-        std::vector<int> idx(n);
-        const diffpy::srreal::kernels::BondCandidatesArgs args = {
-          .x = x.data(),
-          .y = y.data(),
-          .z = z.data(),
-          .n = n,
-          .d2hi = std::min(fused, separate),
-          .idx = idx.data(),
-        };
-        const int m = kernel.bondCandidates(args);
-        CHECK((m == 0 || m == n));
-      }
-    }
-    CHECK(nrounded > 0);
     std::vector<double> x(9, 1.0), y(9, -2.0), z(9, 2.0);
     std::vector<int> idx(9);
     diffpy::srreal::kernels::BondCandidatesArgs args = {

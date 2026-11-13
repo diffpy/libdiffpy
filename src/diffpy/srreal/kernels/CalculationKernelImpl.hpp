@@ -26,7 +26,8 @@ namespace kernels {
 
 /// Add one Gaussian peak to the PDFCalculator RDF array.
 ///
-/// For each i in [ilo, ihi) with x = (rlosteps + i) * rstep - dist:
+/// For each i in [ilo, ihi) with x = xlo + (i - ilo) * rstep, where
+/// xlo = (rlosteps + ilo) * rstep - dist:
 ///     out[i] += scale * G(x, fwhm) * (x / dist + 1)
 /// where G(x, fwhm) = peakheight * exp(-4 * ln(2) * (x / fwhm)^2), or zero
 /// for |x / fwhm| >= halfboundrel when cropped.  peakheight is the profile
