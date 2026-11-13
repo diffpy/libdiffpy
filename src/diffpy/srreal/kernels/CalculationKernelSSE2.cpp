@@ -9,7 +9,7 @@
  *
  ******************************************************************************
  *
- * NEON calculation kernel. Include nothing else here.
+ * SSE2 calculation kernel.  Include nothing else here.
  *
  *****************************************************************************/
 

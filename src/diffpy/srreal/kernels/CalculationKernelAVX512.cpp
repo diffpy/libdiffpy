@@ -15,6 +15,7 @@
 
 // xsimd namespace of this file, see CalculationKernelSIMD.ipp
 #define LIBDIFFPY_XSIMD_NAMESPACE xsimd_avx512
+#define LIBDIFFPY_XSIMD_AVX512 1
 #include "CalculationKernelSIMD.ipp"
 
 namespace diffpy {

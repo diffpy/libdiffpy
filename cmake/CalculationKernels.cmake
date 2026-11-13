@@ -2,10 +2,9 @@
 # and xsimd, all SIMD kernels of the target architecture are built too and
 # the library selects the best one the CPU supports at runtime, see
 # src/diffpy/srreal/kernels/CalculationKernelDispatch.cpp.
-set(LIBDIFFPY_SIMD "AUTO" CACHE STRING
-  "SIMD calculation kernels: AUTO (all kernels of the target architecture \
-when xsimd is found) or OFF (scalar kernel only)")
-set_property(CACHE LIBDIFFPY_SIMD PROPERTY STRINGS AUTO OFF)
+option(LIBDIFFPY_SIMD
+  "Build the SIMD calculation kernels of the target architecture when xsimd \
+is found" ON)
 
 # Target architecture.  A universal macOS build matches no architecture
 # below and gets only the scalar kernel.
@@ -56,10 +55,14 @@ set_source_files_properties("${_kernel_dir}/CalculationKernelScalar.cpp"
   PROPERTIES COMPILE_OPTIONS "${_kernel_math_options}")
 
 # Inline functions compiled for the SIMD instruction sets must not be shared
-# with the rest of the library, see CalculationKernelSIMD.ipp.  -O2 inlines
-# them also in unoptimized builds and -fno-lto keeps LTO from sharing them.
+# with the rest of the library, see CalculationKernelSIMD.ipp.  MSVC compiles
+# the kernels for the SSE2 baseline, its intrinsics need no /arch:AVX*.  With
+# GCC and Clang -O2 inlines the functions also in unoptimized builds.  /GL-
+# and -fno-lto keep LTO from sharing them.
 set(_simd_isolation_options)
-if(_kernel_simd AND NOT MSVC)
+if(_kernel_simd AND MSVC AND _kernel_arch STREQUAL "x86_64")
+  list(APPEND _simd_isolation_options /arch:SSE2 /GL-)
+elseif(_kernel_simd AND NOT MSVC)
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-fno-lto LIBDIFFPY_HAS_NO_LTO)
   if(LIBDIFFPY_HAS_NO_LTO)
@@ -75,8 +78,11 @@ endif()
 function(_libdiffpy_add_simd_kernel name)
   set(_source "${_kernel_dir}/CalculationKernel${name}.cpp")
   set(_options ${ARGN} ${_kernel_math_options} ${_simd_isolation_options})
+  # Each kernel sets up xsimd for itself.
   set_source_files_properties("${_source}"
-    PROPERTIES COMPILE_OPTIONS "${_options}")
+    PROPERTIES COMPILE_OPTIONS "${_options}"
+      SKIP_PRECOMPILE_HEADERS ON
+      SKIP_UNITY_BUILD_INCLUSION ON)
   target_sources(diffpy PRIVATE "${_source}")
   target_compile_definitions(diffpy PRIVATE LIBDIFFPY_KERNEL_${name}=1)
   string(TOLOWER "${name}" _lower)
@@ -86,8 +92,8 @@ endfunction()
 if(_kernel_simd AND _kernel_arch STREQUAL "x86_64")
   _libdiffpy_add_simd_kernel(SSE2)
   if(MSVC)
-    _libdiffpy_add_simd_kernel(AVX2 /arch:AVX2)
-    _libdiffpy_add_simd_kernel(AVX512 /arch:AVX512)
+    _libdiffpy_add_simd_kernel(AVX2)
+    _libdiffpy_add_simd_kernel(AVX512)
   else()
     _libdiffpy_add_simd_kernel(AVX2 -mavx2 -mfma)
     _libdiffpy_add_simd_kernel(AVX512

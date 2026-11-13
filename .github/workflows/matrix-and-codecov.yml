@@ -75,6 +75,9 @@ jobs:
           cmake --build --preset release --parallel ${{ matrix.jobs }} || exit /b 1
           ctest --test-dir build\release --output-on-failure --no-tests=error
 
+      - name: Check SIMD kernel isolation
+        run: python .github/scripts/check-kernel-isolation.py build
+
       - name: Generate coverage report
         if: matrix.coverage == 'ON'
         run: >-

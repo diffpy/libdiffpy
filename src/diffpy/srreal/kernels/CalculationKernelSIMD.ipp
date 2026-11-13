@@ -22,9 +22,13 @@
  * The linker keeps one copy of each inline function for the whole library,
  * so a copy compiled here could run AVX-512 code on a CPU without it.  To
  * avoid that, each file renames the xsimd namespace to
- * LIBDIFFPY_XSIMD_NAMESPACE and is compiled with optimization and without
- * link-time optimization, which inlines the few standard library functions
- * used here.  For the same reason use only C math functions.
+ * LIBDIFFPY_XSIMD_NAMESPACE and is compiled without link-time optimization.
+ * GCC and Clang inline the few stl functions used here, so
+ * use only C math functions.  MSVC compiles these files for SSE2,
+ * see CalculationKernelMSVC.hpp.
+ *
+ * Keep scalar floating point code out of the vector loops, there it makes
+ * MSVC pass the batches of the loop through the stack.
  *
  *****************************************************************************/
 
@@ -47,7 +51,17 @@
 
 // The xsimd headers and all code below use the renamed namespace.
 #define xsimd LIBDIFFPY_XSIMD_NAMESPACE
+#if defined(_MSC_VER) && !defined(__clang__) && defined(_M_X64)
+#include "CalculationKernelMSVC.hpp"
+#endif
 #include <xsimd/xsimd.hpp>
+
+// Inlines a helper at every call.
+#if defined(_MSC_VER)
+#define LIBDIFFPY_KERNEL_INLINE __forceinline
+#else
+#define LIBDIFFPY_KERNEL_INLINE inline __attribute__((always_inline))
+#endif
 
 namespace diffpy {
 namespace srreal {
@@ -65,6 +79,9 @@ constexpr int RESEED_SLACK = 8;
 /// normal and rho finite.  exp(-SAFE_EXPONENT) is about 1e-261.
 constexpr double SAFE_EXPONENT = 600.0;
 
+/// Lane numbers of the widest batch.
+constexpr double LANE_INDEX[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+
 template <class Arch>
 struct SIMDKernel {
   using B = xsimd::batch<double, Arch>;
@@ -73,9 +90,8 @@ struct SIMDKernel {
 
   /// The batch {0, 1, ..., W - 1}.
   static B laneIndex() {
-    double v[W];
-    for (int j = 0; j < W; ++j) v[j] = j;
-    return B::load_unaligned(v);
+    static_assert(W <= 8, "LANE_INDEX is too short.");
+    return B::load_unaligned(LANE_INDEX);
   }
 
   /// End of the block that starts at i, the last block ends at hi.
@@ -84,23 +100,35 @@ struct SIMDKernel {
     return last ? hi : i + RESEED_STEPS * W;
   }
 
-  /// Load the first n lanes from p, the other lanes are zero.
-  static B load(const double* p, int n) {
-    if (n >= W) return B::load_unaligned(p);
+  /// End of the whole vectors in [i, iend), only the last block has a rest.
+  static int wholeEnd(int i, int iend) { return iend - (iend - i) % W; }
+
+  // Batches go by value, MSVC keeps them in memory when passed by reference.
+
+  /// Load the first n < W lanes from p, the other lanes are zero.
+  static LIBDIFFPY_KERNEL_INLINE B loadPartial(const double* p, int n) {
     double v[W] = {};
     for (int j = 0; j < n; ++j) v[j] = p[j];
     return B::load_unaligned(v);
   }
 
-  /// Add the first n lanes of u * v to out.
-  static void addProduct(double* out, const B& u, const B& v, int n) {
-    if (n >= W) {
-      xsimd::fma(u, v, B::load_unaligned(out)).store_unaligned(out);
-      return;
-    }
+  /// Add u * v to out.
+  static void addProduct(double* out, B u, B v) {
+    xsimd::fma(u, v, B::load_unaligned(out)).store_unaligned(out);
+  }
+
+  /// Add the first n < W lanes of u * v to out.
+  static LIBDIFFPY_KERNEL_INLINE void addProductPartial(double* out, B u, B v,
+                                                        int n) {
     double uv[W];
     (u * v).store_unaligned(uv);
     for (int j = 0; j < n; ++j) out[j] += uv[j];
+  }
+
+  /// Zero t from the first set lane of small on, small must have one.
+  static B truncated(B t, BB small) {
+    const uint64_t m = small.mask();
+    return xsimd::select(BB::from_mask((m ^ (m - 1)) >> 1), t, B(0.0));
   }
 
   static void gaussianWindow(const GaussianWindowArgs& args) {
@@ -139,30 +167,43 @@ struct SIMDKernel {
     const B vrscalestep(wh / a.dist);
     for (int i = a.ilo; i < a.ihi;) {
       const int iend = blockEnd(i, a.ihi);
+      const int ivec = wholeEnd(i, iend);
       // Same x as the scalar kernel, so cropping agrees.
       const B xseed = steps * vrstep + vxlo;
       B g = vnorm * xsimd::exp(negb * xseed * xseed);
       B ratio = xsimd::exp(negb * (twowh * xseed + whwh));
       if (a.cropped) {
-        for (; i < iend; i += W) {
+        for (; i < ivec; i += W) {
           const B x = steps * vrstep + vxlo;
           const B y =
             xsimd::select(xsimd::abs(x / vfwhm) >= vhalfbound, zero, g);
-          addProduct(a.out + i, y, xsimd::fma(x, vinvdist, one), iend - i);
+          addProduct(a.out + i, y, xsimd::fma(x, vinvdist, one));
           g *= ratio;
           ratio *= ratiostep;
           steps += vw;
         }
+        if (i < iend) {
+          const B x = steps * vrstep + vxlo;
+          const B y =
+            xsimd::select(xsimd::abs(x / vfwhm) >= vhalfbound, zero, g);
+          addProductPartial(a.out + i, y, xsimd::fma(x, vinvdist, one),
+                            iend - i);
+          return;
+        }
       } else {
         B rscaled = xsimd::fma(xseed, vinvdist, one);
-        const int istart = i;
-        for (; i < iend; i += W) {
-          addProduct(a.out + i, g, rscaled, iend - i);
+        // Advance before the loop, the next seeds then do not wait for it.
+        steps += B(double(ivec - i));
+        for (; i < ivec; i += W) {
+          addProduct(a.out + i, g, rscaled);
           g *= ratio;
           ratio *= ratiostep;
           rscaled += vrscalestep;
         }
-        steps += B(double(i - istart));
+        if (i < iend) {
+          addProductPartial(a.out + i, g, rscaled, iend - i);
+          return;
+        }
       }
     }
   }
@@ -188,6 +229,7 @@ struct SIMDKernel {
     const B lanes = laneIndex();
     for (int kq = a.kqlo; kq < a.kqhi;) {
       const int kqend = blockEnd(kq, a.kqhi);
+      const int kqvec = wholeEnd(kq, kqend);
       const B k = B(double(kq)) + lanes;
       const B q = k * vqstep;
       const B dwq = vdwsigma * q;
@@ -195,24 +237,30 @@ struct SIMDKernel {
       B g = vsinescale * xsimd::exp(neghalf * dwq * dwq);
       B ratio = xsimd::exp(negalpha * (twow * k + ww));
       auto [s, c] = xsimd::sincos(q * vdist);
-      for (; kq < kqend; kq += W) {
-        const int n = kqend - kq;
-        // Unused lanes have zero t and do not reach the output.
-        B t = g * load(a.sf0 + kq, n) * load(a.sf1 + kq, n);
-        const auto small = xsimd::abs(t) <= vprec;
-        const bool last = xsimd::any(small);
-        if (last) {
+      for (; kq < kqvec; kq += W) {
+        const B t =
+          g * B::load_unaligned(a.sf0 + kq) * B::load_unaligned(a.sf1 + kq);
+        const BB small = xsimd::abs(t) <= vprec;
+        if (xsimd::any(small)) {
           // Keep the lanes before the first small term.
-          const uint64_t m = small.mask();
-          t = xsimd::select(BB::from_mask((m ^ (m - 1)) >> 1), t, B(0.0));
+          addProduct(a.out + kq, truncated(t, small), s);
+          return;
         }
-        addProduct(a.out + kq, t, s, n);
-        if (last) return;
+        addProduct(a.out + kq, t, s);
         g *= ratio;
         ratio *= ratiostep;
         const B snext = xsimd::fma(s, cosw, c * sinw);
         c = xsimd::fms(c, cosw, s * sinw);
         s = snext;
+      }
+      if (kq < kqend) {
+        const int n = kqend - kq;
+        // Unused lanes have zero t and do not reach the output.
+        B t = g * loadPartial(a.sf0 + kq, n) * loadPartial(a.sf1 + kq, n);
+        const BB small = xsimd::abs(t) <= vprec;
+        if (xsimd::any(small)) t = truncated(t, small);
+        addProductPartial(a.out + kq, t, s, n);
+        return;
       }
     }
   }
