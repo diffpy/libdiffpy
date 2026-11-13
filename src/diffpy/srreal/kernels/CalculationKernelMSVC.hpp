@@ -17,8 +17,7 @@
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512F__) ||   \
   defined(__AVX10_VER__) || defined(__SSE3__) || defined(__SSSE3__) || \
   defined(__SSE4_1__) || defined(__SSE4_2__)
-#error \
-  "Compile the MSVC SIMD kernels for SSE2 without /arch:AVX*."
+#error "Compile the MSVC SIMD kernels for SSE2 without /arch:AVX*."
 #endif
 
 // Enable the instruction sets of the kernel in xsimd, which also needs the
