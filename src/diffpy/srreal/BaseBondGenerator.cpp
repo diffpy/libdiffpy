@@ -17,6 +17,8 @@
  *
  *****************************************************************************/
 
+#include <algorithm>
+
 #include <diffpy/srreal/BaseBondGenerator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/mathutils.hpp>
@@ -38,7 +40,10 @@ BaseBondGenerator::BaseBondGenerator(StructureAdapterConstPtr stru)
       mr0(R3::zerovector),
       mr1(R3::zerovector),
       mr01(R3::zerovector),
-      mdistance(0.0) {
+      mdistance(0.0),
+      msite_consecutive(true),
+      mmultiplicity_site(-1),
+      mmultiplicity(0) {
   int cnt = stru->countSites();
   msite_all.resize(cnt);
   for (int i = 0; i != cnt; ++i) msite_all[i] = i;
@@ -72,6 +77,7 @@ void BaseBondGenerator::selectAnchorSite(int anchor) {
   assert(0 <= anchor && anchor < mstructure->countSites());
   msite_anchor = anchor;
   mr0 = mstructure->siteCartesianPosition(msite_anchor);
+  mmultiplicity_site = -1;
   this->setFinishedFlag();
 }
 
@@ -80,20 +86,21 @@ void BaseBondGenerator::selectSiteRange(int first, int last) {
   assert(last <= mstructure->countSites());
   msite_first = msite_all.begin() + first;
   msite_last = msite_all.begin() + last;
+  msite_consecutive = true;
   this->setFinishedFlag();
 }
 
 void BaseBondGenerator::selectSites(const SiteIndices& selection) {
   msite_selection = selection;
-  msite_first = msite_selection.begin();
-  msite_last = msite_selection.end();
-  this->setFinishedFlag();
+  this->selectSites(msite_selection.begin(), msite_selection.end());
 }
 
 void BaseBondGenerator::selectSites(SiteIndices::const_iterator first,
                                     SiteIndices::const_iterator last) {
   msite_first = first;
   msite_last = last;
+  const auto gap = [](int i, int j) { return j != i + 1; };
+  msite_consecutive = (std::adjacent_find(first, last, gap) == last);
   this->setFinishedFlag();
 }
 
@@ -118,7 +125,12 @@ int BaseBondGenerator::site0() const { return msite_anchor; }
 int BaseBondGenerator::site1() const { return *msite_current; }
 
 int BaseBondGenerator::multiplicity() const {
-  return mstructure->siteMultiplicity(this->site0());
+  // Calculators ask for every bond, look it up once per anchor.
+  if (mmultiplicity_site != this->site0()) {
+    mmultiplicity = mstructure->siteMultiplicity(this->site0());
+    mmultiplicity_site = this->site0();
+  }
+  return mmultiplicity;
 }
 
 const R3::Vector& BaseBondGenerator::r0() const { return mr0; }
@@ -138,8 +150,7 @@ const R3::Matrix& BaseBondGenerator::Ucartesian1() const {
 }
 
 double BaseBondGenerator::msd() const {
-  static R3::Vector s;
-  s = this->r01();
+  const R3::Vector& s = this->r01();
   double msd0 = meanSquareDisplacement(
     this->Ucartesian0(), s, mstructure->siteAnisotropy(this->site0()));
   double msd1 = meanSquareDisplacement(

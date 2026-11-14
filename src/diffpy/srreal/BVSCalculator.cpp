@@ -19,6 +19,7 @@
 #include <cmath>
 #include <cassert>
 
+#include <diffpy/hash.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/serialization.ipp>
 #include <diffpy/srreal/AtomUtils.hpp>
@@ -164,8 +165,7 @@ void BVSCalculator::cacheStructureData() {
 double BVSCalculator::rmaxFromPrecision(double eps) const {
   const BVParametersTable& bvtb = *(this->getBVParamTable());
   // build a set of unique (symbol, valence) pairs
-  typedef std::unordered_set<pair<string, int>,
-                             boost::hash<pair<string, int> > >
+  typedef std::unordered_set<pair<string, int>, diffpy::PairHash>
     SymbolValenceSet;
   SymbolValenceSet allsymvals;
   assert(int(mstructure_cache.baresymbols.size()) == this->countSites());

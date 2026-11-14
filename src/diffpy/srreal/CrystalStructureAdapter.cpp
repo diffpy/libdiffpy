@@ -20,7 +20,12 @@
  *
  *****************************************************************************/
 
+#include <algorithm>
 #include <cassert>
+#include <cstddef>
+#include <ranges>
+#include <span>
+#include <stdexcept>
 
 #include <diffpy/serialization.ipp>
 #include <diffpy/validators.hpp>
@@ -36,6 +41,31 @@ namespace srreal {
 // Constants -----------------------------------------------------------------
 
 const double DEFAULT_SYMMETRY_PRECISION = 5e-5;
+
+// Local Helpers -------------------------------------------------------------
+
+namespace {
+
+// Bitwise comparisons detect stale symmetry positions.  Unlike == they find
+// NaN equal to itself, so NaN does not force an expansion on every check.
+
+bool sameBits(std::span<const double> x, std::span<const double> y) {
+  return std::ranges::equal(std::as_bytes(x), std::as_bytes(y));
+}
+
+bool sameAtomBits(const Atom& a0, const Atom& a1) {
+  return a0.atomtype == a1.atomtype && a0.anisotropy == a1.anisotropy &&
+         sameBits({&a0.occupancy, 1}, {&a1.occupancy, 1}) &&
+         sameBits(a0.xyz_cartn.data(), a1.xyz_cartn.data()) &&
+         sameBits(a0.uij_cartn.data(), a1.uij_cartn.data());
+}
+
+/// Lattice equality is defined by its base vectors.
+bool sameLatticeBits(const Lattice& L0, const Lattice& L1) {
+  return sameBits(L0.base().data(), L1.base().data());
+}
+
+}  // namespace
 
 //////////////////////////////////////////////////////////////////////////////
 // class CrystalStructureAdapter
@@ -56,15 +86,14 @@ StructureAdapterPtr CrystalStructureAdapter::clone() const {
 }
 
 BaseBondGeneratorPtr CrystalStructureAdapter::createBondGenerator() const {
-  this->updateSymmetryPositions();
+  // the generator brings the symmetry positions up to date
   BaseBondGeneratorPtr bnds(
     new CrystalStructureBondGenerator(shared_from_this()));
   return bnds;
 }
 
 int CrystalStructureAdapter::siteMultiplicity(int idx) const {
-  if (!this->isSymmetryCached()) this->updateSymmetryPositions();
-  int rv = msymatoms[idx].size();
+  int rv = this->getEquivalentAtoms(idx).size();
   return rv;
 }
 
@@ -122,7 +151,7 @@ const SymOpRotTrans& CrystalStructureAdapter::getSymOp(int i) const {
 const CrystalStructureAdapter::AtomVector&
 CrystalStructureAdapter::getEquivalentAtoms(int idx) const {
   assert(0 <= idx && idx < this->countSites());
-  if (!this->isSymmetryCached()) this->updateSymmetryPositions();
+  if (!this->isSiteSymmetryUpToDate(idx)) this->updateSymmetryPositions();
   return msymatoms[idx];
 }
 
@@ -167,11 +196,9 @@ CrystalStructureAdapter::AtomVector CrystalStructureAdapter::expandLatticeAtom(
   // calculate mean values from equivalent sites and adjust any roundoffs
   assert(eqsites.size() == eqduplicity.size());
   assert(eqsites.size() == eqsumpos.size());
-  iterator ai = eqsites.begin();
-  vector<R3::Vector>::const_iterator sii = eqsumpos.begin();
-  vector<int>::const_iterator dpi = eqduplicity.begin();
-  for (; ai != eqsites.end(); ++ai, ++sii, ++dpi) {
-    ai->xyz_cartn = (*sii) / (*dpi);
+  for (auto&& [atom, sumpos, duplicity] :
+       std::views::zip(eqsites, eqsumpos, eqduplicity)) {
+    atom.xyz_cartn = sumpos / duplicity;
   }
   return eqsites;
 }
@@ -191,6 +218,8 @@ void CrystalStructureAdapter::updateSymmetryPositions() const {
     iterator ai = saii->begin();
     for (; ai != saii->end(); ++ai) this->toCartesian(*ai);
   }
+  msymsource.assign(this->begin(), this->end());
+  msymlattice = this->getLattice();
   msymmetry_cached = true;
 }
 
@@ -200,12 +229,20 @@ int CrystalStructureAdapter::findEqualPosition(const AtomVector& eqsites,
                                                const Atom& a0) const {
   const double symeps = this->getSymmetryPrecision();
   const Lattice& L = this->getLattice();
+  // Over a distance d a fractional coordinate changes by at most d times its
+  // reciprocal vector length.  Twice that bound skips most sites early.
+  const double xtol = 2 * symeps * L.ar();
+  const double ytol = 2 * symeps * L.br();
   R3::Vector dxyz;
   const_iterator ai = eqsites.begin();
   for (; ai != eqsites.end(); ++ai) {
-    dxyz = ai->xyz_cartn - a0.xyz_cartn;
+    dxyz[0] = ai->xyz_cartn[0] - a0.xyz_cartn[0];
     dxyz[0] -= round(dxyz[0]);
+    if (fabs(dxyz[0]) > xtol) continue;
+    dxyz[1] = ai->xyz_cartn[1] - a0.xyz_cartn[1];
     dxyz[1] -= round(dxyz[1]);
+    if (fabs(dxyz[1]) > ytol) continue;
+    dxyz[2] = ai->xyz_cartn[2] - a0.xyz_cartn[2];
     dxyz[2] -= round(dxyz[2]);
     if (L.norm(dxyz) <= symeps) return (ai - eqsites.begin());
   }
@@ -216,6 +253,27 @@ bool CrystalStructureAdapter::isSymmetryCached() const {
   msymmetry_cached =
     msymmetry_cached && (int(msymatoms.size()) == this->countSites());
   return msymmetry_cached;
+}
+
+bool CrystalStructureAdapter::isSiteSymmetryUpToDate(int idx) const {
+  // Changes of the symmetry operations or precision reset msymmetry_cached,
+  // so only the atom and the lattice need a check.
+  return this->isSymmetryCached() && msymsource.size() == msymatoms.size() &&
+         sameLatticeBits(msymlattice, this->getLattice()) &&
+         sameAtomBits(msymsource[idx], (*this)[idx]);
+}
+
+bool CrystalStructureAdapter::isSymmetryUpToDate() const {
+  return this->isSymmetryCached() && msymsource.size() == msymatoms.size() &&
+         sameLatticeBits(msymlattice, this->getLattice()) &&
+         std::equal(this->begin(), this->end(), msymsource.begin(),
+                    sameAtomBits);
+}
+
+const std::vector<CrystalStructureAdapter::AtomVector>&
+CrystalStructureAdapter::symmetryAtoms() const {
+  if (!this->isSymmetryUpToDate()) this->updateSymmetryPositions();
+  return msymatoms;
 }
 
 // Comparison functions ------------------------------------------------------
@@ -240,70 +298,35 @@ bool operator!=(const CrystalStructureAdapter& stru0,
 
 // Constructor ---------------------------------------------------------------
 
+// The positions of site1 are its symmetry equivalent atoms.  They are the
+// outer loop of the bond order, see PeriodicStructureBondGenerator.
+
 CrystalStructureBondGenerator::CrystalStructureBondGenerator(
   StructureAdapterConstPtr adpt)
-    : PeriodicStructureBondGenerator(adpt) {
-  mcstructure = dynamic_cast<const CrystalStructureAdapter*>(adpt.get());
-  assert(mcstructure);
-  msymidx = 0;
-  mpuc1 = &(R3::zeromatrix());
+    : PeriodicStructureBondGenerator(adpt, BondOrder::PositionFirst) {
+  const CrystalStructureAdapter* cstru =
+    dynamic_cast<const CrystalStructureAdapter*>(adpt.get());
+  if (!cstru) {
+    throw invalid_argument(
+      "CrystalStructureBondGenerator requires a CrystalStructureAdapter.");
+  }
+  // Copy the symmetry positions and displacements, the adapter replaces
+  // them whenever it expands the symmetry again.
+  const vector<CrystalStructureAdapter::AtomVector>& symatoms =
+    cstru->symmetryAtoms();
+  for (int i = 0; i < int(symatoms.size()); ++i) {
+    for (const Atom& a : symatoms[i]) {
+      this->addPosition(i, a.xyz_cartn);
+      mcelluij.push_back(a.uij_cartn);
+    }
+  }
 }
 
 // Public Methods ------------------------------------------------------------
 
-void CrystalStructureBondGenerator::selectAnchorSite(int anchor) {
-  this->BaseBondGenerator::selectAnchorSite(anchor);
-  const Atom& a0 = this->symatoms(anchor)[0];
-  mr0 = a0.xyz_cartn;
-}
-
 const R3::Matrix& CrystalStructureBondGenerator::Ucartesian1() const {
-  return *mpuc1;
-}
-
-// Protected Methods ---------------------------------------------------------
-
-bool CrystalStructureBondGenerator::iterateSymmetry() {
-  // Iterate the sphere at a fixed symmetry position.
-  if (this->PeriodicStructureBondGenerator::iterateSymmetry()) {
-    this->updater1();
-    return true;
-  }
-  // Advance to the next symmetry position.  We are done if they
-  // were all already used.
-  const AtomVector& sa = this->symatoms(this->site1());
-  ++msymidx;
-  if (msymidx >= sa.size()) return false;
-  // rewind the sphere for the new symmetry position.
-  // this calls CrystalStructureBondGenerator::updater1()
-  this->PeriodicStructureBondGenerator::rewindSymmetry();
-  return true;
-}
-
-void CrystalStructureBondGenerator::rewindSymmetry() {
-  msymidx = 0;
-  // this calls CrystalStructureBondGenerator::updater1()
-  this->PeriodicStructureBondGenerator::rewindSymmetry();
-}
-
-void CrystalStructureBondGenerator::getNextBond() {
-  this->BaseBondGenerator::getNextBond();
-}
-
-void CrystalStructureBondGenerator::updater1() {
-  const AtomVector& sa = this->symatoms(this->site1());
-  assert(msymidx < sa.size());
-  mr1 = mrcsphere + sa[msymidx].xyz_cartn;
-  mpuc1 = &(sa[msymidx].uij_cartn);
-  this->updateDistance();
-}
-
-// Private Methods -----------------------------------------------------------
-
-const CrystalStructureAdapter::AtomVector&
-CrystalStructureBondGenerator::symatoms(int idx) {
-  assert(0 <= idx && idx < int(mcstructure->msymatoms.size()));
-  return mcstructure->msymatoms[idx];
+  if (mcelluij.empty()) return R3::zeromatrix();
+  return mcelluij[mcellindex];
 }
 
 }  // namespace srreal

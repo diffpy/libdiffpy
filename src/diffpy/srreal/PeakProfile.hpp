@@ -47,6 +47,12 @@ class DLL_EXPORT PeakProfile : public diffpy::Attributes,
   virtual double operator()(double x, double fwhm) const = 0;
   virtual double xboundlo(double fwhm) const = 0;
   virtual double xboundhi(double fwhm) const = 0;
+  /// Add the peak of a pair at distance dist to an RDF on the r-grid
+  /// (rlosteps + i) * rstep.  For i in [ilo, ihi) with x = r - dist:
+  ///     out[i] += scale * (*this)(x, fwhm) * (x / dist + 1)
+  virtual void addRDFPeak(double* out, int ilo, int ihi, int rlosteps,
+                          double rstep, double dist, double fwhm,
+                          double scale) const;
   virtual void setPrecision(double eps);
   const double& getPrecision() const;
   virtual eventticker::EventTicker& ticker() const { return mticker; }

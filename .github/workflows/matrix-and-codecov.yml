@@ -75,15 +75,18 @@ jobs:
           cmake --build --preset release --parallel ${{ matrix.jobs }} || exit /b 1
           ctest --test-dir build\release --output-on-failure --no-tests=error
 
+      - name: Check SIMD kernel isolation
+        run: python .github/scripts/check-kernel-isolation.py build
+
       - name: Generate coverage report
-        if: runner.os == 'Linux'
+        if: matrix.coverage == 'ON'
         run: >-
           gcovr --gcov-executable "$CONDA_PREFIX/bin/gcov"
           --root . --filter 'src/diffpy/'
           --xml coverage.xml
 
       - name: Save coverage report
-        if: runner.os == 'Linux'
+        if: matrix.coverage == 'ON'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -92,7 +95,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         # Fork push builds have no upstream Codecov token; keep their artifact.
-        if: runner.os == 'Linux' && github.repository == 'diffpy/libdiffpy'
+        if: matrix.coverage == 'ON' && github.repository == 'diffpy/libdiffpy'
         uses: codecov/codecov-action@v5
         with:
           files: coverage.xml

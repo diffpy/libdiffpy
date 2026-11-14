@@ -24,8 +24,8 @@
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/unordered_set.hpp>
 #include <boost/serialization/unordered_map.hpp>
-#include <boost/functional/hash.hpp>
 
+#include <diffpy/hash.hpp>
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/QuantityType.hpp>
@@ -104,11 +104,10 @@ class DLL_EXPORT PairQuantity : public diffpy::Attributes {
   virtual void restorePartialValue();
 
   // data
-  typedef std::unordered_set<std::pair<int, int>,
-                             boost::hash<std::pair<int, int> > >
+  typedef std::unordered_set<std::pair<int, int>, diffpy::PairHash>
     PairMaskStorage;
   typedef std::unordered_map<std::pair<std::string, std::string>, bool,
-                             boost::hash<std::pair<std::string, std::string> > >
+                             diffpy::PairHash>
     TypeMaskStorage;
   QuantityType mvalue;
   StructureAdapterPtr mstructure;

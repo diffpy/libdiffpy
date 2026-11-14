@@ -63,24 +63,22 @@ StructureDifference StructureAdapter::diff(
 
 double meanSquareDisplacement(const R3::Matrix& Uijcartn, const R3::Vector& s,
                               bool anisotropy) {
-  double rv;
-  if (anisotropy) {
-    assert(R3::norm(s) > 0);
-    assert(eps_eq(Uijcartn(0, 1), Uijcartn(1, 0)));
-    assert(eps_eq(Uijcartn(0, 2), Uijcartn(2, 0)));
-    assert(eps_eq(Uijcartn(1, 2), Uijcartn(2, 1)));
-    static R3::Vector sn;
-    sn = s / R3::norm(s);
-    rv = Uijcartn(0, 0) * sn(0) * sn(0) + Uijcartn(1, 1) * sn(1) * sn(1) +
-         Uijcartn(2, 2) * sn(2) * sn(2) + 2 * Uijcartn(0, 1) * sn(0) * sn(1) +
-         2 * Uijcartn(0, 2) * sn(0) * sn(2) +
-         2 * Uijcartn(1, 2) * sn(1) * sn(2);
-  } else {
-    assert(eps_eq(Uijcartn(0, 0), Uijcartn(1, 1)));
-    assert(eps_eq(Uijcartn(0, 0), Uijcartn(2, 2)));
-    rv = Uijcartn(0, 0);
+  const R3::Matrix& U = Uijcartn;
+  if (!anisotropy) {
+    assert(eps_eq(U(0, 0), U(1, 1)));
+    assert(eps_eq(U(0, 0), U(2, 2)));
+    return U(0, 0);
   }
-  return rv;
+  assert(R3::norm(s) > 0);
+  assert(eps_eq(U(0, 1), U(1, 0)));
+  assert(eps_eq(U(0, 2), U(2, 0)));
+  assert(eps_eq(U(1, 2), U(2, 1)));
+  // s'Us / s's is the MSD along s without normalizing s first.
+  const double s0 = s[0], s1 = s[1], s2 = s[2];
+  const double sUs =
+    U(0, 0) * s0 * s0 + U(1, 1) * s1 * s1 + U(2, 2) * s2 * s2 +
+    2 * (U(0, 1) * s0 * s1 + U(0, 2) * s0 * s2 + U(1, 2) * s1 * s2);
+  return sUs / (s0 * s0 + s1 * s1 + s2 * s2);
 }
 
 double maxUii(StructureAdapterPtr stru) {

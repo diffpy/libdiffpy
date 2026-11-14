@@ -23,6 +23,7 @@
 #include <functional>
 
 #include <diffpy/srreal/BaseDebyeSum.hpp>
+#include <diffpy/srreal/kernels/CalculationKernelImpl.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/serialization.ipp>
@@ -141,19 +142,27 @@ void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds,
   // calculate sigma parameter for the Debye-Waller dampign Gaussian
   const double fwhm = this->getPeakWidthModel()->calculate(bnds);
   const double fwhmtosigma = 1.0 / (2 * sqrt(2 * M_LN2));
-  const double dwsigma = fwhmtosigma * fwhm;
   const int nqpts = pdfutils_qmaxSteps(this);
-  const int smscale = summationscale * bnds.multiplicity();
-  const double& sineprec = this->getDebyePrecision();
-  for (int kq = pdfutils_qminSteps(this); kq < nqpts; ++kq) {
-    const double q = kq * this->getQstep();
-    const double dwscale = exp(-0.5 * pow(dwsigma * q, 2));
-    const double sinescale = smscale * dwscale *
-                             this->sfSiteAtkQ(bnds.site0(), kq) *
-                             this->sfSiteAtkQ(bnds.site1(), kq) / dist;
-    if (eps_eq(0.0, sinescale, sineprec)) break;
-    mvalue[kq] += sinescale * sin(q * dist);
-  }
+  const auto& sftypeatkq = mstructure_cache.sftypeatkq;
+  const auto& typeofsite = mstructure_cache.typeofsite;
+  const auto& sf0 = sftypeatkq[typeofsite[bnds.site0()]];
+  const auto& sf1 = sftypeatkq[typeofsite[bnds.site1()]];
+  assert(nqpts <= int(mvalue.size()));
+  assert(nqpts <= int(sf0.size()));
+  assert(nqpts <= int(sf1.size()));
+
+  kernels::activeCalculationKernel().debyeSum({
+    .out = mvalue.data(),
+    .kqlo = pdfutils_qminSteps(this),
+    .kqhi = nqpts,
+    .qstep = this->getQstep(),
+    .dist = dist,
+    .dwsigma = fwhmtosigma * fwhm,
+    .scale = double(summationscale * bnds.multiplicity()),
+    .prec = this->getDebyePrecision(),
+    .sf0 = sf0.data(),
+    .sf1 = sf1.data(),
+  });
 }
 
 void BaseDebyeSum::stashPartialValue() { mdbsumstash = this->value(); }
@@ -169,15 +178,6 @@ double BaseDebyeSum::sfSiteAtQ(int siteidx, const double& q) const {
 }
 
 // Private Methods -----------------------------------------------------------
-
-double BaseDebyeSum::sfSiteAtkQ(int siteidx, int kq) const {
-  assert(0 <= siteidx && siteidx < int(mstructure_cache.typeofsite.size()));
-  int typeidx = mstructure_cache.typeofsite[siteidx];
-  assert(typeidx < int(mstructure_cache.sftypeatkq.size()));
-  const QuantityType& sfarray = mstructure_cache.sftypeatkq[typeidx];
-  assert(0 <= kq && kq < int(sfarray.size()));
-  return sfarray[kq];
-}
 
 double BaseDebyeSum::sfAverageAtkQ(int kq) const {
   assert(kq < int(mstructure_cache.sfaverageatkq.size()));

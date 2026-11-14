@@ -73,6 +73,8 @@ void PQEvaluatorBasic::validate(PairQuantity& pq) const { return; }
 
 void PQEvaluatorBasic::updateValue(PairQuantity& pq, StructureAdapterPtr stru) {
   mtypeused = BASIC;
+  // The value is not valid until this update completes.
+  mvalue_ticker = eventticker::EventTicker();
   pq.setStructure(stru);
   BaseBondGeneratorPtr bnds = pq.mstructure->createBondGenerator();
   pq.configureBondGenerator(*bnds);
@@ -155,6 +157,8 @@ void PQEvaluatorOptimized::updateValue(PairQuantity& pq,
   }
   // Remove contributions from the extra sites in the old structure
   assert(sd.stru0 == mlast_structure);
+  // The value belongs to no structure until this update completes.
+  mlast_structure.reset();
   int cntsites0 = sd.stru0->countSites();
   BaseBondGeneratorPtr bnds0 = sd.stru0->createBondGenerator();
   pq.configureBondGenerator(*bnds0);

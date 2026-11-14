@@ -45,7 +45,21 @@ To use the same options for every build, set them in a ``CMakeUserPresets.json``
 file in the repository root. To use another generator, configure a separate
 directory with ``cmake -S . -B <build-dir> -G "<generator>"``. To disable the
 ObjCryst adapter, pass ``-DLIBDIFFPY_ENABLE_OBJCRYST=OFF``. For gprof
-instrumentation, use ``-DLIBDIFFPY_PROFILE=ON``.
+instrumentation, use ``-DLIBDIFFPY_PROFILE=ON``. To build the optimized
+shared library without link-time optimization, pass ``-DLIBDIFFPY_LTO=OFF``.
+
+Calculation kernels
+-------------------
+
+``PDFCalculator`` and ``DebyePDFCalculator`` run their inner loops in a
+calculation kernel. The scalar kernel is always built. With the default
+``-DLIBDIFFPY_SIMD=ON`` the SIMD kernels of the target architecture are built
+too when `xsimd <https://github.com/xtensor-stack/xsimd>`_ is found;
+``-DLIBDIFFPY_SIMD=OFF`` builds only the scalar kernel.
+
+The SIMD kernels are ``avx512``, ``avx2`` and ``sse2`` on x86-64 and ``neon``
+on arm64. On first use the library picks the best kernel that the CPU
+supports, for example ``avx2`` on a CPU without AVX-512.
 
 Embed libdiffpy in another CMake project
 ----------------------------------------

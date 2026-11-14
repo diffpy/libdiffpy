@@ -1,3 +1,4 @@
 cxx-compiler
 cmake>=3.22
 ninja
+xsimd

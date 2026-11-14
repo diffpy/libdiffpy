@@ -81,6 +81,11 @@ class DLL_EXPORT BaseBondGenerator {
   double mdistance;
   SiteIndices msite_all;
   SiteIndices msite_selection;
+  /// True when the selected sites are consecutive indices.
+  bool msite_consecutive;
+  /// Multiplicity of the anchor site mmultiplicity_site, -1 when unknown.
+  mutable int mmultiplicity_site;
+  mutable int mmultiplicity;
 
   // methods
   virtual bool iterateSymmetry();

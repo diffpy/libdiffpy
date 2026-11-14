@@ -71,9 +71,8 @@ class DLL_EXPORT BaseDebyeSum : public PairQuantity,
 
  private:
   // methods
-  /// cache structure factors data for a quick access during summation
-  double sfSiteAtkQ(int siteidx, int kq) const;
   double sfAverageAtkQ(int kq) const;
+  /// cache structure factors data for a quick access during summation
   void cacheStructureData();
 
   // data

@@ -20,10 +20,10 @@
 #define R3LINALG_HPP_INCLUDED
 
 #include <algorithm>
-#include <boost/serialization/base_object.hpp>
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <boost/serialization/access.hpp>
 #include <diffpy/mathutils.hpp>
 
 #include <diffpy/Export.hpp>
@@ -32,177 +32,237 @@ namespace diffpy {
 namespace srreal {
 namespace R3 {
 
-// Declarations --------------------------------------------------------------
-
-namespace ublas = boost::numeric::ublas;
-using ublas::column;
-using ublas::prod;
-using ublas::row;
-using ublas::trans;
-
-// Constants
+// Constants -----------------------------------------------------------------
 
 extern DLL_EXPORT const int Ndim;
 using ::diffpy::mathutils::SQRT_DOUBLE_EPS;
-const ublas::zero_vector<double> zerovector(Ndim);
 
-// Classes
+// Classes -------------------------------------------------------------------
 
-class DLL_EXPORT Vector
-    : public ublas::vector<double, ublas::bounded_array<double, 3> > {
-  typedef ublas::vector<double, ublas::bounded_array<double, 3> > BaseVector;
-
+class Vector {
  public:
+  typedef double value_type;
+  typedef std::size_t size_type;
+  typedef std::array<double, 3> array_type;
+  typedef array_type::iterator iterator;
+  typedef array_type::const_iterator const_iterator;
+
   // constructors
-  Vector() : BaseVector(3) {}
+  constexpr Vector() noexcept : mdata{} {}
+  constexpr Vector(double x, double y, double z) noexcept : mdata{x, y, z} {}
+  constexpr Vector(const Vector&) noexcept = default;
+  constexpr Vector(Vector&&) noexcept = default;
 
-  Vector(const double& x, const double& y, const double& z) : BaseVector(3) {
-    Vector::iterator xi = this->begin();
-    *(xi++) = x;
-    *(xi++) = y;
-    *(xi++) = z;
+  // Assignments are restricted to lvalues so that writes to a temporary,
+  // such as row(A, 0) = v, fail to compile instead of being lost.
+  constexpr Vector& operator=(const Vector&) & noexcept = default;
+  constexpr Vector& operator=(Vector&&) & noexcept = default;
+
+  // Element writes need an lvalue too, row(A, 0)[1] = x does not compile.
+  constexpr double& operator[](size_type i) & noexcept { return mdata[i]; }
+  constexpr const double& operator[](size_type i) const& noexcept {
+    return mdata[i];
+  }
+  constexpr double& operator()(size_type i) & noexcept { return mdata[i]; }
+  constexpr const double& operator()(size_type i) const& noexcept {
+    return mdata[i];
+  }
+  static constexpr size_type size() noexcept { return 3; }
+  constexpr array_type& data() & noexcept { return mdata; }
+  constexpr const array_type& data() const& noexcept { return mdata; }
+
+  // iterators, writable only for lvalues
+  constexpr iterator begin() & noexcept { return mdata.begin(); }
+  constexpr iterator end() & noexcept { return mdata.end(); }
+  constexpr const_iterator begin() const& noexcept { return mdata.begin(); }
+  constexpr const_iterator end() const& noexcept { return mdata.end(); }
+
+  // exact element-wise equality, != is rewritten from it
+  constexpr bool operator==(const Vector&) const noexcept = default;
+
+  // in-place arithmetic
+  constexpr Vector& operator+=(const Vector& v) & noexcept {
+    for (size_type k = 0; k < 3; ++k) mdata[k] += v.mdata[k];
+    return *this;
   }
 
-  template <class T>
-  Vector(const ublas::vector_expression<T>& r) : BaseVector(r) {}
-
-  template <class T>
-  void operator=(const ublas::vector_expression<T>& r) {
-    BaseVector::operator=(r);
+  constexpr Vector& operator-=(const Vector& v) & noexcept {
+    for (size_type k = 0; k < 3; ++k) mdata[k] -= v.mdata[k];
+    return *this;
   }
 
-  template <class T>
-  void operator=(const BaseVector& r) {
-    BaseVector::operator=(r);
+  constexpr Vector& operator*=(double s) & noexcept {
+    for (double& x : mdata) x *= s;
+    return *this;
+  }
+
+  constexpr Vector& operator/=(double s) & noexcept {
+    for (double& x : mdata) x /= s;
+    return *this;
   }
 
  private:
+  array_type mdata;
+
   // serialization
   friend class boost::serialization::access;
   template <class Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    using boost::serialization::base_object;
-    ar& base_object<BaseVector>(*this);
-  }
+  void serialize(Archive& ar, const unsigned int version);
 };
 
-class DLL_EXPORT Matrix
-    : public ublas::matrix<double, ublas::row_major,
-                           ublas::bounded_array<double, 9> > {
-  typedef ublas::matrix<double, ublas::row_major,
-                        ublas::bounded_array<double, 9> >
-    BaseMatrix;
-
+class Matrix {
  public:
+  typedef double value_type;
+  typedef std::size_t size_type;
+  typedef std::array<double, 9> array_type;
+
   // constructors
-  Matrix() : BaseMatrix(3, 3) {}
+  constexpr Matrix() noexcept : mdata{} {}
+  constexpr Matrix(double x0, double x1, double x2, double x3, double x4,
+                   double x5, double x6, double x7, double x8) noexcept
+      : mdata{x0, x1, x2, x3, x4, x5, x6, x7, x8} {}
+  constexpr Matrix(const Matrix&) noexcept = default;
+  constexpr Matrix(Matrix&&) noexcept = default;
 
-  Matrix(const double& x0, const double& x1, const double& x2, const double& x3,
-         const double& x4, const double& x5, const double& x6, const double& x7,
-         const double& x8)
-      : BaseMatrix(3, 3) {
-    Matrix::array_type::iterator xi = this->data().begin();
-    *(xi++) = x0;
-    *(xi++) = x1;
-    *(xi++) = x2;
-    *(xi++) = x3;
-    *(xi++) = x4;
-    *(xi++) = x5;
-    *(xi++) = x6;
-    *(xi++) = x7;
-    *(xi++) = x8;
+  // assignments are restricted to lvalues, see Vector
+  constexpr Matrix& operator=(const Matrix&) & noexcept = default;
+  constexpr Matrix& operator=(Matrix&&) & noexcept = default;
+
+  // row-major element access, writable only for lvalues
+  constexpr double& operator()(size_type i, size_type j) & noexcept {
+    return mdata[3 * i + j];
+  }
+  constexpr const double& operator()(size_type i, size_type j) const& noexcept {
+    return mdata[3 * i + j];
+  }
+  static constexpr size_type size1() noexcept { return 3; }
+  static constexpr size_type size2() noexcept { return 3; }
+  constexpr array_type& data() & noexcept { return mdata; }
+  constexpr const array_type& data() const& noexcept { return mdata; }
+
+  // exact element-wise equality, != is rewritten from it
+  constexpr bool operator==(const Matrix&) const noexcept = default;
+
+  // in-place arithmetic
+  constexpr Matrix& operator+=(const Matrix& A) & noexcept {
+    for (size_type k = 0; k < 9; ++k) mdata[k] += A.mdata[k];
+    return *this;
   }
 
-  template <class T>
-  Matrix(const ublas::matrix_expression<T>& r) : BaseMatrix(r) {}
-
-  template <class T>
-  void operator=(const ublas::matrix_expression<T>& r) {
-    BaseMatrix::operator=(r);
+  constexpr Matrix& operator-=(const Matrix& A) & noexcept {
+    for (size_type k = 0; k < 9; ++k) mdata[k] -= A.mdata[k];
+    return *this;
   }
 
-  template <class T>
-  void operator=(const BaseMatrix& r) {
-    BaseMatrix::operator=(r);
+  constexpr Matrix& operator*=(double s) & noexcept {
+    for (double& x : mdata) x *= s;
+    return *this;
+  }
+
+  constexpr Matrix& operator/=(double s) & noexcept {
+    for (double& x : mdata) x /= s;
+    return *this;
   }
 
  private:
+  array_type mdata;
+
   // serialization
   friend class boost::serialization::access;
   template <class Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    using boost::serialization::base_object;
-    ar& base_object<BaseMatrix>(*this);
-  }
+  void serialize(Archive& ar, const unsigned int version);
 };
 
-// Functions
+inline constexpr Vector zerovector{};
+
+// Functions -----------------------------------------------------------------
 
 DLL_EXPORT const Matrix& identity();
 DLL_EXPORT const Matrix& zeromatrix();
 DLL_EXPORT double determinant(const Matrix& A);
-DLL_EXPORT const Matrix& inverse(const Matrix& A);
+DLL_EXPORT Matrix inverse(const Matrix& A);
 
-const Vector& floor(const Vector&);
-template <class V>
-double norm(const V&);
-template <class V>
-double distance(const V& u, const V& v);
-template <class V>
-double dot(const V& u, const V& v);
-template <class V>
-Vector cross(const V& u, const V& v);
-template <class V>
-const Vector& mxvecproduct(const Matrix&, const V&);
-template <class V>
-const Vector& mxvecproduct(const V&, const Matrix&);
+// Vector arithmetic ---------------------------------------------------------
 
-// Equality ------------------------------------------------------------------
-
-inline bool operator==(const Vector& u, const Vector& v) {
-  bool rv = std::equal(u.begin(), u.end(), v.begin());
-  return rv;
+constexpr Vector operator-(const Vector& u) noexcept {
+  return Vector(-u[0], -u[1], -u[2]);
 }
 
-inline bool operator!=(const Vector& u, const Vector& v) { return !(u == v); }
-
-inline bool operator==(const Matrix& A, const Matrix& B) {
-  bool rv = (&A == &B) ||
-            std::equal(A.data().begin(), A.data().end(), B.data().begin());
-  return rv;
+constexpr Vector operator+(Vector u, const Vector& v) noexcept {
+  return u += v;
 }
 
-inline bool operator!=(const Matrix& A, const Matrix& B) { return !(A == B); }
+constexpr Vector operator-(Vector u, const Vector& v) noexcept {
+  return u -= v;
+}
+
+constexpr Vector operator*(Vector u, double s) noexcept { return u *= s; }
+constexpr Vector operator*(double s, Vector u) noexcept { return u *= s; }
+constexpr Vector operator/(Vector u, double s) noexcept { return u /= s; }
+
+// Matrix arithmetic ---------------------------------------------------------
+
+constexpr Matrix operator-(Matrix A) noexcept { return A *= -1.0; }
+
+constexpr Matrix operator+(Matrix A, const Matrix& B) noexcept {
+  return A += B;
+}
+
+constexpr Matrix operator-(Matrix A, const Matrix& B) noexcept {
+  return A -= B;
+}
+
+constexpr Matrix operator*(Matrix A, double s) noexcept { return A *= s; }
+constexpr Matrix operator*(double s, Matrix A) noexcept { return A *= s; }
+constexpr Matrix operator/(Matrix A, double s) noexcept { return A /= s; }
+
+/// Matrix product A * B.
+constexpr Matrix prod(const Matrix& A, const Matrix& B) noexcept {
+  Matrix C;
+  for (std::size_t i = 0; i < 3; ++i) {
+    for (std::size_t j = 0; j < 3; ++j) {
+      C(i, j) = A(i, 0) * B(0, j) + A(i, 1) * B(1, j) + A(i, 2) * B(2, j);
+    }
+  }
+  return C;
+}
+
+constexpr Matrix trans(const Matrix& A) noexcept {
+  return Matrix(A(0, 0), A(1, 0), A(2, 0), A(0, 1), A(1, 1), A(2, 1), A(0, 2),
+                A(1, 2), A(2, 2));
+}
+
+/// Copy of the i-th row of A.
+constexpr Vector row(const Matrix& A, std::size_t i) noexcept {
+  return Vector(A(i, 0), A(i, 1), A(i, 2));
+}
+
+/// Copy of the j-th column of A.
+constexpr Vector column(const Matrix& A, std::size_t j) noexcept {
+  return Vector(A(0, j), A(1, j), A(2, j));
+}
+
+constexpr void setrow(Matrix& A, std::size_t i, const Vector& v) noexcept {
+  A(i, 0) = v[0];
+  A(i, 1) = v[1];
+  A(i, 2) = v[2];
+}
+
+constexpr void setcolumn(Matrix& A, std::size_t j, const Vector& v) noexcept {
+  A(0, j) = v[0];
+  A(1, j) = v[1];
+  A(2, j) = v[2];
+}
 
 // Hashing -------------------------------------------------------------------
 
 DLL_EXPORT size_t hash_value(const Vector& v);
 DLL_EXPORT size_t hash_value(const Matrix& A);
 
-// Inlined functions ---------------------------------------------------------
+// Vector functions ----------------------------------------------------------
 
-inline const Vector& floor(const Vector& v) {
-  static Vector res;
-  Vector::const_iterator xi = v.begin();
-  Vector::iterator xo = res.begin();
-  for (; xi != v.end(); ++xi, ++xo) *xo = std::floor(*xi);
-  return res;
-}
-
-// Template functions --------------------------------------------------------
-
-template <class V>
-double norm(const V& u) {
-  return sqrt(R3::dot(u, u));
-}
-
-template <class V>
-double distance(const V& u, const V& v) {
-  static R3::Vector duv;
-  duv[0] = u[0] - v[0];
-  duv[1] = u[1] - v[1];
-  duv[2] = u[2] - v[2];
-  return R3::norm(duv);
+inline Vector floor(const Vector& v) {
+  return Vector(std::floor(v[0]), std::floor(v[1]), std::floor(v[2]));
 }
 
 template <class V>
@@ -211,30 +271,38 @@ double dot(const V& u, const V& v) {
 }
 
 template <class V>
+double norm(const V& u) {
+  return std::sqrt(R3::dot(u, u));
+}
+
+template <class V>
+double distance(const V& u, const V& v) {
+  const double dx = u[0] - v[0];
+  const double dy = u[1] - v[1];
+  const double dz = u[2] - v[2];
+  return std::sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+template <class V>
 Vector cross(const V& u, const V& v) {
-  Vector res;
-  res[0] = u[1] * v[2] - u[2] * v[1];
-  res[1] = u[2] * v[0] - u[0] * v[2];
-  res[2] = u[0] * v[1] - u[1] * v[0];
-  return res;
+  return Vector(u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2],
+                u[0] * v[1] - u[1] * v[0]);
 }
 
+/// Matrix-vector product M * u.
 template <class V>
-const Vector& mxvecproduct(const Matrix& M, const V& u) {
-  static Vector res;
-  res[0] = M(0, 0) * u[0] + M(0, 1) * u[1] + M(0, 2) * u[2];
-  res[1] = M(1, 0) * u[0] + M(1, 1) * u[1] + M(1, 2) * u[2];
-  res[2] = M(2, 0) * u[0] + M(2, 1) * u[1] + M(2, 2) * u[2];
-  return res;
+Vector mxvecproduct(const Matrix& M, const V& u) {
+  return Vector(M(0, 0) * u[0] + M(0, 1) * u[1] + M(0, 2) * u[2],
+                M(1, 0) * u[0] + M(1, 1) * u[1] + M(1, 2) * u[2],
+                M(2, 0) * u[0] + M(2, 1) * u[1] + M(2, 2) * u[2]);
 }
 
+/// Vector-matrix product u * M.
 template <class V>
-const Vector& mxvecproduct(const V& u, const Matrix& M) {
-  static Vector res;
-  res[0] = u[0] * M(0, 0) + u[1] * M(1, 0) + u[2] * M(2, 0);
-  res[1] = u[0] * M(0, 1) + u[1] * M(1, 1) + u[2] * M(2, 1);
-  res[2] = u[0] * M(0, 2) + u[1] * M(1, 2) + u[2] * M(2, 2);
-  return res;
+Vector mxvecproduct(const V& u, const Matrix& M) {
+  return Vector(u[0] * M(0, 0) + u[1] * M(1, 0) + u[2] * M(2, 0),
+                u[0] * M(0, 1) + u[1] * M(1, 1) + u[2] * M(2, 1),
+                u[0] * M(0, 2) + u[1] * M(1, 2) + u[2] * M(2, 2));
 }
 
 }  // namespace R3
@@ -260,5 +328,8 @@ EpsilonEqual::operator()<srreal::R3::Matrix, srreal::R3::Matrix>(
 
 }  // namespace mathutils
 }  // namespace diffpy
+
+// Implementation of serialization
+#include <diffpy/srreal/R3linalg.ipp>
 
 #endif  // R3LINALG_HPP_INCLUDED

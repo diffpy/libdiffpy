@@ -17,7 +17,8 @@
  *
  *****************************************************************************/
 
-#include <list>
+#include <array>
+#include <cassert>
 #include <stdexcept>
 
 #include <diffpy/srreal/Lattice.hpp>
@@ -33,19 +34,35 @@ using namespace diffpy::srreal;
 
 Lattice::Lattice() {
   mbaserot = R3::identity();
-  this->setLatPar(1.0, 1.0, 1.0, 90.0, 90.0, 90.0);
+  this->assignLatPar(1.0, 1.0, 1.0, 90.0, 90.0, 90.0);
 }
 
 Lattice::Lattice(double a0, double b0, double c0, double alpha0, double beta0,
                  double gamma0) {
   mbaserot = R3::identity();
-  this->setLatPar(a0, b0, c0, alpha0, beta0, gamma0);
+  this->assignLatPar(a0, b0, c0, alpha0, beta0, gamma0);
 }
 
 // Public Methods ------------------------------------------------------------
 
+// The setters leave this lattice unchanged when they throw.
+
 void Lattice::setLatPar(double a0, double b0, double c0, double alpha0,
                         double beta0, double gamma0) {
+  Lattice L(*this);
+  L.assignLatPar(a0, b0, c0, alpha0, beta0, gamma0);
+  *this = L;
+}
+
+void Lattice::setLatBase(const R3::Vector& va0, const R3::Vector& vb0,
+                         const R3::Vector& vc0) {
+  Lattice L(*this);
+  L.assignLatBase(va0, vb0, vc0);
+  *this = L;
+}
+
+void Lattice::assignLatPar(double a0, double b0, double c0, double alpha0,
+                           double beta0, double gamma0) {
   using diffpy::mathutils::acosd;
   using diffpy::mathutils::cosd;
   using diffpy::mathutils::sind;
@@ -89,20 +106,20 @@ void Lattice::setLatPar(double a0, double b0, double c0, double alpha0,
   mvar = R3::column(mrecbase, 0);
   mvbr = R3::column(mrecbase, 1);
   mvcr = R3::column(mrecbase, 2);
-  R3::row(mnormbase, 0) = R3::row(mbase, 0) * mar;
-  R3::row(mnormbase, 1) = R3::row(mbase, 1) * mbr;
-  R3::row(mnormbase, 2) = R3::row(mbase, 2) * mcr;
-  R3::column(mrecnormbase, 0) = R3::column(mrecbase, 0) / mar;
-  R3::column(mrecnormbase, 1) = R3::column(mrecbase, 1) / mbr;
-  R3::column(mrecnormbase, 2) = R3::column(mrecbase, 2) / mcr;
+  R3::setrow(mnormbase, 0, R3::row(mbase, 0) * mar);
+  R3::setrow(mnormbase, 1, R3::row(mbase, 1) * mbr);
+  R3::setrow(mnormbase, 2, R3::row(mbase, 2) * mcr);
+  R3::setcolumn(mrecnormbase, 0, R3::column(mrecbase, 0) / mar);
+  R3::setcolumn(mrecnormbase, 1, R3::column(mrecbase, 1) / mbr);
+  R3::setcolumn(mrecnormbase, 2, R3::column(mrecbase, 2) / mcr);
 }
 
-void Lattice::setLatBase(const R3::Vector& va0, const R3::Vector& vb0,
-                         const R3::Vector& vc0) {
+void Lattice::assignLatBase(const R3::Vector& va0, const R3::Vector& vb0,
+                            const R3::Vector& vc0) {
   using diffpy::mathutils::acosd;
-  R3::row(mbase, 0) = va0;
-  R3::row(mbase, 1) = vb0;
-  R3::row(mbase, 2) = vc0;
+  R3::setrow(mbase, 0, va0);
+  R3::setrow(mbase, 1, vb0);
+  R3::setrow(mbase, 2, vc0);
   double detbase = R3::determinant(mbase);
   if (fabs(detbase) < 1.0e-8) {
     throw invalid_argument("base vectors are degenerate");
@@ -148,12 +165,12 @@ void Lattice::setLatBase(const R3::Vector& va0, const R3::Vector& vb0,
   mvbr = R3::column(mrecbase, 1);
   mvcr = R3::column(mrecbase, 2);
   // bases normalized to unit reciprocal vectors
-  R3::row(mnormbase, 0) = R3::row(mbase, 0) * mar;
-  R3::row(mnormbase, 1) = R3::row(mbase, 1) * mbr;
-  R3::row(mnormbase, 2) = R3::row(mbase, 2) * mcr;
-  R3::column(mrecnormbase, 0) = R3::column(mrecbase, 0) / mar;
-  R3::column(mrecnormbase, 1) = R3::column(mrecbase, 1) / mbr;
-  R3::column(mrecnormbase, 2) = R3::column(mrecbase, 2) / mcr;
+  R3::setrow(mnormbase, 0, R3::row(mbase, 0) * mar);
+  R3::setrow(mnormbase, 1, R3::row(mbase, 1) * mbr);
+  R3::setrow(mnormbase, 2, R3::row(mbase, 2) * mcr);
+  R3::setcolumn(mrecnormbase, 0, R3::column(mrecbase, 0) / mar);
+  R3::setcolumn(mrecnormbase, 1, R3::column(mrecbase, 1) / mbr);
+  R3::setcolumn(mrecnormbase, 2, R3::column(mrecbase, 2) / mcr);
   this->updateMetrics();
 }
 
@@ -169,67 +186,52 @@ double Lattice::volume() const {
   return rv;
 }
 
-const R3::Vector& Lattice::cartesian(const R3::Vector& lv) const {
-  static R3::Vector res;
-  res = R3::mxvecproduct(lv, mbase);
-  return res;
+R3::Vector Lattice::cartesian(const R3::Vector& lv) const {
+  return R3::mxvecproduct(lv, mbase);
 }
 
-const R3::Vector& Lattice::fractional(const R3::Vector& cv) const {
-  static R3::Vector res;
-  res = R3::mxvecproduct(cv, mrecbase);
-  return res;
+R3::Vector Lattice::fractional(const R3::Vector& cv) const {
+  return R3::mxvecproduct(cv, mrecbase);
 }
 
-const R3::Vector& Lattice::ucvCartesian(const R3::Vector& cv) const {
-  static R3::Vector res;
-  res = cartesian(ucvFractional(fractional(cv)));
-  return res;
+R3::Vector Lattice::ucvCartesian(const R3::Vector& cv) const {
+  return cartesian(ucvFractional(fractional(cv)));
 }
 
-const R3::Vector& Lattice::ucvFractional(const R3::Vector& lv) const {
+R3::Vector Lattice::ucvFractional(const R3::Vector& lv) const {
   using mathutils::eps_eq;
-  static R3::Vector res;
-  res = lv - floor(lv);
+  R3::Vector res = lv - floor(lv);
   if (eps_eq(res[0], 1.0)) res[0] = 0.0;
   if (eps_eq(res[1], 1.0)) res[1] = 0.0;
   if (eps_eq(res[2], 1.0)) res[2] = 0.0;
   return res;
 }
 
-const R3::Matrix& Lattice::cartesianMatrix(const R3::Matrix& Ml) const {
-  static R3::Matrix res0, res1;
-  res0 = prod(Ml, mnormbase);
-  res1 = prod(R3::trans(mnormbase), res0);
-  return res1;
+R3::Matrix Lattice::cartesianMatrix(const R3::Matrix& Ml) const {
+  return R3::prod(R3::trans(mnormbase), R3::prod(Ml, mnormbase));
 }
 
-const R3::Matrix& Lattice::fractionalMatrix(const R3::Matrix& Mc) const {
-  static R3::Matrix res0, res1;
-  res0 = prod(Mc, mrecnormbase);
-  res1 = prod(R3::trans(mrecnormbase), res0);
-  return res1;
+R3::Matrix Lattice::fractionalMatrix(const R3::Matrix& Mc) const {
+  return R3::prod(R3::trans(mrecnormbase), R3::prod(Mc, mrecnormbase));
 }
 
 const R3::Vector& Lattice::ucMaxDiagonal() const {
-  static list<R3::Vector> ucdiagonals;
-  if (ucdiagonals.empty()) {
-    ucdiagonals.push_back(R3::Vector(+1, +1, +1));
-    ucdiagonals.push_back(R3::Vector(-1, +1, +1));
-    ucdiagonals.push_back(R3::Vector(+1, -1, +1));
-    ucdiagonals.push_back(R3::Vector(+1, +1, -1));
-  }
+  static constexpr array<R3::Vector, 4> ucdiagonals = {{
+    {+1, +1, +1},
+    {-1, +1, +1},
+    {+1, -1, +1},
+    {+1, +1, -1},
+  }};
   double maxnorm = -1;
-  list<R3::Vector>::iterator ucd;
-  list<R3::Vector>::iterator maxucd = ucdiagonals.end();
-  for (ucd = ucdiagonals.begin(); ucd != ucdiagonals.end(); ++ucd) {
-    double normucd = this->norm(*ucd);
+  const R3::Vector* maxucd = nullptr;
+  for (const R3::Vector& ucd : ucdiagonals) {
+    double normucd = this->norm(ucd);
     if (normucd > maxnorm) {
       maxnorm = normucd;
-      maxucd = ucd;
+      maxucd = &ucd;
     }
   }
-  assert(maxucd != ucdiagonals.end());
+  assert(maxucd);
   return *maxucd;
 }
 

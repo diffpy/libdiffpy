@@ -19,7 +19,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <sstream>
-#include <boost/functional/hash.hpp>
+#include <diffpy/hash.hpp>
 #include <diffpy/srreal/BVParam.hpp>
 #include <diffpy/serialization.ipp>
 
@@ -92,12 +92,7 @@ void BVParam::setFromCifLine(const std::string& cifline) {
 // class BVParam::BondHash ---------------------------------------------------
 
 size_t BVParam::BondHash::operator()(const BVParam& bp) const {
-  size_t seed = 0;
-  boost::hash_combine(seed, bp.matom0);
-  boost::hash_combine(seed, bp.mvalence0);
-  boost::hash_combine(seed, bp.matom1);
-  boost::hash_combine(seed, bp.mvalence1);
-  return seed;
+  return diffpy::hash_values(bp.matom0, bp.mvalence0, bp.matom1, bp.mvalence1);
 }
 
 // class BVParam::BondEqual --------------------------------------------------

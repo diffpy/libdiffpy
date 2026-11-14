@@ -19,14 +19,28 @@
 #include <fstream>
 #include <sstream>
 #include <cassert>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/algorithm/string/case_conv.hpp>
+#include <cctype>
+#include <cmath>
+#include <algorithm>
+#include <limits>
+#include <string_view>
 
 #include <diffpy/runtimepath.hpp>
 #include <diffpy/srreal/PeriodicStructureAdapter.hpp>
 
 #include "test_helpers.hpp"
+
+namespace {
+
+char lower_char(char c) {
+  return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+}
+
+bool iequals(std::string_view a, std::string_view b) {
+  return std::ranges::equal(a, b, {}, lower_char, lower_char);
+}
+
+}  // namespace
 
 // Resolve DIFFPYTESTSDIRPATH ------------------------------------------------
 
@@ -71,12 +85,12 @@ diffpy::srreal::StructureAdapterPtr loadTestPeriodicStructure(
   string fileformat;
   // process structure file header
   while (fp >> line) {
-    if (line.wcount() >= 2 && boost::iequals(line.words[0], "format")) {
+    if (line.wcount() >= 2 && iequals(line.words[0], "format")) {
       fileformat = line.words[1];
-      assert(boost::iequals(fileformat, "pdffit"));
+      assert(iequals(fileformat, "pdffit"));
     }
     if (line.wcount() == 7 && line.words[0] == "cell") {
-      boost::replace_all(line.line, ",", " ");
+      std::ranges::replace(line.line, ',', ' ');
       string skip;
       double a, b, c, alpha, beta, gamma;
       istringstream fpwords(line.line);
@@ -101,7 +115,7 @@ diffpy::srreal::StructureAdapterPtr loadTestPeriodicStructure(
     Uc(2, 1) = Uc(1, 2);
     if (!fp) break;
     // convert string symbol to standard case
-    boost::to_lower(ai.atomtype);
+    std::ranges::transform(ai.atomtype, ai.atomtype.begin(), lower_char);
     string::iterator tt = ai.atomtype.begin();
     for (; tt != ai.atomtype.end(); ++tt) {
       if (isalpha(*tt)) {
@@ -121,6 +135,24 @@ diffpy::srreal::StructureAdapterPtr loadTestPeriodicStructure(
     stru.append(ai);
   }
   return pstru;
+}
+
+// Array comparison ----------------------------------------------------------
+
+double maxRelativeError(const diffpy::srreal::QuantityType& actual,
+                        const diffpy::srreal::QuantityType& reference,
+                        double scale) {
+  const double inf = std::numeric_limits<double>::infinity();
+  if (actual.size() != reference.size()) return inf;
+  double maxdiff = 0.0;
+  double maxref = 0.0;
+  for (size_t i = 0; i < actual.size(); ++i) {
+    if (!std::isfinite(actual[i]) || !std::isfinite(reference[i])) return inf;
+    maxdiff = std::max(maxdiff, std::fabs(actual[i] - reference[i]));
+    maxref = std::max(maxref, std::fabs(reference[i]));
+  }
+  if (scale == 0.0) scale = maxref;
+  return (scale > 0.0) ? maxdiff / scale : inf;
 }
 
 // End of test_helpers.cpp

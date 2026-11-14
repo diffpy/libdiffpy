@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include <cmath>
+#include <typeinfo>
 
 #include <gsl/gsl_sf_erf.h>
 
@@ -71,6 +72,13 @@ void CroppedGaussianProfile::setPrecision(double eps) {
     double area = gsl_sf_erf(sqrt(-log(eps1)));
     mscale = 1.0 / area;
   }
+}
+
+// Protected Methods ---------------------------------------------------------
+
+GaussianProfile::KernelShape CroppedGaussianProfile::kernelShape() const {
+  const bool exact = (typeid(*this) == typeid(CroppedGaussianProfile));
+  return exact ? KernelShape::CroppedGaussian : KernelShape::None;
 }
 
 // Registration --------------------------------------------------------------

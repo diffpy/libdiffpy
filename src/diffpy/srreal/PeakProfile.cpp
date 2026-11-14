@@ -41,6 +41,20 @@ PeakProfile::PeakProfile() : mprecision(0.0) {
 
 // Public Methods ------------------------------------------------------------
 
+void PeakProfile::addRDFPeak(double* out, int ilo, int ihi, int rlosteps,
+                             double rstep, double dist, double fwhm,
+                             double scale) const {
+  for (int i = ilo; i < ihi; ++i) {
+    const double x = (rlosteps + i) * rstep - dist;
+    const double y = (*this)(x, fwhm);
+    // Contributions in G(r) need to be normalized by pair distance,
+    // not by r as done in PDFfit or PDFfit2.  Here we rescale RDF
+    // in such way that division by r will give a correct result.
+    const double yrdf = y * (x / dist + 1);
+    out[i] += scale * yrdf;
+  }
+}
+
 void PeakProfile::setPrecision(double eps) {
   if (mprecision != eps) mticker.click();
   mprecision = eps;
