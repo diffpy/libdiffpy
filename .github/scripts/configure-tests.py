@@ -3,7 +3,8 @@
 import json
 from pathlib import Path
 
-requirements = ["python"]
+# llvm-tools for check-kernel-isolation.py
+requirements = ["python", "llvm-tools"]
 for filename in ("build.txt", "conda.txt", "tests.txt"):
     for line in (Path("requirements") / filename).read_text().splitlines():
         spec = line.split("#", 1)[0].strip()

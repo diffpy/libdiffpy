@@ -142,11 +142,14 @@ std::vector<Bond> generated(BaseBondGenerator& bnds) {
   return rv;
 }
 
+/// Equality of the bond vectors.
+const diffpy::mathutils::EpsilonEqual allclose(1e-12);
+
 bool sameBond(const Bond& a, const Bond& e) {
   bool rv = (a.site0 == e.site0) && (a.site1 == e.site1) &&
-            (std::fabs(a.distance - e.distance) <= 1e-14 * e.distance);
+            (std::fabs(a.distance - e.distance) <= 1e-14 * e.distance) &&
+            allclose(a.r1, e.r1) && allclose(a.r01, e.r01);
   for (int k = 0; k < 3; ++k) {
-    rv = rv && (a.r1[k] == e.r1[k]) && (a.r01[k] == e.r01[k]);
     for (int l = 0; l < 3; ++l) rv = rv && (a.u1(k, l) == e.u1(k, l));
   }
   return rv;
@@ -163,10 +166,8 @@ void checkSameBonds(const std::vector<Bond>& actual,
   const Bond& e = expected[i];
   CHECK(a.site0 == e.site0);
   CHECK(a.site1 == e.site1);
-  for (int k = 0; k < 3; ++k) {
-    CHECK(a.r1[k] == e.r1[k]);
-    CHECK(a.r01[k] == e.r01[k]);
-  }
+  CHECK(allclose(a.r1, e.r1));
+  CHECK(allclose(a.r01, e.r01));
   CHECK(std::fabs(a.distance - e.distance) <= 1e-14 * e.distance);
   for (int k = 0; k < 3; ++k) {
     for (int l = 0; l < 3; ++l) CHECK(a.u1(k, l) == e.u1(k, l));

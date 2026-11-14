@@ -78,6 +78,16 @@ jobs:
       - name: Check SIMD kernel isolation
         run: python .github/scripts/check-kernel-isolation.py build
 
+      - name: Save SIMD kernel objects
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-objects-${{ matrix.os }}
+          path: |
+            build/**/CalculationKernel*.o
+            build/**/CalculationKernel*.obj
+          if-no-files-found: ignore
+
       - name: Generate coverage report
         if: matrix.coverage == 'ON'
         run: >-
