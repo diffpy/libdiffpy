@@ -21,6 +21,7 @@
 #include <sstream>
 
 #include <diffpy/srreal/PairQuantity.hpp>
+#include <diffpy/srreal/kernels/PairTable.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/serialization.ipp>
 
@@ -106,7 +107,7 @@ const double& PairQuantity::getRmax() const { return mrmax; }
 
 void PairQuantity::setEvaluatorType(PQEvaluatorType evtp) {
   if (mevaluator.get() && mevaluator->typeint() == evtp) return;
-  PQEvaluatorPtr pqev = createPQEvaluator(evtp, mevaluator);
+  PQEvaluatorPtr pqev = createPQEvaluator(evtp, mevaluator.ptr());
   // validate the new evaluator object
   try {
     pqev->validate(*this);
@@ -206,11 +207,11 @@ bool PairQuantity::getPairMask(int i, int j) const {
 }
 
 void PairQuantity::setTypeMask(string smbli, string smblj, bool mask) {
-  static string upcaseall;
-  if (upcaseall.empty()) {
-    upcaseall = ALLATOMSSTR;
-    transform(upcaseall.begin(), upcaseall.end(), upcaseall.begin(), ::toupper);
-  }
+  static const string upcaseall = [] {
+    string rv = ALLATOMSSTR;
+    transform(rv.begin(), rv.end(), rv.begin(), ::toupper);
+    return rv;
+  }();
   // accept "ALL" (upper ALLATOMSSTR) for smbli and smblj
   if (upcaseall == smbli) smbli = ALLATOMSSTR;
   if (upcaseall == smblj) smblj = ALLATOMSSTR;
@@ -271,6 +272,24 @@ void PairQuantity::resizeValue(size_t sz) { mvalue.resize(sz); }
 void PairQuantity::resetValue() {
   mmergedvaluescount = 0;
   fill(mvalue.begin(), mvalue.end(), 0.0);
+}
+
+const kernels::CalculationKernel& PairQuantity::preparePairSum(
+  kernels::PairSumArgs& args, double rmin, double rmax) {
+  if (!mallpairs.pairsum)
+    mallpairs.pairsum = std::make_shared<kernels::PairSumState>();
+  auto& state = *mallpairs.pairsum;
+  args.mask = this->hasMask() ? this : nullptr;
+  const auto& kernel = kernels::activeCalculationKernel();
+  args.g = state.table.geometryArgs(*mstructure, rmin, rmax);
+  args.workspace = state.workspaceFor(kernel);
+  args.out = mvalue.data();
+  return kernel;
+}
+
+void PairQuantity::AllPairsState::record(kernels::PairSumStats stats) {
+  pairs = stats.pairs;
+  peaks = stats.peaks;
 }
 
 void PairQuantity::configureBondGenerator(BaseBondGenerator& bnds) const {

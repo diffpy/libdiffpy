@@ -16,14 +16,19 @@
  *
  *****************************************************************************/
 
+#include <algorithm>
+#include <bit>
+#include <span>
 #include <cassert>
+#include <typeinfo>
+#include <cstdint>
+#include <map>
 #include <string>
-#include <stdexcept>
-#include <sstream>
-#include <functional>
 
 #include <diffpy/srreal/BaseDebyeSum.hpp>
-#include <diffpy/srreal/kernels/CalculationKernelImpl.hpp>
+#include <diffpy/srreal/DebyePDFCalculator.hpp>
+#include <diffpy/srreal/kernels/PairTable.hpp>
+#include <diffpy/srreal/kernels/PairGeometry.hpp>
 #include <diffpy/mathutils.hpp>
 #include <diffpy/validators.hpp>
 #include <diffpy/serialization.ipp>
@@ -42,6 +47,11 @@ namespace {
 
 /// Default cutoff for the Q-decreasing scale of the sine contributions.
 const double DEFAULT_DEBYE_PRECISION = 1e-6;
+
+std::span<const double> factorRow(const QuantityType& factors, int row,
+                                  int nq) {
+  return std::span(factors).subspan(std::size_t(row) * nq, nq);
+}
 
 }  // namespace
 
@@ -139,17 +149,12 @@ void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds,
                                        int summationscale) {
   const double dist = bnds.distance();
   if (eps_eq(0.0, dist)) return;
-  // calculate sigma parameter for the Debye-Waller dampign Gaussian
   const double fwhm = this->getPeakWidthModel()->calculate(bnds);
-  const double fwhmtosigma = 1.0 / (2 * sqrt(2 * M_LN2));
   const int nqpts = pdfutils_qmaxSteps(this);
-  const auto& sftypeatkq = mstructure_cache.sftypeatkq;
-  const auto& typeofsite = mstructure_cache.typeofsite;
-  const auto& sf0 = sftypeatkq[typeofsite[bnds.site0()]];
-  const auto& sf1 = sftypeatkq[typeofsite[bnds.site1()]];
-  assert(nqpts <= int(mvalue.size()));
-  assert(nqpts <= int(sf0.size()));
-  assert(nqpts <= int(sf1.size()));
+  const auto& cache = mstructure_cache;
+  const int t0 = cache.types.typeofsite[bnds.site0()];
+  const int t1 = cache.types.typeofsite[bnds.site1()];
+  if (!nqpts) return;
 
   kernels::activeCalculationKernel().debyeSum({
     .out = mvalue.data(),
@@ -157,12 +162,46 @@ void BaseDebyeSum::addPairContribution(const BaseBondGenerator& bnds,
     .kqhi = nqpts,
     .qstep = this->getQstep(),
     .dist = dist,
-    .dwsigma = fwhmtosigma * fwhm,
+    .dwsigma = kernels::fwhmToSigma(fwhm),
     .scale = double(summationscale * bnds.multiplicity()),
     .prec = this->getDebyePrecision(),
-    .sf0 = sf0.data(),
-    .sf1 = sf1.data(),
+    .sf0 = factorRow(cache.factors, cache.types.curve[t0], nqpts).data(),
+    .sf1 = factorRow(cache.factors, cache.types.curve[t1], nqpts).data(),
+    .occ0 = cache.types.occupancy[t0],
+    .occ1 = cache.types.occupancy[t1],
   });
+}
+
+bool BaseDebyeSum::addAllPairContributions() {
+  if (typeid(*this) != typeid(BaseDebyeSum)) return false;
+  return this->addAllPairsOfDebyeSum();
+}
+
+bool BaseDebyeSum::addAllPairsOfDebyeSum() {
+  // Other peak width models and structures need per-bond evaluation.
+  kernels::DebyePairSumArgs args = {};
+  if (!kernels::assignPairWidth(args.w, *this->getPeakWidthModel()) ||
+      !kernels::PairTable::supports(*mstructure))
+    return false;
+  BaseBondGenerator range(mstructure);
+  this->configureBondGenerator(range);
+  const auto& cache = mstructure_cache;
+  const int nq = cache.nq;
+  args.typeofsite = cache.types.typeofsite.data();
+  args.curve = cache.types.curve.data();
+  args.occupancy = cache.types.occupancy.data();
+  args.ntypes = int(cache.types.curve.size());
+  args.ncurves = nq ? int(cache.factors.size() / nq) : 0;
+  args.nq = nq;
+  args.sf = cache.factors.data();
+  args.kqlo = pdfutils_qminSteps(this);
+  args.kqhi = nq;
+  args.qstep = this->getQstep();
+  args.prec = this->getDebyePrecision();
+  const auto& kernel =
+    this->preparePairSum(args, range.getRmin(), range.getRmax());
+  mallpairs.record(kernel.debyePairSum(args));
+  return true;
 }
 
 void BaseDebyeSum::stashPartialValue() { mdbsumstash = this->value(); }
@@ -185,58 +224,135 @@ double BaseDebyeSum::sfAverageAtkQ(int kq) const {
 }
 
 void BaseDebyeSum::cacheStructureData() {
-  using std::placeholders::_1;
-  int cntsites = this->countSites();
-  const int nqpts = pdfutils_qmaxSteps(this);
-  QuantityType zeros(nqpts, 0.0);
-  unordered_map<string, int> atomtypeidx;
-  // sftypeatkq
-  mstructure_cache.typeofsite.clear();
-  mstructure_cache.typeofsite.reserve(cntsites);
-  mstructure_cache.sftypeatkq.clear();
-  for (int siteidx = 0; siteidx < cntsites; ++siteidx) {
-    const string& smbl = mstructure->siteAtomType(siteidx);
-    if (!atomtypeidx.count(smbl)) {
-      atomtypeidx.insert(make_pair(smbl, int(atomtypeidx.size())));
-    }
-    int tpidx = atomtypeidx[smbl];
-    mstructure_cache.typeofsite.push_back(tpidx);
-    // do nothing if the type has been already cached
-    if (tpidx < int(mstructure_cache.sftypeatkq.size())) continue;
-    assert(tpidx == int(mstructure_cache.sftypeatkq.size()));
-    // here we need to build a new array
-    mstructure_cache.sftypeatkq.push_back(zeros);
-    QuantityType& sfarray = mstructure_cache.sftypeatkq.back();
-    for (int kq = pdfutils_qminSteps(this); kq < nqpts; ++kq) {
-      double q = this->getQstep() * kq;
-      sfarray[kq] = this->sfSiteAtQ(siteidx, q);
+  auto& c = mstructure_cache;
+  const int nq = pdfutils_qmaxSteps(this);
+  SiteTypes sites;
+  sites.typeofsite.resize(this->countSites());
+  if (typeid(*this) == typeid(DebyePDFCalculator) ||
+      typeid(*this) == typeid(BaseDebyeSum)) {
+    this->cacheElementFactors(sites, nq);
+  } else {
+    this->cacheCustomFactors(sites, nq);
+  }
+  c.types = std::move(sites);
+  c.nq = nq;
+  c.totaloccupancy = mstructure->totalOccupancy();
+  c.sfaverageatkq.assign(c.nq, 0.0);
+  std::vector<int> multiplicity(c.types.curve.size(), 0);
+  for (int i = 0; i < this->countSites(); ++i) {
+    multiplicity[c.types.typeofsite[i]] += mstructure->siteMultiplicity(i);
+  }
+  const int lo = pdfutils_qminSteps(this);
+  for (size_t t = 0; t < multiplicity.size(); ++t) {
+    const auto row = factorRow(c.factors, c.types.curve[t], c.nq);
+    for (int k = lo; k < c.nq; ++k) {
+      c.sfaverageatkq[k] += (row[k] * c.types.occupancy[t]) * multiplicity[t];
     }
   }
-  assert(cntsites == int(mstructure_cache.typeofsite.size()));
-  assert(atomtypeidx.size() == mstructure_cache.sftypeatkq.size());
-  // totaloccupancy
-  mstructure_cache.totaloccupancy = mstructure->totalOccupancy();
-  // sfaverageatkq
-  QuantityType& sfak = mstructure_cache.sfaverageatkq;
-  sfak = zeros;
-  int ntps = mstructure_cache.sftypeatkq.size();
-  vector<int> tpmultipl(ntps, 0);
-  for (int siteidx = 0; siteidx < cntsites; ++siteidx) {
-    int tpidx = mstructure_cache.typeofsite[siteidx];
-    assert(tpidx < ntps);
-    tpmultipl[tpidx] += mstructure->siteMultiplicity(siteidx);
+  if (eps_gt(c.totaloccupancy, 0.0)) {
+    const double scale = 1.0 / c.totaloccupancy;
+    for (double& f : c.sfaverageatkq) f *= scale;
   }
-  for (int tpidx = 0; tpidx < ntps; ++tpidx) {
-    QuantityType& sfarray = mstructure_cache.sftypeatkq[tpidx];
-    const int multipl = tpmultipl[tpidx];
-    for (int kq = pdfutils_qminSteps(this); kq < nqpts; ++kq) {
-      sfak[kq] += sfarray[kq] * multipl;
+}
+
+void BaseDebyeSum::cacheElementFactors(SiteTypes& sites, int nq) {
+  auto& c = mstructure_cache;
+  std::map<SiteKey, int> types;
+  std::map<std::string, int> elements;
+  const auto* pdf = dynamic_cast<const DebyePDFCalculator*>(this);
+  for (int i = 0; i < this->countSites(); ++i) {
+    const auto& symbol = mstructure->siteAtomType(i);
+    const double occ = pdf ? mstructure->siteOccupancy(i) : 1.0;
+    auto [t, added] =
+      types.try_emplace({symbol, bit_cast<uint64_t>(occ)}, int(types.size()));
+    sites.typeofsite[i] = t->second;
+    if (added) {
+      auto el = elements.try_emplace(symbol, int(elements.size())).first;
+      sites.curve.push_back(el->second);
+      sites.occupancy.push_back(occ);
     }
   }
-  const double& totocc = mstructure_cache.totaloccupancy;
-  const double tosc = eps_gt(totocc, 0.0) ? (1.0 / totocc) : 1.0;
-  transform(sfak.begin(), sfak.end(), sfak.begin(),
-            bind(multiplies<double>(), tosc, _1));
+  const auto tick = this->ticker();
+  if (elements == melements && tick == msfticker &&
+      c.factors.size() == elements.size() * nq)
+    return;
+  QuantityType factors(elements.size() * nq);
+  const int lo = pdfutils_qminSteps(this);
+  for (const auto& [symbol, row] : elements) {
+    for (int k = lo; k < nq; ++k) {
+      factors[size_t(row) * nq + k] =
+        pdf ? pdf->getScatteringFactorTable()->lookup(symbol,
+                                                      k * this->getQstep())
+            : 1.0;
+    }
+  }
+  c.factors.swap(factors);
+  melements.swap(elements);
+  msfticker = tick;
+}
+
+void BaseDebyeSum::cacheCustomFactors(SiteTypes& sites, int nq) {
+  auto& c = mstructure_cache;
+  std::map<SiteKey, int> types;
+  QuantityType factors, row(nq);
+  const bool comparePrevious = nq == c.nq && this->ticker() == msfticker;
+  const int lo = pdfutils_qminSteps(this);
+  bool changed = mcustomAmbiguous;
+  bool ambiguous = false;
+  for (int i = 0; i < this->countSites(); ++i) {
+    SiteKey key{mstructure->siteAtomType(i),
+                bit_cast<uint64_t>(mstructure->siteOccupancy(i))};
+    for (int k = lo; k < nq; ++k)
+      row[k] = this->sfSiteAtQ(i, k * this->getQstep());
+    auto old = mcustomTypes.find(key);
+    if (comparePrevious && old != mcustomTypes.end() &&
+        !std::ranges::equal(row, factorRow(c.factors, old->second, nq)))
+      changed = true;
+    const int next = int(sites.curve.size());
+    auto [t, added] = types.try_emplace(std::move(key), next);
+    int id = t->second;
+    if (!added && !std::ranges::equal(row, factorRow(factors, id, nq))) {
+      id = next;
+      ambiguous = true;
+    }
+    if (id == next) {
+      factors.insert(factors.end(), row.begin(), row.end());
+      sites.curve.push_back(id);
+      sites.occupancy.push_back(1.0);
+    }
+    sites.typeofsite[i] = id;
+  }
+  if (changed || ambiguous) mticker.click();
+  msfticker = this->ticker();
+  mcustomAmbiguous = ambiguous;
+  mcustomTypes.swap(types);
+  c.factors.swap(factors);
+}
+
+std::vector<QuantityType> BaseDebyeSum::archiveFactors() const {
+  const auto& c = mstructure_cache;
+  std::vector<QuantityType> rows(c.types.curve.size(), QuantityType(c.nq));
+  for (size_t t = 0; t < rows.size(); ++t) {
+    const auto row = factorRow(c.factors, c.types.curve[t], c.nq);
+    std::ranges::transform(row, rows[t].begin(),
+                           [&](double f) { return f * c.types.occupancy[t]; });
+  }
+  return rows;
+}
+
+void BaseDebyeSum::loadFactors(const std::vector<QuantityType>& rows) {
+  auto& c = mstructure_cache;
+  c.nq = rows.empty() ? 0 : int(rows.front().size());
+  c.factors.clear();
+  c.types.curve.resize(rows.size());
+  c.types.occupancy.assign(rows.size(), 1.0);
+  for (size_t t = 0; t < rows.size(); ++t) {
+    c.types.curve[t] = int(t);
+    c.factors.insert(c.factors.end(), rows[t].begin(), rows[t].end());
+  }
+  melements.clear();
+  mcustomTypes.clear();
+  mcustomAmbiguous = false;
 }
 
 }  // namespace srreal

@@ -185,7 +185,8 @@ void BaseBondGenerator::updateDistance() {
 // Private Methods -----------------------------------------------------------
 
 void BaseBondGenerator::advanceWhileInvalid() {
-  while (!this->finished() && (this->bondOutOfRange() || this->atSelfPair())) {
+  while (!this->finished() &&
+         (this->bondOutOfRange() || (!mkeepcoincident && this->atSelfPair()))) {
     this->getNextBond();
   }
 }

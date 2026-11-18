@@ -225,6 +225,7 @@ struct SIMDKernel {
     const B vdwsigma(a.dwsigma);
     const B vsinescale(a.scale / a.dist);
     const B vprec(a.prec);
+    const B vcount(a.count);
     const B neghalf(-0.5);
     const B lanes = laneIndex();
     for (int kq = a.kqlo; kq < a.kqhi;) {
@@ -237,9 +238,14 @@ struct SIMDKernel {
       B g = vsinescale * xsimd::exp(neghalf * dwq * dwq);
       B ratio = xsimd::exp(negalpha * (twow * k + ww));
       auto [s, c] = xsimd::sincos(q * vdist);
+      // The pairs are counted in the sine, which leaves the terms for
+      // their comparison with the precision.  The rotation keeps the
+      // scale of (sin, cos).
+      s *= vcount;
+      c *= vcount;
       for (; kq < kqvec; kq += W) {
-        const B t =
-          g * B::load_unaligned(a.sf0 + kq) * B::load_unaligned(a.sf1 + kq);
+        const B t = g * (B::load_unaligned(a.sf0 + kq) * B(a.occ0)) *
+                    (B::load_unaligned(a.sf1 + kq) * B(a.occ1));
         const BB small = xsimd::abs(t) <= vprec;
         if (xsimd::any(small)) {
           // Keep the lanes before the first small term.
@@ -256,7 +262,8 @@ struct SIMDKernel {
       if (kq < kqend) {
         const int n = kqend - kq;
         // Unused lanes have zero t and do not reach the output.
-        B t = g * loadPartial(a.sf0 + kq, n) * loadPartial(a.sf1 + kq, n);
+        B t = g * (loadPartial(a.sf0 + kq, n) * B(a.occ0)) *
+              (loadPartial(a.sf1 + kq, n) * B(a.occ1));
         const BB small = xsimd::abs(t) <= vprec;
         if (xsimd::any(small)) t = truncated(t, small);
         addProductPartial(a.out + kq, t, s, n);
@@ -304,7 +311,7 @@ struct SIMDKernel {
 template <class Arch>
 constexpr CalculationKernel makeSIMDKernel(const char* name) {
   using K = SIMDKernel<Arch>;
-  return {name, K::gaussianWindow, K::debyeSum, K::bondCandidates};
+  return makeCPUKernel<K::gaussianWindow, K::debyeSum>(name, K::bondCandidates);
 }
 
 }  // namespace

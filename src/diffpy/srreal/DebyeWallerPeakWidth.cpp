@@ -19,6 +19,7 @@
 
 #include <diffpy/srreal/DebyeWallerPeakWidth.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
+#include <diffpy/srreal/kernels/PairGeometry.hpp>
 #include <diffpy/serialization.ipp>
 
 namespace diffpy {
@@ -46,10 +47,11 @@ const string& DebyeWallerPeakWidth::type() const {
 }
 
 double DebyeWallerPeakWidth::calculate(const BaseBondGenerator& bnds) const {
-  using diffpy::mathutils::GAUSS_SIGMA_TO_FWHM;
-  double msdval = bnds.msd();
-  double rv = (msdval < 0.0) ? 0.0 : GAUSS_SIGMA_TO_FWHM * sqrt(msdval);
-  return rv;
+  return this->calculateFromMSD(bnds.distance(), bnds.msd());
+}
+
+double DebyeWallerPeakWidth::calculateFromMSD(double r, double msdval) const {
+  return kernels::debyeWallerWidth(msdval);
 }
 
 double DebyeWallerPeakWidth::maxWidth(StructureAdapterPtr stru, double rmin,

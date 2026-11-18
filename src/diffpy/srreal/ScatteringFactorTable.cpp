@@ -100,14 +100,16 @@ unordered_set<string> ScatteringFactorTable::getCustomSymbols() const {
 void ScatteringFactorTableOwner::setScatteringFactorTable(
   ScatteringFactorTablePtr sft) {
   ensureNonNull("ScatteringFactorTable", sft);
-  if (msftable != sft) mprivateticker.click();
-  msftable = sft;
+  if (msftable != sft) {
+    msftable = sft;
+    mtickedtable = msftable;
+    mprivateticker.click();
+  }
 }
 
 void ScatteringFactorTableOwner::setScatteringFactorTableByType(
   const string& tp) {
-  msftable = ScatteringFactorTable::createByType(tp);
-  mprivateticker.click();
+  this->setScatteringFactorTable(ScatteringFactorTable::createByType(tp));
 }
 
 ScatteringFactorTablePtr&
@@ -127,6 +129,10 @@ const string& ScatteringFactorTableOwner::getRadiationType() const {
 }
 
 eventticker::EventTicker& ScatteringFactorTableOwner::ticker() const {
+  if (mtickedtable.lock() != msftable) {
+    mtickedtable = msftable;
+    mprivateticker.click();
+  }
   if (msftable) mprivateticker.updateFrom(msftable->ticker());
   return mprivateticker;
 }

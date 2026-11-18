@@ -19,6 +19,11 @@
 #ifndef BASEDEBYESUM_HPP_INCLUDED
 #define BASEDEBYESUM_HPP_INCLUDED
 
+#include <cstdint>
+#include <map>
+#include <string>
+#include <utility>
+
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/PeakWidthModel.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
@@ -62,6 +67,10 @@ class DLL_EXPORT BaseDebyeSum : public PairQuantity,
   // PairQuantity overloads
   virtual void resetValue();
   virtual void addPairContribution(const BaseBondGenerator&, int);
+  virtual bool addAllPairContributions();
+  /// addAllPairContributions for derived classes that keep the
+  /// addPairContribution of this class.
+  bool addAllPairsOfDebyeSum();
   // support for PQEvaluatorOptimized
   virtual void stashPartialValue();
   virtual void restorePartialValue();
@@ -81,13 +90,31 @@ class DLL_EXPORT BaseDebyeSum : public PairQuantity,
   double mqmax;
   double mqstep;
   double mdebyeprecision;
-  struct {
+  struct SiteTypes {
     std::vector<int> typeofsite;
-    std::vector<QuantityType> sftypeatkq;
+    // A scattering type names an elemental curve and a site occupancy.
+    std::vector<int> curve;
+    std::vector<double> occupancy;
+  };
+  struct {
+    SiteTypes types;
+    QuantityType factors;  // consecutive curves on the Q grid
+    int nq = 0;
     QuantityType sfaverageatkq;
     double totaloccupancy;
   } mstructure_cache;
   QuantityType mdbsumstash;
+  std::map<std::string, int> melements;
+  eventticker::EventTicker msfticker;
+
+  using SiteKey = std::pair<std::string, std::uint64_t>;
+  // Representative curves identify changes to virtual, site-specific factors.
+  std::map<SiteKey, int> mcustomTypes;
+  bool mcustomAmbiguous = false;
+  void cacheCustomFactors(SiteTypes&, int nq);
+  void cacheElementFactors(SiteTypes&, int nq);
+  std::vector<QuantityType> archiveFactors() const;
+  void loadFactors(const std::vector<QuantityType>& curves);
 
   // serialization
   friend class boost::serialization::access;
@@ -100,8 +127,12 @@ class DLL_EXPORT BaseDebyeSum : public PairQuantity,
     ar & mqmax;
     ar & mqstep;
     ar & mdebyeprecision;
-    ar & mstructure_cache.typeofsite;
-    ar & mstructure_cache.sftypeatkq;
+    ar & mstructure_cache.types.typeofsite;
+    // Preserve the archive representation used before elemental curves.
+    std::vector<QuantityType> curves;
+    if constexpr (Archive::is_saving::value) curves = this->archiveFactors();
+    ar & curves;
+    if constexpr (Archive::is_loading::value) this->loadFactors(curves);
     ar & mstructure_cache.sfaverageatkq;
     ar & mstructure_cache.totaloccupancy;
   }

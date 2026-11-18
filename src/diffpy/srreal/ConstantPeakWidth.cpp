@@ -82,6 +82,10 @@ const string& ConstantPeakWidth::type() const {
   return rv;
 }
 
+double ConstantPeakWidth::calculateFromMSD(double r, double msd) const {
+  return this->getWidth();
+}
+
 double ConstantPeakWidth::calculate(const BaseBondGenerator& bnds) const {
   return this->getWidth();
 }

@@ -109,12 +109,10 @@ class wksmbl_hash {
 typedef unordered_set<WaasKirfFormula, wksmbl_hash, wksmbl_equal>
   SetOfWKFormulas;
 
-const SetOfWKFormulas& getWKFormulasSet() {
+SetOfWKFormulas loadWKFormulasSet() {
   using namespace diffpy::runtimepath;
   using diffpy::validators::ensureFileOK;
-  static unique_ptr<SetOfWKFormulas> the_set;
-  if (the_set) return *the_set;
-  the_set.reset(new SetOfWKFormulas);
+  SetOfWKFormulas the_set;
   string wkfile = datapath("f0_WaasKirf.dat");
   ifstream fp(wkfile.c_str());
   ensureFileOK(wkfile, fp);
@@ -144,16 +142,23 @@ const SetOfWKFormulas& getWKFormulasSet() {
         throw line.format_error(
           wkfile, "Line should contain 11 floating point values.");
       }
-      if (the_set->count(wk)) {
+      if (the_set.count(wk)) {
         string emsg = "Duplicate atom symbol \"";
         emsg += wk.symbol + "\".";
         throw line.format_error(wkfile, emsg);
       }
-      the_set->insert(wk);
+      the_set.insert(wk);
       wk.symbol.clear();
     }
   }
-  return getWKFormulasSet();
+  return the_set;
+}
+
+/// The table is loaded on the first call, also when the first calls come
+/// from several threads.  A failed load is repeated on the next call.
+const SetOfWKFormulas& getWKFormulasSet() {
+  static const SetOfWKFormulas the_set = loadWKFormulasSet();
+  return the_set;
 }
 
 SetOfWKFormulas::const_iterator findWKFormula(const string& smbl) {
@@ -186,56 +191,57 @@ SetOfWKFormulas::const_iterator findWKFormula(const string& smbl) {
 
 typedef unordered_map<string, int> ElectronNumberStorage;
 
-ElectronNumberStorage& getElectronNumberTable() {
+ElectronNumberStorage loadElectronNumberTable() {
   using namespace diffpy::runtimepath;
   using diffpy::validators::ensureFileOK;
-  static unique_ptr<ElectronNumberStorage> entable;
+  ElectronNumberStorage entable;
   typedef ElectronNumberStorage::value_type ENPair;
-  if (!entable) {
-    entable.reset(new ElectronNumberStorage);
-    string ionfile = datapath("ionlist.dat");
-    ifstream fp0(ionfile.c_str());
-    ensureFileOK(ionfile, fp0);
-    LineReader line;
-    while (fp0 >> line) {
-      if (line.isignored()) continue;
-      istringstream fpline(line.line);
-      string element;
-      int z = 0;
-      fpline >> element >> z;
-      if (!fpline) {
-        throw line.format_error(ionfile,
-                                "Expected at least 2 columns for (symbol, Z).");
-      }
-      entable->insert(ENPair(element, z));
-      for (int v; fpline >> v;) {
-        ostringstream smbl;
-        smbl << element << abs(v) << ((v > 0) ? '+' : '-');
-        entable->insert(ENPair(smbl.str(), z - v));
-      }
+  string ionfile = datapath("ionlist.dat");
+  ifstream fp0(ionfile.c_str());
+  ensureFileOK(ionfile, fp0);
+  LineReader line;
+  while (fp0 >> line) {
+    if (line.isignored()) continue;
+    istringstream fpline(line.line);
+    string element;
+    int z = 0;
+    fpline >> element >> z;
+    if (!fpline) {
+      throw line.format_error(ionfile,
+                              "Expected at least 2 columns for (symbol, Z).");
     }
-    const size_t mintablesize = 447;
-    if (entable->size() < mintablesize) {
-      ostringstream emsg;
-      emsg << "Incomplete file.  Expected " << mintablesize << " items loaded "
-           << entable->size() << ".";
-      throw line.format_error(ionfile, emsg.str());
+    entable.insert(ENPair(element, z));
+    for (int v; fpline >> v;) {
+      ostringstream smbl;
+      smbl << element << abs(v) << ((v > 0) ? '+' : '-');
+      entable.insert(ENPair(smbl.str(), z - v));
     }
   }
-  return *entable;
+  const size_t mintablesize = 447;
+  if (entable.size() < mintablesize) {
+    ostringstream emsg;
+    emsg << "Incomplete file.  Expected " << mintablesize << " items loaded "
+         << entable.size() << ".";
+    throw line.format_error(ionfile, emsg.str());
+  }
+  return entable;
+}
+
+/// Loaded on the first call as the Waasmaier-Kirfel formulas.
+const ElectronNumberStorage& getElectronNumberTable() {
+  static const ElectronNumberStorage entable = loadElectronNumberTable();
+  return entable;
 }
 
 // Neutron scattering lengths
 
 typedef unordered_map<string, double> NeutronBCStorage;
 
-const NeutronBCStorage& getNeutronBCTable() {
+NeutronBCStorage loadNeutronBCTable() {
   using namespace diffpy::runtimepath;
   using diffpy::validators::ensureFileOK;
   typedef NeutronBCStorage::value_type BCPair;
-  static unique_ptr<NeutronBCStorage> bctable;
-  if (bctable) return *bctable;
-  bctable.reset(new NeutronBCStorage);
+  NeutronBCStorage bctable;
   string nsffile = datapath("nsftable.dat");
   ifstream fp(nsffile.c_str());
   ensureFileOK(nsffile, fp);
@@ -264,12 +270,12 @@ const NeutronBCStorage& getNeutronBCTable() {
     if (!fpbc) {
       throw line.format_error(nsffile, "Invalid b_c value.");
     }
-    if (bctable->count(smbl)) {
+    if (bctable.count(smbl)) {
       string emsg = "Duplicate atom symbol \"";
       emsg += smbl + "\".";
       throw line.format_error(nsffile, emsg);
     }
-    bctable->insert(BCPair(smbl, bc));
+    bctable.insert(BCPair(smbl, bc));
     // elements are not explicitly included if there is just one isotope
     // or if all isotopes are unstable
     size_t p2 = smbl.find_first_of('-');
@@ -278,23 +284,29 @@ const NeutronBCStorage& getNeutronBCTable() {
       // there is just one isotope
       const string& chlf = line.words[1];
       bool addel =
-        (chlf == "100") || (!bctable->count(el) && *chlf.rbegin() == 'Y');
+        (chlf == "100") || (!bctable.count(el) && *chlf.rbegin() == 'Y');
       if (addel) {
-        if (bctable->count(el)) {
+        if (bctable.count(el)) {
           string emsg = "Duplicate element entry for \"";
           emsg += el + "\".";
           throw line.format_error(nsffile, emsg);
           ;
         }
-        bctable->insert(BCPair(el, bc));
+        bctable.insert(BCPair(el, bc));
       }
     }
   }
   // define aliases for neutron, deuterium and tritium
-  bctable->insert(BCPair("n", bctable->at("1-n")));
-  bctable->insert(BCPair("D", bctable->at("2-H")));
-  bctable->insert(BCPair("T", bctable->at("3-H")));
-  return getNeutronBCTable();
+  bctable.insert(BCPair("n", bctable.at("1-n")));
+  bctable.insert(BCPair("D", bctable.at("2-H")));
+  bctable.insert(BCPair("T", bctable.at("3-H")));
+  return bctable;
+}
+
+/// Loaded on the first call as the Waasmaier-Kirfel formulas.
+const NeutronBCStorage& getNeutronBCTable() {
+  static const NeutronBCStorage bctable = loadNeutronBCTable();
+  return bctable;
 }
 
 }  // namespace

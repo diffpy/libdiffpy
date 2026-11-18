@@ -16,13 +16,19 @@
  *
  *****************************************************************************/
 
+#include <bit>
 #include <stdexcept>
 #include <sstream>
 #include <cmath>
 #include <cassert>
+#include <typeinfo>
 
 #include <diffpy/serialization.ipp>
 #include <diffpy/srreal/PDFCalculator.hpp>
+#include <diffpy/srreal/CroppedGaussianProfile.hpp>
+#include <diffpy/srreal/GaussianProfile.hpp>
+#include <diffpy/srreal/kernels/PairTable.hpp>
+#include <diffpy/srreal/kernels/CalculationKernelImpl.hpp>
 #include <diffpy/srreal/StructureAdapter.hpp>
 #include <diffpy/srreal/R3linalg.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
@@ -245,19 +251,15 @@ void PDFCalculator::setQmax(double qmax) {
   if (_initialQstepUpdate(this)) this->resetValue();
 }
 
-const double& PDFCalculator::getQmax() const {
-  static double rv;
-  rv = min(mqmax, M_PI / this->getRstep());
-  return rv;
+double PDFCalculator::getQmax() const {
+  return min(mqmax, M_PI / this->getRstep());
 }
 
-const double& PDFCalculator::getQstep() const {
-  static double rv;
+double PDFCalculator::getQstep() const {
   // replicate the zero padding as done in fftgtof
-  int Npad1 = this->extendedRmaxSteps();
-  int Npad2 = (Npad1 > 0) ? (1 << int(ceil(log2(Npad1)))) : 0;
-  rv = (Npad2 > 0) ? M_PI / (Npad2 * this->getRstep()) : 0.0;
-  return rv;
+  const int n = this->extendedRmaxSteps();
+  if (n <= 0) return 0.0;
+  return M_PI / (std::bit_ceil(std::size_t(n)) * this->getRstep());
 }
 
 // R-range methods
@@ -425,16 +427,35 @@ void PDFCalculator::addPairContribution(const BaseBondGenerator& bnds,
   double sfprod = this->sfSite(bnds.site0()) * this->sfSite(bnds.site1());
   double peakscale = sfprod * bnds.multiplicity() * summationscale;
   double fwhm = this->getPeakWidthModel()->calculate(bnds);
-  const PeakProfile& pkf = *(this->getPeakProfile());
-  double dist = bnds.distance();
-  double xlo = dist + pkf.xboundlo(fwhm);
-  double xhi = dist + pkf.xboundhi(fwhm);
-  int i = max(0, this->calcIndex(xlo));
-  int ilast = min(this->countCalcPoints(), this->calcIndex(xhi) + 1);
-  assert(ilast <= int(mvalue.size()));
-  assert(eps_gt(dist, 0.0));
-  pkf.addRDFPeak(mvalue.data(), i, ilast, this->rcalcloSteps(),
-                 this->getRstep(), dist, fwhm, peakscale);
+  kernels::addProfilePeak(*this->getPeakProfile(), mvalue.data(),
+                          this->countCalcPoints(), this->rcalcloSteps(),
+                          this->getRstep(), bnds.distance(), fwhm, peakscale);
+}
+
+bool PDFCalculator::addAllPairContributions() {
+  if (typeid(*this) != typeid(PDFCalculator)) return false;
+  return this->addAllPairsOfPDF();
+}
+
+bool PDFCalculator::addAllPairsOfPDF() {
+  // Other peak width models and structures need per-bond evaluation.
+  kernels::PDFPairSumArgs args = {};
+  if (!kernels::assignPairWidth(args.w, *this->getPeakWidthModel()) ||
+      !kernels::PairTable::supports(*mstructure))
+    return false;
+  const PeakProfile& pkf = *this->getPeakProfile();
+  args.cropped = typeid(pkf) == typeid(CroppedGaussianProfile);
+  if (!args.cropped && typeid(pkf) != typeid(GaussianProfile)) return false;
+  args.height = pkf(0.0, 1.0);
+  args.halfboundrel = pkf.xboundhi(1.0);
+  args.sfsite = mstructure_cache.sfsite.data();
+  args.npts = this->countCalcPoints();
+  args.rlosteps = this->rcalcloSteps();
+  args.rstep = this->getRstep();
+  const auto& kernel =
+    this->preparePairSum(args, this->rcalclo(), this->rcalchi());
+  mallpairs.record(kernel.pdfPairSum(args));
+  return true;
 }
 
 void PDFCalculator::stashPartialValue() {
@@ -516,11 +537,6 @@ int PDFCalculator::countExtendedPoints() const {
 int PDFCalculator::countCalcPoints() const {
   int rv = this->rcalchiSteps() - this->rcalcloSteps();
   assert(rv >= 0);
-  return rv;
-}
-
-int PDFCalculator::calcIndex(double r) const {
-  int rv = int(floor(r / this->getRstep())) - this->rcalcloSteps();
   return rv;
 }
 

@@ -163,12 +163,8 @@ template <class TBase>
 typename HasClassRegistry<TBase>::RegistryStorage&
 HasClassRegistry<TBase>::getRegistry()
 {
-    static std::unique_ptr<RegistryStorage> the_registry;
-    if (!the_registry.get())
-    {
-        the_registry.reset(new RegistryStorage());
-    }
-    return *the_registry;
+    static RegistryStorage the_registry;
+    return the_registry;
 }
 
 }   // namespace diffpy

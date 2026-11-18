@@ -18,14 +18,6 @@
       }
     },
     {
-      "name": "release",
-      "inherits": "ninja",
-      "displayName": "Optimized build",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
       "name": "debug",
       "inherits": "ninja",
       "displayName": "Debug build with C assertions and unit tests",
@@ -35,26 +27,32 @@
       }
     },
     {
-      "name": "coverage",
+      "name": "release",
       "inherits": "ninja",
+      "displayName": "Optimized build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "coverage",
+      "inherits": "debug",
       "displayName": "Debug build instrumented for coverage analysis",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "LIBDIFFPY_BUILD_TESTS": "ON",
         "LIBDIFFPY_COVERAGE": "ON"
       }
     }
   ],
   "buildPresets": [
     {
-      "name": "release",
-      "configurePreset": "release",
-      "configuration": "Release"
-    },
-    {
       "name": "debug",
       "configurePreset": "debug",
       "configuration": "Debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "configuration": "Release"
     },
     {
       "name": "coverage",
@@ -75,15 +73,15 @@
       }
     },
     {
+      "name": "release",
+      "inherits": "debug",
+      "configurePreset": "release",
+      "configuration": "Release"
+    },
+    {
       "name": "coverage",
-      "configurePreset": "coverage",
-      "configuration": "Debug",
-      "execution": {
-        "noTestsAction": "error"
-      },
-      "output": {
-        "outputOnFailure": true
-      }
+      "inherits": "debug",
+      "configurePreset": "coverage"
     }
   ]
 }

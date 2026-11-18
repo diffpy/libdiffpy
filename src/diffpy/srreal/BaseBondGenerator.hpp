@@ -28,6 +28,10 @@
 namespace diffpy {
 namespace srreal {
 
+namespace kernels {
+class PairTable;
+}
+
 /// Use zero default for rmax so any misconfiguration of r-limits is obvious.
 const double DEFAULT_BONDGENERATOR_RMAX = 0.0;
 
@@ -94,6 +98,10 @@ class DLL_EXPORT BaseBondGenerator {
   void updateDistance();
 
  private:
+  friend class kernels::PairTable;
+  // A cached candidate may move away from a coincident site on the next call.
+  bool mkeepcoincident = false;
+
   // methods
   void advanceWhileInvalid();
   bool bondOutOfRange() const;

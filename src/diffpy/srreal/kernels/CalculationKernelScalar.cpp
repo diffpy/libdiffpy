@@ -43,9 +43,10 @@ void debyeSumScalar(const DebyeSumArgs& a) {
     const double q = kq * a.qstep;
     const double dwq = a.dwsigma * q;
     const double dwscale = exp(-0.5 * dwq * dwq);
-    const double sinescale = a.scale * dwscale * a.sf0[kq] * a.sf1[kq] / a.dist;
+    const double sinescale = (a.scale / a.dist) * dwscale *
+                             (a.sf0[kq] * a.occ0) * (a.sf1[kq] * a.occ1);
     if (fabs(sinescale) <= a.prec) break;
-    a.out[kq] += sinescale * sin(q * a.dist);
+    a.out[kq] += a.count * sinescale * sin(q * a.dist);
   }
 }
 
@@ -66,8 +67,9 @@ int bondCandidatesScalar(const BondCandidatesArgs& a) {
 }  // namespace
 
 const CalculationKernel& scalarCalculationKernel() {
-  static constexpr CalculationKernel kernel = {
-    "scalar", gaussianWindowScalar, debyeSumScalar, bondCandidatesScalar};
+  static constexpr auto kernel =
+    makeCPUKernel<gaussianWindowScalar, debyeSumScalar>("scalar",
+                                                        bondCandidatesScalar);
   return kernel;
 }
 

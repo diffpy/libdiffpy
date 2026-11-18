@@ -22,6 +22,7 @@
 #ifndef SCATTERINGFACTORTABLE_HPP_INCLUDED
 #define SCATTERINGFACTORTABLE_HPP_INCLUDED
 
+#include <memory>
 #include <unordered_set>
 
 #include <boost/serialization/base_object.hpp>
@@ -88,6 +89,8 @@ class DLL_EXPORT ScatteringFactorTableOwner {
  private:
   // data
   ScatteringFactorTablePtr msftable;
+  // Detect replacements made through the mutable table reference.
+  mutable std::weak_ptr<ScatteringFactorTable> mtickedtable;
   mutable eventticker::EventTicker mprivateticker;
 
   // serialization
@@ -95,6 +98,7 @@ class DLL_EXPORT ScatteringFactorTableOwner {
   template <class Archive>
   void serialize(Archive& ar, const unsigned int version) {
     ar & msftable & mprivateticker;
+    if constexpr (Archive::is_loading::value) mtickedtable = msftable;
   }
 };
 

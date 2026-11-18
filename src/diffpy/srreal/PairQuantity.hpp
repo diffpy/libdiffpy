@@ -39,6 +39,13 @@ namespace srreal {
 
 class BaseBondGenerator;
 
+namespace kernels {
+struct PairSumState;
+struct PairSumArgs;
+struct PairSumStats;
+struct CalculationKernel;
+}
+
 class DLL_EXPORT PairQuantity : public diffpy::Attributes {
  public:
   // class constants
@@ -93,6 +100,13 @@ class DLL_EXPORT PairQuantity : public diffpy::Attributes {
   virtual void resetValue();
   virtual void configureBondGenerator(BaseBondGenerator&) const;
   virtual void addPairContribution(const BaseBondGenerator&, int) {}
+  /// For an unpartitioned half sum, add every unmasked pair as
+  /// addPairContribution would. Return false before changing the value
+  /// to use per-bond evaluation. Derived calculators can opt in when
+  /// their batch sum matches their per-bond contributions.
+  virtual bool addAllPairContributions() { return false; }
+  const kernels::CalculationKernel& preparePairSum(kernels::PairSumArgs&,
+                                                   double rmin, double rmax);
   virtual void executeParallelMerge(const std::string& pdata);
   virtual void finishValue() {}
   int countSites() const;
@@ -109,17 +123,63 @@ class DLL_EXPORT PairQuantity : public diffpy::Attributes {
   typedef std::unordered_map<std::pair<std::string, std::string>, bool,
                              diffpy::PairHash>
     TypeMaskStorage;
+  /// Pairs of the last structures for calculators that add all pairs at
+  /// once.  Neither copied nor serialized.
+  struct AllPairsState {
+    AllPairsState() = default;
+    void record(kernels::PairSumStats stats);
+    AllPairsState(const AllPairsState& other)
+        : pairs(other.pairs), peaks(other.peaks) {}
+    AllPairsState& operator=(const AllPairsState& other) {
+      pairsum.reset();
+      pairs = other.pairs;
+      peaks = other.peaks;
+      return *this;
+    }
+    std::shared_ptr<kernels::PairSumState> pairsum;
+    /// Pairs and merged contributions of the last sum of all pairs, from
+    /// which the OPTIMIZED evaluator estimates the work of the next one.
+    double pairs = 0.0;
+    double peaks = 0.0;
+  };
+
   QuantityType mvalue;
   StructureAdapterPtr mstructure;
   double mrmin;
   double mrmax;
-  PQEvaluatorPtr mevaluator;
+  /// The evaluator of the calculator.  A copy gets a fresh evaluator, so
+  /// that it does not take the last structure of the original for its own.
+  class EvaluatorHolder {
+   public:
+    EvaluatorHolder() {}
+    EvaluatorHolder(const EvaluatorHolder& other) : mptr(other.copy()) {}
+    EvaluatorHolder& operator=(const EvaluatorHolder& other) {
+      if (this != &other) mptr = other.copy();
+      return *this;
+    }
+    EvaluatorHolder& operator=(PQEvaluatorPtr pqev) {
+      mptr = pqev;
+      return *this;
+    }
+    PQEvaluatorBasic* operator->() const { return mptr.get(); }
+    PQEvaluatorBasic* get() const { return mptr.get(); }
+    PQEvaluatorPtr& ptr() { return mptr; }
+
+   private:
+    PQEvaluatorPtr copy() const {
+      return mptr ? createPQEvaluator(mptr->typeint(), mptr) : mptr;
+    }
+    PQEvaluatorPtr mptr;
+  };
+
+  EvaluatorHolder mevaluator;
   bool mdefaultpairmask;
   PairMaskStorage minvertpairmask;
   std::unordered_map<int, bool> msiteallmask;
   TypeMaskStorage mtypemask;
   int mmergedvaluescount;
   mutable eventticker::EventTicker mticker;
+  AllPairsState mallpairs;
 
  private:
   // methods
@@ -134,7 +194,7 @@ class DLL_EXPORT PairQuantity : public diffpy::Attributes {
     ar & mstructure;
     ar & mrmin;
     ar & mrmax;
-    ar & mevaluator;
+    ar & mevaluator.ptr();
     ar & mdefaultpairmask;
     ar & minvertpairmask;
     ar & msiteallmask;

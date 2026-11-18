@@ -38,6 +38,9 @@ class DLL_EXPORT JeongPeakWidth : public DebyeWallerPeakWidth {
   // methods
   virtual const std::string& type() const;
   virtual double calculate(const BaseBondGenerator&) const;
+  /// Width of this model for a bond of the distance r with the mean square
+  /// displacement msd.
+  double calculateFromMSD(double r, double msd) const override;
   virtual double maxWidth(StructureAdapterPtr, double rmin, double rmax) const;
 
   // data access

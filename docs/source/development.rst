@@ -32,8 +32,8 @@ The CMake presets require CMake 3.22 or later and use Ninja. On Windows,
 run them in a command prompt with the conda build environment activated.
 The build presets are
 
-* ``release`` - optimized build with C assertion checks disabled
 * ``debug`` - unoptimized build with debug information and C assertion checks
+* ``release`` - optimized build with C assertion checks disabled
 * ``coverage`` - unoptimized build instrumented for coverage analysis
 
 The library is built in the ``build/<preset>`` directory, for example
@@ -48,8 +48,8 @@ ObjCryst adapter, pass ``-DLIBDIFFPY_ENABLE_OBJCRYST=OFF``. For gprof
 instrumentation, use ``-DLIBDIFFPY_PROFILE=ON``. To build the optimized
 shared library without link-time optimization, pass ``-DLIBDIFFPY_LTO=OFF``.
 
-Calculation kernels
--------------------
+SIMD calculation kernels
+------------------------
 
 ``PDFCalculator`` and ``DebyePDFCalculator`` run their inner loops in a
 calculation kernel. The scalar kernel is always built. With the default

@@ -355,29 +355,33 @@ TEST_CASE("TestCalculationKernel::test_window_lengths", "[CalculationKernel]") {
         // The scale is negative when a calculator removes a pair.
         std::vector<double> sf(hi);
         for (int kq = 0; kq < hi; ++kq) sf[kq] = std::exp(-0.01 * kq);
+        // Several equal pairs add what one pair adds that many times.
         for (double scale : {2.0, -2.0}) {
           for (double prec : {0.0, 1e-3, 0.1}) {
-            INFO("lo " << lo << ", n " << n << ", scale " << scale << ", prec "
-                       << prec);
-            QuantityType reference(hi + padding, fill);
-            QuantityType actual(reference);
-            DebyeSumArgs args = {
-              .out = reference.data(),
-              .kqlo = lo,
-              .kqhi = hi,
-              .qstep = 0.05,
-              .dist = 1.7,
-              .dwsigma = 0.1,
-              .scale = scale,
-              .prec = prec,
-              .sf0 = sf.data(),
-              .sf1 = sf.data(),
-            };
-            scalar.debyeSum(args);
-            args.out = actual.data();
-            kernel.debyeSum(args);
-            CHECK(maxRelativeError(actual, reference) <= KERNEL_TOLERANCE);
-            CHECK(sameUntouched(actual, reference, fill));
+            for (int count : {1, 3}) {
+              INFO("lo " << lo << ", n " << n << ", scale " << scale
+                         << ", prec " << prec << ", count " << count);
+              QuantityType reference(hi + padding, fill);
+              QuantityType actual(reference);
+              DebyeSumArgs args = {
+                .out = reference.data(),
+                .kqlo = lo,
+                .kqhi = hi,
+                .qstep = 0.05,
+                .dist = 1.7,
+                .dwsigma = 0.1,
+                .scale = scale,
+                .prec = prec,
+                .sf0 = sf.data(),
+                .sf1 = sf.data(),
+              };
+              for (int k = 0; k < count; ++k) scalar.debyeSum(args);
+              args.out = actual.data();
+              args.count = count;
+              kernel.debyeSum(args);
+              CHECK(maxRelativeError(actual, reference) <= KERNEL_TOLERANCE);
+              CHECK(sameUntouched(actual, reference, fill));
+            }
           }
         }
       }

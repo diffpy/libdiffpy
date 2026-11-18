@@ -91,7 +91,7 @@ if(MSVC AND (LIBDIFFPY_COVERAGE OR LIBDIFFPY_PROFILE))
 endif()
 
 if(LIBDIFFPY_COVERAGE)
-  add_compile_options(--coverage -O0 -g)
+  add_compile_options(--coverage -fprofile-update=atomic -O0 -g)
   add_link_options(--coverage)
 endif()
 

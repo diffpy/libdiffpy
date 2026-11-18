@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <mutex>
 #include <ranges>
 #include <span>
 #include <stdexcept>
@@ -65,6 +66,13 @@ bool sameLatticeBits(const Lattice& L0, const Lattice& L1) {
   return sameBits(L0.base().data(), L1.base().data());
 }
 
+/// Guards the symmetry positions of all adapters, which const methods
+/// expand on demand, also in threads that share an adapter.
+std::mutex& symmetryCacheMutex() {
+  static std::mutex mutex;
+  return mutex;
+}
+
 }  // namespace
 
 //////////////////////////////////////////////////////////////////////////////
@@ -81,6 +89,7 @@ CrystalStructureAdapter::CrystalStructureAdapter()
 // Public Methods ------------------------------------------------------------
 
 StructureAdapterPtr CrystalStructureAdapter::clone() const {
+  const std::lock_guard<std::mutex> lock(symmetryCacheMutex());
   StructureAdapterPtr rv(new CrystalStructureAdapter(*this));
   return rv;
 }
@@ -151,6 +160,7 @@ const SymOpRotTrans& CrystalStructureAdapter::getSymOp(int i) const {
 const CrystalStructureAdapter::AtomVector&
 CrystalStructureAdapter::getEquivalentAtoms(int idx) const {
   assert(0 <= idx && idx < this->countSites());
+  const std::lock_guard<std::mutex> lock(symmetryCacheMutex());
   if (!this->isSiteSymmetryUpToDate(idx)) this->updateSymmetryPositions();
   return msymatoms[idx];
 }
@@ -204,21 +214,24 @@ CrystalStructureAdapter::AtomVector CrystalStructureAdapter::expandLatticeAtom(
 }
 
 void CrystalStructureAdapter::updateSymmetryPositions() const {
-  // build asymmetric unit in lattice coordinates
-  AtomVector lcatoms(this->begin(), this->end());
-  AtomVector::iterator lcai = lcatoms.begin();
-  for (; lcai != lcatoms.end(); ++lcai) this->toFractional(*lcai);
-  // build symmetry positions for all atoms in the asymmetric unit
-  msymatoms.resize(this->countSites());
-  assert(lcatoms.size() == msymatoms.size());
-  lcai = lcatoms.begin();
-  std::vector<AtomVector>::iterator saii = msymatoms.begin();
-  for (; lcai != lcatoms.end(); ++lcai, ++saii) {
-    *saii = this->expandLatticeAtom(*lcai);
-    iterator ai = saii->begin();
-    for (; ai != saii->end(); ++ai) this->toCartesian(*ai);
+  // Expand only the sites whose atoms changed, or all of them after a change
+  // of the lattice or a reset of msymmetry_cached.
+  const int cntsites = this->countSites();
+  const bool keepsame = this->isSymmetryCached() &&
+                        msymsource.size() == msymatoms.size() &&
+                        sameLatticeBits(msymlattice, this->getLattice());
+  msymatoms.resize(cntsites);
+  if (!keepsame) msymsource.assign(cntsites, Atom());
+  for (int i = 0; i < cntsites; ++i) {
+    const Atom& a = (*this)[i];
+    if (keepsame && sameAtomBits(msymsource[i], a)) continue;
+    // expand the atom in lattice coordinates
+    Atom lca = a;
+    this->toFractional(lca);
+    msymatoms[i] = this->expandLatticeAtom(lca);
+    for (Atom& ai : msymatoms[i]) this->toCartesian(ai);
+    msymsource[i] = a;
   }
-  msymsource.assign(this->begin(), this->end());
   msymlattice = this->getLattice();
   msymmetry_cached = true;
 }
@@ -272,6 +285,7 @@ bool CrystalStructureAdapter::isSymmetryUpToDate() const {
 
 const std::vector<CrystalStructureAdapter::AtomVector>&
 CrystalStructureAdapter::symmetryAtoms() const {
+  const std::lock_guard<std::mutex> lock(symmetryCacheMutex());
   if (!this->isSymmetryUpToDate()) this->updateSymmetryPositions();
   return msymatoms;
 }

@@ -65,8 +65,8 @@ class DLL_EXPORT PDFCalculator : public PairQuantity,
   void setQmin(double);
   const double& getQmin() const;
   void setQmax(double);
-  const double& getQmax() const;
-  const double& getQstep() const;
+  double getQmax() const;
+  double getQstep() const;
 
   // R-range methods
   QuantityType getRgrid() const;
@@ -110,6 +110,10 @@ class DLL_EXPORT PDFCalculator : public PairQuantity,
   virtual void resetValue();
   virtual void configureBondGenerator(BaseBondGenerator&) const;
   virtual void addPairContribution(const BaseBondGenerator&, int);
+  virtual bool addAllPairContributions();
+  /// addAllPairContributions for derived classes that keep the
+  /// addPairContribution of this class.
+  bool addAllPairsOfPDF();
   // support for PQEvaluatorOptimized
   virtual void stashPartialValue();
   virtual void restorePartialValue();
@@ -136,8 +140,6 @@ class DLL_EXPORT PDFCalculator : public PairQuantity,
   int countExtendedPoints() const;
   /// number of points in the complete calculated r-grid
   int countCalcPoints() const;
-  /// index of a nearby point in the complete calculated r-grid
-  int calcIndex(double r) const;
   /// reduce extended grid to user-requested results grid
   /// by cutting away the points for termination ripples
   void cutRipplePoints(QuantityType& y) const;

@@ -19,6 +19,7 @@
 
 #include <cassert>
 #include <algorithm>
+#include <typeinfo>
 
 #include <diffpy/hash.hpp>
 #include <diffpy/serialization.ipp>
@@ -135,6 +136,18 @@ StructureDifference AtomicStructureAdapter::diff(
   typedef std::shared_ptr<const class AtomicStructureAdapter> APtr;
   APtr pother = std::dynamic_pointer_cast<APtr::element_type>(other);
   if (!pother) return sd;
+  // The same atoms can be another structure in a derived adapter, such as a
+  // crystal.  Only its diff can tell, so it must allow the fast update too.
+  if (typeid(*this) != typeid(*pother)) {
+    thread_local bool reversed = false;
+    if (!reversed) {
+      struct Reversal {
+        Reversal() { reversed = true; }
+        ~Reversal() { reversed = false; }
+      } reversal;
+      if (!other->diff(this->shared_from_this()).allowsfastupdate()) return sd;
+    }
+  }
   // try fast side-by-side comparison
   sd.diffmethod = StructureDifference::Method::SIDEBYSIDE;
   const AtomicStructureAdapter& astru0 = *this;

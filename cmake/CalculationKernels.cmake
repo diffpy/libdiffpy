@@ -40,9 +40,13 @@ endif()
 
 # The main source glob is not recursive, add the kernels explicitly.
 set(_kernel_dir "${PROJECT_SOURCE_DIR}/src/diffpy/srreal/kernels")
+find_package(Threads REQUIRED)
+target_link_libraries(diffpy PRIVATE Threads::Threads)
 target_sources(diffpy PRIVATE
+  "${_kernel_dir}/CalculationKernelCPU.cpp"
   "${_kernel_dir}/CalculationKernelScalar.cpp"
-  "${_kernel_dir}/CalculationKernelDispatch.cpp")
+  "${_kernel_dir}/CalculationKernelDispatch.cpp"
+  "${_kernel_dir}/PairTable.cpp")
 set(_kernel_names scalar)
 
 # All kernels need IEEE arithmetic to give consistent results.
@@ -51,7 +55,10 @@ if(MSVC)
 else()
   set(_kernel_math_options -fno-fast-math -ffp-contract=off)
 endif()
-set_source_files_properties("${_kernel_dir}/CalculationKernelScalar.cpp"
+set_source_files_properties(
+  "${_kernel_dir}/CalculationKernelCPU.cpp"
+  "${_kernel_dir}/CalculationKernelScalar.cpp"
+  "${_kernel_dir}/PairTable.cpp"
   PROPERTIES COMPILE_OPTIONS "${_kernel_math_options}")
 
 # Inline functions compiled for the SIMD instruction sets must not be shared
