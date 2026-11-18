@@ -150,6 +150,7 @@ struct PairSumStats {
 /// Owned by the calculator and reused by kernels with the same backend.
 struct PairSumWorkspace {
   virtual ~PairSumWorkspace() = default;
+  virtual bool isCurrentDevice() const { return true; }
 };
 using MakeWorkspace = PairSumWorkspace* (*)();
 
@@ -158,7 +159,7 @@ struct PairSumArgs {
   PairWidthArgs w;
   double* out;
   PairSumWorkspace* workspace;
-  /// A null mask includes every pair.
+  /// Only the CPU reads the mask. A null pointer includes every pair.
   const PairQuantity* mask;
 };
 
@@ -210,10 +211,15 @@ struct CalculationKernel {
   PairSumStats (*pdfPairSum)(const PDFPairSumArgs&);
   PairSumStats (*debyePairSum)(const DebyePairSumArgs&);
   MakeWorkspace makeWorkspace;
+  bool onDevice = false;
 };
 
 /// The active kernel, exported for the unit tests.
 DLL_EXPORT const CalculationKernel& activeCalculationKernel();
+
+/// Use the selected CPU kernel for CPU-only features, or the preferred CPU
+/// kernel when the active kernel is on a device.
+const CalculationKernel& pairSumKernel(bool cpuOnly);
 
 PairSumStats cpuPDFPairSum(const PDFPairSumArgs&, GaussianWindow);
 PairSumStats cpuDebyePairSum(const DebyePairSumArgs&, DebyeSum);
@@ -239,6 +245,18 @@ constexpr CalculationKernel makeCPUKernel(
           [](const DebyePairSumArgs& a) { return cpuDebyePairSum(a, Debye); },
           makeCPUWorkspace};
 }
+
+// Functions of the CUDA kernels, which exist only when CMake compiles
+// them, see cmake/Cuda.cmake.  The Mixed ones add in single precision
+// where the result keeps six digits.
+
+/// Null when a CUDA device can run the pair sums, otherwise why it cannot.
+const char* cudaKernelUnavailable();
+PairSumStats cudaPDFPairSum(const PDFPairSumArgs&);
+PairSumStats cudaPDFPairSumMixed(const PDFPairSumArgs&);
+PairSumStats cudaDebyePairSum(const DebyePairSumArgs&);
+PairSumStats cudaDebyePairSumMixed(const DebyePairSumArgs&);
+PairSumWorkspace* makeCudaWorkspace();
 
 }  // namespace kernels
 }  // namespace srreal

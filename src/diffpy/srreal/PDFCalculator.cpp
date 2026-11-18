@@ -454,7 +454,7 @@ bool PDFCalculator::addAllPairsOfPDF() {
   args.rstep = this->getRstep();
   const auto& kernel =
     this->preparePairSum(args, this->rcalclo(), this->rcalchi());
-  mallpairs.record(kernel.pdfPairSum(args));
+  mallpairs.record(kernel.pdfPairSum(args), kernel.onDevice);
   return true;
 }
 

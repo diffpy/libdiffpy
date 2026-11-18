@@ -17,6 +17,12 @@
 
 #include <diffpy/srreal/kernels/CalculationKernelImpl.hpp>
 
+#ifdef __CUDACC__
+#define DIFFPY_HOST_DEVICE __host__ __device__
+#else
+#define DIFFPY_HOST_DEVICE
+#endif
+
 namespace diffpy {
 namespace srreal {
 namespace kernels {
@@ -24,7 +30,7 @@ namespace kernels {
 constexpr double PAIR_SIGMA_TO_FWHM = 2.3548200450309493;
 
 /// Use the per-bond rounding order for the Debye precision cutoff.
-inline double fwhmToSigma(double fwhm) {
+DIFFPY_HOST_DEVICE inline double fwhmToSigma(double fwhm) {
   constexpr double scale = 1.0 / PAIR_SIGMA_TO_FWHM;
   return fwhm * scale;
 }
@@ -35,7 +41,8 @@ inline long long pairCount(const PairGeometryArgs& g) {
 }
 
 /// Clip before converting to an integer, including for very wide peaks.
-inline int gridIndex(double r, double step, int lo, int offset, int npts) {
+DIFFPY_HOST_DEVICE inline int gridIndex(double r, double step, int lo,
+                                        int offset, int npts) {
   const double i = floor(r / step) - lo + offset;
   return i > 0 ? (i < npts ? int(i) : npts) : 0;
 }
@@ -50,8 +57,8 @@ struct Pair {
 };
 
 /// As meanSquareDisplacement for the tensor xx, yy, zz, xy, xz, yz.
-inline double siteMSD(const double* U, double rx, double ry, double rz,
-                      int anisotropy) {
+DIFFPY_HOST_DEVICE inline double siteMSD(const double* U, double rx, double ry,
+                                         double rz, int anisotropy) {
   if (!anisotropy) return U[0];
   const double sUs = U[0] * rx * rx + U[1] * ry * ry + U[2] * rz * rz +
                      2 * (U[3] * rx * ry + U[4] * rx * rz + U[5] * ry * rz);
@@ -62,7 +69,7 @@ inline double siteMSD(const double* U, double rx, double ry, double rz,
 struct ClusterPair {
   int site0, site1;
 
-  static ClusterPair at(long long k) {
+  DIFFPY_HOST_DEVICE static ClusterPair at(long long k) {
     // k = i0 * (i0 - 1) / 2 + i1 with i1 < i0.
     long long row = (long long)((1.0 + sqrt(1.0 + 8.0 * (double)k)) / 2);
     while (row * (row - 1) / 2 > k) --row;
@@ -78,8 +85,8 @@ struct ClusterPair {
   }
 };
 
-inline Pair pairAt(const PairGeometryArgs& g, long long k,
-                   ClusterPair cluster) {
+DIFFPY_HOST_DEVICE inline Pair pairAt(const PairGeometryArgs& g, long long k,
+                                      ClusterPair cluster) {
   Pair rv{};
   int p1 = cluster.site1;
   rv.site0 = cluster.site0;
@@ -109,30 +116,31 @@ inline Pair pairAt(const PairGeometryArgs& g, long long k,
   return rv;
 }
 
-/// Look up a pair directly from its index.
-inline Pair pairAt(const PairGeometryArgs& g, long long k) {
+/// Random access for independent CUDA threads.
+DIFFPY_HOST_DEVICE inline Pair pairAt(const PairGeometryArgs& g, long long k) {
   return pairAt(g, k, g.translations ? ClusterPair{} : ClusterPair::at(k));
 }
 
-inline double debyeWallerWidth(double msd) {
+DIFFPY_HOST_DEVICE inline double debyeWallerWidth(double msd) {
   return msd < 0.0 ? 0.0 : PAIR_SIGMA_TO_FWHM * sqrt(msd);
 }
 
-inline double sharpeningRatio(double r, double delta1, double delta2,
-                              double qbroad) {
+DIFFPY_HOST_DEVICE inline double sharpeningRatio(double r, double delta1,
+                                                 double delta2, double qbroad) {
   if (r < DBL_EPSILON) return 0.0;
   const double qr = qbroad * r;
   return 1.0 - delta1 / r - delta2 / (r * r) + qr * qr;
 }
 
-inline double sharpenedWidth(double r, double corr, double msd,
-                             double qbroadsep) {
+DIFFPY_HOST_DEVICE inline double sharpenedWidth(double r, double corr,
+                                                double msd, double qbroadsep) {
   const double qr = qbroadsep * r;
   return sqrt(corr) * debyeWallerWidth(msd) + qr * qr;
 }
 
 /// FWHM of the built-in peak width models for one pair.
-inline double widthOf(const PairWidthArgs& w, double dist, double msd) {
+DIFFPY_HOST_DEVICE inline double widthOf(const PairWidthArgs& w, double dist,
+                                         double msd) {
   if (w.kind == PairWidthArgs::Constant) return w.width;
   if (w.kind == PairWidthArgs::DebyeWaller) return debyeWallerWidth(msd);
   const double corr = sharpeningRatio(dist, w.delta1, w.delta2, w.qbroad);
@@ -143,4 +151,5 @@ inline double widthOf(const PairWidthArgs& w, double dist, double msd) {
 }  // namespace srreal
 }  // namespace diffpy
 
+#undef DIFFPY_HOST_DEVICE
 #endif

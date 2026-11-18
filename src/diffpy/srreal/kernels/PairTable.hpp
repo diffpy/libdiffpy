@@ -84,7 +84,7 @@ class DLL_EXPORT PairTable {
   };
   static View view(const StructureAdapter& stru);
 
-  /// Contiguous storage for the arrays read by the pair-sum kernels.
+  /// Contiguous storage for the arrays read by both CPU and CUDA kernels.
   struct Geometry {
     std::vector<double> pos, posuij, siteuij, trans;
     std::vector<unsigned char> anisotropy;

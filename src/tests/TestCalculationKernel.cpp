@@ -234,10 +234,17 @@ TEST_CASE("TestCalculationKernel::test_available", "[CalculationKernel]") {
     return std::ranges::find(names, name) != names.end();
   };
   REQUIRE(!names.empty());
-  // The scalar kernel is the last resort.
-  CHECK(names.back() == "scalar");
-  const std::vector<std::string> known = {"avx512", "avx2", "sse2", "neon",
-                                          "scalar"};
+  // The scalar kernel is the last resort of the CPU.  The CUDA kernels
+  // follow it, so that they are never the default.
+  const size_t cntcpu = names.size() - (has("cuda") ? 2 : 0);
+  CHECK(names[cntcpu - 1] == "scalar");
+  CHECK(has("cuda") == has("cuda-mixed"));
+  if (has("cuda")) {
+    CHECK(names[cntcpu] == "cuda");
+    CHECK(names[cntcpu + 1] == "cuda-mixed");
+  }
+  const std::vector<std::string> known = {"avx512", "avx2", "sse2",      "neon",
+                                          "scalar", "cuda", "cuda-mixed"};
   for (const std::string& kname : names) {
     INFO("kernel " << kname);
     CHECK(std::ranges::count(names, kname) == 1);
@@ -272,6 +279,22 @@ TEST_CASE("TestCalculationKernel::test_selection", "[CalculationKernel]") {
     CHECK_THROWS_AS(setCalculationKernel("neon"), std::invalid_argument);
   } else {
     CHECK_THROWS_AS(setCalculationKernel("sse2"), std::invalid_argument);
+  }
+  // The CUDA kernels tell why they are not available.
+  if (std::ranges::find(names, "cuda") == names.end()) {
+    for (const char* cuda : {"cuda", "cuda-mixed"}) {
+      INFO("kernel '" << cuda << "'");
+      try {
+        setCalculationKernel(cuda);
+        FAIL("The kernel was taken without a device.");
+      } catch (const std::invalid_argument& e) {
+        const std::string what = e.what();
+        INFO(what);
+        CHECK(what.find("is not available: ") != std::string::npos);
+        CHECK(what.find("use one of") == std::string::npos);
+      }
+      CHECK(active == getCalculationKernel());
+    }
   }
 }
 

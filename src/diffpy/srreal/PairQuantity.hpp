@@ -127,16 +127,19 @@ class DLL_EXPORT PairQuantity : public diffpy::Attributes {
   /// once.  Neither copied nor serialized.
   struct AllPairsState {
     AllPairsState() = default;
-    void record(kernels::PairSumStats stats);
+    void record(kernels::PairSumStats stats, bool usedDevice);
     AllPairsState(const AllPairsState& other)
-        : pairs(other.pairs), peaks(other.peaks) {}
+        : ondevice(other.ondevice), pairs(other.pairs), peaks(other.peaks) {}
     AllPairsState& operator=(const AllPairsState& other) {
       pairsum.reset();
+      ondevice = other.ondevice;
       pairs = other.pairs;
       peaks = other.peaks;
       return *this;
     }
     std::shared_ptr<kernels::PairSumState> pairsum;
+    /// The last full sum ran on a GPU.
+    bool ondevice = false;
     /// Pairs and merged contributions of the last sum of all pairs, from
     /// which the OPTIMIZED evaluator estimates the work of the next one.
     double pairs = 0.0;

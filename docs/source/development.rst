@@ -33,7 +33,9 @@ run them in a command prompt with the conda build environment activated.
 The build presets are
 
 * ``debug`` - unoptimized build with debug information and C assertion checks
+* ``debug-cuda`` - debug build with CUDA calculation kernels
 * ``release`` - optimized build with C assertion checks disabled
+* ``release-cuda`` - optimized build with CUDA calculation kernels
 * ``coverage`` - unoptimized build instrumented for coverage analysis
 
 The library is built in the ``build/<preset>`` directory, for example
@@ -60,6 +62,26 @@ too when `xsimd <https://github.com/xtensor-stack/xsimd>`_ is found;
 The SIMD kernels are ``avx512``, ``avx2`` and ``sse2`` on x86-64 and ``neon``
 on arm64. On first use the library picks the best kernel that the CPU
 supports, for example ``avx2`` on a CPU without AVX-512.
+
+CUDA calculation kernels
+------------------------
+
+Build and test with the ``debug-cuda`` preset ::
+
+        cmake --preset debug-cuda
+        cmake --build --preset debug-cuda --parallel 4
+        ctest --preset debug-cuda
+
+Use ``release-cuda`` for an optimized build. To run the tests with either
+release preset, pass ``-DLIBDIFFPY_BUILD_TESTS=ON`` when configuring, then
+build and run CTest with the same preset.
+To select ``nvcc`` or its host C++ compiler, set ``CUDACXX`` or
+``CUDAHOSTCXX``, respectively, before the first configure.
+
+On a compatible GPU, ``availableCalculationKernels`` lists ``cuda``
+(double precision) and ``cuda-mixed`` (single-precision sampling with
+double-precision distances and sums). Without a compatible GPU, CPU
+kernels remain available and the ``[cuda]`` tests skip.
 
 Embed libdiffpy in another CMake project
 ----------------------------------------

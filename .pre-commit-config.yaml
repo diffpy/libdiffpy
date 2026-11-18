@@ -43,7 +43,7 @@ repos:
     hooks:
       - id: clang-format
         name: clang-format (C/C++)
-        files: \.(c|cpp|cc|cxx|h|hpp|hh)$
+        files: \.(c|cpp|cc|cxx|cu|h|hpp|hh)$
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:

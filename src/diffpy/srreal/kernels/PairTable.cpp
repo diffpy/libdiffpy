@@ -322,7 +322,7 @@ bool assignPairWidth(PairWidthArgs& rv, const PeakWidthModel& model) {
 //////////////////////////////////////////////////////////////////////////////
 
 PairSumWorkspace* PairSumState::workspaceFor(const CalculationKernel& kernel) {
-  if (mfactory != kernel.makeWorkspace) {
+  if (mfactory != kernel.makeWorkspace || !mworkspace->isCurrentDevice()) {
     mworkspace.reset(kernel.makeWorkspace());
     mfactory = kernel.makeWorkspace;
   }

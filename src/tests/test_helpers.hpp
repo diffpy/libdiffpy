@@ -58,6 +58,7 @@ void testAllKernels(Fn&& fn) {
   KernelGuard guard;
   for (const std::string& kname :
        diffpy::srreal::availableCalculationKernels()) {
+    if (kname.starts_with("cuda")) continue;
     diffpy::srreal::setCalculationKernel(kname);
     INFO("kernel " << kname);
     fn();
@@ -78,6 +79,10 @@ class AllPairs : public T {
  public:
   /// True when the last full calculation added all pairs at once.
   bool addedAllPairs() const { return maddedallpairs; }
+  /// True when it added them on the GPU.
+  bool addedOnDevice() const {
+    return maddedallpairs && this->mallpairs.ondevice;
+  }
 
  protected:
   // every calculation starts with the value reset

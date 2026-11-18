@@ -280,16 +280,18 @@ const kernels::CalculationKernel& PairQuantity::preparePairSum(
     mallpairs.pairsum = std::make_shared<kernels::PairSumState>();
   auto& state = *mallpairs.pairsum;
   args.mask = this->hasMask() ? this : nullptr;
-  const auto& kernel = kernels::activeCalculationKernel();
+  const auto& kernel = kernels::pairSumKernel(args.mask != nullptr);
   args.g = state.table.geometryArgs(*mstructure, rmin, rmax);
   args.workspace = state.workspaceFor(kernel);
   args.out = mvalue.data();
   return kernel;
 }
 
-void PairQuantity::AllPairsState::record(kernels::PairSumStats stats) {
+void PairQuantity::AllPairsState::record(kernels::PairSumStats stats,
+                                         bool usedDevice) {
   pairs = stats.pairs;
   peaks = stats.peaks;
+  ondevice = usedDevice;
 }
 
 void PairQuantity::configureBondGenerator(BaseBondGenerator& bnds) const {

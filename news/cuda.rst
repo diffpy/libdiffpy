@@ -1,5 +1,10 @@
 **Added:**
 
+* Build with ``LIBDIFFPY_CUDA=ON`` or either CUDA preset (``debug-cuda``,
+  ``release-cuda``) to enable the ``cuda`` and ``cuda-mixed`` kernels for full
+  PDF and Debye sums. Query build support with ``libdiffpy_HAS_CUDA`` (CMake)
+  or ``DIFFPY_HAS_CUDA`` (C++).
+  CUDA-enabled builds also run on CPU-only machines.
 * Derived calculators can implement ``addAllPairContributions`` or reuse
   ``addAllPairsOfPDF`` and ``addAllPairsOfDebyeSum``. The constant, Debye-Waller
   and Jeong peak width models now provide ``calculateFromMSD``.

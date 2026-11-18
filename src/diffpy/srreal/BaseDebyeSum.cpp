@@ -200,7 +200,7 @@ bool BaseDebyeSum::addAllPairsOfDebyeSum() {
   args.prec = this->getDebyePrecision();
   const auto& kernel =
     this->preparePairSum(args, range.getRmin(), range.getRmax());
-  mallpairs.record(kernel.debyePairSum(args));
+  mallpairs.record(kernel.debyePairSum(args), kernel.onDevice);
   return true;
 }
 

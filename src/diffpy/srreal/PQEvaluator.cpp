@@ -88,6 +88,7 @@ void PQEvaluatorBasic::updateValue(PairQuantity& pq, StructureAdapterPtr stru) {
   mvalue_ticker = eventticker::EventTicker();
   pq.setStructure(stru);
   // A batch covers the complete half sum of an unpartitioned evaluation.
+  pq.mallpairs.ondevice = false;
   const bool halfsum = !this->getFlag(USEFULLSUM) && !this->isParallel();
   if (halfsum && pq.addAllPairContributions()) {
     maddedallpairs = true;
@@ -289,6 +290,9 @@ bool PQEvaluatorOptimized::allPairsTakeLessWork(
   // A change of whether the calculator adds all pairs forces a full
   // calculation anyway.
   if (!maddedallpairs) return false;
+  // A sum on the device beats any fast update on the CPU.
+  const bool changes = !sd.pop0.empty() || !sd.add1.empty();
+  if (pq.mallpairs.ondevice) return changes;
   // share of the pairs that have one of the sites
   auto pairshare = [](const SiteIndices& sites, const StructureAdapter& s) {
     if (sites.empty()) return 0.0;

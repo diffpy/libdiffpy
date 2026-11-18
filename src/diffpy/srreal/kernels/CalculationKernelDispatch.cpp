@@ -36,7 +36,7 @@ namespace {
 /// Kernels of this build that the CPU can run, from the most to the least
 /// preferred.  CMake defines LIBDIFFPY_KERNEL_<NAME> for each SIMD kernel it
 /// compiles.  The scalar kernel is last and always available.
-const std::vector<const CalculationKernel*>& availableKernels() {
+const std::vector<const CalculationKernel*>& cpuKernels() {
   static const std::vector<const CalculationKernel*> available = [] {
     std::vector<const CalculationKernel*> rv;
 #if defined(LIBDIFFPY_SIMD_KERNELS)
@@ -63,9 +63,66 @@ const std::vector<const CalculationKernel*>& availableKernels() {
   return available;
 }
 
-/// The active kernel, the most preferred one is selected on first use.
+// Kernel tables have process lifetime. Availability is checked on the
+// current device whenever a caller lists or explicitly selects CUDA.
+const char* cudaUnavailable() {
+#if defined(LIBDIFFPY_KERNEL_CUDA)
+  return kernels::cudaKernelUnavailable();
+#else
+  return "libdiffpy was built without CUDA";
+#endif
+}
+
+const std::vector<const CalculationKernel*>& cudaKernels() {
+  static const std::vector<const CalculationKernel*> cuda = [] {
+    std::vector<const CalculationKernel*> rv;
+#if defined(LIBDIFFPY_KERNEL_CUDA)
+    const CalculationKernel& cpu = *cpuKernels().front();
+    static const CalculationKernel doubles = {
+      "cuda",
+      cpu.gaussianWindow,
+      cpu.debyeSum,
+      cpu.bondCandidates,
+      kernels::cudaPDFPairSum,
+      kernels::cudaDebyePairSum,
+      kernels::makeCudaWorkspace,
+      true,
+    };
+    static const CalculationKernel mixed = {
+      "cuda-mixed",
+      cpu.gaussianWindow,
+      cpu.debyeSum,
+      cpu.bondCandidates,
+      kernels::cudaPDFPairSumMixed,
+      kernels::cudaDebyePairSumMixed,
+      kernels::makeCudaWorkspace,
+      true,
+    };
+    rv = {&doubles, &mixed};
+#endif
+    return rv;
+  }();
+  return cuda;
+}
+
+bool isCudaName(const std::string& name) {
+  return name == "cuda" || name == "cuda-mixed";
+}
+
+/// All kernels that setCalculationKernel takes.
+std::vector<const CalculationKernel*> availableKernels() {
+  std::vector<const CalculationKernel*> rv = cpuKernels();
+  if (!cudaUnavailable()) {
+    const auto& cuda = cudaKernels();
+    rv.insert(rv.end(), cuda.begin(), cuda.end());
+  }
+  return rv;
+}
+
+/// The active kernel, the most preferred one of the CPU is selected on
+/// first use.
 std::atomic<const CalculationKernel*>& activeKernelSlot() {
-  static std::atomic<const CalculationKernel*> slot{availableKernels().front()};
+  static std::atomic<const CalculationKernel*> slot{cpuKernels().front()};
   return slot;
 }
 
@@ -85,14 +142,22 @@ std::string getCalculationKernel() {
 }
 
 void setCalculationKernel(const std::string& name) {
-  const auto& available = availableKernels();
+  // No device is looked for when the name is one of the CPU.
+  const bool cuda = isCudaName(name);
+  if (cuda) {
+    if (const char* reason = cudaUnavailable()) {
+      throw std::invalid_argument("Calculation kernel '" + name +
+                                  "' is not available: " + reason + ".");
+    }
+  }
+  const auto& available = cuda ? cudaKernels() : cpuKernels();
   const auto it = std::ranges::find_if(
     available, [&](const CalculationKernel* k) { return name == k->name; });
   if (it == available.end()) {
     std::string names;
-    for (const CalculationKernel* k : available) {
+    for (const std::string& kname : availableCalculationKernels()) {
       if (!names.empty()) names += ", ";
-      names += k->name;
+      names += kname;
     }
     throw std::invalid_argument("Calculation kernel '" + name +
                                 "' is not available, use one of: " + names +
@@ -105,6 +170,11 @@ namespace kernels {
 
 const CalculationKernel& activeCalculationKernel() {
   return *activeKernelSlot().load(std::memory_order_relaxed);
+}
+
+const CalculationKernel& pairSumKernel(bool cpuOnly) {
+  const auto& kernel = activeCalculationKernel();
+  return cpuOnly && kernel.onDevice ? *cpuKernels().front() : kernel;
 }
 
 }  // namespace kernels
