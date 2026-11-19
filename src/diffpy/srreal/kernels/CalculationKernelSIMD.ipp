@@ -47,7 +47,7 @@
 #include <math.h>
 #include <stdint.h>
 
-#include <diffpy/srreal/kernels/CalculationKernelImpl.hpp>
+#include <diffpy/srreal/kernels/PairGeometry.hpp>
 
 // The xsimd headers and all code below use the renamed namespace.
 #define xsimd LIBDIFFPY_XSIMD_NAMESPACE
@@ -152,58 +152,36 @@ struct SIMDKernel {
     const B twowh(2 * wh);
     const B whwh(wh * wh);
     const B ratiostep(exp(-2 * b * wh * wh));
-    const B vw(1.0 * W);
     const B vrstep(a.rstep);
     const B vxlo(xlo);
     const B vinvdist(1.0 / a.dist);
     const B vnorm(a.scale * a.peakheight);
-    const B vfwhm(a.fwhm);
-    const B vhalfbound(a.halfboundrel);
     const B one(1.0);
-    const B zero(0.0);
-    // Grid steps of the lanes from ilo, whole numbers are exact in double.
-    B steps = laneIndex();
+    int first = a.ilo, last = a.ihi;
+    if (a.cropped)
+      cropGaussianWindow(first, last, a.rlosteps, a.rstep, a.dist, a.fwhm,
+                         a.halfboundrel);
+    B steps = B(double(first - a.ilo)) + laneIndex();
     // x / dist + 1 grows by a constant per vector step.
     const B vrscalestep(wh / a.dist);
-    for (int i = a.ilo; i < a.ihi;) {
-      const int iend = blockEnd(i, a.ihi);
+    for (int i = first; i < last;) {
+      const int iend = blockEnd(i, last);
       const int ivec = wholeEnd(i, iend);
-      // Same x as the scalar kernel, so cropping agrees.
       const B xseed = steps * vrstep + vxlo;
       B g = vnorm * xsimd::exp(negb * xseed * xseed);
       B ratio = xsimd::exp(negb * (twowh * xseed + whwh));
-      if (a.cropped) {
-        for (; i < ivec; i += W) {
-          const B x = steps * vrstep + vxlo;
-          const B y =
-            xsimd::select(xsimd::abs(x / vfwhm) >= vhalfbound, zero, g);
-          addProduct(a.out + i, y, xsimd::fma(x, vinvdist, one));
-          g *= ratio;
-          ratio *= ratiostep;
-          steps += vw;
-        }
-        if (i < iend) {
-          const B x = steps * vrstep + vxlo;
-          const B y =
-            xsimd::select(xsimd::abs(x / vfwhm) >= vhalfbound, zero, g);
-          addProductPartial(a.out + i, y, xsimd::fma(x, vinvdist, one),
-                            iend - i);
-          return;
-        }
-      } else {
-        B rscaled = xsimd::fma(xseed, vinvdist, one);
-        // Advance before the loop, the next seeds then do not wait for it.
-        steps += B(double(ivec - i));
-        for (; i < ivec; i += W) {
-          addProduct(a.out + i, g, rscaled);
-          g *= ratio;
-          ratio *= ratiostep;
-          rscaled += vrscalestep;
-        }
-        if (i < iend) {
-          addProductPartial(a.out + i, g, rscaled, iend - i);
-          return;
-        }
+      B rscaled = xsimd::fma(xseed, vinvdist, one);
+      // Advance before the loop, the next seeds then do not wait for it.
+      steps += B(double(ivec - i));
+      for (; i < ivec; i += W) {
+        addProduct(a.out + i, g, rscaled);
+        g *= ratio;
+        ratio *= ratiostep;
+        rscaled += vrscalestep;
+      }
+      if (i < iend) {
+        addProductPartial(a.out + i, g, rscaled, iend - i);
+        return;
       }
     }
   }

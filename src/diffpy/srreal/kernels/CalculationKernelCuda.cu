@@ -128,8 +128,7 @@ struct PeakGrid {
   double halfboundrel;
 };
 
-// Keep the original lower grid index as the origin, including when cropping
-// removes the first point. This is the coordinate used by the CPU kernels.
+// Keep the original lower grid index as the origin for sampling the peak.
 struct PeakWindow {
   int origin, first, last;
   double xlo;
@@ -146,15 +145,10 @@ __device__ PeakWindow peakWindow(const PeakGrid& grid, double dist,
     gridIndex(dist - half, grid.rstep, grid.rlosteps, 0, grid.npts);
   const int hi =
     gridIndex(dist + half, grid.rstep, grid.rlosteps, 1, grid.npts);
-  PeakWindow win{lo, lo, hi, (grid.rlosteps + lo) * grid.rstep - dist};
-  if (grid.cropped) {
-    while (win.first < win.last &&
-           fabs(win.x(win.first, grid.rstep) / fwhm) >= grid.halfboundrel)
-      ++win.first;
-    while (win.first < win.last &&
-           fabs(win.x(win.last - 1, grid.rstep) / fwhm) >= grid.halfboundrel)
-      --win.last;
-  }
+  PeakWindow win{lo, lo, hi, (double(grid.rlosteps) + lo) * grid.rstep - dist};
+  if (grid.cropped)
+    cropGaussianWindow(win.first, win.last, grid.rlosteps, grid.rstep, dist,
+                       fwhm, grid.halfboundrel);
   return win;
 }
 

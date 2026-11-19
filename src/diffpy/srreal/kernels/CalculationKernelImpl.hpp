@@ -31,8 +31,9 @@ namespace kernels {
 /// xlo = (rlosteps + ilo) * rstep - dist:
 ///     out[i] += scale * G(x, fwhm) * (x / dist + 1)
 /// where G(x, fwhm) = peakheight * exp(-4 * ln(2) * (x / fwhm)^2), or zero
-/// for |x / fwhm| >= halfboundrel when cropped.  peakheight is the profile
-/// value at x = 0.  Nothing is added for fwhm <= 0.
+/// outside the cropped support. The cutoff uses the absolute grid offset
+/// (rlosteps + i) * rstep - dist. peakheight is the profile value at x = 0.
+/// Nothing is added for fwhm <= 0.
 struct GaussianWindowArgs {
   double* out;
   int ilo;

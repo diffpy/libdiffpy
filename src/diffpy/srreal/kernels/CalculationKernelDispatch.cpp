@@ -20,7 +20,7 @@
 #include <vector>
 
 #if defined(LIBDIFFPY_SIMD_KERNELS)
-#include <xsimd/config/xsimd_cpuid.hpp>
+#include <xsimd/xsimd.hpp>
 #endif
 
 #include <diffpy/srreal/CalculationKernel.hpp>

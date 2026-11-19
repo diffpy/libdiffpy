@@ -47,6 +47,19 @@ DIFFPY_HOST_DEVICE inline int gridIndex(double r, double step, int lo,
   return i > 0 ? (i < npts ? int(i) : npts) : 0;
 }
 
+/// Crop against the given r-grid. Reconstructing x from the start of
+/// the window can round a boundary sample to the other side of the cutoff.
+DIFFPY_HOST_DEVICE static inline void cropGaussianWindow(
+  int& first, int& last, int rlosteps, double rstep, double dist, double fwhm,
+  double halfboundrel) {
+  auto outside = [&](int i) {
+    const double x = (double(rlosteps) + i) * rstep - dist;
+    return fabs(x / fwhm) >= halfboundrel;
+  };
+  while (first < last && outside(first)) ++first;
+  while (first < last && outside(last - 1)) --last;
+}
+
 struct Pair {
   bool ok;
   int site0;
