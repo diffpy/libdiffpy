@@ -39,10 +39,17 @@ namespace {
 
 // Device ----------------------------------------------------------------------
 
+const char* errorDescription(cudaError_t err) {
+  // The Windows runtime can return nullptr when the driver is unavailable.
+  const char* description = cudaGetErrorString(err);
+  return description ? description
+                     : "CUDA runtime error (no description available)";
+}
+
 void check(cudaError_t err, const char* what) {
   if (err == cudaSuccess) return;
   throw std::runtime_error(std::string("the CUDA device failed in ") + what +
-                           " with '" + cudaGetErrorString(err) + "'");
+                           " with '" + errorDescription(err) + "'");
 }
 
 int currentDevice() {
@@ -546,7 +553,7 @@ const char* cudaKernelUnavailable() {
   // calling thread's current device and driver without launching any work.
   cudaFuncAttributes attributes;
   const cudaError_t err = cudaFuncGetAttributes(&attributes, pdfPeaks<false>);
-  return err == cudaSuccess ? nullptr : cudaGetErrorString(err);
+  return err == cudaSuccess ? nullptr : errorDescription(err);
 }
 
 PairSumStats cudaPDFPairSum(const PDFPairSumArgs& a) {
