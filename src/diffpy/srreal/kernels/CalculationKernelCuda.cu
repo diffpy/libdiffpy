@@ -113,8 +113,8 @@ const int THREADS = 128;
 /// Pairs that one thread of the Debye sum adds for its Q point.
 const int SUBCHUNK = 1024;
 
-const double FOUR_LN2 = 2.7725887222397811;
-const double TWO_PI = 6.2831853071795865;
+constexpr double FOUR_LN2 = 2.7725887222397811;
+constexpr double TWO_PI = 6.2831853071795865;
 
 // Peaks of the PDF
 // --------------------------------------------------------------
