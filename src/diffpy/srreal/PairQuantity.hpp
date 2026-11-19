@@ -44,7 +44,7 @@ struct PairSumState;
 struct PairSumArgs;
 struct PairSumStats;
 struct CalculationKernel;
-}
+}  // namespace kernels
 
 class DLL_EXPORT PairQuantity : public diffpy::Attributes {
  public:

@@ -228,8 +228,8 @@ __global__ void pdfPeaks(PairGeometryArgs g, PairWidthArgs w,
           using Real = std::conditional_t<Mixed, float, double>;
           const Real xr = Real(x * p.invwidth);
           const Real correction = Real(x) * Real(p.invdist) + Real(1);
-          row[i] += Real(p.amplitude) * exp(-Real(FOUR_LN2) * xr * xr) *
-                    correction;
+          row[i] +=
+            Real(p.amplitude) * exp(-Real(FOUR_LN2) * xr * xr) * correction;
         }
       }
     }
