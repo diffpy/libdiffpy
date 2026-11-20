@@ -39,6 +39,10 @@ namespace srreal {
 
 class PairQuantity;
 
+namespace kernels {
+struct CalculationKernel;
+}
+
 /// shared pointer to PQEvaluatorBasic
 
 typedef std::shared_ptr<class PQEvaluatorBasic> PQEvaluatorPtr;
@@ -82,6 +86,8 @@ class DLL_EXPORT PQEvaluatorBasic {
   eventticker::EventTicker mvalue_ticker;
   /// type of PQEvaluator that was actually used
   PQEvaluatorType mtypeused;
+  /// the calculator added all pairs at once in the last full calculation
+  bool maddedallpairs = false;
 
  private:
   // serialization
@@ -91,6 +97,8 @@ class DLL_EXPORT PQEvaluatorBasic {
     ar & mconfigflags & mcpuindex & mncpu & mvalue_ticker;
   }
 };
+
+class StructureDifference;
 
 class DLL_EXPORT PQEvaluatorOptimized : public PQEvaluatorBasic {
  public:
@@ -102,9 +110,13 @@ class DLL_EXPORT PQEvaluatorOptimized : public PQEvaluatorBasic {
  private:
   // data
   StructureAdapterPtr mlast_structure;
+  // Process-local kernel identity. A restored value is recomputed on first use.
+  const kernels::CalculationKernel* mlastkernel = nullptr;
 
-  // helper method
+  // helper methods
   void updateValueCompletely(PairQuantity&, StructureAdapterPtr);
+  bool allPairsTakeLessWork(const PairQuantity&,
+                            const StructureDifference&) const;
 
   // serialization
   friend class boost::serialization::access;
@@ -113,6 +125,7 @@ class DLL_EXPORT PQEvaluatorOptimized : public PQEvaluatorBasic {
     using boost::serialization::base_object;
     ar& base_object<PQEvaluatorBasic>(*this);
     ar & mlast_structure;
+    if constexpr (Archive::is_loading::value) mlastkernel = nullptr;
   }
 };
 

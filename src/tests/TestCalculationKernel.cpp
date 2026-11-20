@@ -234,10 +234,17 @@ TEST_CASE("TestCalculationKernel::test_available", "[CalculationKernel]") {
     return std::ranges::find(names, name) != names.end();
   };
   REQUIRE(!names.empty());
-  // The scalar kernel is the last resort.
-  CHECK(names.back() == "scalar");
-  const std::vector<std::string> known = {"avx512", "avx2", "sse2", "neon",
-                                          "scalar"};
+  // The scalar kernel is the last resort of the CPU.  The CUDA kernels
+  // follow it, so that they are never the default.
+  const size_t cntcpu = names.size() - (has("cuda") ? 2 : 0);
+  CHECK(names[cntcpu - 1] == "scalar");
+  CHECK(has("cuda") == has("cuda-mixed"));
+  if (has("cuda")) {
+    CHECK(names[cntcpu] == "cuda");
+    CHECK(names[cntcpu + 1] == "cuda-mixed");
+  }
+  const std::vector<std::string> known = {"avx512", "avx2", "sse2",      "neon",
+                                          "scalar", "cuda", "cuda-mixed"};
   for (const std::string& kname : names) {
     INFO("kernel " << kname);
     CHECK(std::ranges::count(names, kname) == 1);
@@ -272,6 +279,22 @@ TEST_CASE("TestCalculationKernel::test_selection", "[CalculationKernel]") {
     CHECK_THROWS_AS(setCalculationKernel("neon"), std::invalid_argument);
   } else {
     CHECK_THROWS_AS(setCalculationKernel("sse2"), std::invalid_argument);
+  }
+  // The CUDA kernels tell why they are not available.
+  if (std::ranges::find(names, "cuda") == names.end()) {
+    for (const char* cuda : {"cuda", "cuda-mixed"}) {
+      INFO("kernel '" << cuda << "'");
+      try {
+        setCalculationKernel(cuda);
+        FAIL("The kernel was taken without a device.");
+      } catch (const std::invalid_argument& e) {
+        const std::string what = e.what();
+        INFO(what);
+        CHECK(what.find("is not available: ") != std::string::npos);
+        CHECK(what.find("use one of") == std::string::npos);
+      }
+      CHECK(active == getCalculationKernel());
+    }
   }
 }
 
@@ -355,29 +378,33 @@ TEST_CASE("TestCalculationKernel::test_window_lengths", "[CalculationKernel]") {
         // The scale is negative when a calculator removes a pair.
         std::vector<double> sf(hi);
         for (int kq = 0; kq < hi; ++kq) sf[kq] = std::exp(-0.01 * kq);
+        // Several equal pairs add what one pair adds that many times.
         for (double scale : {2.0, -2.0}) {
           for (double prec : {0.0, 1e-3, 0.1}) {
-            INFO("lo " << lo << ", n " << n << ", scale " << scale << ", prec "
-                       << prec);
-            QuantityType reference(hi + padding, fill);
-            QuantityType actual(reference);
-            DebyeSumArgs args = {
-              .out = reference.data(),
-              .kqlo = lo,
-              .kqhi = hi,
-              .qstep = 0.05,
-              .dist = 1.7,
-              .dwsigma = 0.1,
-              .scale = scale,
-              .prec = prec,
-              .sf0 = sf.data(),
-              .sf1 = sf.data(),
-            };
-            scalar.debyeSum(args);
-            args.out = actual.data();
-            kernel.debyeSum(args);
-            CHECK(maxRelativeError(actual, reference) <= KERNEL_TOLERANCE);
-            CHECK(sameUntouched(actual, reference, fill));
+            for (int count : {1, 3}) {
+              INFO("lo " << lo << ", n " << n << ", scale " << scale
+                         << ", prec " << prec << ", count " << count);
+              QuantityType reference(hi + padding, fill);
+              QuantityType actual(reference);
+              DebyeSumArgs args = {
+                .out = reference.data(),
+                .kqlo = lo,
+                .kqhi = hi,
+                .qstep = 0.05,
+                .dist = 1.7,
+                .dwsigma = 0.1,
+                .scale = scale,
+                .prec = prec,
+                .sf0 = sf.data(),
+                .sf1 = sf.data(),
+              };
+              for (int k = 0; k < count; ++k) scalar.debyeSum(args);
+              args.out = actual.data();
+              args.count = count;
+              kernel.debyeSum(args);
+              CHECK(maxRelativeError(actual, reference) <= KERNEL_TOLERANCE);
+              CHECK(sameUntouched(actual, reference, fill));
+            }
           }
         }
       }

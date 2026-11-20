@@ -196,6 +196,17 @@ CrystalStructureAdapterPtr loadTestCrystalStructure(const std::string& f) {
   return rv;
 }
 
+/// The same crystal built anew, without any cached symmetry positions.
+CrystalStructureAdapterPtr rebuiltCrystal(const CrystalStructureAdapter& s) {
+  const Lattice& L = s.getLattice();
+  CrystalStructureAdapterPtr rv(new CrystalStructureAdapter);
+  rv->setLatPar(L.a(), L.b(), L.c(), L.alpha(), L.beta(), L.gamma());
+  rv->assign(s.begin(), s.end());
+  rv->setSymmetryPrecision(s.getSymmetryPrecision());
+  for (int i = 0; i < s.countSymOps(); ++i) rv->addSymOp(s.getSymOp(i));
+  return rv;
+}
+
 /// Select bonds up to 6 from the site 1, used with CaTiO3.
 void nearSite1(BaseBondGenerator& bnds) {
   bnds.setRmax(6.0);
@@ -277,23 +288,13 @@ TEST_CASE("TestBondGeneratorBatching::test_crystal_changes",
       bnds->selectAnchorSite(0);
       return generated(*bnds);
     };
-    // the same structure rebuilt without cached symmetry positions
-    auto rebuilt = [](const CrystalStructureAdapter& s) {
-      const Lattice& L = s.getLattice();
-      CrystalStructureAdapterPtr rv(new CrystalStructureAdapter);
-      rv->setLatPar(L.a(), L.b(), L.c(), L.alpha(), L.beta(), L.gamma());
-      rv->assign(s.begin(), s.end());
-      rv->setSymmetryPrecision(s.getSymmetryPrecision());
-      for (int i = 0; i < s.countSymOps(); ++i) rv->addSymOp(s.getSymOp(i));
-      return rv;
-    };
     auto same = [](const std::vector<Bond>& a, const std::vector<Bond>& b) {
       return a.size() == b.size() &&
              std::equal(a.begin(), a.end(), b.begin(), sameBond);
     };
     std::vector<Bond> last = bonds(*stru);
     REQUIRE(!last.empty());
-    checkSameBonds(last, bonds(*rebuilt(*stru)));
+    checkSameBonds(last, bonds(*rebuiltCrystal(*stru)));
     R3::Matrix R = R3::identity();
     R(2, 2) = -1.0;
     const std::pair<const char*, std::function<void()>> changes[] = {
@@ -310,7 +311,7 @@ TEST_CASE("TestBondGeneratorBatching::test_crystal_changes",
       change();
       const std::vector<Bond> now = bonds(*stru);
       CHECK(!same(last, now));
-      checkSameBonds(now, bonds(*rebuilt(*stru)));
+      checkSameBonds(now, bonds(*rebuiltCrystal(*stru)));
       last = now;
     }
   });
@@ -344,6 +345,49 @@ TEST_CASE("TestBondGeneratorBatching::test_crystal_refresh",
     CHECK(stru->siteMultiplicity(0) > 0);
     checkSameBonds(generated(*bnds), expected);
   });
+}
+
+TEST_CASE("TestBondGeneratorBatching::test_crystal_site_expansion",
+          "[BondGeneratorBatching]") {
+  // A changed atom expands only its own site again.  All sites then have
+  // the positions of a new expansion.
+  CrystalStructureAdapterPtr stru = loadTestCrystalStructure("CaTiO3.stru");
+  const int cntsites = stru->countSites();
+  auto arrays = [&] {
+    std::vector<const Atom*> rv;
+    for (int i = 0; i < cntsites; ++i) {
+      rv.push_back(stru->getEquivalentAtoms(i).data());
+    }
+    return rv;
+  };
+  auto checkAsRebuilt = [&] {
+    const CrystalStructureAdapterPtr fresh = rebuiltCrystal(*stru);
+    for (int i = 0; i < cntsites; ++i) {
+      INFO("site " << i);
+      CHECK(fresh->getEquivalentAtoms(i) == stru->getEquivalentAtoms(i));
+    }
+  };
+  const std::vector<const Atom*> before = arrays();
+  stru->at(3).xyz_cartn[1] += 0.2;
+  stru->at(5).uij_cartn(0, 0) += 0.01;
+  const R3::Vector moved = stru->getEquivalentAtoms(3)[0].xyz_cartn;
+  const std::vector<const Atom*> after = arrays();
+  for (int i = 0; i < cntsites; ++i) {
+    if (i == 3 || i == 5) continue;
+    INFO("site " << i);
+    CHECK(before[i] == after[i]);
+  }
+  checkAsRebuilt();
+  // an atom that moves back gets its first positions again
+  stru->at(3).xyz_cartn[1] -= 0.2;
+  CHECK(moved != stru->getEquivalentAtoms(3)[0].xyz_cartn);
+  checkAsRebuilt();
+  // a new lattice moves the positions of every site
+  stru->setLatPar(5.5, 7.7, 5.4, 90.0, 95.0, 90.0);
+  checkAsRebuilt();
+  // sites that take the atoms of their neighbors
+  std::swap(stru->at(1), stru->at(2));
+  checkAsRebuilt();
 }
 
 TEST_CASE("TestBondGeneratorBatching::test_crystal_constructor",

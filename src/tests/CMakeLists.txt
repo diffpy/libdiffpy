@@ -61,6 +61,11 @@ set_property(SOURCE TestCalculationKernel.cpp test_helpers.cpp
 target_include_directories(alltests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(alltests PRIVATE
   libdiffpy::diffpy Catch2::Catch2WithMain Threads::Threads)
+if(TARGET diffpy_cuda)
+  # The device-switch test selects the current GPU through the CUDA runtime.
+  target_link_libraries(alltests PRIVATE CUDA::cudart_static)
+  target_compile_definitions(alltests PRIVATE LIBDIFFPY_TEST_CUDA_RUNTIME)
+endif()
 # test_helpers.cpp finds the testdata directory from this macro.
 set_property(SOURCE test_helpers.cpp APPEND PROPERTY COMPILE_DEFINITIONS
   "DIFFPYTESTSDIRPATH=${CMAKE_CURRENT_SOURCE_DIR}")
@@ -97,6 +102,9 @@ list(REMOVE_DUPLICATES _suite_tags)
 foreach(tag IN LISTS _suite_tags)
   string(REGEX REPLACE "^\"\\[|\\]\"$" "" name "${tag}")
   add_test(NAME "${name}" COMMAND alltests "[${name}]")
+  # Catch2 returns 4 when it skipped all tests of the tag, as those of the
+  # CUDA kernels without a device.
+  set_tests_properties("${name}" PROPERTIES SKIP_RETURN_CODE 4)
   if(WIN32 AND LIBDIFFPY_TEST_INSTALLED)
     set_tests_properties("${name}" PROPERTIES ENVIRONMENT_MODIFICATION
       "PATH=path_list_prepend:$<TARGET_FILE_DIR:libdiffpy::diffpy>")

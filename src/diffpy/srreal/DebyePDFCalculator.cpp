@@ -19,6 +19,7 @@
 #include <cassert>
 #include <valarray>
 #include <stdexcept>
+#include <typeinfo>
 
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
 #include <diffpy/srreal/PDFUtils.hpp>
@@ -229,6 +230,11 @@ void DebyePDFCalculator::resetValue() {
 void DebyePDFCalculator::configureBondGenerator(BaseBondGenerator& bnds) const {
   bnds.setRmin(this->rcalclo());
   bnds.setRmax(this->rcalchi());
+}
+
+bool DebyePDFCalculator::addAllPairContributions() {
+  if (typeid(*this) != typeid(DebyePDFCalculator)) return false;
+  return this->addAllPairsOfDebyeSum();
 }
 
 double DebyePDFCalculator::sfSiteAtQ(int siteidx, const double& Q) const {

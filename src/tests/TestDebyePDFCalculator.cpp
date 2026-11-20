@@ -19,7 +19,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include <functional>
 #include <memory>
+#include <sstream>
+#include <vector>
 
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/DebyePDFCalculator.hpp>
@@ -350,6 +353,173 @@ TEST_CASE_METHOD(TestDebyePDFCalculatorFixture,
   mpdfc->setScatteringFactorTableByType("neutron");
   mpdfc->eval(mstru10);
   CHECK(BASIC == mpdfc->getEvaluatorTypeUsed());
+}
+
+TEST_CASE_METHOD(TestDebyePDFCalculatorFixture,
+                 "TestDebyePDFCalculator::test_DBPDF_site_occupancies",
+                 "[DebyePDFCalculator]") {
+  // Sites of one element with different occupancies scatter as sites of
+  // different atom types with those occupancies.
+  AtomicStructureAdapterPtr mixed =
+    std::make_shared<AtomicStructureAdapter>(*mstru10);
+  AtomicStructureAdapterPtr named =
+    std::make_shared<AtomicStructureAdapter>(*mstru10);
+  for (int i : {0, 3, 4, 8}) {
+    mixed->at(i).occupancy = 0.4;
+    named->at(i).occupancy = 0.4;
+    named->at(i).atomtype = "C2";
+  }
+  mpdfc->getScatteringFactorTable()->setCustomAs("C2", "C");
+  for (PQEvaluatorType tp : {BASIC, OPTIMIZED}) {
+    INFO("evaluator " << tp);
+    mpdfc->setEvaluatorType(tp);
+    mpdfc->eval(named);
+    const QuantityType gnamed = mpdfc->getPDF();
+    const QuantityType fnamed = mpdfc->getF();
+    mpdfc->eval(mstru10);
+    CHECK(!allclose(gnamed, mpdfc->getPDF()));
+    mpdfc->eval(mixed);
+    CHECK(allclose(gnamed, mpdfc->getPDF()));
+    CHECK(allclose(fnamed, mpdfc->getF()));
+  }
+  // A new occupancy of the first site of an element is a change of that
+  // site only, which the fast update must get right.
+  mpdfc->setEvaluatorType(OPTIMIZED);
+  mpdfc->eval(mixed);
+  mixed->at(0).occupancy = 0.7;
+  named->at(0).occupancy = 0.7;
+  mpdfc->eval(mixed);
+  CHECK(OPTIMIZED == mpdfc->getEvaluatorTypeUsed());
+  const QuantityType gfast = mpdfc->getPDF();
+  mpdfc->setEvaluatorType(BASIC);
+  mpdfc->eval(named);
+  CHECK(allclose(gfast, mpdfc->getPDF()));
+}
+
+TEST_CASE_METHOD(TestDebyePDFCalculatorFixture,
+                 "TestDebyePDFCalculator::test_retry_unknown_atom",
+                 "[DebyePDFCalculator]") {
+  const QuantityType expected = mpdfc->eval(mstru10);
+  mstru10->at(1).atomtype = "Bogus";
+  CHECK_THROWS_AS(mpdfc->eval(mstru10), invalid_argument);
+  CHECK_THROWS_AS(mpdfc->eval(mstru10), invalid_argument);
+  mstru10->at(1).atomtype = "C";
+  CHECK(mpdfc->eval(mstru10) == expected);
+}
+
+TEST_CASE_METHOD(TestDebyePDFCalculatorFixture,
+                 "TestDebyePDFCalculator::test_replace_table_by_reference",
+                 "[DebyePDFCalculator]") {
+  DebyePDFCalculator reference;
+  reference.setScatteringFactorTableByType("neutron");
+  const auto neutron = reference.eval(mstru10);
+  for (const auto evaluator : {BASIC, OPTIMIZED}) {
+    DebyePDFCalculator calc;
+    calc.setEvaluatorType(evaluator);
+    auto& table = calc.getScatteringFactorTable();
+    REQUIRE(calc.eval(mstru10) != neutron);
+    table = reference.getScatteringFactorTable();
+    CHECK(calc.eval(mstru10) == neutron);
+    CHECK(calc.getEvaluatorTypeUsed() == BASIC);
+  }
+}
+
+TEST_CASE_METHOD(TestDebyePDFCalculatorFixture,
+                 "TestDebyePDFCalculator::test_DBPDF_kept_scattering_factors",
+                 "[DebyePDFCalculator]") {
+  // The kept scattering factors must follow every change of the calculator
+  // and of the occupancies.
+  typedef std::function<void(DebyePDFCalculator&)> Config;
+  std::vector<Config> history;
+  auto configure = [&](Config cfg) {
+    cfg(*mpdfc);
+    history.push_back(cfg);
+  };
+  // the calculator that is checked
+  DebyePDFCalculator* calc = mpdfc.get();
+  auto check = [&](StructureAdapterPtr stru) {
+    DebyePDFCalculator fresh;
+    for (const Config& cfg : history) cfg(fresh);
+    fresh.setEvaluatorType(BASIC);
+    fresh.eval(stru);
+    calc->eval(stru);
+    CHECK(allclose(fresh.getPDF(), calc->getPDF()));
+    CHECK(allclose(fresh.getF(), calc->getF()));
+  };
+  check(mstru10);
+  check(mstru10d1);
+  configure(
+    [](DebyePDFCalculator& c) { c.setScatteringFactorTableByType("neutron"); });
+  check(mstru10d1);
+  configure([](DebyePDFCalculator& c) {
+    c.getScatteringFactorTable()->setCustomAs("C", "Au");
+  });
+  check(mstru10d1);
+  configure([](DebyePDFCalculator& c) { c.setQmax(15.0); });
+  check(mstru10d1);
+  configure([](DebyePDFCalculator& c) { c.setRstep(0.02); });
+  check(mstru10d1);
+  // Many occupancies in turn, which leave arrays that no site uses.
+  AtomicStructureAdapterPtr stru =
+    std::make_shared<AtomicStructureAdapter>(*mstru10d1);
+  // a calculator of a derived class adds its pairs one by one
+  struct DerivedDebyePDFCalculator : DebyePDFCalculator {};
+  DerivedDebyePDFCalculator onebyone;
+  for (const Config& cfg : history) cfg(onebyone);
+  for (DebyePDFCalculator* c : {(DebyePDFCalculator*)&onebyone, mpdfc.get()}) {
+    const bool pairbypair = (c == &onebyone);
+    calc = c;
+    check(stru);
+    for (int k = 0; k < 40; ++k) {
+      INFO((pairbypair ? "pair by pair" : "all pairs") << " step " << k);
+      stru->at(3).occupancy = 0.5 + 0.01 * k;
+      stru->at(7).occupancy = 0.9 - 0.01 * k;
+      check(stru);
+      if (pairbypair) CHECK(OPTIMIZED == calc->getEvaluatorTypeUsed());
+    }
+  }
+  calc = mpdfc.get();
+  // a restored calculator builds its scattering factors again
+  stringstream storage(ios::in | ios::out | ios::binary);
+  diffpy::serialization::oarchive oa(storage, ios::binary);
+  oa << mpdfc;
+  diffpy::serialization::iarchive ia(storage, ios::binary);
+  std::shared_ptr<DebyePDFCalculator> pdfc1;
+  ia >> pdfc1;
+  const QuantityType g = mpdfc->getPDF();
+  stru->at(3).occupancy = 0.3;
+  pdfc1->eval(stru);
+  CHECK(!allclose(g, pdfc1->getPDF()));
+  mpdfc.swap(pdfc1);
+  check(stru);
+}
+
+TEST_CASE_METHOD(TestDebyePDFCalculatorFixture,
+                 "TestDebyePDFCalculator::test_structure_dependent_scattering",
+                 "[DebyePDFCalculator]") {
+  struct SiteFactor : DebyePDFCalculator {
+    double sfSiteAtQ(int site, const double&) const override {
+      // Both site-specific and structure-wide dependence.
+      return mstructure->siteCartesianUij(site)(0, 0) +
+             mstructure->siteCartesianUij(0)(1, 1);
+    }
+  };
+  for (auto evaluator : {BASIC, OPTIMIZED}) {
+    SiteFactor calc;
+    calc.setEvaluatorType(evaluator);
+    auto stru = std::make_shared<AtomicStructureAdapter>(*mstru10);
+    for (double u : {0.004, 0.05, 0.02, 0.004}) {
+      (*stru)[0].uij_cartn = u * R3::identity();
+      // Give the reference sites unique keys. It must always evaluate each
+      // site's curve, including sites whose own parameters stayed unchanged.
+      auto named = std::make_shared<AtomicStructureAdapter>(*stru);
+      for (int i = 0; i < named->countSites(); ++i)
+        (*named)[i].atomtype = std::to_string(i);
+      SiteFactor fresh;
+      fresh.setEvaluatorType(BASIC);
+      CHECK(allclose(calc.eval(stru), fresh.eval(named)));
+    }
+  }
 }
 
 // End of file

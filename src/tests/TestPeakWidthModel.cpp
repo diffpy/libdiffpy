@@ -104,6 +104,9 @@ TEST_CASE_METHOD(TestPeakWidthModelFixture,
   CHECK_THAT(w, WithinAbs(mjepw->calculate(*bnds), meps));
   mcjepw->setDelta2(0.75);
   CHECK_THAT(0.5 * w, WithinAbs(mjepw->calculate(*bnds), meps));
+  const DebyeWallerPeakWidth& model = *mcjepw;
+  CHECK_THAT(model.calculateFromMSD(bnds->distance(), bnds->msd()),
+             WithinAbs(0.5 * w, meps));
   mcjepw->setDelta2(0);
   mcjepw->setQbroad(sqrt(3));
   mcjepw->setQbroad_seperable(0);

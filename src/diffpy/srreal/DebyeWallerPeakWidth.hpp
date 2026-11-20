@@ -36,6 +36,9 @@ class DLL_EXPORT DebyeWallerPeakWidth : public PeakWidthModel {
   // methods
   virtual const std::string& type() const;
   virtual double calculate(const BaseBondGenerator&) const;
+  /// Width of this model for a bond of the distance r with the mean square
+  /// displacement msd.  This model does not use r.
+  virtual double calculateFromMSD(double r, double msd) const;
   virtual double maxWidth(StructureAdapterPtr, double rmin, double rmax) const;
 
  private:

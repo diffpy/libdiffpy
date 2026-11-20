@@ -16,7 +16,7 @@
 #include <cmath>
 #include <numbers>
 
-#include <diffpy/srreal/kernels/CalculationKernelImpl.hpp>
+#include <diffpy/srreal/kernels/PairGeometry.hpp>
 
 namespace diffpy {
 namespace srreal {
@@ -26,11 +26,14 @@ namespace {
 
 void gaussianWindowScalar(const GaussianWindowArgs& a) {
   if (a.fwhm <= 0.0) return;
-  const double xlo = (a.rlosteps + a.ilo) * a.rstep - a.dist;
-  for (int i = a.ilo; i < a.ihi; ++i) {
+  int first = a.ilo, last = a.ihi;
+  if (a.cropped)
+    cropGaussianWindow(first, last, a.rlosteps, a.rstep, a.dist, a.fwhm,
+                       a.halfboundrel);
+  const double xlo = (double(a.rlosteps) + a.ilo) * a.rstep - a.dist;
+  for (int i = first; i < last; ++i) {
     const double x = xlo + (i - a.ilo) * a.rstep;
     const double xrel = x / a.fwhm;
-    if (a.cropped && fabs(xrel) >= a.halfboundrel) continue;
     const double y = a.peakheight * exp(-4 * std::numbers::ln2 * xrel * xrel);
     // Normalized by dist instead of r, see PeakProfile::addRDFPeak.
     const double yrdf = y * (x / a.dist + 1);
@@ -43,9 +46,10 @@ void debyeSumScalar(const DebyeSumArgs& a) {
     const double q = kq * a.qstep;
     const double dwq = a.dwsigma * q;
     const double dwscale = exp(-0.5 * dwq * dwq);
-    const double sinescale = a.scale * dwscale * a.sf0[kq] * a.sf1[kq] / a.dist;
+    const double sinescale = (a.scale / a.dist) * dwscale *
+                             (a.sf0[kq] * a.occ0) * (a.sf1[kq] * a.occ1);
     if (fabs(sinescale) <= a.prec) break;
-    a.out[kq] += sinescale * sin(q * a.dist);
+    a.out[kq] += a.count * sinescale * sin(q * a.dist);
   }
 }
 
@@ -66,8 +70,9 @@ int bondCandidatesScalar(const BondCandidatesArgs& a) {
 }  // namespace
 
 const CalculationKernel& scalarCalculationKernel() {
-  static constexpr CalculationKernel kernel = {
-    "scalar", gaussianWindowScalar, debyeSumScalar, bondCandidatesScalar};
+  static constexpr auto kernel =
+    makeCPUKernel<gaussianWindowScalar, debyeSumScalar>("scalar",
+                                                        bondCandidatesScalar);
   return kernel;
 }
 

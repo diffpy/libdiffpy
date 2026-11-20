@@ -20,6 +20,8 @@
 #ifndef ATOMICSTRUCTUREADAPTER_HPP_INCLUDED
 #define ATOMICSTRUCTUREADAPTER_HPP_INCLUDED
 
+#include <utility>
+
 #include <boost/serialization/vector.hpp>
 
 #include <diffpy/srreal/StructureAdapter.hpp>
@@ -115,6 +117,7 @@ class DLL_EXPORT AtomicStructureAdapter : public StructureAdapter {
   void assign(Iter first, Iter last) {
     matoms.assign(first, last);
   }
+  void assign(AtomVector&& atoms) noexcept { matoms = std::move(atoms); }
   void assign(size_t n, const Atom& a) { matoms.assign(n, a); }
   // iterator forwarding
   iterator begin() { return matoms.begin(); }

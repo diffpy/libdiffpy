@@ -164,6 +164,8 @@ class DLL_EXPORT PeriodicStructureBondGenerator : public BaseBondGenerator {
     int nextpoint = 0;
   };
 
+  friend class kernels::PairTable;
+
   /// Create generator without site1 positions, add them with addPosition.
   PeriodicStructureBondGenerator(StructureAdapterConstPtr, BondOrder);
 

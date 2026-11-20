@@ -50,18 +50,58 @@ class KernelGuard {
   std::string msaved;
 };
 
-/// Call fn() with each available calculation kernel active, then restore the
-/// kernel that was active before.  Failed checks report their kernel.
-/// Do not use SECTION in fn, it would run only with the first kernel.
+/// Call fn() with each available CPU kernel active, then restore the kernel
+/// that was active before.  Do not use SECTION in fn, it would run only with
+/// the first kernel.
 template <class Fn>
 void testAllKernels(Fn&& fn) {
   KernelGuard guard;
   for (const std::string& kname :
        diffpy::srreal::availableCalculationKernels()) {
+    if (kname.starts_with("cuda")) continue;
     diffpy::srreal::setCalculationKernel(kname);
     INFO("kernel " << kname);
     fn();
   }
 }
+
+// Sums of all pairs ---------------------------------------------------------
+
+/// A calculator of the class T that adds its pairs one by one, as the
+/// calculators of the library do in every class derived from them.
+template <class T>
+struct PairByPair : T {};
+
+/// A calculator of the class T that adds all pairs at once where T does,
+/// and tells whether it did.
+template <class T>
+class AllPairs : public T {
+ public:
+  /// True when the last full calculation added all pairs at once.
+  bool addedAllPairs() const { return maddedallpairs; }
+  /// True when it added them on the GPU.
+  bool addedOnDevice() const {
+    return maddedallpairs && this->mallpairs.ondevice;
+  }
+
+ protected:
+  // every calculation starts with the value reset
+  void resetValue() override {
+    maddedallpairs = false;
+    this->T::resetValue();
+  }
+
+  bool addAllPairContributions() override {
+    if constexpr (requires { this->addAllPairsOfPDF(); }) {
+      maddedallpairs = this->addAllPairsOfPDF();
+    } else {
+      maddedallpairs = this->addAllPairsOfDebyeSum();
+    }
+    return maddedallpairs;
+  }
+
+ private:
+  bool maddedallpairs = false;
+};
 
 #endif  // TEST_HELPERS_HPP_INCLUDED

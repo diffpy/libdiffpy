@@ -18,14 +18,6 @@
       }
     },
     {
-      "name": "release",
-      "inherits": "ninja",
-      "displayName": "Optimized build",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
       "name": "debug",
       "inherits": "ninja",
       "displayName": "Debug build with C assertions and unit tests",
@@ -35,26 +27,58 @@
       }
     },
     {
-      "name": "coverage",
+      "name": "debug-cuda",
+      "inherits": "debug",
+      "displayName": "Debug build with CUDA kernels and unit tests",
+      "cacheVariables": {
+        "LIBDIFFPY_CUDA": "ON"
+      }
+    },
+    {
+      "name": "release",
       "inherits": "ninja",
+      "displayName": "Optimized build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "release-cuda",
+      "inherits": "release",
+      "displayName": "Optimized build with CUDA kernels",
+      "cacheVariables": {
+        "LIBDIFFPY_CUDA": "ON"
+      }
+    },
+    {
+      "name": "coverage",
+      "inherits": "debug",
       "displayName": "Debug build instrumented for coverage analysis",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "LIBDIFFPY_BUILD_TESTS": "ON",
         "LIBDIFFPY_COVERAGE": "ON"
       }
     }
   ],
   "buildPresets": [
     {
+      "name": "debug",
+      "configurePreset": "debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "debug-cuda",
+      "configurePreset": "debug-cuda",
+      "configuration": "Debug"
+    },
+    {
       "name": "release",
       "configurePreset": "release",
       "configuration": "Release"
     },
     {
-      "name": "debug",
-      "configurePreset": "debug",
-      "configuration": "Debug"
+      "name": "release-cuda",
+      "configurePreset": "release-cuda",
+      "configuration": "Release"
     },
     {
       "name": "coverage",
@@ -75,15 +99,25 @@
       }
     },
     {
+      "name": "debug-cuda",
+      "inherits": "debug",
+      "configurePreset": "debug-cuda"
+    },
+    {
+      "name": "release",
+      "inherits": "debug",
+      "configurePreset": "release",
+      "configuration": "Release"
+    },
+    {
+      "name": "release-cuda",
+      "inherits": "release",
+      "configurePreset": "release-cuda"
+    },
+    {
       "name": "coverage",
-      "configurePreset": "coverage",
-      "configuration": "Debug",
-      "execution": {
-        "noTestsAction": "error"
-      },
-      "output": {
-        "outputOnFailure": true
-      }
+      "inherits": "debug",
+      "configurePreset": "coverage"
     }
   ]
 }

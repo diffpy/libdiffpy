@@ -25,6 +25,10 @@
 # define DIFFPY_HAS_OBJCRYST
 #endif
 
+#if ${DIFFPY_HAS_CUDA}
+# define DIFFPY_HAS_CUDA
+#endif
+
 #endif  // FEATURES_HPP_INCLUDED
 
 // vim:ft=cpp:

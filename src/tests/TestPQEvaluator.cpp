@@ -25,6 +25,8 @@
 #include <diffpy/srreal/PQEvaluator.hpp>
 #include <diffpy/srreal/AtomicStructureAdapter.hpp>
 #include <diffpy/srreal/CrystalStructureAdapter.hpp>
+#include <diffpy/srreal/NoMetaStructureAdapter.hpp>
+#include <diffpy/srreal/NoSymmetryStructureAdapter.hpp>
 #include <diffpy/srreal/PeriodicStructureAdapter.hpp>
 #include <diffpy/srreal/PairCounter.hpp>
 #include <diffpy/srreal/PDFCalculator.hpp>
@@ -92,12 +94,14 @@ CrystalStructureAdapterPtr inversionCrystal(double x) {
 // TestPQEvaluator
 //////////////////////////////////////////////////////////////////////////////
 
-class TestPQEvaluatorFixture {
+/// Calculators of the class PDF with the BASIC and OPTIMIZED evaluators.
+template <class PDF>
+class TestPQEvaluatorFixtureOf {
  protected:
   // data
   EpsilonEqual allclose;
-  PDFCalculator mpdfcb;
-  PDFCalculator mpdfco;
+  PDF mpdfcb;
+  PDF mpdfco;
   QuantityType mzeros;
   AtomicStructureAdapterPtr mstru10;
   AtomicStructureAdapterPtr mstru10d1;
@@ -117,7 +121,7 @@ class TestPQEvaluatorFixture {
   }
 
  public:
-  TestPQEvaluatorFixture() {
+  TestPQEvaluatorFixtureOf() {
     // setup PDFCalculator instances and the zero vector for comparison
     mpdfcb.setEvaluatorType(BASIC);
     mpdfco.setEvaluatorType(OPTIMIZED);
@@ -140,7 +144,12 @@ class TestPQEvaluatorFixture {
     mstru9 = std::make_shared<AtomicStructureAdapter>(*mstru10);
     mstru9->erase(9);
   }
-};  // class TestPQEvaluatorFixture
+};  // class TestPQEvaluatorFixtureOf
+
+typedef TestPQEvaluatorFixtureOf<PDFCalculator> TestPQEvaluatorFixture;
+// Calculators that add their pairs one by one also in a full calculation.
+typedef TestPQEvaluatorFixtureOf<PairByPair<PDFCalculator>>
+  TestPQEvaluatorPairByPairFixture;
 
 TEST_CASE_METHOD(TestPQEvaluatorFixture,
                  "TestPQEvaluator::test_initial_evaluator_type_used",
@@ -188,6 +197,40 @@ TEST_CASE_METHOD(TestPQEvaluatorFixture,
 }
 
 TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_PDF_copies_of_calculator",
+                 "[PQEvaluator]") {
+  // A copy of a calculator has an evaluator of its own.
+  for (PQEvaluatorType tp : {OPTIMIZED, PQEvaluatorType::CHECK, BASIC}) {
+    INFO("evaluator " << tp);
+    PDFCalculator pdfc;
+    pdfc.setEvaluatorType(tp);
+    PDFCalculator early = pdfc;
+    const QuantityType v10 = pdfc.eval(mstru10);
+    CHECK(tp == early.getEvaluatorType());
+    CHECK(NONE == early.getEvaluatorTypeUsed());
+    CHECK(v10 == early.eval(mstru10));
+    CHECK(BASIC == early.getEvaluatorTypeUsed());
+    // a copy with a value and its assignment
+    PDFCalculator late = pdfc;
+    PDFCalculator assigned;
+    assigned = pdfc;
+    const QuantityType v9 = pdfc.eval(mstru9);
+    CHECK(!allclose(v9, v10));
+    for (PDFCalculator* c : {&late, &assigned}) {
+      CHECK(tp == c->getEvaluatorType());
+      CHECK(v10 == c->value());
+      CHECK(v10 == c->eval(mstru10));
+      CHECK(BASIC == c->getEvaluatorTypeUsed());
+      CHECK(allclose(v9, c->eval(mstru9)));
+      if (tp != BASIC) CHECK(tp == c->getEvaluatorTypeUsed());
+    }
+    // the calculator is as it was
+    CHECK(v9 == pdfc.eval(mstru9));
+    if (tp != BASIC) CHECK(tp == pdfc.getEvaluatorTypeUsed());
+  }
+}
+
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
                  "TestPQEvaluator::test_PDF_reverse_atoms", "[PQEvaluator]") {
   mpdfco.eval(mstru10);
   CHECK(allclose(mzeros, this->pdfcdiff(mstru10r)));
@@ -228,8 +271,10 @@ TEST_CASE_METHOD(TestPQEvaluatorFixture, "TestPQEvaluator::test_PDF_type_mask",
   CHECK(!allclose(gb0, gb2));
 }
 
-TEST_CASE_METHOD(TestPQEvaluatorFixture, "TestPQEvaluator::test_PDF_pair_mask",
-                 "[PQEvaluator]") {
+TEST_CASE_METHOD(TestPQEvaluatorPairByPairFixture,
+                 "TestPQEvaluator::test_PDF_pair_mask", "[PQEvaluator]") {
+  // The fast updates below are of pairs that are added one by one.  A sum
+  // of all pairs takes less work for some changes of this small structure.
   mpdfcb.setPairMask(0, 3, false);
   mpdfco.setPairMask(0, 3, false);
   CHECK(mzeros == this->pdfcdiff(mstru10));
@@ -362,6 +407,152 @@ TEST_CASE_METHOD(TestPQEvaluatorFixture, "TestPQEvaluator::test_failed_update",
     pdfc.countdown = -1;
     pdfc.eval(mstru10d1);
     CHECK(allclose(v10d1, pdfc.value()));
+  }
+}
+
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_PDF_unchanged_structure",
+                 "[PQEvaluator]") {
+  // New structures of the same content keep the value, and later changes
+  // are still found.
+  mpdfco.eval(mstru10);
+  const QuantityType v10 = mpdfco.value();
+  for (int i = 0; i < 3; ++i) {
+    StructureAdapterPtr copy = mstru10->clone();
+    mpdfco.eval(copy);
+    CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+    CHECK(copy == mpdfco.getStructure());
+    CHECK(v10 == mpdfco.value());
+  }
+  CHECK(allclose(mzeros, this->pdfcdiff(mstru10d1)));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  CHECK(allclose(mzeros, this->pdfcdiff(mstru10d1->clone())));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  CHECK(allclose(mzeros, this->pdfcdiff(mstru10)));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+}
+
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_PDF_unchanged_structure_new_baseline",
+                 "[PQEvaluator]") {
+  // The slope of a linear baseline comes from the structure at every
+  // evaluation, also when the structure did not change.
+  PeriodicStructureAdapterPtr stru(new PeriodicStructureAdapter);
+  stru->setLatPar(11.0, 5.0, 6.0, 90.0, 90.0, 90.0);
+  stru->assign(mstru10->begin(), mstru10->end());
+  CHECK(allclose(mzeros, this->pdfcdiff(stru)));
+  const QuantityType g0 = mpdfco.getPDF();
+  mpdfcb.setBaselineByType("linear");
+  mpdfco.setBaselineByType("linear");
+  CHECK(allclose(mzeros, this->pdfcdiff(stru->clone())));
+  CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+  CHECK(allclose(g0, mpdfco.getPDF()));
+}
+
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_PDF_structure_kind", "[PQEvaluator]") {
+  // A periodic structure differs from a cluster of the same atoms.
+  PeriodicStructureAdapterPtr periodic(new PeriodicStructureAdapter);
+  periodic->setLatPar(11.0, 5.0, 6.0, 90.0, 90.0, 90.0);
+  periodic->assign(mstru10->begin(), mstru10->end());
+  CrystalStructureAdapterPtr crystal(new CrystalStructureAdapter);
+  crystal->setLatPar(11.0, 5.0, 6.0, 90.0, 90.0, 90.0);
+  crystal->assign(mstru10->begin(), mstru10->end());
+  crystal->addSymOp(R3::identity(), R3::zerovector);
+  crystal->addSymOp(R3::identity(), R3::Vector(0.0, 0.5, 0.5));
+  const StructureAdapterPtr strus[] = {mstru10, periodic, crystal, mstru10,
+                                       crystal, periodic, mstru10};
+  QuantityType glast;
+  for (const StructureAdapterPtr& stru : strus) {
+    CHECK(allclose(mzeros, this->pdfcdiff(stru)));
+    const QuantityType g = mpdfcb.getPDF();
+    CHECK(!allclose(glast, g));
+    glast = g;
+  }
+}
+
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_PDF_derived_structure_class",
+                 "[PQEvaluator]") {
+  // A class that adds nothing to a built-in adapter, as one defined in
+  // Python, has copies of the built-in class and keeps its fast updates.
+  struct DerivedPeriodic : PeriodicStructureAdapter {};
+  struct DerivedCrystal : CrystalStructureAdapter {};
+  std::shared_ptr<DerivedPeriodic> periodic(new DerivedPeriodic);
+  periodic->setLatPar(11.0, 5.0, 6.0, 90.0, 90.0, 90.0);
+  periodic->assign(mstru10->begin(), mstru10->end());
+  std::shared_ptr<DerivedCrystal> crystal(new DerivedCrystal);
+  crystal->setLatPar(11.0, 5.0, 6.0, 90.0, 90.0, 90.0);
+  crystal->assign(mstru10->begin(), mstru10->end());
+  crystal->addSymOp(R3::identity(), R3::zerovector);
+  crystal->addSymOp(R3::identity(), R3::Vector(0.0, 0.5, 0.5));
+  const std::shared_ptr<AtomicStructureAdapter> strus[] = {periodic, crystal};
+  for (const auto& stru : strus) {
+    REQUIRE(typeid(*stru) != typeid(*stru->clone()));
+    CHECK(allclose(mzeros, this->pdfcdiff(stru)));
+    CHECK(BASIC == mpdfco.getEvaluatorTypeUsed());
+    const QuantityType g0 = mpdfcb.getPDF();
+    CHECK(allclose(mzeros, this->pdfcdiff(stru)));
+    CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+    stru->at(3).xyz_cartn[1] += 0.2;
+    CHECK(allclose(mzeros, this->pdfcdiff(stru)));
+    CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+    CHECK(!allclose(g0, mpdfcb.getPDF()));
+  }
+}
+
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_PDF_structure_kind_in_wrappers",
+                 "[PQEvaluator]") {
+  // Wrappers compare their source structures.
+  PeriodicStructureAdapterPtr periodic(new PeriodicStructureAdapter);
+  periodic->setLatPar(11.0, 5.0, 6.0, 90.0, 90.0, 90.0);
+  periodic->assign(mstru10->begin(), mstru10->end());
+  const StructureAdapterPtr strus[] = {nometa(mstru10), nometa(periodic),
+                                       nometa(mstru10), nosymmetry(periodic),
+                                       nosymmetry(mstru10)};
+  QuantityType glast;
+  for (const StructureAdapterPtr& stru : strus) {
+    CHECK(allclose(mzeros, this->pdfcdiff(stru)));
+    const QuantityType g = mpdfcb.getPDF();
+    glast = g;
+  }
+  CHECK(!glast.empty());
+}
+
+TEST_CASE_METHOD(TestPQEvaluatorFixture,
+                 "TestPQEvaluator::test_crystal_site_changes",
+                 "[PQEvaluator]") {
+  // Changes of single sites of a crystal, which expand only their own
+  // symmetry positions again.
+  mpdfcb.setRmax(7.0);
+  mpdfco.setRmax(7.0);
+  mzeros.assign(mpdfcb.getRgrid().size(), 0.0);
+  CrystalStructureAdapterPtr stru = inversionCrystal(0.3);
+  CHECK(allclose(mzeros, this->pdfcdiff(stru)));
+  QuantityType glast = mpdfcb.getPDF();
+  const std::function<void(CrystalStructureAdapter&)> changes[] = {
+    [](CrystalStructureAdapter& s) { s.at(2).xyz_cartn[1] += 0.1; },
+    [](CrystalStructureAdapter& s) { s.at(3).uij_cartn *= 1.5; },
+    [](CrystalStructureAdapter& s) { s.at(4).occupancy = 0.5; },
+    // to a special position and away from it
+    [](CrystalStructureAdapter& s) { s.at(0).xyz_cartn[0] = 0.0; },
+    [](CrystalStructureAdapter& s) { s.at(0).xyz_cartn[0] = 0.2; },
+    [](CrystalStructureAdapter& s) { s.at(1).xyz_cartn[2] -= 0.1; },
+  };
+  bool inplace = false;
+  for (const auto& change : changes) {
+    // every second change is made in place
+    if (!inplace) {
+      stru = std::dynamic_pointer_cast<CrystalStructureAdapter>(stru->clone());
+    }
+    inplace = !inplace;
+    change(*stru);
+    CHECK(allclose(mzeros, this->pdfcdiff(stru)));
+    CHECK(OPTIMIZED == mpdfco.getEvaluatorTypeUsed());
+    const QuantityType g = mpdfcb.getPDF();
+    CHECK(!allclose(glast, g));
+    glast = g;
   }
 }
 

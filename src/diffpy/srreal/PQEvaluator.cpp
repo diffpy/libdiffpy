@@ -28,6 +28,7 @@
 #include <diffpy/srreal/PairQuantity.hpp>
 #include <diffpy/srreal/BondCalculator.hpp>
 #include <diffpy/srreal/StructureDifference.hpp>
+#include <diffpy/srreal/kernels/CalculationKernelImpl.hpp>
 
 using namespace std;
 
@@ -40,6 +41,15 @@ namespace {
 
 // tolerated load variance for splitting outer loop for parallel evaluation
 const double CPU_LOAD_VARIANCE = 0.1;
+
+// Work of a sum of all pairs for each of its pairs and for each of the
+// contributions that it merges them to, in the units of the work for a
+// pair that is added by itself.
+const double ALLPAIRS_PAIR_WORK = 0.2;
+const double ALLPAIRS_PEAK_WORK = 0.85;
+// The estimate is within about 15 %, so the sum of all pairs must take at
+// most this share of the work of the fast update.
+const double ALLPAIRS_WORK_MARGIN = 0.85;
 
 SiteIndices complementary_indices(const int sz, const SiteIndices& indices0) {
   SiteIndices rv;
@@ -73,9 +83,18 @@ void PQEvaluatorBasic::validate(PairQuantity& pq) const { return; }
 
 void PQEvaluatorBasic::updateValue(PairQuantity& pq, StructureAdapterPtr stru) {
   mtypeused = BASIC;
+  maddedallpairs = false;
   // The value is not valid until this update completes.
   mvalue_ticker = eventticker::EventTicker();
   pq.setStructure(stru);
+  // A batch covers the complete half sum of an unpartitioned evaluation.
+  pq.mallpairs.ondevice = false;
+  const bool halfsum = !this->getFlag(USEFULLSUM) && !this->isParallel();
+  if (halfsum && pq.addAllPairContributions()) {
+    maddedallpairs = true;
+    mvalue_ticker.click();
+    return;
+  }
   BaseBondGeneratorPtr bnds = pq.mstructure->createBondGenerator();
   pq.configureBondGenerator(*bnds);
   int cntsites = pq.mstructure->countSites();
@@ -141,9 +160,8 @@ void PQEvaluatorOptimized::validate(PairQuantity& pq) const {
 void PQEvaluatorOptimized::updateValue(PairQuantity& pq,
                                        StructureAdapterPtr stru) {
   mtypeused = OPTIMIZED;
-  // revert to normal calculation if there is no structure or
-  // if PairQuantity uses mask
-  if (pq.ticker() >= mvalue_ticker || !mlast_structure) {
+  if (pq.ticker() >= mvalue_ticker || !mlast_structure ||
+      mlastkernel != &kernels::activeCalculationKernel()) {
     return this->updateValueCompletely(pq, stru);
   }
   // do not do fast updates if they take more work
@@ -155,47 +173,52 @@ void PQEvaluatorOptimized::updateValue(PairQuantity& pq,
       sd.diffmethod != StructureDifference::Method::SIDEBYSIDE) {
     return this->updateValueCompletely(pq, stru);
   }
+  if (this->allPairsTakeLessWork(pq, sd)) {
+    return this->updateValueCompletely(pq, stru);
+  }
   // Remove contributions from the extra sites in the old structure
   assert(sd.stru0 == mlast_structure);
   // The value belongs to no structure until this update completes.
+  const StructureAdapterPtr last_structure = mlast_structure;
   mlast_structure.reset();
-  int cntsites0 = sd.stru0->countSites();
-  BaseBondGeneratorPtr bnds0 = sd.stru0->createBondGenerator();
-  pq.configureBondGenerator(*bnds0);
   // loop counter
   long n = mcpuindex;
   bool usefullsum = this->getFlag(USEFULLSUM);
-  // the loop is adjusted according to usefullsum and split within
-  // the outer loop in case of parallel evaluation.
-  SiteIndices anchors = sd.pop0;
-  SiteIndices unchanged;
-  if (!sd.pop0.empty()) {
-    unchanged = complementary_indices(cntsites0, sd.pop0);
-    anchors.insert(anchors.end(), unchanged.begin(), unchanged.end());
-  }
-  bnds0->selectSites(anchors.begin(), anchors.end());
-  SiteIndices::const_iterator last_anchor =
-    usefullsum ? anchors.end() : (anchors.begin() + sd.pop0.size());
-  SiteIndices::const_iterator ii0;
-  bool needsreselection = usefullsum;
   const bool hasmask = pq.hasMask();
-  for (ii0 = anchors.begin(); ii0 != last_anchor; ++ii0) {
-    if (n++ % mncpu) continue;
-    const int& i0 = *ii0;
-    bnds0->selectAnchorSite(i0);
-    // when using half sum, deselect visited popped sites
-    if (!usefullsum) bnds0->selectSites(ii0, anchors.end());
-    // when using full sum, select only the popped sites when
-    // anchored at an unchanged atom
-    else if (needsreselection && ii0 >= (anchors.begin() + sd.pop0.size())) {
-      bnds0->selectSites(sd.pop0.begin(), sd.pop0.end());
-      needsreselection = false;
-    }
-    for (bnds0->rewind(); !bnds0->finished(); bnds0->next()) {
-      int i1 = bnds0->site1();
-      if (hasmask && !pq.getPairMask(i0, i1)) continue;
-      const int summationscale = (usefullsum || i0 == i1) ? -1 : -2;
-      pq.addPairContribution(*bnds0, summationscale);
+  // A structure of the same content has no sites to remove or to add.
+  // It needs no bond generators, which copy all positions of a crystal.
+  if (!sd.pop0.empty()) {
+    int cntsites0 = sd.stru0->countSites();
+    BaseBondGeneratorPtr bnds0 = sd.stru0->createBondGenerator();
+    pq.configureBondGenerator(*bnds0);
+    // the loop is adjusted according to usefullsum and split within
+    // the outer loop in case of parallel evaluation.
+    SiteIndices anchors = sd.pop0;
+    SiteIndices unchanged = complementary_indices(cntsites0, sd.pop0);
+    anchors.insert(anchors.end(), unchanged.begin(), unchanged.end());
+    bnds0->selectSites(anchors.begin(), anchors.end());
+    SiteIndices::const_iterator last_anchor =
+      usefullsum ? anchors.end() : (anchors.begin() + sd.pop0.size());
+    SiteIndices::const_iterator ii0;
+    bool needsreselection = usefullsum;
+    for (ii0 = anchors.begin(); ii0 != last_anchor; ++ii0) {
+      if (n++ % mncpu) continue;
+      const int& i0 = *ii0;
+      bnds0->selectAnchorSite(i0);
+      // when using half sum, deselect visited popped sites
+      if (!usefullsum) bnds0->selectSites(ii0, anchors.end());
+      // when using full sum, select only the popped sites when
+      // anchored at an unchanged atom
+      else if (needsreselection && ii0 >= (anchors.begin() + sd.pop0.size())) {
+        bnds0->selectSites(sd.pop0.begin(), sd.pop0.end());
+        needsreselection = false;
+      }
+      for (bnds0->rewind(); !bnds0->finished(); bnds0->next()) {
+        int i1 = bnds0->site1();
+        if (hasmask && !pq.getPairMask(i0, i1)) continue;
+        const int summationscale = (usefullsum || i0 == i1) ? -1 : -2;
+        pq.addPairContribution(*bnds0, summationscale);
+      }
     }
   }
   // Add contributions from the new atoms in the updated structure
@@ -210,47 +233,78 @@ void PQEvaluatorOptimized::updateValue(PairQuantity& pq,
     return this->updateValueCompletely(pq, stru);
   }
   pq.restorePartialValue();
-  int cntsites1 = sd.stru1->countSites();
-  BaseBondGeneratorPtr bnds1 = sd.stru1->createBondGenerator();
-  pq.configureBondGenerator(*bnds1);
-  anchors = sd.add1;
-  unchanged.clear();
   if (!sd.add1.empty()) {
-    unchanged = complementary_indices(cntsites1, sd.add1);
+    int cntsites1 = sd.stru1->countSites();
+    BaseBondGeneratorPtr bnds1 = sd.stru1->createBondGenerator();
+    pq.configureBondGenerator(*bnds1);
+    SiteIndices anchors = sd.add1;
+    SiteIndices unchanged = complementary_indices(cntsites1, sd.add1);
     anchors.insert(anchors.begin(), unchanged.begin(), unchanged.end());
-  }
-  bnds1->selectSites(sd.add1.begin(), sd.add1.end());
-  SiteIndices::const_iterator first_anchor =
-    usefullsum ? anchors.begin() : (anchors.end() - sd.add1.size());
-  SiteIndices::const_iterator ii1;
-  needsreselection = usefullsum;
-  for (ii1 = first_anchor; ii1 != anchors.end(); ++ii1) {
-    if (n++ % mncpu) continue;
-    const int& i0 = *ii1;
-    bnds1->selectAnchorSite(i0);
-    // when using half sum, activate the added site
-    if (!usefullsum) bnds1->selectSites(anchors.begin(), ii1 + 1);
-    // when using full sum select unchanged atoms once anchored
-    // at an added atom.
-    else if (needsreselection && ii1 >= (anchors.end() - sd.add1.size())) {
-      bnds1->selectSites(anchors.begin(), anchors.end());
-      needsreselection = false;
+    bnds1->selectSites(sd.add1.begin(), sd.add1.end());
+    SiteIndices::const_iterator first_anchor =
+      usefullsum ? anchors.begin() : (anchors.end() - sd.add1.size());
+    SiteIndices::const_iterator ii1;
+    bool needsreselection = usefullsum;
+    for (ii1 = first_anchor; ii1 != anchors.end(); ++ii1) {
+      if (n++ % mncpu) continue;
+      const int& i0 = *ii1;
+      bnds1->selectAnchorSite(i0);
+      // when using half sum, activate the added site
+      if (!usefullsum) bnds1->selectSites(anchors.begin(), ii1 + 1);
+      // when using full sum select unchanged atoms once anchored
+      // at an added atom.
+      else if (needsreselection && ii1 >= (anchors.end() - sd.add1.size())) {
+        bnds1->selectSites(anchors.begin(), anchors.end());
+        needsreselection = false;
+      }
+      for (bnds1->rewind(); !bnds1->finished(); bnds1->next()) {
+        int i1 = bnds1->site1();
+        if (hasmask && !pq.getPairMask(i0, i1)) continue;
+        const int summationscale = (usefullsum || i0 == i1) ? +1 : +2;
+        pq.addPairContribution(*bnds1, summationscale);
+      }
     }
-    for (bnds1->rewind(); !bnds1->finished(); bnds1->next()) {
-      int i1 = bnds1->site1();
-      if (hasmask && !pq.getPairMask(i0, i1)) continue;
-      const int summationscale = (usefullsum || i0 == i1) ? +1 : +2;
-      pq.addPairContribution(*bnds1, summationscale);
-    }
   }
-  mlast_structure = pq.getStructure()->clone();
+  // The saved geometry must use the site order of the new scattering arrays.
+  // A sorted comparison can report empty differences after a permutation.
+  const bool sameorder =
+    sd.diffmethod == StructureDifference::Method::SIDEBYSIDE &&
+    sd.pop0.empty() && sd.add1.empty();
+  mlast_structure = sameorder ? last_structure : pq.getStructure()->clone();
   mvalue_ticker.click();
 }
 
 void PQEvaluatorOptimized::updateValueCompletely(PairQuantity& pq,
                                                  StructureAdapterPtr stru) {
+  mlast_structure.reset();
   this->PQEvaluatorBasic::updateValue(pq, stru);
   mlast_structure = pq.getStructure()->clone();
+  mlastkernel = &kernels::activeCalculationKernel();
+}
+
+// True when a sum of all pairs is expected to take less work than the fast
+// update of the changed sites.
+
+bool PQEvaluatorOptimized::allPairsTakeLessWork(
+  const PairQuantity& pq, const StructureDifference& sd) const {
+  // A change of whether the calculator adds all pairs forces a full
+  // calculation anyway.
+  if (!maddedallpairs) return false;
+  // A sum on the device beats any fast update on the CPU.
+  const bool changes = !sd.pop0.empty() || !sd.add1.empty();
+  if (pq.mallpairs.ondevice) return changes;
+  // share of the pairs that have one of the sites
+  auto pairshare = [](const SiteIndices& sites, const StructureAdapter& s) {
+    if (sites.empty()) return 0.0;
+    const double others = 1.0 - double(sites.size()) / s.countSites();
+    return 1.0 - others * others;
+  };
+  const double pairs = pq.mallpairs.pairs;
+  const double fastwork =
+    (pairshare(sd.pop0, *sd.stru0) + pairshare(sd.add1, *sd.stru1)) * pairs;
+  const double fullwork =
+    ALLPAIRS_PAIR_WORK * pairs + ALLPAIRS_PEAK_WORK * pq.mallpairs.peaks;
+  return fullwork < ALLPAIRS_WORK_MARGIN * fastwork;
 }
 
 // Helper classes and functions for PQEvaluatorCheck -------------------------
@@ -373,6 +427,7 @@ PQEvaluatorPtr createPQEvaluator(PQEvaluatorType pqtp, PQEvaluatorPtr pqevsrc) {
     rv->mncpu = pqevsrc->mncpu;
     rv->mvalue_ticker = pqevsrc->mvalue_ticker;
     rv->mtypeused = pqevsrc->mtypeused;
+    rv->maddedallpairs = pqevsrc->maddedallpairs;
   }
   return rv;
 }

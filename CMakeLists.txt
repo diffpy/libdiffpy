@@ -42,6 +42,7 @@ option(LIBDIFFPY_TEST_INSTALLED
   "Build only the unit tests and link them with the installed libdiffpy" OFF)
 set(LIBDIFFPY_TESTS "" CACHE STRING
   "Comma or space separated patterns selecting the Test*.cpp unit test files")
+option(LIBDIFFPY_CUDA "Build the CUDA calculation kernels" OFF)
 option(LIBDIFFPY_COVERAGE "Instrument the build for coverage analysis" OFF)
 option(LIBDIFFPY_PROFILE "Build with gprof profiling information" OFF)
 
@@ -78,10 +79,13 @@ if(PROJECT_IS_TOP_LEVEL)
   if(MSVC)
     # /W3 rather than /Wall, which floods the log with warnings from the
     # standard library and boost headers.
-    add_compile_options(/W3)
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/W3>)
     add_link_options(/OPT:NOREF /OPT:NOICF)
   else()
-    add_compile_options(-Wall $<$<CONFIG:Release>:-ffast-math>)
+    # for the C++ sources, nvcc does not take these options
+    add_compile_options(
+      $<$<COMPILE_LANGUAGE:CXX>:-Wall>
+      $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Release>>:-ffast-math>)
   endif()
 endif()
 
@@ -91,12 +95,12 @@ if(MSVC AND (LIBDIFFPY_COVERAGE OR LIBDIFFPY_PROFILE))
 endif()
 
 if(LIBDIFFPY_COVERAGE)
-  add_compile_options(--coverage -O0 -g)
+  add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:--coverage;-fprofile-update=atomic;-O0;-g>")
   add_link_options(--coverage)
 endif()
 
 if(LIBDIFFPY_PROFILE)
-  add_compile_options(-pg)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pg>)
   add_link_options(-pg)
 endif()
 
@@ -247,6 +251,11 @@ if(LIBDIFFPY_HAS_OBJCRYST)
 else()
   set(DIFFPY_HAS_OBJCRYST 0)
 endif()
+if(LIBDIFFPY_CUDA)
+  set(DIFFPY_HAS_CUDA 1)
+else()
+  set(DIFFPY_HAS_CUDA 0)
+endif()
 set(_features_header "${_generated_include_dir}/diffpy/features.hpp")
 configure_file("${PROJECT_SOURCE_DIR}/src/diffpy/features.tpl"
   "${_features_header}")
@@ -343,11 +352,19 @@ if(LIBDIFFPY_HAS_OBJCRYST)
   target_link_libraries(diffpy PUBLIC ObjCryst::ObjCryst)
 endif()
 include(CalculationKernels)
+if(LIBDIFFPY_CUDA)
+  include(Cuda)
+endif()
 
 # Installation ----------------------------------------------------------------
 
 if(LIBDIFFPY_INSTALL)
   set(LIBDIFFPY_CMAKE_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/libdiffpy")
+  if(LIBDIFFPY_CUDA AND NOT _libdiffpy_library_type STREQUAL "SHARED_LIBRARY")
+    # A static libdiffpy leaves the CUDA kernels to the program that links it.
+    install(TARGETS diffpy_cuda EXPORT libdiffpyTargets
+      ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT Development)
+  endif()
 
   install(TARGETS diffpy EXPORT libdiffpyTargets
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Runtime

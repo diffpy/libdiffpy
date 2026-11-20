@@ -104,6 +104,7 @@ class DLL_EXPORT DebyePDFCalculator : public BaseDebyeSum,
   virtual void resetValue();
   virtual void configureBondGenerator(BaseBondGenerator&) const;
   virtual double sfSiteAtQ(int, const double& Q) const;
+  virtual bool addAllPairContributions();
 
  private:
   // methods

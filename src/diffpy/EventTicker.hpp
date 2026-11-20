@@ -41,6 +41,7 @@ class DLL_EXPORT EventTicker {
 
   // methods
   /// record an event and advance the global ticker.
+  /// Tickers of different threads may click at the same time.
   void click();
   /// advance internal ticker if the other ticker is newer.
   void updateFrom(const EventTicker& other);
@@ -56,8 +57,10 @@ class DLL_EXPORT EventTicker {
   bool operator!=(const EventTicker&) const;
 
  private:
-  // global counter
-  static value_type gtick;
+  /// Advance the global counter and return its new value.
+  static value_type advanceGlobalTick();
+  /// Return the current value of the global counter.
+  static value_type globalTick();
 
   // data
   value_type mtick;
@@ -66,6 +69,7 @@ class DLL_EXPORT EventTicker {
   friend class boost::serialization::access;
   template <class Archive>
   void save(Archive& ar, const unsigned int version) const {
+    const value_type gtick = globalTick();
     ar << mtick << gtick;
   }
 
@@ -73,6 +77,7 @@ class DLL_EXPORT EventTicker {
   void load(Archive& ar, const unsigned int version) {
     value_type ga;
     ar >> mtick >> ga;
+    const value_type gtick = globalTick();
     if (ga > gtick) {
       if (ga.first != gtick.first)
         mtick.first = mtick.second = 0;

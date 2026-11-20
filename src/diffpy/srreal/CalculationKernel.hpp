@@ -24,12 +24,12 @@
 namespace diffpy {
 namespace srreal {
 
-/// Names of the kernels that this build and CPU can run, from the most to
-/// the least preferred: "avx512", "avx2" and "sse2" on x86-64, "neon" on
-/// arm64, and "scalar", which is last and always available.
+/// Names of the kernels that this build and machine can run, CPU kernels
+/// first in order of preference.  A compatible CUDA device adds "cuda" and
+/// "cuda-mixed", which only run full PDF and Debye sums.
 DLL_EXPORT std::vector<std::string> availableCalculationKernels();
 
-/// Name of the kernel in use, by default the most preferred one.
+/// Name of the kernel in use, by default the first available one.
 DLL_EXPORT std::string getCalculationKernel();
 
 /// Use the named kernel for all calculators.

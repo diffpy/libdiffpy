@@ -20,6 +20,8 @@
  *
  *****************************************************************************/
 
+#include <mutex>
+
 #include <diffpy/EventTicker.hpp>
 #include <diffpy/serialization.ipp>
 
@@ -36,14 +38,7 @@ EventTicker::EventTicker() : mtick(0, 0) {}
 
 // Public Methods ------------------------------------------------------------
 
-void EventTicker::click() {
-  ++gtick.second;
-  if (0 >= gtick.second) {
-    ++gtick.first;
-    gtick.second = 0;
-  }
-  mtick = gtick;
-}
+void EventTicker::click() { mtick = advanceGlobalTick(); }
 
 void EventTicker::updateFrom(const EventTicker& other) {
   if (other > *this) mtick = other.mtick;
@@ -75,9 +70,31 @@ bool EventTicker::operator!=(const EventTicker& other) const {
   return mtick != other.mtick;
 }
 
-// Static Global Data --------------------------------------------------------
+// Private Static Methods ----------------------------------------------------
 
-EventTicker::value_type EventTicker::gtick(0, 0);
+namespace {
+
+// Tickers click also while other files initialize their static objects,
+// so the counter and its mutex must be initialized at compile time.
+constinit std::mutex gtickmutex;
+constinit EventTicker::value_type gtick(0, 0);
+
+}  // namespace
+
+EventTicker::value_type EventTicker::advanceGlobalTick() {
+  const std::lock_guard<std::mutex> lock(gtickmutex);
+  ++gtick.second;
+  if (0 >= gtick.second) {
+    ++gtick.first;
+    gtick.second = 0;
+  }
+  return gtick;
+}
+
+EventTicker::value_type EventTicker::globalTick() {
+  const std::lock_guard<std::mutex> lock(gtickmutex);
+  return gtick;
+}
 
 }  // namespace eventticker
 }  // namespace diffpy

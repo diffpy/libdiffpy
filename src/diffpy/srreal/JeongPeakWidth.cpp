@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 #include <diffpy/srreal/JeongPeakWidth.hpp>
-#include <diffpy/mathutils.hpp>
+#include <diffpy/srreal/kernels/PairGeometry.hpp>
 #include <diffpy/serialization.ipp>
 
 namespace diffpy {
@@ -63,11 +63,17 @@ double JeongPeakWidth::calculate(const BaseBondGenerator& bnds) const {
   double r = bnds.distance();
   double corr = this->msdSharpeningRatio(r);
   // avoid calculating square root of negative value
-  double fwhm = (corr <= 0)
-                  ? 0.0
-                  : (sqrt(corr) * this->DebyeWallerPeakWidth::calculate(bnds) +
-                     pow(this->getQbroad_seperable() * r, 2));
-  return fwhm;
+  // The bond calculates its displacement only when it is needed.
+  return (corr <= 0)
+           ? 0.0
+           : kernels::sharpenedWidth(r, corr, bnds.msd(), mqbroad_seperable);
+}
+
+double JeongPeakWidth::calculateFromMSD(double r, double msdval) const {
+  double corr = this->msdSharpeningRatio(r);
+  return (corr <= 0)
+           ? 0.0
+           : kernels::sharpenedWidth(r, corr, msdval, mqbroad_seperable);
 }
 
 double JeongPeakWidth::maxWidth(StructureAdapterPtr stru, double rmin,
@@ -114,12 +120,7 @@ void JeongPeakWidth::setQbroad(double qbroad) {
 // Private Methods -----------------------------------------------------------
 
 double JeongPeakWidth::msdSharpeningRatio(const double& r) const {
-  using diffpy::mathutils::DOUBLE_EPS;
-  // avoid division by zero
-  if (r < DOUBLE_EPS) return 0.0;
-  double rv = 1.0 - this->getDelta1() / r - this->getDelta2() / pow(r, 2) +
-              pow(this->getQbroad() * r, 2);
-  return rv;
+  return kernels::sharpeningRatio(r, mdelta1, mdelta2, mqbroad);
 }
 
 // Registration --------------------------------------------------------------
